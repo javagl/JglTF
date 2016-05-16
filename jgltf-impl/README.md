@@ -53,7 +53,7 @@ as follows:
 A more generic solution for reading glTF data, including improved 
 error handling and the option to conveniently obtain the associated
 (binary) data of glTF is offered by the 
-[jgltf-model](https://github.com/javagl/JglTF/jgltf-model) library.
+[jgltf-model](https://github.com/javagl/JglTF/tree/master/jgltf-model) library.
 
 
  

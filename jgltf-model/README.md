@@ -6,7 +6,7 @@ Transmission Format, in Java
 **Note:** This library is still subject to change.
 
 This library extends the basic auto-generated 
-[jgltf-impl](https://github.com/javagl/JglTF/jgltf-impl) library
+[jgltf-impl](https://github.com/javagl/JglTF/tree/master/jgltf-impl) library
 by classes that offer the entities and data that appear in a
 glTF in a form that is more convenient for the use in Java. For example,
 the raw data buffers of glTF are offered as `ByteBuffer` instances, and 
