@@ -18,20 +18,20 @@ An overview of the current functionality:
 * Basic browsing by right-clicking references and selecting the referenced
 element:
  
-![GltfBrowser_browsing_01.png](https://github.com/javagl/JglTF/images/GltfBrowser_browsing_01.png)
+![GltfBrowser_browsing_01.png](https://github.com/javagl/JglTF/blob/master/images/GltfBrowser_browsing_01.png)
 
 * Viewing images (of textures):
 
-![GltfBrowser_images_01.png](https://github.com/javagl/JglTF/images/GltfBrowser_images_01.png)
+![GltfBrowser_images_01.png](https://github.com/javagl/JglTF/blob/master/images/GltfBrowser_images_01.png)
 
 
 * Viewing the source code of vertex- and fragment shaders:
 
-![GltfBrowser_shaders_01.png](https://github.com/javagl/JglTF/images/GltfBrowser_shaders_01.png)
+![GltfBrowser_shaders_01.png](https://github.com/javagl/JglTF/blob/master/images/GltfBrowser_shaders_01.png)
 
 
 * Viewing the data that is provided by accessors:
 
-![GltfBrowser_accessors_01.png](https://github.com/javagl/JglTF/images/GltfBrowser_accessors_01.png)
+![GltfBrowser_accessors_01.png](https://github.com/javagl/JglTF/blob/master/images/GltfBrowser_accessors_01.png)
 
 
