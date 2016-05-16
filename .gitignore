@@ -1,0 +1,17 @@
+/.metadata
+/.recommenders
+/.settings
+/.project
+/JglTF
+/jgltf-browser/.settings
+/jgltf-browser/.project
+/jgltf-browser/target
+/jgltf-browser/.classpath
+/jgltf-impl/.project
+/jgltf-impl/.settings
+/jgltf-impl/target
+/jgltf-impl/.classpath
+/jgltf-model/.project
+/jgltf-model/.settings
+/jgltf-model/target
+/jgltf-model/.classpath
