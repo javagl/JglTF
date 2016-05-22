@@ -18,8 +18,6 @@ for glTF, with the following properties:
 * JSON arrays that contain numbers, integers or booleans are represented 
   as Java arrays (`float[]`, `int[]` and `boolean[]`, respectively)
 * JSON arrays with objects are represented with `List<Type>`
-* JSON arrays with objects that must have unique elements (according to 
-  the specification) are represented with `Set<Type>`
 * Single number- integer- or boolean-properties are represented with
   the reference types `Float`, `Integer` and `Boolean`. They are *not*
   represented with primitive types (`float`, `int` or `boolean`) in

@@ -8,8 +8,8 @@
 
 package de.javagl.jgltf.impl;
 
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 
 /**
@@ -29,7 +29,7 @@ public class GlTF
      * &nbsp;&nbsp;The elements of this array (optional) 
      * 
      */
-    private Set<String> extensionsUsed;
+    private List<String> extensionsUsed;
     /**
      * A dictionary object of accessors. (optional)<br> 
      * Default: {} 
@@ -147,7 +147,7 @@ public class GlTF
      * @param extensionsUsed The extensionsUsed to set
      * 
      */
-    public void setExtensionsUsed(Set<String> extensionsUsed) {
+    public void setExtensionsUsed(List<String> extensionsUsed) {
         if (extensionsUsed == null) {
             this.extensionsUsed = extensionsUsed;
             return ;
@@ -164,7 +164,7 @@ public class GlTF
      * @return The extensionsUsed
      * 
      */
-    public Set<String> getExtensionsUsed() {
+    public List<String> getExtensionsUsed() {
         return this.extensionsUsed;
     }
 

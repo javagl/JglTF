@@ -8,7 +8,7 @@
 
 package de.javagl.jgltf.impl;
 
-import java.util.Set;
+import java.util.List;
 
 
 /**
@@ -28,7 +28,7 @@ public class Scene
      * &nbsp;&nbsp;The elements of this array (optional) 
      * 
      */
-    private Set<String> nodes;
+    private List<String> nodes;
 
     /**
      * The IDs of each root node. (optional)<br> 
@@ -39,7 +39,7 @@ public class Scene
      * @param nodes The nodes to set
      * 
      */
-    public void setNodes(Set<String> nodes) {
+    public void setNodes(List<String> nodes) {
         if (nodes == null) {
             this.nodes = nodes;
             return ;
@@ -56,7 +56,7 @@ public class Scene
      * @return The nodes
      * 
      */
-    public Set<String> getNodes() {
+    public List<String> getNodes() {
         return this.nodes;
     }
 

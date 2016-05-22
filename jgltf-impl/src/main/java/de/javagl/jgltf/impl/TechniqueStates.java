@@ -8,7 +8,7 @@
 
 package de.javagl.jgltf.impl;
 
-import java.util.Set;
+import java.util.List;
 
 
 /**
@@ -29,7 +29,7 @@ public class TechniqueStates
      * &nbsp;&nbsp;Valid values: [3042, 2884, 2929, 32823, 32926, 3089] 
      * 
      */
-    private Set<Integer> enable;
+    private List<Integer> enable;
     /**
      * Arguments for fixed-function rendering state functions other than 
      * `enable()`/`disable()`. (optional) 
@@ -49,7 +49,7 @@ public class TechniqueStates
      * the given constraints
      * 
      */
-    public void setEnable(Set<Integer> enable) {
+    public void setEnable(List<Integer> enable) {
         if (enable == null) {
             this.enable = enable;
             return ;
@@ -72,7 +72,7 @@ public class TechniqueStates
      * @return The enable
      * 
      */
-    public Set<Integer> getEnable() {
+    public List<Integer> getEnable() {
         return this.enable;
     }
 

@@ -8,7 +8,7 @@
 
 package de.javagl.jgltf.impl;
 
-import java.util.Set;
+import java.util.List;
 
 
 /**
@@ -40,14 +40,14 @@ public class Node
      * &nbsp;&nbsp;The elements of this array (optional) 
      * 
      */
-    private Set<String> children;
+    private List<String> children;
     /**
      * The ID of skeleton nodes. (optional)<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;The elements of this array (optional) 
      * 
      */
-    private Set<String> skeletons;
+    private List<String> skeletons;
     /**
      * The ID of the skin referenced by this node. (optional) 
      * 
@@ -75,7 +75,7 @@ public class Node
      * &nbsp;&nbsp;The elements of this array (optional) 
      * 
      */
-    private Set<String> meshes;
+    private List<String> meshes;
     /**
      * The node's unit quaternion rotation in the order (x, y, z, w), where w 
      * is the scalar. (optional)<br> 
@@ -138,7 +138,7 @@ public class Node
      * @param children The children to set
      * 
      */
-    public void setChildren(Set<String> children) {
+    public void setChildren(List<String> children) {
         if (children == null) {
             this.children = children;
             return ;
@@ -155,7 +155,7 @@ public class Node
      * @return The children
      * 
      */
-    public Set<String> getChildren() {
+    public List<String> getChildren() {
         return this.children;
     }
 
@@ -167,7 +167,7 @@ public class Node
      * @param skeletons The skeletons to set
      * 
      */
-    public void setSkeletons(Set<String> skeletons) {
+    public void setSkeletons(List<String> skeletons) {
         if (skeletons == null) {
             this.skeletons = skeletons;
             return ;
@@ -183,7 +183,7 @@ public class Node
      * @return The skeletons
      * 
      */
-    public Set<String> getSkeletons() {
+    public List<String> getSkeletons() {
         return this.skeletons;
     }
 
@@ -287,7 +287,7 @@ public class Node
      * @param meshes The meshes to set
      * 
      */
-    public void setMeshes(Set<String> meshes) {
+    public void setMeshes(List<String> meshes) {
         if (meshes == null) {
             this.meshes = meshes;
             return ;
@@ -303,7 +303,7 @@ public class Node
      * @return The meshes
      * 
      */
-    public Set<String> getMeshes() {
+    public List<String> getMeshes() {
         return this.meshes;
     }
 

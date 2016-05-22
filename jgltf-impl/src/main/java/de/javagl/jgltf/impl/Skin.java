@@ -8,7 +8,7 @@
 
 package de.javagl.jgltf.impl;
 
-import java.util.Set;
+import java.util.List;
 
 
 /**
@@ -45,7 +45,7 @@ public class Skin
      * &nbsp;&nbsp;The elements of this array (optional) 
      * 
      */
-    private Set<String> jointNames;
+    private List<String> jointNames;
 
     /**
      * Floating-point 4x4 transformation matrix stored in column-major order. 
@@ -127,7 +127,7 @@ public class Skin
      * @throws NullPointerException If the given value is <code>null</code>
      * 
      */
-    public void setJointNames(Set<String> jointNames) {
+    public void setJointNames(List<String> jointNames) {
         if (jointNames == null) {
             throw new NullPointerException((("Invalid value for jointNames: "+ jointNames)+", may not be null"));
         }
@@ -143,7 +143,7 @@ public class Skin
      * @return The jointNames
      * 
      */
-    public Set<String> getJointNames() {
+    public List<String> getJointNames() {
         return this.jointNames;
     }
 
