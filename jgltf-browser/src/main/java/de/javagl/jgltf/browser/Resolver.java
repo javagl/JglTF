@@ -182,6 +182,8 @@ class Resolver
         m.put("glTF.nodes.*.camera", gltf.getCameras());
         m.put("glTF.nodes.*.meshes.*", gltf.getMeshes());
         m.put("glTF.nodes.*.children.*", gltf.getNodes());
+        m.put("glTF.nodes.*.skeletons.*", gltf.getNodes());
+        m.put("glTF.nodes.*.skin", gltf.getSkins());
         m.put("glTF.meshes.*.primitives.*.material", gltf.getMaterials());
         m.put("glTF.meshes.*.primitives.*.attributes.*", gltf.getAccessors());
         m.put("glTF.meshes.*.primitives.*.indices", gltf.getAccessors());
