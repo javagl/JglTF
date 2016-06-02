@@ -51,7 +51,7 @@ public final class AnimationRunner
     /**
      * The step size, in milliseconds
      */
-    private final long stepSizeMs = 25;
+    private final long stepSizeMs = 10;
     
     /**
      * Create a new runner for the given {@link AnimationManager}
@@ -85,7 +85,7 @@ public final class AnimationRunner
      * Stop this runner. If the runner is not {@link #isRunning()},
      * then this has no effect.
      */
-    synchronized void stop()
+    public synchronized void stop()
     {
         if (!isRunning())
         {

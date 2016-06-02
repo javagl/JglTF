@@ -109,7 +109,7 @@ public final class AnimationManager
      * Reset this manager to its initial state. This will also update
      * all {@link Animation}s with a time of 0.0.
      */
-    void reset()
+    public void reset()
     {
         startNs = System.nanoTime();
         currentNs = System.nanoTime();
