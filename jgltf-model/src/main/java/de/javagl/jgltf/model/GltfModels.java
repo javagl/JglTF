@@ -89,6 +89,11 @@ public class GltfModels
      * GL_INT_VEC4       : An int[] array of appropriate size
      * </code></pre> 
      * 
+     * TODO : This method does not yet support arrays/lists of values. 
+     * When the technique.parameters.count of the respective uniform
+     * is defined and greater than 1, then the return type should
+     * be a List of the types summarized above. 
+     * 
      * @param uniformName The uniform name
      * @param technique The {@link Technique}
      * @param material The {@link Material}

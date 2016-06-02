@@ -29,7 +29,10 @@ package de.javagl.jgltf.model;
 import de.javagl.jgltf.impl.Accessor;
 
 /**
- * Utility methods related to {@link Accessor}s
+ * Utility methods related to {@link Accessor}s.<br>
+ * <br>
+ * Unless otherwise noted, none of the arguments to these methods may 
+ * be <code>null</code>.
  */
 public class Accessors
 {
@@ -47,18 +50,12 @@ public class Accessors
      * </code></pre>
      * 
      * @param accessorType The {@link Accessor#getType()}. 
-     * May not be <code>null</code>
      * @return The number of components
      * @throws IllegalArgumentException If the given type is none of the
      * valid parameters
      */
     public static int getNumComponentsForAccessorType(String accessorType)
     {
-        if (accessorType == null)
-        {
-            throw new IllegalArgumentException(
-                "Invalid accessor type: "+accessorType);
-        }
         switch (accessorType)
         {
             case "SCALAR": return 1;

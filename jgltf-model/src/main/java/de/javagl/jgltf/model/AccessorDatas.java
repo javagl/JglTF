@@ -35,7 +35,10 @@ import de.javagl.jgltf.impl.BufferView;
  * Methods to create instances of the {@link Accessor} data utility classes
  * that allow a <i>typed</i> access to the data that is provided by the
  * {@link GltfData#getBufferViewAsByteBuffer(String) bufferViews} that
- * the {@link Accessor} refers to.
+ * the {@link Accessor} refers to.<br>
+ * <br>
+ * Unless otherwise noted, none of the arguments to these methods may 
+ * be <code>null</code>.
  */
 public class AccessorDatas
 {
@@ -86,7 +89,9 @@ public class AccessorDatas
      * @return The {@link AccessorByteData}
      * @throws IllegalArgumentException If the 
      * {@link Accessor#getComponentType() component type} of the given
-     * accessor is not <code>GL_BYTE</code> or <code>GL_UNSIGNED_BYTE</code> 
+     * accessor is not <code>GL_BYTE</code> or <code>GL_UNSIGNED_BYTE</code>
+     * @throws GltfException If the {@link Accessor#getBufferView()} refers
+     * to a {@link BufferView} that does not exist 
      */
     public static AccessorByteData createByte(
         Accessor accessor, GltfData gltfData)
@@ -94,6 +99,11 @@ public class AccessorDatas
         String bufferViewId = accessor.getBufferView();
         ByteBuffer bufferViewByteBuffer = 
             gltfData.getBufferViewAsByteBuffer(bufferViewId);
+        if (bufferViewByteBuffer == null)
+        {
+            throw new GltfException("The accessor buffer view with ID " + 
+                bufferViewId + " does not exist");
+        }
         return createByte(accessor, bufferViewByteBuffer);
     }
     
@@ -166,6 +176,8 @@ public class AccessorDatas
      * @throws IllegalArgumentException If the 
      * {@link Accessor#getComponentType() component type} of the given
      * accessor is not <code>GL_SHORT</code> or <code>GL_UNSIGNED_SHORT</code> 
+     * @throws GltfException If the {@link Accessor#getBufferView()} refers
+     * to a {@link BufferView} that does not exist 
      */
     public static AccessorShortData createShort(
         Accessor accessor, GltfData gltfData)
@@ -173,6 +185,11 @@ public class AccessorDatas
         String bufferViewId = accessor.getBufferView();
         ByteBuffer bufferViewByteBuffer = 
             gltfData.getBufferViewAsByteBuffer(bufferViewId);
+        if (bufferViewByteBuffer == null)
+        {
+            throw new GltfException("The accessor buffer view with ID " + 
+                bufferViewId + " does not exist");
+        }
         return createShort(accessor, bufferViewByteBuffer);
     }
     
@@ -244,6 +261,8 @@ public class AccessorDatas
      * @throws IllegalArgumentException If the 
      * {@link Accessor#getComponentType() component type} of the given
      * accessor is not <code>GL_INT</code> or <code>GL_UNSIGNED_INT</code> 
+     * @throws GltfException If the {@link Accessor#getBufferView()} refers
+     * to a {@link BufferView} that does not exist 
      */
     public static AccessorIntData createInt(
         Accessor accessor, GltfData gltfData)
@@ -251,6 +270,11 @@ public class AccessorDatas
         String bufferViewId = accessor.getBufferView();
         ByteBuffer bufferViewByteBuffer = 
             gltfData.getBufferViewAsByteBuffer(bufferViewId);
+        if (bufferViewByteBuffer == null)
+        {
+            throw new GltfException("The accessor buffer view with ID " + 
+                bufferViewId + " does not exist");
+        }
         return createInt(accessor, bufferViewByteBuffer);
     }
     
@@ -316,6 +340,8 @@ public class AccessorDatas
      * @throws IllegalArgumentException If the 
      * {@link Accessor#getComponentType() component type} of the given
      * accessor is not <code>GL_FLOAT</code>
+     * @throws GltfException If the {@link Accessor#getBufferView()} refers
+     * to a {@link BufferView} that does not exist 
      */
     public static AccessorFloatData createFloat(
         Accessor accessor, GltfData gltfData)
@@ -323,6 +349,11 @@ public class AccessorDatas
         String bufferViewId = accessor.getBufferView();
         ByteBuffer bufferViewByteBuffer = 
             gltfData.getBufferViewAsByteBuffer(bufferViewId);
+        if (bufferViewByteBuffer == null)
+        {
+            throw new GltfException("The accessor buffer view with ID " + 
+                bufferViewId + " does not exist");
+        }
         return createFloat(accessor, bufferViewByteBuffer);
     }
     

@@ -87,7 +87,7 @@ public class GltfDataLoader
     /**
      * The constant indicating JSON scene format
      */
-    private static final int SCENE_FORMAT_JSON =0;
+    private static final int SCENE_FORMAT_JSON = 0;
     
     /**
      * Load the {@link GltfData} from the given URI
@@ -167,7 +167,7 @@ public class GltfDataLoader
         if (length != data.length)
         {
             throw new IOException(
-                "The length field indicated "+length+" bytes for, " + 
+                "The length field indicated "+length+" bytes, " + 
                 "but only found " + data.length + " have been read");
         }
         int sceneLength = intData.get(3);

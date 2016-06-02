@@ -29,7 +29,10 @@ package de.javagl.jgltf.model;
 import de.javagl.jgltf.impl.Node;
 
 /**
- * Utility methods related to {@link Node}s
+ * Utility methods related to {@link Node}s.<br>
+ * <br>
+ * Unless otherwise noted, none of the arguments to these methods may 
+ * be <code>null</code>.
  */
 class Nodes
 {
@@ -41,8 +44,7 @@ class Nodes
      * are not <code>null</code>, respectively.
      * 
      * The result will be written to the given array, as a 4x4 matrix in 
-     * column major order. The given array may not be <code>null</code>, 
-     * and must at least have a length of 16. 
+     * column major order. The given array must at least have a length of 16. 
      * 
      * @param node The node
      * @param localTransform The array that will store the result

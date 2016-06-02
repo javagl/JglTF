@@ -42,6 +42,9 @@ public class Techniques
      * @param technique The {@link Technique}
      * @param uniformName The uniform name
      * @return The {@link TechniqueParameters}
+     * @throws GltfException If the given technique does not
+     * contain a technique parameter ID for the uniform with the given name, 
+     * or no technique parameters with the respective ID
      */
     public static TechniqueParameters getUniformTechniqueParameters(
         Technique technique, String uniformName)
@@ -51,8 +54,20 @@ public class Techniques
         // the technique parameter IDs to the TechniqueParameters. 
         String techniqueParameterId = 
             technique.getUniforms().get(uniformName);
+        if (techniqueParameterId == null)
+        {
+            throw new GltfException(
+                "No technique parameter ID for uniform with name " + 
+                uniformName + " found in technique");
+        }
         TechniqueParameters techniqueParameters = 
             technique.getParameters().get(techniqueParameterId);
+        if (techniqueParameters == null)
+        {
+            throw new GltfException(
+                "No technique parameters for technique parameter ID " +
+                techniqueParameterId + " found in technique");
+        }
         return techniqueParameters;
     }
 
@@ -63,6 +78,9 @@ public class Techniques
      * @param technique The {@link Technique}
      * @param attributeName The program attribute name
      * @return The {@link TechniqueParameters}
+     * @throws GltfException If the given technique does not
+     * contain a technique parameter ID for the attribute with the given name, 
+     * or no technique parameters with the respective ID
      */
     public static TechniqueParameters getAttributeTechniqueParameters(
         Technique technique, String attributeName)
@@ -72,8 +90,20 @@ public class Techniques
         // map technique parameter IDs to TechniqueParameters.
         String techniqueParameterId = 
             technique.getAttributes().get(attributeName);
+        if (techniqueParameterId == null)
+        {
+            throw new GltfException(
+                "No technique parameter ID for attribue with name " + 
+                    attributeName + " found in technique");
+        }
         TechniqueParameters techniqueParameters = 
             technique.getParameters().get(techniqueParameterId);
+        if (techniqueParameters == null)
+        {
+            throw new GltfException(
+                "No technique parameters for technique parameter ID " +
+                techniqueParameterId + " found in technique");
+        }
         return techniqueParameters;
     }
 
