@@ -29,20 +29,19 @@ package de.javagl.jgltf.browser;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLConnection;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CancellationException;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.BorderFactory;
 import javax.swing.JDesktopPane;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -54,13 +53,14 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
-import javax.swing.SwingConstants;
-import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import de.javagl.jgltf.model.GltfData;
 import de.javagl.jgltf.model.GltfDataLoader;
+import de.javagl.jgltf.model.GltfDataLoader.ProgressListener;
 import de.javagl.jgltf.model.JsonError;
+import de.javagl.swing.tasks.SwingTask;
+import de.javagl.swing.tasks.SwingTaskExecutors;
 
 /**
  * The main glTF browser application class, containing the main frame 
@@ -182,7 +182,8 @@ class GltfBrowserApplication
         
         openFileChooser = new JFileChooser(".");
         openFileChooser.setFileFilter(
-            new FileNameExtensionFilter("glTF Files", "gltf", "glb"));
+            new FileNameExtensionFilter(
+                "glTF Files (.gltf, .glb)", "gltf", "glb"));
         
         desktopPane = new JDesktopPane();
         frame.getContentPane().add(desktopPane);
@@ -262,8 +263,8 @@ class GltfBrowserApplication
      */
     void openUriInBackground(URI uri)
     {
-        // The Swing worker that executes the loader in a background thread
-        class Worker extends SwingWorker<GltfData, Object>
+        // The Swing task that executes the loader in a background thread
+        class Worker extends SwingTask<GltfData, Object>
         {
             /**
              * The list of JsonError instances that have occurred during 
@@ -275,7 +276,32 @@ class GltfBrowserApplication
             @Override
             public GltfData doInBackground() throws IOException
             {
-                return GltfDataLoader.load(uri, e -> jsonErrors.add(e));
+                String message = "Loading glTF from " + extractFileName(uri);
+                long contentLength = getContentLength(uri);
+                if (contentLength >= 0)
+                {
+                    message += " (" + 
+                        NumberFormat.getNumberInstance().format(contentLength) + 
+                        " bytes)";
+                }
+                message += String.format("%30s", "");
+                setMessage(message);
+                
+                ProgressListener progressListener = new ProgressListener()
+                {
+                    @Override
+                    public void updateMessage(String message)
+                    {
+                        setMessage(message);
+                    }
+                    @Override
+                    public void updateProgress(double progress)
+                    {
+                        setProgress(progress);
+                    }
+                }; 
+                return GltfDataLoader.load(uri, e -> jsonErrors.add(e), 
+                    progressListener);
             }
 
             @Override
@@ -286,6 +312,10 @@ class GltfBrowserApplication
                     GltfData gltfData = get();
                     createGltfBrowserPanel(uri.toString(), gltfData);
                 } 
+                catch (CancellationException e)
+                {
+                    return;
+                }
                 catch (Exception e)
                 {
                     e.printStackTrace();
@@ -334,70 +364,16 @@ class GltfBrowserApplication
                 }
                 return sb.toString();
             }
-            
         }
         
-        // A PropertyChangeListener that hides the (modal) dialog
-        // when the worker is done
-        class WorkerCompletionWaiter implements PropertyChangeListener 
-        {
-            /**
-             * The dialog that will be shown while loading
-             */
-            private final JDialog dialog;
-
-            /**
-             * Create the new work completion waiter
-             * 
-             * @param dialog The dialog that will be shown while loading
-             */
-            WorkerCompletionWaiter(JDialog dialog) 
-            {
-                this.dialog = dialog;
-            }
-
-            @Override
-            public void propertyChange(PropertyChangeEvent event) 
-            {
-                if ("state".equals(event.getPropertyName()) && 
-                    SwingWorker.StateValue.DONE == event.getNewValue()) 
-                {
-                    dialog.setVisible(false);
-                    dialog.dispose();
-                }
-            }
-        }
         Worker worker = new Worker();
-        JDialog dialog = new JDialog(frame, true);
-        
-        // Try to obtain the size of the input file
-        String contentLengthString = "";
-        try
-        {
-            URLConnection connection = uri.toURL().openConnection();
-            int contentLength = connection.getContentLength();
-            if (contentLength > 0)
-            {
-                contentLengthString = String.valueOf(contentLength)+" bytes ";
-            }
-        }
-        catch (IOException e)
-        {
-            // Ignored
-        }
-        
-        JLabel label = new JLabel(
-            "Loading " + contentLengthString + "from " + uri,
-            SwingConstants.CENTER);
-        label.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        dialog.getContentPane().add(label);
-        worker.addPropertyChangeListener(new WorkerCompletionWaiter(dialog));
-        worker.execute();
-        dialog.pack();
-        dialog.setLocationRelativeTo(frame);
-        dialog.setVisible(true);
+        SwingTaskExecutors.create(worker)
+            .setTitle("Loading")
+            .setMillisToDecideToPopup(250)
+            .setCancelable(true)
+            .build()
+            .execute();        
     }
-    
     
     /**
      * Create the {@link GltfBrowserPanel} for the given {@link GltfData}, 
@@ -440,5 +416,44 @@ class GltfBrowserApplication
         frame.dispose();
     }
 
+    /**
+     * Tries to extract the "file name" that is referred to with the 
+     * given URI. If no file name can be extracted, then the string
+     * representation of the URI is returned.
+     * 
+     * @param uri The URI
+     * @return The file name
+     */
+    private static String extractFileName(URI uri)
+    {
+        String s = uri.toString();
+        int lastSlashIndex = s.lastIndexOf('/');
+        if (lastSlashIndex != -1)
+        {
+            return s.substring(lastSlashIndex+1);
+        }
+        return s;
+    }
+    
+    /**
+     * Try to obtain the content length from the given URI. Returns -1
+     * if the content length can not be determined.
+     * 
+     * @param uri The URI
+     * @return The content length
+     */
+    static long getContentLength(URI uri)
+    {
+        try
+        {
+            URLConnection connection = uri.toURL().openConnection();
+            return connection.getContentLengthLong();
+        }
+        catch (IOException e)
+        {
+            return -1;
+        }
+    }
+    
     
 }

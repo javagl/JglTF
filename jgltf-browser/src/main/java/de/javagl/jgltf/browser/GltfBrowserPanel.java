@@ -52,12 +52,20 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import de.javagl.common.ui.tree.filtered.FilteredTree;
+import de.javagl.common.ui.tree.filtered.TreeModelFilter;
+import de.javagl.jgltf.browser.ObjectTrees.NodeEntry;
 import de.javagl.jgltf.browser.Resolver.ResolvedEntity;
 import de.javagl.jgltf.impl.GlTF;
 import de.javagl.jgltf.model.GltfData;
@@ -82,7 +90,7 @@ class GltfBrowserPanel extends JPanel
     /**
      * The tree that displays the glTF structure
      */
-    private final JTree tree;
+    private JTree tree;
     
     /**
      * The history of tree paths that have been selected
@@ -165,7 +173,30 @@ class GltfBrowserPanel extends JPanel
         add(sp, BorderLayout.EAST);
         */
         
-        tree = ObjectTrees.create("glTF", gltfData.getGltf());
+        mainSplitPane.setLeftComponent(
+            new JScrollPane(createTreePanel(gltfData.getGltf())));
+        
+        infoPanelContainer = new JPanel(new GridLayout(1,1));
+        mainSplitPane.setRightComponent(infoPanelContainer);
+    }
+    
+    /**
+     * Create the panel containing the (filterable, browsable) tree 
+     * showing the structure of the given {@link GlTF}
+     *  
+     * @param gltf The {@link GlTF}
+     * @return The tree panel
+     */
+    private JPanel createTreePanel(GlTF gltf)
+    {
+        JPanel treePanel = new JPanel(new BorderLayout());
+
+        TreeModel originalTreeModel = 
+            ObjectTrees.createTreeModel("glTF", gltf);
+        FilteredTree filteredTree = 
+            FilteredTree.create(originalTreeModel);
+        tree = filteredTree.getTree();
+        tree.setCellRenderer(new NodeEntryTreeCellRenderer());
         tree.addTreeSelectionListener(e -> treeSelectionChanged());
         
         JPopupMenu popupMenu = new JPopupMenu();
@@ -185,13 +216,97 @@ class GltfBrowserPanel extends JPanel
             }
         };
         tree.addMouseListener(popupMenuMouseListener);        
+        treePanel.add(new JScrollPane(tree), BorderLayout.CENTER);
         
-        mainSplitPane.setLeftComponent(new JScrollPane(tree));
+
+        JTextField filterTextField = new JTextField();
+        treePanel.add(filterTextField, BorderLayout.NORTH);
+        filterTextField.getDocument().addDocumentListener(new DocumentListener()
+        {
+            @Override
+            public void removeUpdate(DocumentEvent e)
+            {
+                update();
+            }
+            
+            @Override
+            public void insertUpdate(DocumentEvent e)
+            {
+                update();
+            }
+            
+            @Override
+            public void changedUpdate(DocumentEvent e)
+            {
+                update();
+            }
+            
+            private void update()
+            {
+                String s = filterTextField.getText();
+                if (s == null || s.trim().length() == 0)
+                {
+                    filteredTree.setFilter(null);
+                }
+                else
+                {
+                    filteredTree.setFilter(
+                        createNodeEntryModelFilter(s));
+                }
+            }
+        });        
         
-        infoPanelContainer = new JPanel(new GridLayout(1,1));
-        mainSplitPane.setRightComponent(infoPanelContainer);
-        
+        return treePanel;
     }
+    
+    /**
+     * Creates a tree model filter that accepts a node when it is a  
+     * <code>DefaultMutableTreeNode</code> that contains a 
+     * <code>NodeEntry</code> as its user object, whose
+     * {@link NodeEntryTreeCellRenderer#createString(NodeEntry) string
+     * representation} case-insensitively contains the given string,
+     * or when it has a descendant to which this property applies
+     * 
+     * @param string The string to look for
+     * @return The filter
+     */
+    private TreeModelFilter createNodeEntryModelFilter(String string)
+    {
+        return new TreeModelFilter()
+        {
+            @Override
+            public boolean acceptNode(TreeModel treeModel, TreeNode node)
+            {
+                if (!(node instanceof DefaultMutableTreeNode))
+                {
+                    return false;
+                }
+                DefaultMutableTreeNode n = (DefaultMutableTreeNode)node;
+                Object userObject = n.getUserObject();
+                if (!(userObject instanceof NodeEntry))
+                {
+                    return false;
+                }
+                NodeEntry nodeEntry = (NodeEntry)userObject;
+                String nodeEntryString = 
+                    NodeEntryTreeCellRenderer.createString(nodeEntry);
+                if (nodeEntryString.toLowerCase().contains(
+                    string.toLowerCase())) 
+                {
+                    return true;
+                }
+                for (int i=0; i<node.getChildCount(); i++)
+                {
+                    if (acceptNode(treeModel, node.getChildAt(i)))
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        };        
+    }
+    
     
     /**
      * Create the control panel

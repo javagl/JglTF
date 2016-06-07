@@ -27,15 +27,19 @@
 package de.javagl.jgltf.model;
 
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLConnection;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Base64;
+import java.util.function.LongConsumer;
 
 import javax.imageio.ImageIO;
 
@@ -93,19 +97,83 @@ class IO
      * be an actual URI, or a data URI with base64 encoded data.
      * 
      * @param uri The URI
+     * @param totalNumBytesReadConsumer An optional consumer for the total
+     * number of bytes that have been read from the input.
      * @return The byte array
      * @throws IOException If an IO error occurs
      */
-    static byte[] read(URI uri) throws IOException
+    static byte[] read(URI uri, LongConsumer totalNumBytesReadConsumer) 
+        throws IOException
     {
         if ("data".equalsIgnoreCase(uri.getScheme()))
         {
             return readDataUri(uri.toString());
         }
-        try (InputStream inputStream = uri.toURL().openStream())
+        try (InputStream inputStream = 
+                createInputStream(uri, totalNumBytesReadConsumer))
         {
             byte data[] = readStream(inputStream);
             return data;
+        }
+    }
+    
+    /**
+     * Creates an input stream from the given URI. If the given consumer
+     * is not <code>null</code>, then it will be informed about the 
+     * number of bytes that have been read from the returned stream.
+     * 
+     * @param uri The URI
+     * @param totalNumBytesReadConsumer An optional consumer for the total
+     * number of bytes that have been read from the input.
+     * @return The input stream
+     * @throws IOException If the stream can not be created
+     */
+    static InputStream createInputStream(
+        URI uri, LongConsumer totalNumBytesReadConsumer) throws IOException
+    {
+        InputStream inputStream = uri.toURL().openStream();
+        if (totalNumBytesReadConsumer == null)
+        {
+            return inputStream;
+        }
+        ProgressInputStream progressInputStream = 
+            new ProgressInputStream(inputStream);
+        PropertyChangeListener listener = new PropertyChangeListener()
+        {
+            @Override
+            public void propertyChange(PropertyChangeEvent event)
+            {
+                if (event.getPropertyName().equals("totalNumBytesRead"))
+                {
+                    Object newValue = event.getNewValue();
+                    Number number = (Number)newValue;
+                    totalNumBytesReadConsumer.accept(
+                        number.longValue());
+                }
+            }
+        };
+        progressInputStream.addPropertyChangeListener(listener);
+        return progressInputStream;
+    }
+    
+    
+    /**
+     * Try to obtain the content length from the given URI. Returns -1
+     * if the content length can not be determined.
+     * 
+     * @param uri The URI
+     * @return The content length
+     */
+    static long getContentLength(URI uri)
+    {
+        try
+        {
+            URLConnection connection = uri.toURL().openConnection();
+            return connection.getContentLengthLong();
+        }
+        catch (IOException e)
+        {
+            return -1;
         }
     }
 
@@ -133,25 +201,29 @@ class IO
      * 
      * @param inputStream The input stream to read
      * @return The data from the inputStream
-     * @throws IOException If an IO error occurs
+     * @throws IOException If an IO error occurs, or if the thread that
+     * executes this method is interrupted.
      */
     private static byte[] readStream(InputStream inputStream) throws IOException
     {
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream())
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        byte buffer[] = new byte[8192];
+        while (true)
         {
-            byte buffer[] = new byte[8192];
-            while (true)
+            int read = inputStream.read(buffer);
+            if (read == -1)
             {
-                int read = inputStream.read(buffer);
-                if (read == -1)
-                {
-                    break;
-                }
-                baos.write(buffer, 0, read);
+                break;
             }
-            baos.flush();
-            return baos.toByteArray();
+            baos.write(buffer, 0, read);
+            if (Thread.currentThread().isInterrupted())
+            {
+                throw new IOException("Interrupted while reading stream",
+                    new InterruptedException());
+            }
         }
+        baos.flush();
+        return baos.toByteArray();
     }
     
     /**
@@ -165,7 +237,7 @@ class IO
     static ByteBuffer readAsByteBuffer(
         URI uri) throws IOException 
     {
-        byte data[] = read(uri);
+        byte data[] = read(uri, null);
         ByteBuffer byteBuffer = ByteBuffer.allocateDirect(data.length);
         byteBuffer.order(ByteOrder.nativeOrder());
         byteBuffer.put(data);
@@ -183,7 +255,7 @@ class IO
      */
     static String readAsString(URI uri) throws IOException
     {
-        return new String(read(uri));
+        return new String(read(uri, null));
     }
     
     /**
@@ -196,7 +268,8 @@ class IO
     static BufferedImage readAsBufferedImage(
         URI uri) throws IOException
     {
-        try (InputStream inputStream = new ByteArrayInputStream(read(uri)))
+        try (InputStream inputStream = 
+                new ByteArrayInputStream(read(uri, null)))
         {
             BufferedImage bufferedImage = ImageIO.read(inputStream);
             return bufferedImage;

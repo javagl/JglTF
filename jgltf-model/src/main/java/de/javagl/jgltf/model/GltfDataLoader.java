@@ -34,11 +34,13 @@ import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
+import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
+import java.util.function.LongConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -90,6 +92,30 @@ public class GltfDataLoader
     private static final int SCENE_FORMAT_JSON = 0;
     
     /**
+     * Interface for classes that may be informed about the progress 
+     * of loading the glTF data
+     */
+    public interface ProgressListener
+    {
+        /**
+         * Will be called when the message changed.
+         * 
+         * @param message A message indicating what is currently loaded
+         */
+        void updateMessage(String message);
+        
+        /**
+         * Will be called when the progress of loading the data changed.
+         * 
+         * @param progress A progress value. This may be a value in [0.0, 1.0]
+         * to indicate the progress, or it may be &lt;0 to indicate that
+         * the progress is not known.
+         */
+        void updateProgress(double progress);
+        
+    }
+    
+    /**
      * Load the {@link GltfData} from the given URI
      * 
      * @param uri The URI
@@ -98,31 +124,206 @@ public class GltfDataLoader
      * @return The {@link GltfData}
      * @throws IOException If an IO error occurs
      */
-    public static GltfData load(URI uri, Consumer<JsonError> jsonErrorConsumer) 
+    public static GltfData load(URI uri, 
+        Consumer<JsonError> jsonErrorConsumer) 
+        throws IOException
+    {
+        return load(uri, jsonErrorConsumer, null);
+    }
+    
+    /**
+     * Load the {@link GltfData} from the given URI
+     * 
+     * @param uri The URI
+     * @param jsonErrorConsumer The consumer for {@link JsonError}s. If this 
+     * is <code>null</code>, then log messages will be created for errors
+     * @param progressListener An optional {@link ProgressListener} that will 
+     * be informed about the progress of loading the data
+     * @return The {@link GltfData}
+     * @throws IOException If an IO error occurs
+     */
+    public static GltfData load(URI uri, 
+        Consumer<JsonError> jsonErrorConsumer, 
+        ProgressListener progressListener) 
         throws IOException
     {
         GltfData gltfData = null;
-        if (uri.toString().endsWith(".glb"))
+        if (uri.toString().toLowerCase().endsWith(".glb"))
         {
-            byte data[] = IO.read(uri);
+            byte data[] = IO.read(uri, 
+                createReadBytesConsumer(uri, progressListener));
             gltfData = createBinaryGltfData(uri, data, jsonErrorConsumer);
         }
         else
         {
-            GlTF gltf = readGltf(uri, jsonErrorConsumer);
+            GlTF gltf = readGltf(uri, jsonErrorConsumer, progressListener);
             gltfData = new GltfData(uri, gltf);
         }
 
         URI baseUri = IO.getParent(uri);
-        readBuffersAsByteBuffers(gltfData, baseUri);
+        readBuffersAsByteBuffers(gltfData, baseUri, progressListener);
         createBufferViewsAsByteBuffers(gltfData);
-        readImagesAsBufferedImages(gltfData, baseUri);
-        readShadersAsStrings(gltfData, baseUri);
+        readImagesAsBufferedImages(gltfData, baseUri, progressListener);
+        readShadersAsStrings(gltfData, baseUri, progressListener);
         createExtractedAccessorByteBuffers(gltfData);
         
         return gltfData;
     }
     
+    /**
+     * Create a consumer for the number of bytes that have been read from
+     * the given URI, forwarding the information as a progress value in 
+     * [0.0, 1.0] to the given progress listener. If the given progress
+     * listener is <code>null</code>, or the total size can not be 
+     * obtained from the given URI, then <code>null</code> will be returned.
+     *  
+     * @param uri The URI
+     * @param progressListener The progress listener
+     * @return The consumer
+     */
+    private static LongConsumer createReadBytesConsumer(
+        URI uri, ProgressListener progressListener)
+    {
+        if (progressListener == null)
+        {
+            return null;
+        }
+        long contentLength = IO.getContentLength(uri);
+        if (contentLength <= 0)
+        {
+            return null;
+        }
+        return totalNumBytesRead -> 
+        {
+            double progress = (double)totalNumBytesRead / contentLength;
+            if (progress >= 1.0)
+            {
+                progress = -1.0;
+            }
+            progressListener.updateProgress(progress);
+        };
+    }
+
+    
+    /**
+     * Read the {@link Buffer} data of the {@link GlTF} and store
+     * it in the given {@link GltfData}
+     * 
+     * @param gltfData The {@link GltfData}
+     * @param baseUri The base URI against which relative URIs will be resolved
+     * @param progressListener An optional {@link ProgressListener} that will 
+     * be informed about the progress of loading the data
+     * @throws IOException If the data can not be read
+     */
+    private static void readBuffersAsByteBuffers(
+        GltfData gltfData, URI baseUri, ProgressListener progressListener) 
+            throws IOException
+    {
+        GlTF gltf = gltfData.getGltf();
+        if (gltf.getBuffers() == null)
+        {
+            return;
+        }
+        for (Entry<String, Buffer> entry : gltf.getBuffers().entrySet())
+        {
+            String id = entry.getKey();
+            if (!id.equals(BINARY_GLTF_BUFFER_ID))
+            {
+                Buffer buffer = entry.getValue();
+                String bufferUriString = buffer.getUri();
+                URI absoluteUri = IO.makeAbsolute(baseUri, bufferUriString);
+                
+                String message = createMessageString(
+                    "Reading buffer data from", absoluteUri);
+                if (progressListener != null)
+                {
+                    progressListener.updateMessage(message);
+                }
+                logger.log(level, message);
+    
+                ByteBuffer bufferAsByteBuffer = 
+                    IO.readAsByteBuffer(absoluteUri);
+                
+                logger.log(level, "Reading buffer data DONE");
+                
+                gltfData.putBufferAsByteBuffer(id, bufferAsByteBuffer);
+            }
+        }
+    }
+    
+    
+    /**
+     * Read the {@link Image} data of the {@link GlTF} and store
+     * it in the given {@link GltfData}
+     * 
+     * @param gltfData The {@link GltfData}
+     * @param baseUri The base URI against which relative URIs will be resolved
+     * @param progressListener An optional {@link ProgressListener} that will 
+     * be informed about the progress of loading the data
+     * @throws IOException If the data can not be read
+     */
+    private static void readImagesAsBufferedImages(
+        GltfData gltfData, URI baseUri, ProgressListener progressListener) 
+            throws IOException
+    {
+        GlTF gltf = gltfData.getGltf();
+        if (gltf.getImages() == null)
+        {
+            return;
+        }
+        for (Entry<String, Image> entry : gltf.getImages().entrySet())
+        {
+            String id = entry.getKey();
+            Image image = entry.getValue();
+            
+            Map<String, Object> binaryGltfExtensionMap = 
+                getExtensionMap(image, KHRONOS_BINARY_GLTF_EXTENSION_NAME);
+            if (binaryGltfExtensionMap != null)
+            {
+                String message = "Reading image data from binary buffer";
+                logger.log(level, message);
+                if (progressListener != null)
+                {
+                    progressListener.updateMessage(message);
+                }
+
+                String bufferViewId = String.valueOf(
+                    binaryGltfExtensionMap.get("bufferView"));
+                ByteBuffer bufferViewByteBuffer = 
+                    gltfData.getBufferViewAsByteBuffer(bufferViewId);
+                try (InputStream inputStream = 
+                    createByteBufferInputStream(bufferViewByteBuffer.slice()))
+                {
+                    BufferedImage imageAsBufferedImage =
+                        ImageIO.read(inputStream);
+                    gltfData.putImageAsBufferedImage(id, imageAsBufferedImage);
+                    logger.log(level, 
+                        "Reading image data from binary buffer DONE");
+                }
+            }
+            else
+            {
+                String imageUriString = image.getUri();
+                URI absoluteUri = IO.makeAbsolute(baseUri, imageUriString);
+                
+                String message = createMessageString(
+                    "Reading image data from", absoluteUri);
+                if (progressListener != null)
+                {
+                    progressListener.updateMessage(message);
+                }
+                logger.log(level, message);
+                
+                BufferedImage imageAsBufferedImage = 
+                    IO.readAsBufferedImage(absoluteUri);
+                
+                logger.log(level, "Reading image data DONE");
+                
+                gltfData.putImageAsBufferedImage(id, imageAsBufferedImage);
+            }
+        }
+    }
+        
     
     /**
      * Create the {@link GltfData} from the given data that was read from
@@ -302,17 +503,29 @@ public class GltfDataLoader
      * @param uri The input URI
      * @param jsonErrorConsumer The consumer for {@link JsonError}s. If this 
      * is <code>null</code>, then log messages will be created for errors
+     * @param progressListener An optional {@link ProgressListener} that will 
+     * be informed about the progress of loading the data
      * @return The {@link GlTF}
      * @throws IOException If the {@link GlTF} could not be read
      */
-    private static GlTF readGltf(URI uri, Consumer<JsonError> jsonErrorConsumer) 
+    private static GlTF readGltf(
+        URI uri, Consumer<JsonError> jsonErrorConsumer,
+        ProgressListener progressListener) 
         throws IOException
     {
-        logger.log(level, "Reading glTF from "+uri);
+        String message = createMessageString("Reading glTF", uri);
+        if (progressListener != null)
+        {
+            progressListener.updateMessage(message);
+        }
+        logger.log(level, message);
 
         ObjectMapper objectMapper = new ObjectMapper();
         JacksonUtils.configure(objectMapper, jsonErrorConsumer);
-        try (InputStream inputStream = uri.toURL().openStream())
+        LongConsumer totalNumBytesReadConsumer = 
+            createReadBytesConsumer(uri, progressListener);
+        try (InputStream inputStream = 
+            IO.createInputStream(uri, totalNumBytesReadConsumer))
         {
             GlTF gltf = objectMapper.readValue(inputStream, GlTF.class);
             logger.log(level, "Reading glTF DONE");
@@ -320,111 +533,21 @@ public class GltfDataLoader
         }
     }
     
-    /**
-     * Read the {@link Buffer} data of the {@link GlTF} and store
-     * it in the given {@link GltfData}
-     * 
-     * @param gltfData The {@link GltfData}
-     * @param baseUri The base URI against which relative URIs will be resolved
-     * @throws IOException If the data can not be read
-     */
-    private static void readBuffersAsByteBuffers(
-        GltfData gltfData, URI baseUri) throws IOException
-    {
-        GlTF gltf = gltfData.getGltf();
-        if (gltf.getBuffers() == null)
-        {
-            return;
-        }
-        for (Entry<String, Buffer> entry : gltf.getBuffers().entrySet())
-        {
-            String id = entry.getKey();
-            if (!id.equals(BINARY_GLTF_BUFFER_ID))
-            {
-                Buffer buffer = entry.getValue();
-                String bufferUriString = buffer.getUri();
-                
-                logger.log(level, "Reading buffer data from "+bufferUriString);
-    
-                ByteBuffer bufferAsByteBuffer = 
-                    IO.readAsByteBuffer(
-                        IO.makeAbsolute(baseUri, bufferUriString));
-                
-                logger.log(level, "Reading buffer data DONE");
-                
-                gltfData.putBufferAsByteBuffer(id, bufferAsByteBuffer);
-            }
-        }
-    }
-    
-    /**
-     * Read the {@link Image} data of the {@link GlTF} and store
-     * it in the given {@link GltfData}
-     * 
-     * @param gltfData The {@link GltfData}
-     * @param baseUri The base URI against which relative URIs will be resolved
-     * @throws IOException If the data can not be read
-     */
-    private static void readImagesAsBufferedImages(
-        GltfData gltfData, URI baseUri) throws IOException
-    {
-        GlTF gltf = gltfData.getGltf();
-        if (gltf.getImages() == null)
-        {
-            return;
-        }
-        for (Entry<String, Image> entry : gltf.getImages().entrySet())
-        {
-            String id = entry.getKey();
-            Image image = entry.getValue();
-            
-            Map<String, Object> binaryGltfExtensionMap = 
-                getExtensionMap(image, KHRONOS_BINARY_GLTF_EXTENSION_NAME);
-            if (binaryGltfExtensionMap != null)
-            {
-                logger.log(level, "Reading image data from binary buffer");
 
-                String bufferViewId = String.valueOf(
-                    binaryGltfExtensionMap.get("bufferView"));
-                ByteBuffer bufferViewByteBuffer = 
-                    gltfData.getBufferViewAsByteBuffer(bufferViewId);
-                try (InputStream inputStream = 
-                    createByteBufferInputStream(bufferViewByteBuffer.slice()))
-                {
-                    BufferedImage imageAsBufferedImage =
-                        ImageIO.read(inputStream);
-                    gltfData.putImageAsBufferedImage(id, imageAsBufferedImage);
-                    logger.log(level, 
-                        "Reading image data from binary buffer DONE");
-                }
-            }
-            else
-            {
-                String imageUriString = image.getUri();
-                
-                logger.log(level, "Reading image data from "+imageUriString);
-                
-                BufferedImage imageAsBufferedImage = 
-                    IO.readAsBufferedImage(
-                        IO.makeAbsolute(baseUri, imageUriString));
-                
-                logger.log(level, "Reading image data DONE");
-                
-                gltfData.putImageAsBufferedImage(id, imageAsBufferedImage);
-            }
-        }
-    }
-    
+
     /**
      * Read the {@link Shader} data of the {@link GlTF} and store
      * it in the given {@link GltfData}
      * 
      * @param gltfData The {@link GltfData}
      * @param baseUri The base URI against which relative URIs will be resolved
+     * @param progressListener An optional {@link ProgressListener} that will 
+     * be informed about the progress of loading the data
      * @throws IOException If the data can not be read
      */
     private static void readShadersAsStrings(
-        GltfData gltfData, URI baseUri) throws IOException
+        GltfData gltfData, URI baseUri, ProgressListener progressListener) 
+            throws IOException
     {
         GlTF gltf = gltfData.getGltf();
         if (gltf.getPrograms() == null)
@@ -435,9 +558,9 @@ public class GltfDataLoader
         {
             Program program = entry.getValue();
             readShader(gltfData, baseUri, program, "vertex", 
-                program.getVertexShader());
+                program.getVertexShader(), progressListener);
             readShader(gltfData, baseUri, program, "fragment", 
-                program.getFragmentShader());
+                program.getFragmentShader(), progressListener);
             
         }
     }
@@ -452,11 +575,14 @@ public class GltfDataLoader
      * @param shaderType The shader type string, for example,
      * <code>"vertex"</code> or <code>"fragment"</code>
      * @param shaderId The {@link Shader} ID
+     * @param progressListener An optional {@link ProgressListener} that will 
+     * be informed about the progress of loading the data
      * @throws IOException If the data can not be read
      */
     private static void readShader(
         GltfData gltfData, URI baseUri, Program program, 
-        String shaderType, String shaderId) throws IOException
+        String shaderType, String shaderId, 
+        ProgressListener progressListener) throws IOException
     {
         GlTF gltf = gltfData.getGltf();
         Shader shader = gltf.getShaders().get(shaderId);
@@ -465,8 +591,13 @@ public class GltfDataLoader
             getExtensionMap(shader, KHRONOS_BINARY_GLTF_EXTENSION_NAME);
         if (binaryGltfExtensionMap != null)
         {
-            logger.log(level, "Reading " + shaderType + 
-                " shader data from binary buffer");
+            String message = "Reading " + shaderType +
+                " shader data from binary buffer";
+            if (progressListener != null)
+            {
+                progressListener.updateMessage(message);
+            }
+            logger.log(level, message);
             
             String bufferViewId = String.valueOf(
                 binaryGltfExtensionMap.get("bufferView"));
@@ -482,13 +613,17 @@ public class GltfDataLoader
         else
         {
             String shaderUriString = shader.getUri();
+            URI absoluteUri = IO.makeAbsolute(baseUri, shaderUriString);
             
-            logger.log(level, "Reading " + shaderType + 
-                " shader data from "+shaderUriString);
+            String message = createMessageString("Reading " + shaderType +
+                " shader data from", absoluteUri);
+            if (progressListener != null)
+            {
+                progressListener.updateMessage(message);
+            }
+            logger.log(level, message);
             
-            String shaderCode =
-                IO.readAsString(
-                    IO.makeAbsolute(baseUri, shaderUriString));
+            String shaderCode = IO.readAsString(absoluteUri);
             
             logger.log(level, "Reading " + shaderType + " shader data DONE");
             
@@ -552,7 +687,9 @@ public class GltfDataLoader
         if (byteLength == null)
         {
             // TODO The default value should be 0, but this simply
-            // does not make sense...
+            // does not make sense. 
+            // Updated: In glTF 1.0.1, the byte length will be required:
+            // https://github.com/KhronosGroup/glTF/issues/560
             byteLength = bufferAsByteBuffer.capacity() - byteOffset;
         }
         
@@ -682,7 +819,50 @@ public class GltfDataLoader
         return accessorByteBuffer;
     }
     
+    /**
+     * Create a string for logging- and progress messages
+     * 
+     * @param messagePrefix The prefix for the message
+     * @param absoluteUri The URI that the data is read from
+     * @return The message string
+     */
+    private static String createMessageString(
+        String messagePrefix, URI absoluteUri)
+    {
+        if ("data".equalsIgnoreCase(absoluteUri.getScheme()))
+        {
+            return messagePrefix + " data URI";
+        }
+        String message = messagePrefix + " " + extractFileName(absoluteUri);
+        long contentLength = IO.getContentLength(absoluteUri);
+        if (contentLength >= 0)
+        {
+            
+            message += " (" + 
+                NumberFormat.getNumberInstance().format(contentLength) + 
+                " bytes)";
+        }
+        return message;
+    }
     
+    /**
+     * Tries to extract the "file name" that is referred to with the 
+     * given URI. If no file name can be extracted, then the string
+     * representation of the URI is returned.
+     * 
+     * @param uri The URI
+     * @return The file name
+     */
+    private static String extractFileName(URI uri)
+    {
+        String s = uri.toString();
+        int lastSlashIndex = s.lastIndexOf('/');
+        if (lastSlashIndex != -1)
+        {
+            return s.substring(lastSlashIndex+1);
+        }
+        return s;
+    }
     
     /**
      * Private constructor to prevent instantiation

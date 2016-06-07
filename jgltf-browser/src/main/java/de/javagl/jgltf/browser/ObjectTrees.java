@@ -42,8 +42,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
-import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
@@ -116,19 +116,19 @@ class ObjectTrees
     
     
     /**
-     * Create a <code>JTree</code> for the given object
+     * Create a <code>TreeModel</code> for the given object
      * 
      * @param rootNodeName The root node name
      * @param object The object
-     * @return The tree
+     * @return The tree model
      */
-    static JTree create(String rootNodeName, Object object)
+    static TreeModel createTreeModel(String rootNodeName, Object object)
     {
         DefaultMutableTreeNode node = createNode(rootNodeName, object);
-        JTree tree = new JTree(node);
-        tree.setCellRenderer(new NodeEntryTreeCellRenderer());
-        return tree;
+        TreeModel treeModel = new DefaultTreeModel(node);
+        return treeModel;
     }
+    
     
     /**
      * Recursively create the tree node for the given object
