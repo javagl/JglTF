@@ -117,7 +117,7 @@ class InfoComponentFactory
         Object selectedValue = ObjectTrees.getNodeEntryValue(selectionPath);
         String pathString = ObjectTrees.createPathString(selectionPath);
 
-        logger.fine("selected      "+selectedValue); // XXX
+        logger.fine("selected      "+selectedValue);
         logger.fine("pathString is "+pathString);
         
         // Check if the selected path is a GL constant. In this case, 
@@ -127,6 +127,10 @@ class InfoComponentFactory
         glConstantPaths.add("glTF.accessors.*.componentType");
         glConstantPaths.add("glTF.techniques.*.parameters.*.type");
         glConstantPaths.add("glTF.techniques.*.states.enable.*");
+        glConstantPaths.add("glTF.textures.*.format");
+        glConstantPaths.add("glTF.textures.*.internalFormat");
+        glConstantPaths.add("glTF.textures.*.target");
+        glConstantPaths.add("glTF.textures.*.type");
         for (String glConstantPath : glConstantPaths)
         {
             if (RegEx.matches(pathString, glConstantPath))

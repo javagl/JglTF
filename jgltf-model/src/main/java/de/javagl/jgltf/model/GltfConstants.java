@@ -208,6 +208,12 @@ public class GltfConstants
      */
     public static final int GL_FRAGMENT_SHADER = 35632; 
     
+    
+    /**
+     * The GL_TEXTURE_2D constant
+     */
+    public static final int GL_TEXTURE_2D = 3553;
+    
     /**
      * Returns the String representation of the given constant
      * 
@@ -255,6 +261,8 @@ public class GltfConstants
 
             case GL_VERTEX_SHADER: return "GL_VERTEX_SHADER";
             case GL_FRAGMENT_SHADER: return "GL_FRAGMENT_SHADER";
+
+            case GL_TEXTURE_2D: return "GL_TEXTURE_2D";
             
             default:
                 return "UNKNOWN_GL_CONSTANT["+constant+"]";
