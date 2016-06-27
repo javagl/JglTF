@@ -33,186 +33,202 @@ package de.javagl.jgltf.model;
 public class GltfConstants
 {
     /**
-     * The GL_BGR constant
+     * The GL_BGR constant (32992)
      */
     public static final int GL_BGR = 32992;
     
     /**
-     * The GL_RGB constant
+     * The GL_RGB constant (6407)
      */
     public static final int GL_RGB = 6407;
     
     /**
-     * The GL_RGBA constant
+     * The GL_RGBA constant (6408)
      */
     public static final int GL_RGBA = 6408;
     
     /**
-     * The GL_BGRA constant
+     * The GL_BGRA constant (32993)
      */
     public static final int GL_BGRA = 32993;
     
-
+    
     
     /**
-     * The GL_BYTE constant
+     * The GL_BYTE constant (5120)
      */
     public static final int GL_BYTE = 5120;
     
     /**
-     * The GL_UNSIGNED_BYTE constant
+     * The GL_UNSIGNED_BYTE constant (5121)
      */
     public static final int GL_UNSIGNED_BYTE = 5121;
 
     /**
-     * The GL_SHORT constant
+     * The GL_SHORT constant (5122)
      */
     public static final int GL_SHORT = 5122;
     
     /**
-     * The GL_UNSIGNED_SHORT constant
+     * The GL_UNSIGNED_SHORT constant (5123)
      */
     public static final int GL_UNSIGNED_SHORT = 5123;
     
     /**
-     * The GL_INT constant
+     * The GL_INT constant (5124)
      */
     public static final int GL_INT = 5124;
 
     /**
-     * The GL_UNSIGNED_INT constant
+     * The GL_UNSIGNED_INT constant (5125)
      */
     public static final int GL_UNSIGNED_INT = 5125;
     
     /**
-     * The GL_FLOAT constant
+     * The GL_FLOAT constant (5126)
      */
     public static final int GL_FLOAT = 5126;
     
-    
+
     
     /**
-     * The GL_FLOAT_VEC2 constant
+     * The GL_FLOAT_VEC2 constant (35664)
      */
     public static final int GL_FLOAT_VEC2 = 35664;
 
     /**
-     * The GL_FLOAT_VEC3 constant
+     * The GL_FLOAT_VEC3 constant (35665)
      */
     public static final int GL_FLOAT_VEC3 = 35665;
 
     /**
-     * The GL_FLOAT_VEC4 constant
+     * The GL_FLOAT_VEC4 constant (35666)
      */
     public static final int GL_FLOAT_VEC4 = 35666;
 
     /**
-     * The GL_INT_VEC2 constant
+     * The GL_INT_VEC2 constant (35667)
      */
     public static final int GL_INT_VEC2 = 35667;
 
     /**
-     * The GL_INT_VEC3 constant
+     * The GL_INT_VEC3 constant (35668)
      */
     public static final int GL_INT_VEC3 = 35668;
 
     /**
-     * The GL_INT_VEC4 constant
+     * The GL_INT_VEC4 constant (35669)
      */
     public static final int GL_INT_VEC4 = 35669;
 
     /**
-     * The GL_BOOL constant
+     * The GL_BOOL constant (35670)
      */
     public static final int GL_BOOL = 35670;
 
     /**
-     * The GL_BOOL_VEC2 constant
+     * The GL_BOOL_VEC2 constant (35671)
      */
     public static final int GL_BOOL_VEC2 = 35671;
 
     /**
-     * The GL_BOOL_VEC3 constant
+     * The GL_BOOL_VEC3 constant (35672)
      */
     public static final int GL_BOOL_VEC3 = 35672;
 
     /**
-     * The GL_BOOL_VEC4 constant
+     * The GL_BOOL_VEC4 constant (35673)
      */
     public static final int GL_BOOL_VEC4 = 35673;
 
     /**
-     * The GL_FLOAT_MAT2 constant
+     * The GL_FLOAT_MAT2 constant (35674)
      */
     public static final int GL_FLOAT_MAT2 = 35674;
 
     /**
-     * The GL_FLOAT_MAT3 constant
+     * The GL_FLOAT_MAT3 constant (35675)
      */
     public static final int GL_FLOAT_MAT3 = 35675;
 
     /**
-     * The GL_FLOAT_MAT4 constant
+     * The GL_FLOAT_MAT4 constant (35676)
      */
     public static final int GL_FLOAT_MAT4 = 35676;
 
     /**
-     * The GL_SAMPLER_2D constant
+     * The GL_SAMPLER_2D constant (35678)
      */
     public static final int GL_SAMPLER_2D = 35678;    
     
     
     
     /**
-     * The GL_POINTS constant
+     * The GL_POINTS constant (0)
      */
     public static final int GL_POINTS = 0;
 
     /**
-     * The GL_LINES constant
+     * The GL_LINES constant (1)
      */
     public static final int GL_LINES = 1;
 
     /**
-     * The GL_LINE_LOOP constant
+     * The GL_LINE_LOOP constant (2)
      */
     public static final int GL_LINE_LOOP = 2;
 
     /**
-     * The GL_LINE_STRIP constant
+     * The GL_LINE_STRIP constant (3)
      */
     public static final int GL_LINE_STRIP = 3;
 
     /**
-     * The GL_TRIANGLES constant
+     * The GL_TRIANGLES constant (4)
      */
     public static final int GL_TRIANGLES = 4;    
 
     /**
-     * The GL_TRIANGLE_STRIP constant
+     * The GL_TRIANGLE_STRIP constant (5)
      */
     public static final int GL_TRIANGLE_STRIP = 5;
 
     /**
-     * The GL_TRIANGLE_FAN constant
+     * The GL_TRIANGLE_FAN constant (6)
      */
     public static final int GL_TRIANGLE_FAN = 6;
     
+    
+    
     /**
-     * The GL_VERTEX_SHADER constant
+     * The GL_VERTEX_SHADER constant (35633)
      */
     public static final int GL_VERTEX_SHADER = 35633; 
     
     /**
-     * The GL_VERTEX_SHADER constant
+     * The GL_VERTEX_SHADER constant (35632)
      */
     public static final int GL_FRAGMENT_SHADER = 35632; 
     
     
+    
     /**
-     * The GL_TEXTURE_2D constant
+     * The GL_TEXTURE_2D constant (3553)
      */
     public static final int GL_TEXTURE_2D = 3553;
+    
+    
+    
+    /**
+     * The GL_ARRAY_BUFFER constant (34962)
+     */
+    public static final int GL_ARRAY_BUFFER =  34962;
+    
+    /**
+     * The GL_ELEMENT_ARRAY_BUFFER constant (34963)
+     */
+    public static final int GL_ELEMENT_ARRAY_BUFFER = 34963;
+    
     
     /**
      * Returns the String representation of the given constant
@@ -263,6 +279,9 @@ public class GltfConstants
             case GL_FRAGMENT_SHADER: return "GL_FRAGMENT_SHADER";
 
             case GL_TEXTURE_2D: return "GL_TEXTURE_2D";
+
+            case GL_ARRAY_BUFFER: return "GL_ARRAY_BUFFER";
+            case GL_ELEMENT_ARRAY_BUFFER: return "GL_ELEMENT_ARRAY_BUFFER";
             
             default:
                 return "UNKNOWN_GL_CONSTANT["+constant+"]";
