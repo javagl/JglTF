@@ -6,7 +6,7 @@
 
 The following image gives an overview of glTF:
 
-![gltfOverview-0.1.3.png](/images/gltfOverview-0.1.3.png)
+![gltfOverview.png](https://github.com/javagl/gltfOverview/releases/download/v0.2.0/gltfOverview-0.2.0.png)
 
 The libraries currently available here are
 
