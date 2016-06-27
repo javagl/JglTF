@@ -47,7 +47,7 @@ public final class AccessorIntData
     /**
      * The number of bytes that each component of this data consists of
      */
-    private static final int numBytesPerComponent = Integer.BYTES;
+    private static final int NUM_BYTES_PER_COMPONENT = Integer.BYTES;
     
     /**
      * The byte buffer of the {@link BufferView} that the {@link Accessor}
@@ -116,7 +116,7 @@ public final class AccessorIntData
         if (byteStride == null || byteStride == 0)
         {
             this.byteStridePerElement = 
-                numComponentsPerElement * numBytesPerComponent;
+                numComponentsPerElement * NUM_BYTES_PER_COMPONENT;
         }
         else
         {
@@ -180,7 +180,7 @@ public final class AccessorIntData
     {
         int byteIndex = byteOffset + 
             elementIndex * byteStridePerElement + 
-            componentIndex * numBytesPerComponent;
+            componentIndex * NUM_BYTES_PER_COMPONENT;
         return bufferViewByteBuffer.getInt(byteIndex);
     }
     
@@ -249,7 +249,7 @@ public final class AccessorIntData
     public ByteBuffer createByteBuffer()
     {
         int totalNumComponents = getTotalNumComponents();
-        int totalBytes = totalNumComponents * numBytesPerComponent;
+        int totalBytes = totalNumComponents * NUM_BYTES_PER_COMPONENT;
         ByteBuffer result = ByteBuffer.allocateDirect(totalBytes)
             .order(ByteOrder.nativeOrder());
         for (int i=0; i<totalNumComponents; i++)
