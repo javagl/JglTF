@@ -54,7 +54,7 @@ public class GltfAnimations
      * The logger used in this class
      */
     private static final Logger logger = 
-        Logger.getLogger(GltfAnimations.class.toString());
+        Logger.getLogger(GltfAnimations.class.getName());
     
     /**
      * Create a new {@link AnimationManager} for the given {@link GltfData},

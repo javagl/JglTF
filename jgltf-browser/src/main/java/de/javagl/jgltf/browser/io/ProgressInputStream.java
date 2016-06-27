@@ -24,7 +24,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.model;
+package de.javagl.jgltf.browser.io;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -36,10 +36,10 @@ import java.io.InputStream;
  * An input stream that informs property change listeners about the
  * number of bytes that are read.
  */
-class ProgressInputStream extends FilterInputStream {
-    
-    // Adapted from http://stackoverflow.com/a/1339589
-    
+class ProgressInputStream extends FilterInputStream 
+{
+    // Originally based on http://stackoverflow.com/a/1339589, heavily modified
+
     /**
      * The property change support
      */
@@ -98,20 +98,28 @@ class ProgressInputStream extends FilterInputStream {
     public int read() throws IOException
     {
         int b = super.read();
-        updateProgress(1);
+        if (b != -1)
+        {
+            updateProgress(1);
+        }
         return b;
     }
 
     @Override
     public int read(byte[] b) throws IOException
     {
-        return (int) updateProgress(super.read(b));
+        return read(b, 0, b.length);
     }
 
     @Override
     public int read(byte[] b, int off, int len) throws IOException
     {
-        return (int) updateProgress(super.read(b, off, len));
+        int read = super.read(b, off, len);
+        if (read == -1)
+        {
+            return -1;
+        }
+        return (int) updateProgress(read);
     }
 
     @Override

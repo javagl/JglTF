@@ -131,6 +131,7 @@ class InfoComponentFactory
         glConstantPaths.add("glTF.textures.*.internalFormat");
         glConstantPaths.add("glTF.textures.*.target");
         glConstantPaths.add("glTF.textures.*.type");
+        glConstantPaths.add("glTF.bufferViews.*.target");
         for (String glConstantPath : glConstantPaths)
         {
             if (RegEx.matches(pathString, glConstantPath))
@@ -324,7 +325,8 @@ class InfoComponentFactory
         if (shaderString == null)
         {
             return createMessageInfoPanel(
-                "Could not find shader data for "+selectedValue);
+                "Could not find shader data for " + selectedValue + 
+                "with ID " + key);
         }
         return createShaderInfoPanel(shaderString);
     }
@@ -349,7 +351,8 @@ class InfoComponentFactory
         if (bufferedImage == null)
         {
             return createMessageInfoPanel(
-                "Could not find image data for "+selectedValue);
+                "Could not find image data for " + selectedValue + 
+                "with ID " + key);
         }
         return createImageInfoPanel(bufferedImage);
     }

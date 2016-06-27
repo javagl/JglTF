@@ -27,17 +27,21 @@
 package de.javagl.jgltf.model;
 
 import java.awt.image.BufferedImage;
-import java.net.URI;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.util.LinkedHashMap;
+import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-import de.javagl.jgltf.impl.Accessor;
+import javax.imageio.ImageIO;
+
 import de.javagl.jgltf.impl.Buffer;
 import de.javagl.jgltf.impl.BufferView;
 import de.javagl.jgltf.impl.GlTF;
 import de.javagl.jgltf.impl.Image;
 import de.javagl.jgltf.impl.Shader;
+import de.javagl.jgltf.model.io.Buffers;
 
 /**
  * A class storing a {@link GlTF} and the associated (binary) data that was 
@@ -47,11 +51,6 @@ import de.javagl.jgltf.impl.Shader;
 public final class GltfData
 {
     /**
-     * The URI that the {@link GlTF} was read from
-     */
-    private final URI uri;
-    
-    /**
      * The {@link GlTF}
      */
     private final GlTF gltf;
@@ -59,61 +58,53 @@ public final class GltfData
     /**
      * The {@link GlTF#getBuffers()}, as byte buffers
      */
-    private final Map<String, ByteBuffer> buffersAsByteBuffers;
+    private final Map<String, ByteBuffer> bufferDatas;
 
     /**
      * The {@link GlTF#getBufferViews()}, as byte buffers
      */
-    private final Map<String, ByteBuffer> bufferViewsAsByteBuffers;
+    private final Map<String, ByteBuffer> bufferViewDatas;
 
     /**
-     * The {@link GlTF#getAccessors()}, as single byte buffers that
-     * have been extracted from the bufferView byte buffers
+     * The {@link GlTF#getImages()}, as byte buffers containing the raw data
      */
-    private final Map<String, ByteBuffer> extractedAccessorByteBuffers;
-    
+    private final Map<String, ByteBuffer> imageDatas;
+
     /**
-     * The {@link GlTF#getImages()}, as buffered images
+     * The {@link GlTF#getShaders()}, as byte buffers containing the raw data
      */
-    private final Map<String, BufferedImage> imagesAsBufferedImages;
-    
-    /**
-     * The {@link GlTF#getShaders()}, as strings
-     */
-    private final Map<String, String> shadersAsStrings;
+    private final Map<String, ByteBuffer> shaderDatas;
     
     /**
      * Creates the new {@link GltfData}. 
      * 
-     * @param uri The base URI that the {@link GlTF} was read from, and 
-     * against which all relative URIs will be resolved
      * @param gltf The {@link GlTF}
      */
-    GltfData(URI uri, GlTF gltf)
+    public GltfData(GlTF gltf)
     {
-        this.uri = uri;
         this.gltf = gltf;
         
-        this.buffersAsByteBuffers = 
-            new LinkedHashMap<String, ByteBuffer>();
-        this.bufferViewsAsByteBuffers = 
-            new LinkedHashMap<String, ByteBuffer>();
-        this.imagesAsBufferedImages = 
-            new LinkedHashMap<String, BufferedImage>();
-        this.shadersAsStrings = 
-            new LinkedHashMap<String, String>();
-        this.extractedAccessorByteBuffers = 
-            new LinkedHashMap<String, ByteBuffer>();
+        this.bufferDatas = new ConcurrentHashMap<String, ByteBuffer>();
+        this.bufferViewDatas = new ConcurrentHashMap<String, ByteBuffer>();
+        this.imageDatas = new ConcurrentHashMap<String, ByteBuffer>();
+        this.shaderDatas = new ConcurrentHashMap<String, ByteBuffer>();
     }
     
     /**
-     * Return the URI that the {@link GlTF} was read from
+     * Copy the data from the given {@link GltfData} into this one. This
+     * will establish all ID-to-data mappings that exist in the given 
+     * {@link GltfData} in this one (overwriting any existing mappings).
+     * The data elements will be copied by reference (that is, it will
+     * not create a deep copy of the data elements).
      * 
-     * @return The URI
+     * @param that The {@link GltfData} to copy
      */
-    URI getUri()
+    public void copy(GltfData that)
     {
-        return uri;
+        this.bufferDatas.putAll(that.bufferDatas);
+        this.bufferViewDatas.putAll(that.bufferViewDatas);
+        this.imageDatas.putAll(that.imageDatas);
+        this.shaderDatas.putAll(that.shaderDatas);
     }
     
     /**
@@ -127,133 +118,226 @@ public final class GltfData
     }
 
     /**
-     * Store the given shader code under the given {@link Shader} id
+     * Store the given byte buffer under the given {@link Shader} id
      * 
-     * @param id The ID
-     * @param shaderCode The shader code
+     * @param id The {@link Shader} ID
+     * @param byteBuffer The byte buffer containing the shader data
      */
-    void putShaderAsString(String id, String shaderCode)
+    public void putShaderData(String id, ByteBuffer byteBuffer)
     {
-        shadersAsStrings.put(id, shaderCode);
+        shaderDatas.put(id, byteBuffer);
     }
     
     /**
-     * Returns the string that corresponds to the code of the {@link Shader}
-     * with the given ID, or <code>null</code> if no such shader is found.
+     * Remove the data that is stored under the given {@link Shader} ID
      * 
-     * @param shaderId The {@link Shader} ID
-     * @return The shader source code
+     * @param id The {@link Shader} ID
      */
-    public String getShaderAsString(String shaderId)
+    void removeShaderData(String id)
     {
-        return shadersAsStrings.get(shaderId);
-    }
-    
-    /**
-     * Store the given buffered image under the given {@link Image} id
-     * 
-     * @param id The ID
-     * @param bufferedImage The buffered image
-     */
-    void putImageAsBufferedImage(String id, BufferedImage bufferedImage)
-    {
-        imagesAsBufferedImages.put(id, bufferedImage);
-    }
-    
-    /**
-     * Returns the buffered image that corresponds to the {@link Image}
-     * with the given ID, or <code>null</code> if no such image is found.
-     * 
-     * @param imageId The {@link Image} ID
-     * @return The byte buffer
-     */
-    public BufferedImage getImageAsBufferedImage(String imageId)
-    {
-        return imagesAsBufferedImages.get(imageId);
-    }
-    
-    
-    /**
-     * Store the given byte buffer under the given {@link BufferView} id.<br>
-     * <br>
-     * This assumes to receive a byte buffer that was extracted from the
-     * byte buffer of the buffer view that is referenced by the accessor.
-     * So the  buffer will contain exactly the elements that are
-     * relevant for the accessor, regardless of the offset and byte stride 
-     * of the accessor. 
-     * 
-     * @param id The ID
-     * @param byteBuffer The buffer
-     */
-    void putExtractedAccessorByteBuffer(String id, ByteBuffer byteBuffer)
-    {
-        extractedAccessorByteBuffers.put(id, byteBuffer);
-    }
-    
-    /**
-     * Returns the byte buffer that corresponds to the {@link Accessor}
-     * with the given ID, or <code>null</code> if no such buffer is found.<br>
-     * <br>
-     * This return a byte buffer that was extracted from the byte buffer 
-     * of the buffer view that is referenced by the accessor.
-     * So the returned buffer will contain exactly the elements that are
-     * relevant for the accessor, regardless of the offset and byte stride 
-     * of the accessor. 
-     * 
-     * @param accessorId The {@link Accessor} ID
-     * @return The byte buffer
-     */
-    public ByteBuffer getExtractedAccessorByteBuffer(String accessorId)
-    {
-        return extractedAccessorByteBuffers.get(accessorId);
-    }
-    
-    
-    /**
-     * Store the given byte buffer under the given {@link Buffer} id
-     * 
-     * @param id The ID
-     * @param byteBuffer The buffer
-     */
-    void putBufferAsByteBuffer(String id, ByteBuffer byteBuffer)
-    {
-        buffersAsByteBuffers.put(id, byteBuffer);
-    }
-    
-    /**
-     * Returns the byte buffer that corresponds to the {@link Buffer}
-     * with the given ID, or <code>null</code> if no such buffer is found.
-     * 
-     * @param bufferId The {@link Buffer} ID
-     * @return The byte buffer
-     */
-    ByteBuffer getBufferAsByteBuffer(String bufferId)
-    {
-        return buffersAsByteBuffers.get(bufferId);
+        shaderDatas.remove(id);
     }
 
     /**
-     * Store the given byte buffer under the given {@link BufferView} id
+     * Returns the byte buffer containing the data of the {@link Shader}
+     * with the given ID, or <code>null</code> if no such data is found.
      * 
-     * @param id The ID
-     * @param byteBuffer The buffer
+     * @param id The {@link Shader} ID
+     * @return The byte buffer
      */
-    void putBufferViewAsByteBuffer(String id, ByteBuffer byteBuffer)
+    public ByteBuffer getShaderData(String id)
     {
-        bufferViewsAsByteBuffers.put(id, byteBuffer);
+        return shaderDatas.get(id);
     }
     
     /**
-     * Returns the byte buffer that corresponds to the {@link BufferView}
-     * with the given ID, or <code>null</code> if no such buffer is found.
+     * Returns an unmodifiable view on the map that maps {@link Shader} IDs
+     * to the byte buffers storing the raw data.
      * 
-     * @param bufferViewId The {@link BufferView} ID
-     * @return The byte buffer
+     * @return The map
      */
-    public ByteBuffer getBufferViewAsByteBuffer(String bufferViewId)
+    public Map<String, ByteBuffer> getShaderDatas()
     {
-        return bufferViewsAsByteBuffers.get(bufferViewId);
+        return Collections.unmodifiableMap(shaderDatas);
     }
     
+    /**
+     * Convenience method that obtains the raw data of the {@link Shader} with
+     * the given ID and returns it as a string. Returns <code>null</code> if 
+     * no such data is found.
+     * 
+     * @param id The {@link Shader} ID
+     * @return The shader as a string
+     */
+    public String getShaderAsString(String id)
+    {
+        ByteBuffer shaderData = getShaderData(id);
+        if (shaderData == null)
+        {
+            return null;
+        }
+        byte data[] = new byte[shaderData.capacity()];
+        shaderData.slice().get(data);
+        return new String(data);
+    }
+    
+    /**
+     * Store the given byte buffer under the given {@link Image} ID
+     * 
+     * @param id The {@link Image} ID
+     * @param byteBuffer The byte buffer containing the image data
+     */
+    public void putImageData(String id, ByteBuffer byteBuffer)
+    {
+        imageDatas.put(id, byteBuffer);
+    }
+    
+    /**
+     * Remove data that is stored under the given {@link Image} ID
+     * 
+     * @param id The {@link Image} ID
+     */
+    void removeImageData(String id)
+    {
+        imageDatas.remove(id);
+    }
+    
+    /**
+     * Returns the byte buffer containing the data of the {@link Image}
+     * with the given ID, or <code>null</code> if no such data is found.
+     * 
+     * @param id The {@link Image} ID
+     * @return The byte buffer
+     */
+    public ByteBuffer getImageData(String id)
+    {
+        return imageDatas.get(id);
+    }
+    
+    /**
+     * Returns an unmodifiable view on the map that maps {@link Image} IDs
+     * to the byte buffers storing the raw data.
+     * 
+     * @return The map
+     */
+    public Map<String, ByteBuffer> getImageDatas()
+    {
+        return Collections.unmodifiableMap(imageDatas);
+    }
+    
+    /**
+     * Convenience method that obtains the raw data of the {@link Image} with
+     * the given ID, reads a <code>BufferedImage</code> from this data, and
+     * returns it. Returns <code>null</code> if no such data is found, or
+     * the data can not be converted into a buffered image.
+     * 
+     * @param id The {@link Image} ID
+     * @return The buffered image
+     */
+    public BufferedImage getImageAsBufferedImage(String id)
+    {
+        ByteBuffer imageData = getImageData(id);
+        if (imageData == null)
+        {
+            return null;
+        }
+        try (InputStream inputStream = 
+            Buffers.createByteBufferInputStream(imageData.slice()))
+        {
+            return ImageIO.read(inputStream);
+        }
+        catch (IOException e)
+        {
+            return null;
+        }
+    }
+    
+    /**
+     * Store the given byte buffer under the given {@link Buffer} ID
+     * 
+     * @param id The {@link Buffer} ID
+     * @param byteBuffer The byte buffer
+     */
+    public void putBufferData(String id, ByteBuffer byteBuffer)
+    {
+        bufferDatas.put(id, byteBuffer);
+    }
+    
+    /**
+     * Remove the data that is stored under the given {@link Buffer} ID
+     * 
+     * @param id The {@link Buffer} ID
+     */
+    void removeBufferData(String id)
+    {
+        bufferDatas.remove(id);
+    }
+    
+    /**
+     * Returns the byte buffer that contains the data of the {@link Buffer}
+     * with the given ID, or <code>null</code> if no such data is found.
+     * 
+     * @param id The {@link Buffer} ID
+     * @return The byte buffer
+     */
+    public ByteBuffer getBufferData(String id)
+    {
+        return bufferDatas.get(id);
+    }
+    
+    /**
+     * Returns an unmodifiable view on the map that maps {@link Buffer} IDs
+     * to the byte buffers storing the raw data.
+     * 
+     * @return The map
+     */
+    public Map<String, ByteBuffer> getBufferDatas()
+    {
+        return Collections.unmodifiableMap(bufferDatas);
+    }
+
+    /**
+     * Store the given byte buffer under the given {@link BufferView} ID
+     * 
+     * @param id The {@link BufferView} ID
+     * @param byteBuffer The byte buffer
+     */
+    public void putBufferViewData(String id, ByteBuffer byteBuffer)
+    {
+        bufferViewDatas.put(id, byteBuffer);
+    }
+    
+    /**
+     * Remove the data that is stored under the given {@link BufferView} ID
+     * 
+     * @param id The {@link BufferView} ID
+     */
+    void removeBufferViewData(String id)
+    {
+        bufferViewDatas.remove(id);
+    }
+    
+    /**
+     * Returns the byte buffer that contains the data of the {@link BufferView} 
+     * with the given ID, or <code>null</code> if no such data is found.
+     * 
+     * @param id The {@link BufferView} ID
+     * @return The byte buffer
+     */
+    public ByteBuffer getBufferViewData(String id)
+    {
+        return bufferViewDatas.get(id);
+    }
+    
+    /**
+     * Returns an unmodifiable view on the map that maps {@link BufferView} IDs
+     * to the byte buffers storing the raw data.
+     * 
+     * @return The map
+     */
+    public Map<String, ByteBuffer> getBufferViewDatas()
+    {
+        return Collections.unmodifiableMap(bufferViewDatas);
+    }
     
 }

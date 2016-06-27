@@ -24,7 +24,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.model;
+package de.javagl.jgltf.model.io;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -73,14 +73,15 @@ class JacksonUtils
     /**
      * Create a DeserializationProblemHandler that may be added to an
      * ObjectMapper, and will handle unknown properties by forwarding 
-     * the error information to the given consumer
+     * the error information to the given consumer, if it is not 
+     * <code>null</code>
      * 
      * @param jsonErrorConsumer The consumer for {@link JsonError}s
      * @return The problem handler
      */
     private static DeserializationProblemHandler 
         createDeserializationProblemHandler(
-            Consumer<JsonError> jsonErrorConsumer)
+            Consumer<? super JsonError> jsonErrorConsumer)
     {
         return new DeserializationProblemHandler()
         {
@@ -91,9 +92,12 @@ class JacksonUtils
                 String propertyName) 
                     throws IOException, JsonProcessingException
             {
-                jsonErrorConsumer.accept(new JsonError(
-                    "Unknown property: " + propertyName, 
-                    jp.getParsingContext(), null));
+                if (jsonErrorConsumer != null)
+                {
+                    jsonErrorConsumer.accept(new JsonError(
+                        "Unknown property: " + propertyName, 
+                        jp.getParsingContext(), null));
+                }
                 return super.handleUnknownProperty(
                     ctxt, jp, deserializer, beanOrClass, propertyName);
             }
@@ -107,12 +111,13 @@ class JacksonUtils
      * information about errors when setting bean properties to the
      * given consumer. (Don't ask ... )  
      * 
-     * @param jsonErrorConsumer The consumer for {@link JsonError}s
+     * @param jsonErrorConsumer The consumer for {@link JsonError}s.
+     * If this is <code>null</code>, then no errors will be reported.
      * @return The modifier
      */
     private static BeanDeserializerModifier 
         createErrorHandlingBeanDeserializerModifier(
-            Consumer<JsonError> jsonErrorConsumer)
+            Consumer<? super JsonError> jsonErrorConsumer)
     {
         return new BeanDeserializerModifier()
         {
@@ -137,7 +142,16 @@ class JacksonUtils
         };    
     }
     
-    
+    /**
+     * Returns a consumer for {@link JsonError}s that prints logging
+     * messages for the errors.
+     *  
+     * @return The consumer
+     */
+    static Consumer<JsonError> loggingJsonErrorConsumer()
+    {
+        return LOG_JSON_ERROR_CONSUMER;
+    }
     
     /**
      * Perform a default configuration of the given object mapper for
@@ -145,11 +159,11 @@ class JacksonUtils
      * 
      * @param objectMapper The object mapper
      * @param jsonErrorConsumer The consumer for {@link JsonError}s. If this 
-     * is <code>null</code>, then log messages will be created for errors
+     * is <code>null</code>, then the errors will not be handled.
      * <code>null</code>, then log outputs will be created for the errors
      */
     static void configure(
-        ObjectMapper objectMapper, Consumer<JsonError> jsonErrorConsumer)
+        ObjectMapper objectMapper, Consumer<? super JsonError> jsonErrorConsumer)
     {
         // Some glTF files have single values instead of arrays,
         // so accept this for compatibility reasons
@@ -159,12 +173,8 @@ class JacksonUtils
         objectMapper.configure(
             DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         
-        Consumer<JsonError> localJsonErrorConsumer = 
-            jsonErrorConsumer != null ? jsonErrorConsumer :
-                LOG_JSON_ERROR_CONSUMER;
-        
         objectMapper.addHandler(
-            createDeserializationProblemHandler(localJsonErrorConsumer));
+            createDeserializationProblemHandler(jsonErrorConsumer));
 
         // Register the module that will initialize the setup context
         // with the error handling bean deserializer modifier
@@ -181,7 +191,7 @@ class JacksonUtils
                 super.setupModule(context);
                 context.addBeanDeserializerModifier(
                     createErrorHandlingBeanDeserializerModifier(
-                        localJsonErrorConsumer));
+                        jsonErrorConsumer));
             }
         });
 

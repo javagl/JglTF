@@ -24,7 +24,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.model;
+package de.javagl.jgltf.model.io;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -46,6 +46,11 @@ import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
 class ErrorReportingSettableBeanProperty extends SettableBeanProperty
 {
     /**
+     * Serial UID 
+     */
+    private static final long serialVersionUID = 7398743799397469737L;
+
+    /**
      * The delegate
      */
     private final SettableBeanProperty delegate;
@@ -53,26 +58,23 @@ class ErrorReportingSettableBeanProperty extends SettableBeanProperty
     /**
      * The consumer for {@link JsonError}s
      */
-    private final Consumer<JsonError> jsonErrorConsumer;
+    private final Consumer<? super JsonError> jsonErrorConsumer;
     
     /**
      * Creates a new instance with the given delegate and error consumer
      *  
      * @param delegate The delegate
-     * @param jsonErrorConsumer Consumer for {@link JsonError}s
+     * @param jsonErrorConsumer The consumer for {@link JsonError}s. If
+     * this is <code>null</code>, then errors will be ignored.
      */
     ErrorReportingSettableBeanProperty(
-        SettableBeanProperty delegate, Consumer<JsonError> jsonErrorConsumer)
+        SettableBeanProperty delegate, 
+        Consumer<? super JsonError> jsonErrorConsumer)
     {
         super(delegate);
         this.delegate = delegate;
         this.jsonErrorConsumer = jsonErrorConsumer;
     }
-
-    /**
-     * Serial UID 
-     */
-    private static final long serialVersionUID = 7398743799397469737L;
 
     @Override
     public SettableBeanProperty
@@ -131,8 +133,11 @@ class ErrorReportingSettableBeanProperty extends SettableBeanProperty
         }
         catch (Exception e)
         {
-            jsonErrorConsumer.accept(new JsonError(
-                e.getMessage(), p.getParsingContext(), e));
+            if (jsonErrorConsumer != null)
+            {
+                jsonErrorConsumer.accept(new JsonError(
+                    e.getMessage(), p.getParsingContext(), e));
+            }
         }
         
     }

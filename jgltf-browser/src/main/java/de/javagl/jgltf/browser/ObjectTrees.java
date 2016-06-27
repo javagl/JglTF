@@ -81,7 +81,7 @@ class ObjectTrees
          * @param name The name
          * @param value The value
          */
-        NodeEntry(String name, Object value)
+        private NodeEntry(String name, Object value)
         {
             this.name = name;
             this.value = value;
@@ -380,7 +380,8 @@ class ObjectTrees
      * If the given tree model contains elements that are not
      * <code>DefaultMutableTreeNode</code> instances, or contain
      * user objects that are not {@link NodeEntry} instances,
-     * then a warning will be printed and <code>null</code> will be returned.
+     * then a warning will be printed, and the respective nodes
+     * will be omitted in the returned list.
      * 
      * @param treeModel The tree model
      * @param nodeEntryValue The {@link NodeEntry} value

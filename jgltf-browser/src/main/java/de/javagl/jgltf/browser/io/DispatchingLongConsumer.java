@@ -24,47 +24,59 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.model;
+package de.javagl.jgltf.browser.io;
 
-import java.nio.ByteBuffer;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.LongConsumer;
 
 /**
- * Utility methods related to buffers
+ * A <code>LongConsumer</code> that dispatches the consumed values to
+ * other <code>LongConsumer</code>s
  */
-class Buffers
+class DispatchingLongConsumer implements LongConsumer
 {
     /**
-     * Create a slice of the given byte buffer, in the specified range.
-     * The returned buffer will have the same byte order as the given
-     * buffer.
-     * 
-     * @param byteBuffer The byte buffer
-     * @param position The position where the slice should start
-     * @param length The length of the slice
-     * @return The slice
-     * @throws IllegalArgumentException If the range that is specified
-     * by the position and length are not valid for the given buffer
+     * The list of consumers
      */
-    public static ByteBuffer createSlice(
-        ByteBuffer byteBuffer, int position, int length)
+    private final List<LongConsumer> consumers;
+    
+    /**
+     * Default constructor
+     */
+    DispatchingLongConsumer()
     {
-        int oldPosition = byteBuffer.position();
-        int oldLimit = byteBuffer.limit();
-        byteBuffer.limit(position + length);
-        byteBuffer.position(position);
-        ByteBuffer slice = byteBuffer.slice();
-        slice.order(byteBuffer.order());
-        byteBuffer.limit(oldLimit);
-        byteBuffer.position(oldPosition);
-        return slice;
+        this.consumers = new CopyOnWriteArrayList<LongConsumer>();
     }
     
     /**
-     * Private constructor to prevent instantiation
+     * Add the given consumer to this consumer
+     * 
+     * @param consumer The consumer
      */
-    private Buffers()
+    void addConsumer(LongConsumer consumer)
     {
-        // Private constructor to prevent instantiation
+        Objects.requireNonNull(consumer, "The consumer may not be null");
+        consumers.add(consumer);
     }
-
+    
+    /**
+     * Remove the given consumer from this consumer
+     * 
+     * @param consumer The consumer
+     */
+    void removeConsumer(LongConsumer consumer)
+    {
+        consumers.remove(consumer);
+    }
+    
+    @Override
+    public void accept(long value)
+    {
+        for (LongConsumer consumer : consumers)
+        {
+            consumer.accept(value);
+        }
+    }
 }

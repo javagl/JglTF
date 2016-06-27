@@ -32,13 +32,12 @@ import java.awt.event.KeyEvent;
 import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLConnection;
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CancellationException;
+import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -56,11 +55,6 @@ import javax.swing.JSeparator;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import de.javagl.jgltf.model.GltfData;
-import de.javagl.jgltf.model.GltfDataLoader;
-import de.javagl.jgltf.model.GltfDataLoader.ProgressListener;
-import de.javagl.jgltf.model.JsonError;
-import de.javagl.swing.tasks.SwingTask;
-import de.javagl.swing.tasks.SwingTaskExecutors;
 
 /**
  * The main glTF browser application class, containing the main frame 
@@ -68,6 +62,12 @@ import de.javagl.swing.tasks.SwingTaskExecutors;
  */
 class GltfBrowserApplication
 {
+    /**
+     * The logger used in this class
+     */
+    private static final Logger logger = 
+        Logger.getLogger(GltfBrowserApplication.class.getName());
+    
     /**
      * The Action for opening a glTF file
      * 
@@ -178,6 +178,7 @@ class GltfBrowserApplication
         
         JMenuBar menuBar = new JMenuBar();
         menuBar.add(createFileMenu());
+        menuBar.add(createSampleModelsMenu());
         frame.setJMenuBar(menuBar);
         
         openFileChooser = new JFileChooser(".");
@@ -188,7 +189,7 @@ class GltfBrowserApplication
         desktopPane = new JDesktopPane();
         frame.getContentPane().add(desktopPane);
         
-        frame.setSize(1024, 768);
+        frame.setSize(1000,700);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
@@ -207,6 +208,116 @@ class GltfBrowserApplication
         fileMenu.add(new JMenuItem(exitAction));
         return fileMenu;
     }
+    
+    /**
+     * Create the menu containing shortcuts for loading the sample models
+     * 
+     * @return The menu
+     */
+    private JMenu createSampleModelsMenu()
+    {
+        JMenu sampleModelsMenu = new JMenu("Sample models");
+
+        Properties sampleModelsProperties = loadProperties(
+            "/sampleModels.properties");
+        if (sampleModelsProperties == null)
+        {
+            JMenuItem errorMenuItem = new JMenuItem(
+                "Could not load sample model definitions");
+            errorMenuItem.setEnabled(false);
+            sampleModelsMenu.add(errorMenuItem);
+            return sampleModelsMenu;
+        }
+        
+        Object basePathObject = sampleModelsProperties.get("basePath");
+        if (basePathObject == null)
+        {
+            JMenuItem errorMenuItem = new JMenuItem(
+                "Could not find sample models base path");
+            errorMenuItem.setEnabled(false);
+            sampleModelsMenu.add(errorMenuItem);
+            return sampleModelsMenu;
+        }
+        
+        String basePath = String.valueOf(basePathObject);
+        for (Entry<Object, Object> entry : sampleModelsProperties.entrySet())
+        {
+            String keyString = String.valueOf(entry.getKey());
+            if (keyString.startsWith("sampleModel"))
+            {
+                Object valueObject = entry.getValue();
+                if (valueObject == null)
+                {
+                    continue;
+                }
+                String valueString = String.valueOf(valueObject);
+                sampleModelsMenu.add(
+                    createSampleModelMenu(basePath, valueString));
+            }
+        }
+        return sampleModelsMenu;
+    }
+    
+    /**
+     * Create a menu containing the shortcuts for loading the sample model
+     * with the given name, in different formats
+     * 
+     * @param basePath The base path
+     * @param name The name of the sample model
+     * @return The menu
+     */
+    private JMenu createSampleModelMenu(String basePath, String name)
+    {
+        JMenu sampleModelMenu = new JMenu(name);
+        
+        sampleModelMenu.add(createSampleModelMenuItem(
+            basePath, name, "glTF", "gltf"));
+        sampleModelMenu.add(createSampleModelMenuItem(
+            basePath, name, "glTF-Embedded", "gltf"));
+        sampleModelMenu.add(createSampleModelMenuItem(
+            basePath, name, "glTF-Binary", "glb"));
+        sampleModelMenu.add(createSampleModelMenuItem(
+            basePath, name, "glTF-MaterialsCommon", "gltf"));
+        return sampleModelMenu;
+    }
+    
+    /**
+     * Create a menu item for loading the specified sample model.
+     * 
+     * @param basePath The base path
+     * @param name The name of the sample model
+     * @param type The type, e.g. "glTF-Binary"
+     * @param extensionWithoutDot The expected file extension, without a dot
+     * @return The menu item
+     */
+    private JMenuItem createSampleModelMenuItem(
+        String basePath, String name, String type, String extensionWithoutDot)
+    {
+        String uriString = 
+            basePath + "/" + name + "/" + type + "/" + 
+            name + "." + extensionWithoutDot;
+        JMenuItem menuItem = new JMenuItem(
+            "<html>" + type + " <font size=-2>(" + 
+            uriString + ")</font></html>");
+        menuItem.addActionListener(event -> 
+        {
+            URI uri = null;
+            try
+            {
+                uri = new URI(uriString);
+            } 
+            catch (URISyntaxException e)
+            {
+                JOptionPane.showMessageDialog(
+                    frame, "Invalid URI: " + e.getMessage(), 
+                    "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            openUriInBackground(uri);
+        });
+        return menuItem;
+    }
+    
     
     /**
      * Open the file chooser to select a file which will be 
@@ -233,8 +344,17 @@ class GltfBrowserApplication
         JDialog dialog = optionPane.createDialog(frame, "Enter URI");
         dialog.setResizable(true);
         dialog.setVisible(true);
+        Object value = optionPane.getValue();
+        if (value == null)
+        {
+            return;
+        }
+        if (!value.equals(JOptionPane.OK_OPTION))
+        {
+            return;
+        }
         String uriString = (String)optionPane.getInputValue();
-        if (uriString == null)
+        if (uriString == null || uriString.trim().isEmpty())
         {
             return;
         }
@@ -254,125 +374,17 @@ class GltfBrowserApplication
     }
     
     /**
-     * Execute {@link GltfDataLoader#load(URI, java.util.function.Consumer)} 
-     * in a background thread, showing a modal dialog. When the data is 
-     * loaded, it will be passed to 
-     * {@link #createGltfBrowserPanel(String, GltfData)}
+     * Execute the task of loading the {@link GltfData} in a background 
+     * thread, showing a modal dialog. When the data is loaded, it will 
+     * be passed to {@link #createGltfBrowserPanel(String, GltfData)}
      * 
      * @param uri The URI to load from
      */
     void openUriInBackground(URI uri)
     {
-        // The Swing task that executes the loader in a background thread
-        class Worker extends SwingTask<GltfData, Object>
-        {
-            /**
-             * The list of JsonError instances that have occurred during 
-             * parsing
-             */
-            private final List<JsonError> jsonErrors = 
-                new ArrayList<JsonError>();
-            
-            @Override
-            public GltfData doInBackground() throws IOException
-            {
-                String message = "Loading glTF from " + extractFileName(uri);
-                long contentLength = getContentLength(uri);
-                if (contentLength >= 0)
-                {
-                    message += " (" + 
-                        NumberFormat.getNumberInstance().format(contentLength) + 
-                        " bytes)";
-                }
-                message += String.format("%30s", "");
-                setMessage(message);
-                
-                ProgressListener progressListener = new ProgressListener()
-                {
-                    @Override
-                    public void updateMessage(String message)
-                    {
-                        setMessage(message);
-                    }
-                    @Override
-                    public void updateProgress(double progress)
-                    {
-                        setProgress(progress);
-                    }
-                }; 
-                return GltfDataLoader.load(uri, e -> jsonErrors.add(e), 
-                    progressListener);
-            }
-
-            @Override
-            protected void done()
-            {
-                try
-                {
-                    GltfData gltfData = get();
-                    createGltfBrowserPanel(uri.toString(), gltfData);
-                } 
-                catch (CancellationException e)
-                {
-                    return;
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("Loading error: " + e.getMessage());
-                    if (!jsonErrors.isEmpty())
-                    {
-                        sb.append("\n");
-                        sb.append("JSON errors:\n");
-                        sb.append(createString(jsonErrors));
-                    }
-                    JOptionPane.showMessageDialog(frame,
-                        sb.toString(), "Error",
-                        JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                
-                if (!jsonErrors.isEmpty())
-                {
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("JSON errors:\n");
-                    sb.append(createString(jsonErrors));
-                    JOptionPane.showMessageDialog(frame,
-                        sb.toString(), "Warning",
-                        JOptionPane.WARNING_MESSAGE);
-                }
-            }
-            
-            /**
-             * Create a string representation of the given errors
-             * 
-             * @param jsonErrors The JsonErrors
-             * @return The string
-             */
-            String createString(Iterable<? extends JsonError> jsonErrors)
-            {
-                StringBuffer sb = new StringBuffer();
-                int counter = 0;
-                for (JsonError jsonError : jsonErrors)
-                {
-                    sb.append(String.valueOf(counter)+ ".:" + 
-                        jsonError.getMessage() + ", JSON path: " + 
-                        jsonError.getJsonPathString() + "\n");
-                    counter++;
-                }
-                return sb.toString();
-            }
-        }
-        
-        Worker worker = new Worker();
-        SwingTaskExecutors.create(worker)
-            .setTitle("Loading")
-            .setMillisToDecideToPopup(250)
-            .setCancelable(true)
-            .build()
-            .execute();        
+        GltfLoadingWorker gltfLoadingWorker = 
+            new GltfLoadingWorker(this, frame, uri);
+        gltfLoadingWorker.load();
     }
     
     /**
@@ -383,7 +395,7 @@ class GltfBrowserApplication
      * @param uriString The URI string, used as the internal frame title
      * @param gltfData The {@link GltfData}
      */
-    private void createGltfBrowserPanel(String uriString, GltfData gltfData)
+    void createGltfBrowserPanel(String uriString, GltfData gltfData)
     {
         final boolean resizable = true;
         final boolean closable = true;
@@ -417,43 +429,42 @@ class GltfBrowserApplication
     }
 
     /**
-     * Tries to extract the "file name" that is referred to with the 
-     * given URI. If no file name can be extracted, then the string
-     * representation of the URI is returned.
-     * 
-     * @param uri The URI
-     * @return The file name
+     * Load the properties from the specified resource. Returns 
+     * <code>null</code> if any error occurs.
+     *  
+     * @param resource The resource
+     * @return The properties
      */
-    private static String extractFileName(URI uri)
+    private static Properties loadProperties(String resource)
     {
-        String s = uri.toString();
-        int lastSlashIndex = s.lastIndexOf('/');
-        if (lastSlashIndex != -1)
+        Properties properties = new Properties();
+        InputStream inputStream =  
+            GltfBrowserApplication.class.getResourceAsStream(resource);
+        if (inputStream == null)
         {
-            return s.substring(lastSlashIndex+1);
+            return null;
         }
-        return s;
-    }
-    
-    /**
-     * Try to obtain the content length from the given URI. Returns -1
-     * if the content length can not be determined.
-     * 
-     * @param uri The URI
-     * @return The content length
-     */
-    static long getContentLength(URI uri)
-    {
-        try
-        {
-            URLConnection connection = uri.toURL().openConnection();
-            return connection.getContentLengthLong();
+        try 
+        {    
+            properties.load(inputStream);
         }
         catch (IOException e)
         {
-            return -1;
+            logger.warning("Could not load properties: " + e.getMessage());
+            return null;
         }
+        finally
+        {
+            try
+            {
+                inputStream.close();
+            } 
+            catch (IOException e)
+            {
+                logger.warning("Could not close stream: " + e.getMessage());
+            }
+        }
+        return properties;
     }
-    
-    
+   
 }

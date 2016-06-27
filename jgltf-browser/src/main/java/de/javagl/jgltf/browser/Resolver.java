@@ -79,7 +79,7 @@ class Resolver
          * <code>null</code>, causing an appropriate {@link #getMessage()}
          * to be generated
          */
-        ResolvedEntity(String context, String pathString, 
+        private ResolvedEntity(String context, String pathString, 
             Object key, Map<?, ?> map)
         {
             this.key = key;
@@ -199,7 +199,8 @@ class Resolver
         m.put("glTF.textures.*.source", gltf.getImages());
         m.put("glTF.skins.*.jointNames.*", gltf.getNodes());
         m.put("glTF.skins.*.inverseBindMatrices", gltf.getAccessors());
-        m.put("*.extensions.KHR_binary_glTF.bufferView", gltf.getBufferViews());
+        m.put("glTF.*.*.extensions.KHR_binary_glTF.bufferView", 
+            gltf.getBufferViews());
         
         // Try to resolve the top level glTF entities 
         // based on the path string

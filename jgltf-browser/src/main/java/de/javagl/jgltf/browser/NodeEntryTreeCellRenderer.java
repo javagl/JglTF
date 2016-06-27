@@ -84,11 +84,19 @@ class NodeEntryTreeCellRenderer
         Object value = nodeEntry.getValue();
         if (value == null)
         {
-            return name + " : "+value;
+            return name + " : " + value;
         }
         if (value instanceof String)
         {
-            return name + " : \""+value+"\"";
+            // Limit the string length to something that is reasonable
+            // to be displayed as a tree node label
+            String string = (String) value;
+            final int maxLength = 80;
+            if (string.length() > maxLength)
+            {
+                string = string.substring(0, maxLength) + "...";
+            }
+            return name + " : \"" + string + "\"";
         }
         if ((value instanceof Number) ||
             (value instanceof Boolean))

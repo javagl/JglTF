@@ -165,16 +165,9 @@ class GltfBrowserPanel extends JPanel
                 mainSplitPane.setDividerLocation(0.3);
             }
         });
-        /*
-        // XXX Test
-        int XXX;
-        JScrollPane sp = new JScrollPane(GltfTree.create(gltfData.getGltf()));
-        sp.setPreferredSize(new Dimension(500,500));
-        add(sp, BorderLayout.EAST);
-        */
         
         mainSplitPane.setLeftComponent(
-            new JScrollPane(createTreePanel(gltfData.getGltf())));
+            createTreePanel(gltfData.getGltf()));
         
         infoPanelContainer = new JPanel(new GridLayout(1,1));
         mainSplitPane.setRightComponent(infoPanelContainer);
