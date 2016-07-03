@@ -23,6 +23,9 @@ The libraries currently available here are
   browsing though the glTF structure, by navigating through the references
   inside the glTF, and showing the images, shader code and accessor data
   in a structured form.
+* [jgltf-obj](https://github.com/javagl/JglTF/tree/master/jgltf-obj) : 
+  A library/application for loading OBJ files and converting them into
+  glTF assets.
   
    
 
