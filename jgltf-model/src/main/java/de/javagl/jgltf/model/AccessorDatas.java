@@ -369,6 +369,32 @@ public class AccessorDatas
     {
         return new AccessorFloatData(accessor, bufferViewByteBuffer);
     }
+
+    /**
+     * Validate that the given {@link Accessor} parameters are valid for
+     * accessing a buffer with the given capacity
+     * 
+     * @param byteOffset The byte offset 
+     * @param numElements The number of elements
+     * @param byteStridePerElement The byte stride
+     * @param bufferCapacity The buffer capacity
+     * @throws IllegalArgumentException If the given byte buffer does not
+     * have a sufficient capacity
+     */
+    public static void validateCapacity(int byteOffset, int numElements,
+        int byteStridePerElement, int bufferCapacity)
+    {
+        int expectedCapacity = numElements * byteStridePerElement;
+        if (expectedCapacity > bufferCapacity)
+        {
+            throw new IllegalArgumentException(
+                "The accessor has an offset of " + byteOffset + " and " + 
+                numElements + " elements with a byte stride of " + 
+                byteStridePerElement + ", requiring " + expectedCapacity + 
+                " bytes, but the buffer view has only " + 
+                bufferCapacity + " bytes");
+        }
+    }
     
     
     /**
@@ -378,4 +404,5 @@ public class AccessorDatas
     {
         // Private constructor to prevent instantiation
     }
+
 }

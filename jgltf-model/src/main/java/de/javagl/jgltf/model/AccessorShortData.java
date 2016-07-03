@@ -93,6 +93,9 @@ public final class AccessorShortData
      * @throws IllegalArgumentException If the 
      * {@link Accessor#getComponentType() component type} of the given
      * accessor is not <code>GL_SHORT</code> or <code>GL_UNSIGEND_SHORT</code>
+     * @throws IllegalArgumentException If the given byte buffer does not
+     * have a sufficient capacity to provide the data for the given 
+     * {@link Accessor}
      */
     AccessorShortData(Accessor accessor,
         ByteBuffer bufferViewByteBuffer, boolean unsigned)
@@ -122,6 +125,8 @@ public final class AccessorShortData
         {
             this.byteStridePerElement = byteStride;
         }
+        AccessorDatas.validateCapacity(byteOffset, numElements, 
+            byteStridePerElement, bufferViewByteBuffer.capacity());
     }
     
     /**

@@ -93,6 +93,9 @@ public final class AccessorIntData
      * @throws IllegalArgumentException If the 
      * {@link Accessor#getComponentType() component type} of the given
      * accessor is not <code>GL_INT</code> or <code>GL_UNSIGEND_INT</code>
+     * @throws IllegalArgumentException If the given byte buffer does not
+     * have a sufficient capacity to provide the data for the given 
+     * {@link Accessor}
      */
     AccessorIntData(Accessor accessor,
         ByteBuffer bufferViewByteBuffer, boolean unsigned)
@@ -122,6 +125,8 @@ public final class AccessorIntData
         {
             this.byteStridePerElement = byteStride;
         }
+        AccessorDatas.validateCapacity(byteOffset, numElements, 
+            byteStridePerElement, bufferViewByteBuffer.capacity());
     }
     
     /**

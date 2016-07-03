@@ -87,6 +87,9 @@ public final class AccessorFloatData
      * @throws IllegalArgumentException If the 
      * {@link Accessor#getComponentType() component type} of the given
      * accessor is not <code>GL_FLOAT</code>
+     * @throws IllegalArgumentException If the given byte buffer does not
+     * have a sufficient capacity to provide the data for the given 
+     * {@link Accessor}
      */
     AccessorFloatData(Accessor accessor,
         ByteBuffer bufferViewByteBuffer)
@@ -115,6 +118,8 @@ public final class AccessorFloatData
         {
             this.byteStridePerElement = byteStride;
         }
+        AccessorDatas.validateCapacity(byteOffset, numElements, 
+            byteStridePerElement, bufferViewByteBuffer.capacity());
     }
     
     /**
