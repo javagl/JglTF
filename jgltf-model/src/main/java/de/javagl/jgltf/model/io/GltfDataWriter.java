@@ -133,10 +133,17 @@ public class GltfDataWriter
                 logger.log(level, 
                     "Writing buffer " + id + " to " + fileName);
                 
-                ByteBuffer bufferData = gltfData.getBufferData(id);
-                writableByteChannel.write(bufferData.slice());
-                
-                logger.log(level, "Writing buffer " + id + " DONE");
+                ByteBuffer data = gltfData.getBufferData(id);
+                if (data == null)
+                {
+                    logger.warning("Writing buffer " + id + " FAILED: " + 
+                        "No buffer data found");
+                }
+                else
+                {
+                    writableByteChannel.write(data.slice());
+                    logger.log(level, "Writing buffer " + id + " DONE");
+                }
             }
         }
         catch (IOException e)
@@ -174,10 +181,17 @@ public class GltfDataWriter
                 logger.log(level, 
                     "Writing image " + id + " to " + fileName);
                 
-                ByteBuffer bufferData = gltfData.getImageData(id);
-                writableByteChannel.write(bufferData.slice());
-                
-                logger.log(level, "Writing image " + id + " DONE");
+                ByteBuffer data = gltfData.getImageData(id);
+                if (data == null)
+                {
+                    logger.warning("Writing image " + id + " FAILED: " + 
+                        "No image data found");
+                }
+                else
+                {
+                    writableByteChannel.write(data.slice());
+                    logger.log(level, "Writing image " + id + " DONE");
+                }
             }
         }
         catch (IOException e)
@@ -215,10 +229,17 @@ public class GltfDataWriter
                 logger.log(level, 
                     "Writing shader " + id + " to " + fileName);
                 
-                ByteBuffer bufferData = gltfData.getShaderData(id);
-                writableByteChannel.write(bufferData.slice());
-                
-                logger.log(level, "Writing shader " + id + " DONE");
+                ByteBuffer data = gltfData.getShaderData(id);
+                if (data == null)
+                {
+                    logger.warning("Writing shader " + id + " FAILED: " + 
+                        "No shader data found");
+                }
+                else
+                {
+                    writableByteChannel.write(data.slice());
+                    logger.log(level, "Writing shader " + id + " DONE");
+                }
             }
         }
         catch (IOException e)

@@ -117,6 +117,10 @@ public class GltfModels
                 {
                     Object object = getUniformValueObject(
                         uniformName, technique, material);
+                    if (object == null)
+                    {
+                        return null;
+                    }
                     Number number = (Number)object;
                     Integer value = number.intValue();
                     return value;
@@ -129,6 +133,10 @@ public class GltfModels
                 {
                     Object object = getUniformValueObject(
                         uniformName, technique, material);
+                    if (object == null)
+                    {
+                        return null;
+                    }
                     Number number = (Number)object;
                     Float value = number.floatValue();
                     return value;
@@ -150,6 +158,10 @@ public class GltfModels
                     {
                         Object object = getUniformValueObject(
                             uniformName, technique, material);
+                        if (object == null)
+                        {
+                            return null;
+                        }
                         List<? extends Number> list = asNumberList(object);
                         value = toFloatArray(list, value);
                         return value;
@@ -171,6 +183,10 @@ public class GltfModels
                     {
                         Object object = getUniformValueObject(
                             uniformName, technique, material);
+                        if (object == null)
+                        {
+                            return null;
+                        }
                         List<? extends Number> list = asNumberList(object);
                         value = toIntArray(list, value);
                         return value;
