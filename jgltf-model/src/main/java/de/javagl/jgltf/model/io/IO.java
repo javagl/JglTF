@@ -28,11 +28,14 @@ package de.javagl.jgltf.model.io;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.URLConnection;
 import java.util.Base64;
 
@@ -55,12 +58,13 @@ public class IO
     {
         try
         {
-            URI uri = new URI(uriString);
+            String escapedUriString = uriString.replaceAll(" ", "%20");
+            URI uri = new URI(escapedUriString);
             if (uri.isAbsolute())
             {
                 return uri;
             }
-            return baseUri.resolve(uriString);
+            return baseUri.resolve(escapedUriString);
         }
         catch (URISyntaxException e)
         {
@@ -136,6 +140,51 @@ public class IO
         }
         return s;
     }
+    
+    /**
+     * Returns whether the resource that is described with the given URI
+     * exists. If an IO exception occurs during this check, this method
+     * will simply return <code>false</code>. 
+     * 
+     * @param uri The URI
+     * @return Whether the resource exists
+     */
+    public static boolean existsUnchecked(URI uri)
+    {
+        try
+        {
+            return exists(uri);
+        } 
+        catch (IOException e)
+        {
+            return false;
+        }
+    }
+   
+    /**
+     * Returns whether the resource that is described with the given URI
+     * exists
+     * 
+     * @param uri The URI
+     * @return Whether the resource exists
+     * @throws IOException If an IO error occurs. This usually implies that
+     * the return value would be <code>false</code>...
+     */
+    private static boolean exists(URI uri) throws IOException
+    {
+        URL url = uri.toURL();
+        URLConnection connection = url.openConnection();
+        if (connection instanceof HttpURLConnection)
+        {
+            HttpURLConnection httpConnection = (HttpURLConnection)connection;
+            httpConnection.setRequestMethod("HEAD");
+            int responseCode = httpConnection.getResponseCode();
+            return responseCode == HttpURLConnection.HTTP_OK;
+        }
+        String path = uri.getPath();
+        return new File(path).exists();
+    }
+    
     
     /**
      * Try to obtain the content length from the given URI. Returns -1
