@@ -26,10 +26,13 @@
  */
 package de.javagl.jgltf.model.io;
 
+import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,8 +49,8 @@ import de.javagl.jgltf.model.Maps;
  * offers methods to resolve the {@link Buffer}, {@link Image} and 
  * {@link Shader} references that are given via the 
  * {@link Buffer#getUri() buffer URIs}, {@link Image#getUri() image URIs}
- * and {@link Shader#getUri() shader URIs} against a base URI, and place 
- * the loaded data into a {@link GltfData}
+ * and {@link Shader#getUri() shader URIs}, and place the loaded data 
+ * into a {@link GltfData}
  */
 public class GltfDataResolver
 {
@@ -66,11 +69,15 @@ public class GltfDataResolver
      * The {@link GltfData} that will be filled with the loaded data
      */
     private final GltfData gltfData;
-    
+
     /**
-     * The base URI against which all other URIs will be resolved
+     * The function that will resolve {@link Buffer#getUri() buffer URI},
+     * {@link Image#getUri() image URI} and {@link Shader#getUri() shader URI}
+     * strings, and provide input streams for reading the data from these
+     * URIs.
      */
-    private URI baseUri;
+    private final Function<? super String, ? extends InputStream> 
+        uriStringResolver; 
     
     /**
      * Creates a new glTF data resolver
@@ -82,16 +89,64 @@ public class GltfDataResolver
      */
     public GltfDataResolver(GltfData gltfData, URI baseUri)
     {
+        this(gltfData, createBaseUriResolver(baseUri));
+    }
+
+    /**
+     * Creates a new glTF data resolver
+     * 
+     * @param gltfData The {@link GltfData} that will be filled with the
+     * loaded data
+     * @param uriStringResolver The function that will be used to resolve
+     * {@link Buffer#getUri() buffer URI}, {@link Image#getUri() image URI} 
+     * and {@link Shader#getUri() shader URI} strings, and provide input 
+     * streams for reading the data from these URIs. If the function 
+     * returns <code>null</code>, then it means that the URI string can not
+     * be resolved, and a warning will be printed for this URI. 
+     */
+    public GltfDataResolver(GltfData gltfData, 
+        Function<? super String, ? extends InputStream> uriStringResolver)
+    {
         Objects.requireNonNull(gltfData, "The gltfData may not be null");
-        Objects.requireNonNull(baseUri, "The baseUri may not be null");
+        Objects.requireNonNull(uriStringResolver, 
+            "The uriStringResolver may not be null");
         this.gltfData = gltfData;
-        this.baseUri = baseUri;
+        this.uriStringResolver = uriStringResolver;
     }
     
     /**
-     * Resolve all {@link Buffer#getUri() buffer URIs} against the base URI
-     * that was given in the constructor, load the data from these URIs, 
-     * and place the results into the current {@link GltfData}
+     * Creates a function that resolves URI strings against the given base
+     * URI, and returns an input stream for reading the data from the
+     * resulting URI
+     * 
+     * @param baseUri The base URI to resolve against
+     * @return The function
+     */
+    private static Function<? super String, ? extends InputStream> 
+        createBaseUriResolver(URI baseUri)
+    {
+        return new Function<String, InputStream>()
+        {
+            @Override
+            public InputStream apply(String uriString)
+            {
+                try
+                {
+                    URI absoluteUri = IO.makeAbsolute(baseUri, uriString);
+                    return IO.createInputStream(absoluteUri);
+                } 
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+        };
+    }
+    
+    /**
+     * Resolve all {@link Buffer#getUri() buffer URIs}, load the data from 
+     * these URIs, and place the results into the current {@link GltfData}
      */
     public void resolveBuffers()
     {
@@ -113,28 +168,39 @@ public class GltfDataResolver
         {
             return;
         }
+        InputStream inputStream = null;
         try
         {
             logger.log(level, "Reading buffer " + id);
             
-            URI absoluteUri = IO.makeAbsolute(baseUri, buffer.getUri());
-            byte data[] = IO.read(absoluteUri);
-            ByteBuffer byteBuffer = Buffers.create(data);
-            gltfData.putBufferData(id, byteBuffer);
-            
-            logger.log(level, "Reading buffer " + id + " DONE");
+            inputStream = uriStringResolver.apply(buffer.getUri());
+            if (inputStream != null)
+            {
+                byte data[] = IO.readStream(inputStream);
+                ByteBuffer byteBuffer = Buffers.create(data);
+                gltfData.putBufferData(id, byteBuffer);
+                logger.log(level, "Reading buffer " + id + " DONE");
+            }
+            else
+            {
+                throw new IOException(
+                    "Could not resolve URI " + buffer.getUri());
+            }
         }
         catch (IOException e)
         {
-            logger.log(level, "Reading buffer " + id + " FAILED: " + 
+            logger.warning("Reading buffer " + id + " FAILED: " + 
                 e.getMessage());
+        }
+        finally
+        {
+            tryClose(inputStream);
         }
     }
 
     /**
-     * Resolve all {@link Image#getUri() image URIs} against the base URI
-     * that was given in the constructor, load the data from these URIs, 
-     * and place the results into the current {@link GltfData}
+     * Resolve all {@link Image#getUri() image URIs}, load the data from 
+     * these URIs, and place the results into the current {@link GltfData}
      */
     public void resolveImages()
     {
@@ -156,28 +222,38 @@ public class GltfDataResolver
         {
             return;
         }
+        InputStream inputStream = null;
         try
         {
             logger.log(level, "Reading image " + id);
             
-            String uriString = image.getUri();
-            URI absoluteUri = IO.makeAbsolute(baseUri, uriString);
-            byte[] data = IO.read(absoluteUri);
-            gltfData.putImageData(id, Buffers.create(data));
-            
-            logger.log(level, "Reading image " + id + " DONE");
+            inputStream = uriStringResolver.apply(image.getUri());
+            if (inputStream != null)
+            {
+                byte data[] = IO.readStream(inputStream);
+                gltfData.putImageData(id, Buffers.create(data));
+                logger.log(level, "Reading image " + id + " DONE");
+            }
+            else
+            {
+                throw new IOException(
+                    "Could not resolve URI " + image.getUri());
+            }
         }
         catch (IOException e)
         {
-            logger.log(level, "Reading image " + id + " FAILED: " + 
+            logger.warning("Reading image " + id + " FAILED: " + 
                 e.getMessage());
+        }
+        finally
+        {
+            tryClose(inputStream);
         }
     }
 
     /**
-     * Resolve all {@link Shader#getUri() shader URIs} against the base URI
-     * that was given in the constructor, load the data from these URIs, 
-     * and place the results into the current {@link GltfData}
+     * Resolve all {@link Shader#getUri() shader URIs}, load the data from 
+     * these URIs, and place the results into the current {@link GltfData}
      */
     public void resolveShaders()
     {
@@ -198,21 +274,54 @@ public class GltfDataResolver
         {
             return;
         }
+        InputStream inputStream = null;
         try
         {
             logger.log(level, "Reading shader " + id);
 
-            String uriString = shader.getUri();
-            URI absoluteUri = IO.makeAbsolute(baseUri, uriString);
-            byte[] data = IO.read(absoluteUri);
-            gltfData.putShaderData(id, Buffers.create(data));
-            
-            logger.log(level, "Reading shader " + id + " DONE");
+            inputStream = uriStringResolver.apply(shader.getUri());
+            if (inputStream != null)
+            {
+                byte data[] = IO.readStream(inputStream);
+                gltfData.putShaderData(id, Buffers.create(data));
+                logger.log(level, "Reading shader " + id + " DONE");
+            }
+            else
+            {
+                throw new IOException(
+                    "Could not resolve URI " + shader.getUri());
+            }
         }
         catch (IOException e)
         {
-            logger.log(level, "Reading shader " + id + " FAILED: " + 
+            logger.warning("Reading shader " + id + " FAILED: " + 
                 e.getMessage());
+        }
+        finally
+        {
+            tryClose(inputStream);
+        }
+    }
+    
+    /**
+     * Try to close the given closeable, printing a warning when an
+     * IO exception is thrown
+     * 
+     * @param closeable The closeable
+     */
+    private static void tryClose(Closeable closeable)
+    {
+        if (closeable != null)
+        {
+            try
+            {
+                closeable.close();
+            }
+            catch (IOException e)
+            {
+                logger.warning("Could not close " + closeable + ": " + 
+                    e.getMessage());
+            }
         }
     }
     
