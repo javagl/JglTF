@@ -299,7 +299,8 @@ public final class GltfModel
      * not have any of the valid values mentioned above.
      * @throws IllegalArgumentException If the semantic of the
      * {@link TechniqueParameters} for the given uniform name
-     * in the given {@link Technique} is is <code>null</code>.
+     * in the given {@link Technique} is is <code>null</code>
+     * or not a valid {@link Semantic}
      * @throws GltfException May be thrown if the computations involve an ID 
      * of an element that is not found in the {@link GlTF}.
      */
@@ -321,13 +322,14 @@ public final class GltfModel
         
         TechniqueParameters techniqueParameters =
             Techniques.getUniformTechniqueParameters(technique, uniformName);
-        String semantic = techniqueParameters.getSemantic();
-        if (semantic == null)
+        String semanticString = techniqueParameters.getSemantic();
+        if (!Semantic.contains(semanticString))
         {
             throw new IllegalArgumentException(
-                "Uniform "+uniformName+" has no semantic " + 
-                "in technique "+technique);
+                "Uniform " + uniformName + " has invalid semantic " + 
+                semanticString + " in technique " + technique);
         }
+        Semantic semantic = Semantic.valueOf(semanticString);
         
         String accessedNodeId = currentNodeId;
         String parameterNodeId = techniqueParameters.getNode();
@@ -342,40 +344,41 @@ public final class GltfModel
             getChecked(gltf.getNodes(), currentNodeId, "current node");
         }
         
+        
         switch (semantic)
         {
-            case "LOCAL":
+            case LOCAL:
             {
                 return createNodeLocalTransformSupplier(accessedNodeId);
             }
             
-            case "MODEL":
+            case MODEL:
             {
                 return createNodeGlobalTransformSupplier(accessedNodeId);
             }
             
-            case "VIEW":
+            case VIEW:
             {
                 return viewMatrixSupplier;
             }
 
-            case "PROJECTION":
+            case PROJECTION:
             {
                 return projectionMatrixSupplier;
             }
             
-            case "MODELVIEW":
+            case MODELVIEW:
             {
                 Supplier<float[]> modelMatrixSupplier = 
                     createNodeGlobalTransformSupplier(accessedNodeId);
                 return MatrixOps
                     .create4x4(viewMatrixSupplier)
                     .multiply4x4(modelMatrixSupplier)
-                    .log("MODELVIEW", Level.FINE)
+                    .log(semanticString, Level.FINE)
                     .build();
             }
             
-            case "MODELVIEWPROJECTION":
+            case MODELVIEWPROJECTION:
             {
                 Supplier<float[]> modelMatrixSupplier = 
                     createNodeGlobalTransformSupplier(accessedNodeId);
@@ -383,40 +386,52 @@ public final class GltfModel
                     .create4x4(projectionMatrixSupplier)
                     .multiply4x4(viewMatrixSupplier)
                     .multiply4x4(modelMatrixSupplier)
-                    .log("MODELVIEWPROJECTION", Level.FINE)
+                    .log(semanticString, Level.FINE)
                     .build();
             }
             
-            case "MODELINVERSE":
+            case MODELINVERSE:
             {
                 Supplier<float[]> model = 
                     createNodeGlobalTransformSupplier(accessedNodeId);
                 return MatrixOps
                     .create4x4(model)
                     .invert4x4()
-                    .log("MODELINVERSE", Level.FINE)
+                    .log(semanticString, Level.FINE)
                     .build();
             }
             
-            case "VIEWINVERSE":
+            case VIEWINVERSE:
             {
                 return MatrixOps
                     .create4x4(viewMatrixSupplier)
                     .invert4x4()
-                    .log("VIEWINVERSE", Level.FINE)
+                    .log(semanticString, Level.FINE)
                     .build();
             }
 
-            case "PROJECTIONINVERSE":
+            case MODELVIEWINVERSE:
+            {
+                Supplier<float[]> modelMatrixSupplier = 
+                    createNodeGlobalTransformSupplier(accessedNodeId);
+                return MatrixOps
+                    .create4x4(viewMatrixSupplier)
+                    .multiply4x4(modelMatrixSupplier)
+                    .invert4x4()
+                    .log(semanticString, Level.FINE)
+                    .build();
+            }
+
+            case PROJECTIONINVERSE:
             {
                 return MatrixOps
                     .create4x4(projectionMatrixSupplier)
                     .invert4x4()
-                    .log("PROJECTIONINVERSE", Level.FINE)
+                    .log(semanticString, Level.FINE)
                     .build();
             }
             
-            case "MODELVIEWPROJECTIONINVERSE":
+            case MODELVIEWPROJECTIONINVERSE:
             {
                 Supplier<float[]> modelMatrixSupplier = 
                     createNodeGlobalTransformSupplier(accessedNodeId);
@@ -425,11 +440,11 @@ public final class GltfModel
                     .multiply4x4(viewMatrixSupplier)
                     .multiply4x4(modelMatrixSupplier)
                     .invert4x4()
-                    .log("MODELVIEWPROJECTIONINVERSE", Level.FINE)
+                    .log(semanticString, Level.FINE)
                     .build();
             }
 
-            case "MODELINVERSETRANSPOSE":
+            case MODELINVERSETRANSPOSE:
             {
                 Supplier<float[]> modelMatrixSupplier = 
                     createNodeGlobalTransformSupplier(accessedNodeId);
@@ -438,11 +453,11 @@ public final class GltfModel
                     .invert4x4()
                     .transpose4x4()
                     .getRotationScale()
-                    .log("MODELINVERSETRANSPOSE", Level.FINE)
+                    .log(semanticString, Level.FINE)
                     .build();
             }
             
-            case "MODELVIEWINVERSETRANSPOSE":
+            case MODELVIEWINVERSETRANSPOSE:
             {
                 Supplier<float[]> modelMatrixSupplier = 
                     createNodeGlobalTransformSupplier(accessedNodeId);
@@ -452,16 +467,16 @@ public final class GltfModel
                     .invert4x4()
                     .transpose4x4()
                     .getRotationScale()
-                    .log("MODELVIEWINVERSETRANSPOSE", Level.FINE)
+                    .log(semanticString, Level.FINE)
                     .build();
             }
             
-            case "VIEWPORT":
+            case VIEWPORT:
             {
                 return viewportSupplier;
             }
             
-            case "JOINTMATRIX":
+            case JOINTMATRIX:
             {
                 return createJointMatrixSupplier(currentNodeId);
             }
@@ -478,6 +493,11 @@ public final class GltfModel
      * Create a supplier for the view matrix of the camera that is attached
      * to the {@link Node} whose ID is provided by the given supplier. This 
      * will be the inverse of the global transform of the node.<br>
+     * <br>
+     * If the given supplier provides an ID of a {@link Node} that is
+     * not contained in the glTF (or one of its parents is not contained
+     * in the glTF) then a warning will be printed and the supplier will 
+     * assume the identity matrix for the respective node.
      * <br> 
      * The matrix will be provided as a float array with 16 elements, 
      * storing the matrix entries in column-major order.<br>
@@ -507,6 +527,11 @@ public final class GltfModel
      * Create the supplier of the projection matrix for the {@link Camera}
      * with the ID that is contained in the {@link Node} with the ID
      * that is provided by the given {@link Supplier}.<br>
+     * <br>
+     * If the given supplier provides an ID of a {@link Node} that is
+     * not contained in the glTF, or of a node that does not have a
+     * {@link Node#getCamera() camera}, then a warning will be printed
+     * and the supplier will return the identity matrix.
      * <br> 
      * The matrix will be provided as a float array with 16 elements, 
      * storing the matrix entries in column-major order.<br>
@@ -530,10 +555,21 @@ public final class GltfModel
         return () ->
         {
             String cameraNodeId = cameraNodeIdSupplier.get();
-            Node node = getChecked(
-                gltf.getNodes(), cameraNodeId, "camera node");
+            Node node = getOptional(
+                gltf.getNodes(), cameraNodeId, "camera node", Level.WARNING);
+            if (node == null)
+            {
+                MathUtils.setIdentity4x4(result);  
+                return result;
+            }
             String cameraId = node.getCamera();
-            Camera camera = getChecked(gltf.getCameras(), cameraId, "camera");
+            Camera camera = getOptional(
+                gltf.getCameras(), cameraId, "camera", Level.WARNING);
+            if (camera == null)
+            {
+                MathUtils.setIdentity4x4(result);  
+                return result;
+            }
             computeProjectionMatrix(camera, result);
             return result;
         };
@@ -741,14 +777,16 @@ public final class GltfModel
      * and store it in the given result array, as a 4x4 matrix in column-major
      * order.<br>
      * <br>
+     * If one of the required nodes can not be found in the glTF, then
+     * a warning will be printed, and the identity matrix will be 
+     * assumed for the respective node.
+     * <br>
      * If the given array is <code>null</code> or does not have a length 
      * of 16, then a new array will be created and returned
      * 
      * @param nodeId The {@link Node} ID
      * @param result The array that will store the result
      * @return The result array
-     * @throws GltfException If the {@link GlTF} does not contain a
-     * {@link Node} for the given ID or any of its parents
      */
     public float[] computeGlobalTransform(String nodeId, float result[])
     {
@@ -765,13 +803,15 @@ public final class GltfModel
     /**
      * Compute the global transform of the {@link Node} with the given ID,
      * and store the result in the given <code>globalTransform</code> array,
-     * in column-major order.
+     * in column-major order.<br>
+     * <br>
+     * If one of the required nodes can not be found in the glTF, then
+     * a warning will be printed, and the identity matrix will be 
+     * assumed for the respective node.
      * 
      * @param nodeId The {@link Node} ID
      * @param tempLocalTransform A 16-element array for temporary storage
      * @param globalTransform The array that will store the result
-     * @throws GltfException If the {@link GlTF} does not contain a
-     * {@link Node} for the given ID, or any of its parents
      */
     private void computeGlobalTransform(
         String nodeId, float tempLocalTransform[], float globalTransform[])
@@ -780,11 +820,14 @@ public final class GltfModel
         MathUtils.setIdentity4x4(globalTransform);
         while (currentNodeId != null)
         {
-            Node currentNode = getChecked(
-                gltf.getNodes(), currentNodeId, "node");
-            Nodes.computeLocalTransform(currentNode, tempLocalTransform);
-            MathUtils.mul4x4(
-                tempLocalTransform, globalTransform, globalTransform);
+            Node currentNode = getOptional(
+                gltf.getNodes(), currentNodeId, "node", Level.WARNING);
+            if (currentNode != null)
+            {
+                Nodes.computeLocalTransform(currentNode, tempLocalTransform);
+                MathUtils.mul4x4(
+                    tempLocalTransform, globalTransform, globalTransform);
+            }
             currentNodeId = nodeIdToParentNodeId.get(currentNodeId);
         }
         MathUtils.mul4x4(rootTransform, globalTransform, globalTransform);
@@ -798,19 +841,26 @@ public final class GltfModel
      * The matrix will be provided as a float array with 16 elements, 
      * storing the matrix entries in column-major order.<br>
      * <br>
+     * If the glTF does not contain the specified {@link Node}, then
+     * a warning will be printed and the resulting supplier will 
+     * return the identity matrix.<br>
+     * <br>
      * Note: The supplier MAY always return the same array instance.
      * Callers MUST NOT store or modify the returned array. 
      * 
      * @param nodeId The {@link Node} ID
      * @return The supplier
-     * @throws GltfException If the {@link GlTF} does not contain a
-     * {@link Node} for the given ID
      */
     private Supplier<float[]> createNodeLocalTransformSupplier(String nodeId)
     {
-        Node node = getChecked(
-            gltf.getNodes(), nodeId, "node for the local transform");
         float localTransform[] = new float[16];
+        MathUtils.setIdentity4x4(localTransform);
+        Node node = getOptional(gltf.getNodes(), 
+            nodeId, "node for the local transform", Level.WARNING);
+        if (node == null)
+        {
+            return () -> localTransform;
+        }
         return () ->
         {
             Nodes.computeLocalTransform(node, localTransform);
@@ -848,7 +898,7 @@ public final class GltfModel
         }
         return result;
     }
-
+    
     /**
      * Obtains the value for the given ID from the given map. If the given 
      * map is <code>null</code>, or there is no non-<code>null</code> value 

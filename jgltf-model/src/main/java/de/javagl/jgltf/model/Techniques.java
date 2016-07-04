@@ -297,6 +297,7 @@ public class Techniques
      *  "MODELINVERSETRANSPOSE"       FLOAT_MAT3
      *  "MODELVIEWINVERSETRANSPOSE"   FLOAT_MAT3
      *  "VIEWPORT"                    FLOAT_VEC4    
+     *  "JOINTMATRIX"                 FLOAT_MAT4
      * </code></pre>
      * 
      * @param semantic The semantic string
@@ -310,33 +311,40 @@ public class Techniques
         {
             return null;
         }
-        switch (semantic)
+        if (!Semantic.contains(semantic))
         {
-            case "LOCAL" : 
-            case "MODEL" :
-            case "VIEW" :
-            case "PROJECTION" :
-            case "MODELVIEW" :
-            case "MODELVIEWPROJECTION" :
-            case "MODELINVERSE" :
-            case "VIEWINVERSE" :
-            case "PROJECTIONINVERSE" :
-            case "MODELVIEWINVERSE" :
-            case "MODELVIEWPROJECTIONINVERSE" :
+            throw new IllegalArgumentException(
+                "Not a valid semantic: " + semantic);
+        }
+        Semantic s = Semantic.valueOf(semantic);
+        switch (s)
+        {
+            case LOCAL: 
+            case MODEL:
+            case VIEW:
+            case PROJECTION:
+            case MODELVIEW:
+            case MODELVIEWPROJECTION:
+            case MODELINVERSE:
+            case VIEWINVERSE:
+            case PROJECTIONINVERSE:
+            case MODELVIEWINVERSE:
+            case MODELVIEWPROJECTIONINVERSE:
+            case JOINTMATRIX:
                 return GltfConstants.GL_FLOAT_MAT4;
     
-            case "MODELINVERSETRANSPOSE":
-            case "MODELVIEWINVERSETRANSPOSE":
+            case MODELINVERSETRANSPOSE:
+            case MODELVIEWINVERSETRANSPOSE:
                 return GltfConstants.GL_FLOAT_MAT3;
     
-            case "VIEWPORT":
+            case VIEWPORT:
                 return GltfConstants.GL_FLOAT_VEC4;
                 
             default:
                 break;
         }
         throw new IllegalArgumentException(
-            "Invalid technique parameters semantic: "+semantic);
+            "Invalid technique parameters semantic: " + semantic);
     }
 
     /**

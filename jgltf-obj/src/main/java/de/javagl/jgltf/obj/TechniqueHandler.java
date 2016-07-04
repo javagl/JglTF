@@ -37,6 +37,7 @@ import de.javagl.jgltf.impl.Shader;
 import de.javagl.jgltf.impl.Technique;
 import de.javagl.jgltf.impl.TechniqueParameters;
 import de.javagl.jgltf.model.GltfConstants;
+import de.javagl.jgltf.model.Semantic;
 
 /**
  * A class for managing the {@link Technique}s that may be required for
@@ -263,16 +264,19 @@ class TechniqueHandler
         
         techniqueParameters.put("modelViewMatrix", 
             createTechniqueParameters(
-                GltfConstants.GL_FLOAT_MAT4, "MODELVIEW"));
+                GltfConstants.GL_FLOAT_MAT4, 
+                Semantic.MODELVIEW.name()));
         if (withNormals)
         {
             techniqueParameters.put("normalMatrix", 
                 createTechniqueParameters(
-                    GltfConstants.GL_FLOAT_MAT3, "MODELVIEWINVERSETRANSPOSE"));
+                    GltfConstants.GL_FLOAT_MAT3, 
+                    Semantic.MODELVIEWINVERSETRANSPOSE.name()));
         }
         techniqueParameters.put("projectionMatrix", 
             createTechniqueParameters(
-                GltfConstants.GL_FLOAT_MAT4, "PROJECTION"));
+                GltfConstants.GL_FLOAT_MAT4, 
+                Semantic.PROJECTION.name()));
 
         techniqueParameters.put(AMBIENT_NAME, 
             createTechniqueParameters(
