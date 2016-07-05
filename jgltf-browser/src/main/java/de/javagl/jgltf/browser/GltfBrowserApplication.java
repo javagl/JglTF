@@ -30,11 +30,19 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyVetoException;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -147,6 +155,20 @@ class GltfBrowserApplication
 
     };
 
+    /**
+     * The menu showing the most recently used URIs
+     */
+    private JMenu recentUrisMenu;
+    
+    /**
+     * The number of recently used entries
+     */
+    private static final int NUM_RECENT_URI_ENTRIES = 8;
+    
+    /**
+     * The recent URIs
+     */
+    private Deque<URI> recentUris;
     
     /**
      * The main frame of the application
@@ -169,6 +191,8 @@ class GltfBrowserApplication
      */
     GltfBrowserApplication()
     {
+        recentUris = new LinkedList<URI>();
+        
         frame = new JFrame("GltfBrowser");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
@@ -205,10 +229,120 @@ class GltfBrowserApplication
         fileMenu.add(new JMenuItem(openFileAction));
         fileMenu.add(new JMenuItem(openUriAction));
         fileMenu.add(new JSeparator());
+        recentUrisMenu = new JMenu("Recent");
+        updateRecentUrisMenu();
+        fileMenu.add(recentUrisMenu);
+        fileMenu.add(new JSeparator());
         fileMenu.add(new JMenuItem(exitAction));
         return fileMenu;
     }
     
+    /**
+     * Update the {@link #recentUrisMenu} based on the contents of the
+     * current recent URIs file
+     */
+    private void updateRecentUrisMenu()
+    {
+        readRecentUris();
+        recentUrisMenu.removeAll();
+        for (URI uri : recentUris)
+        {
+            JMenuItem menuItem = new JMenuItem(uri.toString());
+            menuItem.addActionListener(
+                e -> openUriInBackground(uri));
+            recentUrisMenu.add(menuItem);
+        }
+    }
+    
+    /**
+     * Returns the file that stores the recently used URIs
+     * 
+     * @return The file
+     */
+    private File getRecentUrisFile()
+    {
+        return Paths.get(System.getProperty("java.io.tmpdir"), 
+            this.getClass().getSimpleName()+"_recentUris.txt").toFile();
+    }
+    
+    /**
+     * Read the {@link #recentUris} from the temporary file
+     */
+    private void readRecentUris()
+    {
+        recentUris.clear();
+        File recentUrisFile = getRecentUrisFile();
+        if (recentUrisFile.exists())
+        {
+            try
+            {
+                List<String> uriStrings = 
+                    Files.readAllLines(recentUrisFile.toPath());
+                for (String uriString : uriStrings)
+                {
+                    try
+                    {
+                        URI uri = new URI(uriString);
+                        recentUris.add(uri);
+                    } 
+                    catch (URISyntaxException e)
+                    {
+                        // Should never happen here, unless the user
+                        // messed around in the file manually...
+                        logger.warning("Invalid URI string: " + uriString);
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                logger.warning(
+                    "Could not read recent URIs: " + e.getMessage());
+            }
+        }
+    }
+    
+    /**
+     * Update the recently used URIs with the given URI. This will update
+     * the list, the file, and the menu.
+     * 
+     * @param uri The most recent URI
+     */
+    private void updateRecentUris(URI uri)
+    {
+        recentUris.remove(uri);
+        recentUris.addFirst(uri);
+        while (recentUris.size() > NUM_RECENT_URI_ENTRIES)
+        {
+            recentUris.removeLast();
+        }
+        writeRecentUris();
+        updateRecentUrisMenu();
+    }
+    
+    /**
+     * Write the current {@link #recentUris} to the recent URIs file
+     */
+    private void writeRecentUris()
+    {
+        File recentUrisFile = getRecentUrisFile();
+        try (BufferedWriter bufferedWriter = 
+                new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream(recentUrisFile))))
+        {
+            for (URI uri : recentUris)
+            {
+                bufferedWriter.write(uri.toString()+System.lineSeparator());
+            }
+        } 
+        catch (IOException e)
+        {
+            logger.warning(
+                "Could not write recent URIs: " + e.getMessage());
+        }
+    }
+    
+    
+
     /**
      * Create the menu containing shortcuts for loading the sample models
      * 
@@ -382,6 +516,7 @@ class GltfBrowserApplication
      */
     void openUriInBackground(URI uri)
     {
+        updateRecentUris(uri);
         GltfLoadingWorker gltfLoadingWorker = 
             new GltfLoadingWorker(this, frame, uri);
         gltfLoadingWorker.load();
@@ -405,7 +540,9 @@ class GltfBrowserApplication
             uriString, resizable, closable , maximizable, iconifiable);
         Component gltfBrowserPanel = new GltfBrowserPanel(gltfData);
         internalFrame.getContentPane().add(gltfBrowserPanel);
-        internalFrame.setSize(gltfBrowserPanel.getPreferredSize());
+        internalFrame.setSize(
+            desktopPane.getWidth(), 
+            desktopPane.getHeight());
         internalFrame.setLocation(0, 0);
         desktopPane.add(internalFrame);
         try
