@@ -34,11 +34,14 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
@@ -67,6 +70,8 @@ import de.javagl.jgltf.model.AccessorIntData;
 import de.javagl.jgltf.model.AccessorShortData;
 import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.GltfData;
+import de.javagl.swing.tasks.SwingTask;
+import de.javagl.swing.tasks.SwingTaskExecutors;
 
 /**
  * A class for creating components that display information about 
@@ -199,10 +204,11 @@ class InfoComponentFactory
         
         JPanel dataPanel = new JPanel(new BorderLayout());
         dataPanel.add(new JLabel("Accessor data:"), BorderLayout.NORTH);
-        JTextArea textArea = new JTextArea(
-            createDataString(accessor, 1));
+        JTextArea textArea = new JTextArea();
         textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
         dataPanel.add(new JScrollPane(textArea));
+        
+        updateAccessorDataText(textArea, accessor, 1);
 
         panel.add(dataPanel, BorderLayout.CENTER);
         
@@ -215,13 +221,57 @@ class InfoComponentFactory
             {
                 elementsPerRow = Integer.MAX_VALUE;
             }
-            textArea.setText(createDataString(accessor, elementsPerRow));
-            SwingUtilities.invokeLater(() ->
-                textArea.scrollRectToVisible(new Rectangle(0,0,1,1)));
+            updateAccessorDataText(textArea, accessor, elementsPerRow);
         });
 
         return panel;
-        
+    }
+    
+    /**
+     * Update the text in the given text area to show the data of the
+     * given {@link Accessor}, with the specified number of elements 
+     * per row. Depending on the size of the accessor data, this may
+     * take long, so this is implemented as a background task that
+     * is shielded by a modal dialog.
+     * 
+     * @param textArea The target text area 
+     * @param accessor The {@link Accessor}
+     * @param elementsPerRow The number of elements per row
+     */
+    private void updateAccessorDataText(
+        JTextArea textArea, Accessor accessor, int elementsPerRow)
+    {
+        SwingTask<String, ?> swingTask = new SwingTask<String, Void>()
+        {
+            @Override
+            protected String doInBackground() throws Exception
+            {
+                return createDataString(accessor, elementsPerRow);
+            }
+            
+            @Override
+            protected void done()
+            {
+                try
+                {
+                    String string = get();
+                    textArea.setText(string);
+                    SwingUtilities.invokeLater(() ->
+                        textArea.scrollRectToVisible(new Rectangle(0,0,1,1)));
+                } 
+                catch (InterruptedException | ExecutionException e)
+                {
+                    // Should never happen: createDataString handles this
+                    StringWriter sw = new StringWriter();
+                    e.printStackTrace(new PrintWriter(sw));
+                    textArea.setText(sw.toString());
+                }
+            }
+        };
+        SwingTaskExecutors.create(swingTask)
+            .setMillisToPopup(1000)
+            .build()
+            .execute();            
         
     }
     
@@ -244,7 +294,9 @@ class InfoComponentFactory
             // When there have been errors in the input file, many
             // things can go wrong when trying to create the data
             // string. Handle this case here ... pragmatically: 
-            return "(Error: " + e.getMessage() + ")";
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            return "Error:\n" + sw.toString();
         }
     }
     
