@@ -41,6 +41,7 @@ import java.util.Arrays;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -87,6 +88,11 @@ class GltfBrowserPanel extends JPanel
      */
     private static final long serialVersionUID = 8959452050508861357L;
 
+    /**
+     * The {@link GltfData} that is displayed in this panel
+     */
+    private final GltfData gltfData;
+    
     /**
      * The tree that displays the glTF structure
      */
@@ -149,6 +155,9 @@ class GltfBrowserPanel extends JPanel
     GltfBrowserPanel(GltfData gltfData)
     {
         super(new BorderLayout());
+        Objects.requireNonNull(gltfData, "The gltfData may not be null");
+        
+        this.gltfData = gltfData;
         this.selectionPathHistory = new LinkedList<TreePath>();
         this.infoComponentFactory = new InfoComponentFactory(gltfData);
         this.resolver = new Resolver(gltfData.getGltf());
@@ -171,6 +180,16 @@ class GltfBrowserPanel extends JPanel
         
         infoPanelContainer = new JPanel(new GridLayout(1,1));
         mainSplitPane.setRightComponent(infoPanelContainer);
+    }
+    
+    /**
+     * Returns the {@link GltfData} that is displayed in this panel
+     * 
+     * @return The {@link GltfData}
+     */
+    GltfData getGltfData()
+    {
+        return gltfData;
     }
     
     /**

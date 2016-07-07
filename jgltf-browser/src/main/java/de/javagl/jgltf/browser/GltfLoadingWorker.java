@@ -175,7 +175,8 @@ class GltfLoadingWorker extends SwingTask<GltfData, Object>
         try
         {
             GltfData gltfData = get();
-            owner.createGltfBrowserPanel(uri.toString(), gltfData);
+            String fileName = IO.extractFileName(uri);
+            owner.createGltfBrowserPanel(fileName, gltfData);
         } 
         catch (CancellationException e)
         {

@@ -122,8 +122,20 @@ class InfoComponentFactory
         Object selectedValue = ObjectTrees.getNodeEntryValue(selectionPath);
         String pathString = ObjectTrees.createPathString(selectionPath);
 
-        logger.fine("selected      "+selectedValue);
-        logger.fine("pathString is "+pathString);
+        boolean showLog = false;
+        showLog = true;
+        if (showLog)
+        {
+            // Avoid printing a whole data URI in the log
+            String selectedValueString = String.valueOf(selectedValue);
+            if (selectedValueString.length() > 100)
+            {
+                selectedValueString = 
+                    selectedValueString.substring(0, 100) + "...";
+            }
+            logger.fine("selected      "+selectedValueString);
+            logger.fine("pathString is "+pathString);
+        }
         
         // Check if the selected path is a GL constant. In this case, 
         // just display the string representation of the GL constant
