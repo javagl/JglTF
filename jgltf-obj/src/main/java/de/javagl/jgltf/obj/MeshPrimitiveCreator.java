@@ -38,6 +38,11 @@ import de.javagl.jgltf.impl.Buffer;
 import de.javagl.jgltf.impl.BufferView;
 import de.javagl.jgltf.impl.GlTF;
 import de.javagl.jgltf.impl.MeshPrimitive;
+import de.javagl.jgltf.model.AccessorByteData;
+import de.javagl.jgltf.model.AccessorDatas;
+import de.javagl.jgltf.model.AccessorFloatData;
+import de.javagl.jgltf.model.AccessorIntData;
+import de.javagl.jgltf.model.AccessorShortData;
 import de.javagl.jgltf.model.Accessors;
 import de.javagl.jgltf.model.GltfConstants;
 
@@ -224,8 +229,134 @@ class MeshPrimitiveCreator
             createSimpleAccessor(indicesComponentType, "SCALAR", 
                 numIndices, indicesBufferViewId);
          
+        accessor.setMin(computeMin(accessor, byteBuffer));
+        accessor.setMax(computeMax(accessor, byteBuffer));
+        
         Gltfs.addAccessor(gltf, indicesAccessorId, accessor);
     }
+    
+    /**
+     * Compute the {@link Accessor#getMin()} values from the given parameters
+     * 
+     * @param accessor The {@link Accessor}
+     * @param byteBuffer The data of the {@link BufferView} of the 
+     * {@link Accessor}
+     * @return The minimum values
+     * @throws IllegalArgumentException If the given {@link Accessor} has a
+     * unknown {@link Accessor#getComponentType()} that is not a valid 
+     * integral type
+     */
+    private static float[] computeMin(Accessor accessor, ByteBuffer byteBuffer)
+    {
+        switch (accessor.getComponentType())
+        {
+            case GltfConstants.GL_BYTE:
+            case GltfConstants.GL_UNSIGNED_BYTE:
+            {
+                AccessorByteData accessorData = 
+                    AccessorDatas.createByte(accessor, byteBuffer);
+                return asFloat(accessorData.getMinInt());
+            }
+            
+            case GltfConstants.GL_SHORT:
+            case GltfConstants.GL_UNSIGNED_SHORT:
+            {
+                AccessorShortData accessorData = 
+                    AccessorDatas.createShort(accessor, byteBuffer);
+                return asFloat(accessorData.getMinInt());
+            }
+            
+            case GltfConstants.GL_INT:
+            case GltfConstants.GL_UNSIGNED_INT:
+            {
+                AccessorIntData accessorData = 
+                    AccessorDatas.createInt(accessor, byteBuffer);
+                return asFloat(accessorData.getMinLong());
+            }
+            default:
+                break;
+        }
+        throw new IllegalArgumentException(
+            "Invalid component type " + accessor.getComponentType());
+    }
+    
+    /**
+     * Compute the {@link Accessor#getMax()} values from the given parameters
+     * 
+     * @param accessor The {@link Accessor}
+     * @param byteBuffer The data of the {@link BufferView} of the 
+     * {@link Accessor}
+     * @return The maximum values
+     * @throws IllegalArgumentException If the given {@link Accessor} has a
+     * unknown {@link Accessor#getComponentType()} that is not a valid 
+     * integral type
+     */
+    private static float[] computeMax(Accessor accessor, ByteBuffer byteBuffer)
+    {
+        switch (accessor.getComponentType())
+        {
+            case GltfConstants.GL_BYTE:
+            case GltfConstants.GL_UNSIGNED_BYTE:
+            {
+                AccessorByteData accessorData = 
+                    AccessorDatas.createByte(accessor, byteBuffer);
+                return asFloat(accessorData.getMaxInt());
+            }
+            
+            case GltfConstants.GL_SHORT:
+            case GltfConstants.GL_UNSIGNED_SHORT:
+            {
+                AccessorShortData accessorData = 
+                    AccessorDatas.createShort(accessor, byteBuffer);
+                return asFloat(accessorData.getMaxInt());
+            }
+            
+            case GltfConstants.GL_INT:
+            case GltfConstants.GL_UNSIGNED_INT:
+            {
+                AccessorIntData accessorData = 
+                    AccessorDatas.createInt(accessor, byteBuffer);
+                return asFloat(accessorData.getMaxLong());
+            }
+            default:
+                break;
+        }
+        throw new IllegalArgumentException(
+            "Invalid component type " + accessor.getComponentType());
+    }
+    
+    
+    /**
+     * Convert the given array into a float array
+     * 
+     * @param array The array
+     * @return the result
+     */
+    private static float[] asFloat(int array[])
+    {
+        float result[] = new float[array.length];
+        for (int i = 0; i < array.length; i++)
+        {
+            result[i] = array[i];
+        }
+        return result;
+    }    
+
+    /**
+     * Convert the given array into a float array
+     * 
+     * @param array The array
+     * @return the result
+     */
+    private static float[] asFloat(long array[])
+    {
+        float result[] = new float[array.length];
+        for (int i = 0; i < array.length; i++)
+        {
+            result[i] = array[i];
+        }
+        return result;
+    }    
     
     /**
      * Add the elements the {@link GlTF} that are required for representing
@@ -250,6 +381,11 @@ class MeshPrimitiveCreator
             GltfConstants.GL_FLOAT, "VEC3", 
             numVertices, verticesBufferViewId);
 
+        AccessorFloatData accessorData = 
+            AccessorDatas.createFloat(accessor, byteBuffer);
+        accessor.setMin(accessorData.getMin());
+        accessor.setMax(accessorData.getMax());
+        
         Gltfs.addAccessor(gltf, verticesAccessorId, accessor);
         
     }
@@ -276,6 +412,11 @@ class MeshPrimitiveCreator
         Accessor accessor = createSimpleAccessor(
             GltfConstants.GL_FLOAT, "VEC2", 
             numTexCoords, texCoordsBufferViewId);
+        
+        AccessorFloatData accessorData = 
+            AccessorDatas.createFloat(accessor, byteBuffer);
+        accessor.setMin(accessorData.getMin());
+        accessor.setMax(accessorData.getMax());
 
         Gltfs.addAccessor(gltf, texCoordsAccessorId, accessor);
     }
@@ -302,6 +443,11 @@ class MeshPrimitiveCreator
         Accessor accessor = createSimpleAccessor(
             GltfConstants.GL_FLOAT, "VEC3", 
             numNormals, normalsBufferViewId);
+
+        AccessorFloatData accessorData = 
+            AccessorDatas.createFloat(accessor, byteBuffer);
+        accessor.setMin(accessorData.getMin());
+        accessor.setMax(accessorData.getMax());
 
         Gltfs.addAccessor(gltf, normalsAccessorId, accessor);
     }
