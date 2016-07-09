@@ -40,6 +40,7 @@ import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
@@ -271,7 +272,11 @@ class InfoComponentFactory
                     SwingUtilities.invokeLater(() ->
                         textArea.scrollRectToVisible(new Rectangle(0,0,1,1)));
                 } 
-                catch (InterruptedException | ExecutionException e)
+                catch (InterruptedException e)
+                {
+                    Thread.currentThread().interrupt();
+                }
+                catch (ExecutionException e)
                 {
                     // Should never happen: createDataString handles this
                     StringWriter sw = new StringWriter();
@@ -308,7 +313,8 @@ class InfoComponentFactory
             // string. Handle this case here ... pragmatically: 
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
-            return "Error:\n" + sw.toString();
+            return "Error while creating string. " + 
+                "Input file may be invalid.\n" + sw.toString();
         }
     }
     
@@ -586,7 +592,7 @@ class InfoComponentFactory
         }
         for (Entry<K, ?> entry : map.entrySet())
         {
-            if (entry.getValue() == value)
+            if (Objects.equals(entry.getValue(), value))
             {
                 return entry.getKey();
             }

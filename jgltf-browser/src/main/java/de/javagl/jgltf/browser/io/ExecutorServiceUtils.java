@@ -31,8 +31,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.function.DoubleConsumer;
 import java.util.logging.Logger;
 
@@ -103,6 +101,7 @@ class ExecutorServiceUtils
             } 
             catch (InterruptedException e)
             {
+                Thread.currentThread().interrupt();
                 result = e;
                 break;
             } 
@@ -121,61 +120,6 @@ class ExecutorServiceUtils
         }
         progressConsumer.accept(1.0);
         return result;
-    }
-
-
-    /**
-     * Shut down the given executor service, and wait for an unspecified
-     * amount of time until it terminated. If the waiting times out, then
-     * an error message will be printed.
-     * 
-     * @param executorService The executor service
-     */
-    static void shutdown(ExecutorService executorService)
-    {
-        executorService.shutdown();
-        try
-        {
-            boolean terminated = 
-                executorService.awaitTermination(5, TimeUnit.SECONDS);
-            if (!terminated)
-            {
-                logger.warning("Could not shut down executor service");
-            }
-        } 
-        catch (InterruptedException e)
-        {
-            logger.warning("Interrupted while waiting for executor " + 
-                "service to terminate");
-            Thread.currentThread().interrupt();
-        }
-    }
-    
-    /**
-     * Shut down the given executor service now, and wait for an unspecified
-     * amount of time until it terminated. If the waiting times out, then
-     * an error message will be printed.
-     * 
-     * @param executorService The executor service
-     */
-    static void shutdownNow(ExecutorService executorService)
-    {
-        executorService.shutdownNow();
-        try
-        {
-            boolean terminated = 
-                executorService.awaitTermination(5, TimeUnit.SECONDS);
-            if (!terminated)
-            {
-                logger.warning("Could not shut down executor service now");
-            }
-        } 
-        catch (InterruptedException e)
-        {
-            logger.warning("Interrupted while waiting for executor " + 
-                "service to terminate");
-            Thread.currentThread().interrupt();
-        }
     }
 
     /**

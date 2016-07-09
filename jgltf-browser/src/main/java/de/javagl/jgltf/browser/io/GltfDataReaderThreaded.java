@@ -200,8 +200,11 @@ public class GltfDataReaderThreaded
      */
     public void cancel()
     {
-        ExecutorServiceUtils.shutdownNow(observableExecutorService);
-        observableExecutorService = null;
+        if (observableExecutorService != null)
+        {
+            observableExecutorService.shutdownNow();
+            observableExecutorService = null;
+        }
     }
     
     /**
@@ -407,6 +410,10 @@ public class GltfDataReaderThreaded
                     return null;
                 }
                 GltfData gltfData = readGltfData(inputStream);
+                if (Thread.currentThread().isInterrupted())
+                {
+                    throw new IOException("Interrupted while reading glTF");
+                }
                 setGltfData(gltfData);
                 return null;
             }

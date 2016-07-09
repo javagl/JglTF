@@ -172,7 +172,7 @@ class Resolver
     ResolvedEntity resolve(String pathString, Object key)
     {
         // Create the map from simple path expressions (see the 
-        // "matches(String, String)" method) to the maps that
+        // "RegEx.matches(String, String)" method) to the maps that
         // map the selected element to a glTF entity 
         Map<String, Map<?, ?>> m = 
             new LinkedHashMap<String, Map<?,?>>();
@@ -219,23 +219,35 @@ class Resolver
         if (RegEx.matches(pathString, "glTF.animations.*.channels.*.sampler"))
         {
             String animationId = extractId(pathString, "glTF.animations.");
-            if (animationId != null)
-            {
-                Map<String, Animation> animations = gltf.getAnimations();
-                if (animations != null)
-                {
-                    Animation animation = animations.get(animationId);
-                    if (animation != null)
-                    {
-                        Map<String, AnimationSampler> samplers = 
-                            animation.getSamplers();
-                        return new ResolvedEntity(
-                            "animation samplers", pathString, 
-                            key, samplers);
-                    }
-                }
+            Animation animation = 
+                getOptional(animationId, gltf.getAnimations());
+            if (animation != null)
+            {  
+                Map<String, AnimationSampler> samplers = 
+                    animation.getSamplers();
+                return new ResolvedEntity(
+                    "animation samplers", pathString, 
+                    key, samplers);
             }
         }
+        
+        // Try to resolve the parameter of an animation sampler input or output
+        if (RegEx.matches(pathString, "glTF.animations.*.samplers.*.input") ||
+            RegEx.matches(pathString, "glTF.animations.*.samplers.*.output"))
+        {
+            String animationId = extractId(pathString, "glTF.animations.");
+            Animation animation = 
+                getOptional(animationId, gltf.getAnimations());
+            if (animation != null)
+            {
+                Map<String, String> parameters = 
+                    animation.getParameters();
+                return new ResolvedEntity(
+                    "animation parameters", pathString, 
+                    key, parameters);
+            }
+        }
+        
         
         // Try to resolve the texture of a material value. 
         // (Some guesswork involved here...)
@@ -259,47 +271,42 @@ class Resolver
         if (RegEx.matches(pathString, "glTF.techniques.*.attributes.*"))
         {
             String techniqueId = extractId(pathString, "glTF.techniques.");
-            if (techniqueId != null)
+            Technique technique = 
+                getOptional(techniqueId, gltf.getTechniques());
+            if (technique != null)
             {
-                Map<String, Technique> techniques = gltf.getTechniques();
-                if (techniques != null)
-                {
-                    Technique technique = techniques.get(techniqueId);
-                    if (technique != null)
-                    {
-                        Map<String, TechniqueParameters> parameters = 
-                            technique.getParameters();
-                        return new ResolvedEntity(
-                            "technique parameters", pathString, 
-                            key, parameters);
-                    }
-                }
-            }
-        }
-        
-        // Try to resolve the parameter of an animation sampler input or output
-        if (RegEx.matches(pathString, "glTF.animations.*.samplers.*.input") ||
-            RegEx.matches(pathString, "glTF.animations.*.samplers.*.output"))
-        {
-            String animationId = extractId(pathString, "glTF.animations.");
-            if (animationId != null)
-            {
-                Map<String, Animation> animations = gltf.getAnimations();
-                if (animations != null)
-                {
-                    Animation animation = animations.get(animationId);
-                    if (animation != null)
-                    {
-                        Map<String, String> parameters = 
-                            animation.getParameters();
-                        return new ResolvedEntity(
-                            "animation parameters", pathString, 
-                            key, parameters);
-                    }
-                }
+                Map<String, TechniqueParameters> parameters = 
+                    technique.getParameters();
+                return new ResolvedEntity(
+                    "technique parameters", pathString, 
+                    key, parameters);
             }
         }
         return null;
+    }
+    
+    /**
+     * Returns the value that is associated with the given key in the
+     * given map, or <code>null</code> if either the key or the map
+     * is <code>null</code>.
+     *  
+     * @param <T> The value type
+     * 
+     * @param key The key
+     * @param map The map
+     * @return The value
+     */
+    private static <T> T getOptional(String key, Map<String, T> map)
+    {
+        if (key == null)
+        {
+            return null;
+        }
+        if (map == null)
+        {
+            return null;
+        }
+        return map.get(key);
     }
     
     /**

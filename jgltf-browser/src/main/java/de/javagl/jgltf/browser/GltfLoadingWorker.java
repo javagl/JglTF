@@ -26,49 +26,32 @@
  */
 package de.javagl.jgltf.browser;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridLayout;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
 
 import de.javagl.jgltf.browser.io.GltfDataReaderThreaded;
 import de.javagl.jgltf.model.GltfData;
 import de.javagl.jgltf.model.io.IO;
-import de.javagl.jgltf.model.io.JsonError;
 import de.javagl.swing.tasks.ProgressListener;
 import de.javagl.swing.tasks.SwingTask;
 import de.javagl.swing.tasks.SwingTaskExecutors;
 import de.javagl.swing.tasks.SwingTaskViews;
-import de.javagl.swing.tasks.executors.ExecutorObserver;
-import de.javagl.swing.tasks.executors.ObservableExecutorPanel;
-import de.javagl.swing.tasks.executors.ObservableExecutorService;
-import de.javagl.swing.tasks.executors.TaskViewHandlers;
-import de.javagl.swing.tasks.executors.TaskViewListCellRenderers;
 
 /**
  * The worker class for loading glTF data from a URI. This is a swing task
  * that performs the loading in a background thread, while showing a modal
  * dialog with progress information. 
  */
-class GltfLoadingWorker extends SwingTask<GltfData, Object>
+final class GltfLoadingWorker extends SwingTask<GltfData, Object>
 {
     /**
      * The logger used in this class
@@ -97,10 +80,11 @@ class GltfLoadingWorker extends SwingTask<GltfData, Object>
     private final GltfDataReaderThreaded gltfDataReaderThreaded;
 
     /**
-     * The list of JsonError instances that have occurred during 
-     * parsing
+     * The {@link GltfLoaderPanel} that will be shown in the modal
+     * dialog while this worker is running, and which will display
+     * the progress information and possible error messages.
      */
-    private final List<JsonError> jsonErrors = new ArrayList<JsonError>();
+    private final GltfLoaderPanel gltfLoaderPanel;
 
     /**
      * Creates a new worker
@@ -116,6 +100,8 @@ class GltfLoadingWorker extends SwingTask<GltfData, Object>
         this.uri = uri;
         
         this.gltfDataReaderThreaded = new GltfDataReaderThreaded(-1);
+        this.gltfLoaderPanel = new GltfLoaderPanel(
+            gltfDataReaderThreaded.getObservableExecutorService());
     }
     
     /**
@@ -124,14 +110,11 @@ class GltfLoadingWorker extends SwingTask<GltfData, Object>
      */
     void load()
     {
-        JComponent accessory = createSwingTaskViewAccessory(
-            gltfDataReaderThreaded.getObservableExecutorService());
-        
         SwingTaskExecutors.create(this)
             .setTitle("Loading")
             .setMillisToPopup(0)
             .setSwingTaskViewFactory(c -> 
-                SwingTaskViews.create(c, accessory, false))
+                SwingTaskViews.create(c, gltfLoaderPanel, false))
             .setCancelable(true)
             .build()
             .execute();
@@ -164,8 +147,13 @@ class GltfLoadingWorker extends SwingTask<GltfData, Object>
             }
         }; 
         gltfDataReaderThreaded.addProgressListener(progressListener);
-        gltfDataReaderThreaded.setJsonErrorConsumer(
-            e -> jsonErrors.add(e));
+        gltfDataReaderThreaded.setJsonErrorConsumer(jsonError ->
+        {
+            String jsonErrorString = 
+                jsonError.getMessage() + ",\n at JSON path: " + 
+                jsonError.getJsonPathString() + "\n";
+            gltfLoaderPanel.appendMessage(jsonErrorString);
+        });
         return gltfDataReaderThreaded.readGltfData(uri);
     }
 
@@ -186,159 +174,25 @@ class GltfLoadingWorker extends SwingTask<GltfData, Object>
             //e.printStackTrace();
             return;
         }
-        catch (Exception e)
+        catch (InterruptedException e)
         {
-            e.printStackTrace();
-
+            logger.info("Interrupted while loading " + uri + 
+                " (" + e.getMessage() + ")");
+            gltfDataReaderThreaded.cancel();
+            Thread.currentThread().interrupt();
+        }
+        catch (ExecutionException e)
+        {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
             StringBuilder sb = new StringBuilder();
-            sb.append("Loading error: " + e.getMessage());
-            if (!jsonErrors.isEmpty())
-            {
-                sb.append("\n");
-                sb.append("JSON errors:\n");
-                sb.append(createString(jsonErrors));
-            }
+            sb.append("Loading error: " + e.getMessage() + 
+                "\n" + sw.toString());
             JOptionPane.showMessageDialog(frame,
                 sb.toString(), "Error",
                 JOptionPane.ERROR_MESSAGE);
             return;
         }
-        
-        if (!jsonErrors.isEmpty())
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.append("JSON errors:\n");
-            sb.append(createString(jsonErrors));
-            JOptionPane.showMessageDialog(frame,
-                sb.toString(), "Warning",
-                JOptionPane.WARNING_MESSAGE);
-        }
     }
             
-    /**
-     * Create a string representation of the given errors
-     * 
-     * @param jsonErrors The JsonErrors
-     * @return The string
-     */
-    private String createString(Iterable<? extends JsonError> jsonErrors)
-    {
-        StringBuffer sb = new StringBuffer();
-        int counter = 0;
-        for (JsonError jsonError : jsonErrors)
-        {
-            sb.append(String.valueOf(counter)+ ".:" + 
-                jsonError.getMessage() + ", JSON path: " + 
-                jsonError.getJsonPathString() + "\n");
-            counter++;
-        }
-        return sb.toString();
-    }
-
-    /**
-     * Create the accessory component that displays the list of active tasks
-     * in the dialog that is shown while a glTF is loaded
-     * 
-     * @param observableExecutorService The {@link ObservableExecutorService}
-     * that is processing the loading tasks
-     * @return The accessory component
-     */
-    private JComponent createSwingTaskViewAccessory(
-        ObservableExecutorService observableExecutorService)
-    {
-        JComponent accessory = new JPanel(new BorderLayout());
-        accessory.setBorder(
-            BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(10, 0, 10, 0), 
-                BorderFactory.createTitledBorder("Active tasks:")));
-
-        // Create the ObservableExecutorPanel that shows the currently
-        // running tasks
-        ObservableExecutorPanel observableExecutorPanel = 
-            new ObservableExecutorPanel();
-        observableExecutorPanel.setObservableExecutorService(
-            observableExecutorService);
-        observableExecutorPanel.setPreferredSize(new Dimension(600, 300));
-        observableExecutorPanel.setTaskViewHandler(
-            TaskViewHandlers.createDefault(false));
-        observableExecutorPanel.setCellRenderer(
-            TaskViewListCellRenderers.createBasic());
-        accessory.add(observableExecutorPanel, BorderLayout.CENTER);
-        
-        // Create a text area that will show possible exception stack
-        // traces of selected tasks
-        JTextArea statusTextArea = new JTextArea();
-        statusTextArea.setTabSize(2);
-        statusTextArea.setFont(new Font("Monospaced", Font.PLAIN, 11));
-        observableExecutorService.addExecutorObserver(new ExecutorObserver()
-        {
-            @Override
-            public void tasksFinished()
-            {
-                // Nothing to do here
-            }
-            
-            @Override
-            public void scheduled(Runnable r)
-            {
-                // Nothing to do here
-            }
-            
-            @Override
-            public void beforeExecute(Thread t, Runnable r)
-            {
-                // Nothing to do here
-            }
-            
-            @Override
-            public void afterExecute(Runnable r, Throwable t)
-            {
-                if (t != null)
-                {
-                    StringWriter stringWriter = new StringWriter();
-                    t.printStackTrace(new PrintWriter(stringWriter));
-                    String string = stringWriter.toString();
-                    String message = "\n=== Error in " + r + ":\n" + string;
-                    SwingUtilities.invokeLater(() ->
-                        statusTextArea.append(message));
-                }
-            }
-        });
-        
-        /*
-        observableExecutorPanel.addListSelectionListener(
-            new ListSelectionListener()
-        {
-            @Override
-            public void valueChanged(ListSelectionEvent e)
-            {
-                JList<?> list = (JList<?>)e.getSource();
-                Object value = list.getSelectedValue();
-                TaskView taskView = (TaskView)value;
-                Throwable throwable = taskView.getThrowable();
-                if (throwable != null)
-                {
-                    StringWriter stringWriter = new StringWriter();
-                    throwable.printStackTrace(new PrintWriter(stringWriter));
-                    statusTextArea.setText(stringWriter.toString());
-                }
-                else
-                {
-                    statusTextArea.setText("");
-                }
-            }
-        });
-        */
-        
-        JScrollPane statusScrollPane = new JScrollPane(statusTextArea);
-        statusScrollPane.setPreferredSize(new Dimension(600, 200));
-        JPanel statusPanel = new JPanel(new GridLayout(1,1));
-        statusPanel.setBorder(BorderFactory.createTitledBorder("Messages:"));
-        statusPanel.add(statusScrollPane);
-        accessory.add(statusPanel, BorderLayout.SOUTH);
-        
-        return accessory;
-    }
-    
-    
 }
