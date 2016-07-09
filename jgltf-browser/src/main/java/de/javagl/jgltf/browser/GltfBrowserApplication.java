@@ -47,6 +47,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -69,6 +70,10 @@ import de.javagl.jgltf.model.io.BinaryGltfDataWriter;
 import de.javagl.jgltf.model.io.GltfDataToBinaryConverter;
 import de.javagl.jgltf.model.io.GltfDataToEmbeddedConverter;
 import de.javagl.jgltf.model.io.GltfDataWriter;
+import de.javagl.jgltf.model.io.IO;
+import de.javagl.jgltf.obj.ObjGltfDataCreator;
+import de.javagl.swing.tasks.SwingTask;
+import de.javagl.swing.tasks.SwingTaskExecutors;
 
 /**
  * The main glTF browser application class, containing the main frame 
@@ -131,6 +136,33 @@ class GltfBrowserApplication
         public void actionPerformed(ActionEvent e)
         {
             openUri();
+        }
+    };
+
+    /**
+     * The Action for importing a file
+     * 
+     * @see #importFile()
+     */
+    private final Action importFileAction = new AbstractAction()
+    {
+        /**
+         * Serial UID
+         */
+        private static final long serialVersionUID = 6442563220376147803L;
+
+
+        // Initialization
+        {
+            putValue(NAME, "Import file...");
+            putValue(SHORT_DESCRIPTION, "Import a non-glTF file");
+            putValue(MNEMONIC_KEY, new Integer(KeyEvent.VK_I));
+        }
+        
+        @Override
+        public void actionPerformed(ActionEvent e)
+        {
+            importFile();
         }
     };
     
@@ -300,6 +332,11 @@ class GltfBrowserApplication
      * The FileChooser for opening glTF files
      */
     private final JFileChooser openFileChooser;
+
+    /**
+     * The FileChooser for importing files
+     */
+    private final JFileChooser importFileChooser;
     
     /**
      * The FileChooser for saving glTF files
@@ -375,6 +412,11 @@ class GltfBrowserApplication
             new FileNameExtensionFilter(
                 "glTF Files (.gltf, .glb)", "gltf", "glb"));
         
+        importFileChooser = new JFileChooser(".");
+        importFileChooser.setFileFilter(
+            new FileNameExtensionFilter(
+                "Importable Files (.obj)", "obj"));
+        
         saveFileChooser = new JFileChooser(".");
         saveBinaryFileChooser = new JFileChooser(".");
         
@@ -397,10 +439,15 @@ class GltfBrowserApplication
         fileMenu.add(new JMenuItem(openFileAction));
         fileMenu.add(new JMenuItem(openUriAction));
         fileMenu.add(new JSeparator());
+
         recentUrisMenu = new JMenu("Recent");
         updateRecentUrisMenu();
         fileMenu.add(recentUrisMenu);
         fileMenu.add(new JSeparator());
+
+        fileMenu.add(new JMenuItem(importFileAction));
+        fileMenu.add(new JSeparator());
+        
         fileMenu.add(new JMenuItem(saveAsAction));
         fileMenu.add(new JMenuItem(saveAsBinaryAction));
         fileMenu.add(new JSeparator());
@@ -709,6 +756,71 @@ class GltfBrowserApplication
         gltfLoadingWorker.load();
     }
     
+    
+    /**
+     * Open the file chooser to select a file which will be 
+     * imported upon confirmation
+     */
+    private void importFile()
+    {
+        int returnState = importFileChooser.showOpenDialog(frame);
+        if (returnState == JFileChooser.APPROVE_OPTION) 
+        {
+            File file = importFileChooser.getSelectedFile();
+            importUriInBackground(file.toURI());
+        }        
+    }
+    
+    /**
+     * Import the data from the specified URI in a background thread
+     *  
+     * @param uri The URI
+     */
+    private void importUriInBackground(URI uri)
+    {
+        // TODO Improve this crude "file type detection"...  
+        if (uri.toString().toLowerCase().endsWith(".obj"))
+        {
+            SwingTask<GltfData, ?> swingTask = new SwingTask<GltfData, Void>()
+            {
+                @Override
+                protected GltfData doInBackground() throws Exception
+                {
+                    return new ObjGltfDataCreator().create(uri);
+                }
+                
+                @Override
+                protected void done()
+                {
+                    try
+                    {
+                        GltfData gltfData = get();
+                        String frameTitle =
+                            "glTF for " + IO.extractFileName(uri);
+                        createGltfBrowserPanel(frameTitle, gltfData);
+                    } 
+                    catch (InterruptedException e)
+                    {
+                        Thread.currentThread().interrupt();
+                    }
+                    catch (ExecutionException e)
+                    {
+                        JOptionPane.showMessageDialog(frame, 
+                            "Could not read " + uri + ": " + e.getMessage(), 
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            };
+            SwingTaskExecutors.create(swingTask)
+                .build()
+                .execute();            
+        }
+        else
+        {
+            logger.warning("Unknown file format: " + uri);
+        }
+    }
+
     /**
      * Create the {@link GltfBrowserPanel} for the given {@link GltfData}, 
      * and add it (in an internal frame with the given string as its title)
