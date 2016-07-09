@@ -76,17 +76,17 @@ class ObjSplitting
      * @param obj The input OBJ
      * @return The list of resulting OBJs
      */
-    static List<Obj> split(Obj obj)
+    static List<? extends ReadableObj> split(ReadableObj obj)
     {
-        List<Obj> currentObjs = Collections.singletonList(obj);
-        List<Obj> nextObjs = new ArrayList<Obj>();
+        List<ReadableObj> currentObjs = Collections.singletonList(obj);
+        List<ReadableObj> nextObjs = new ArrayList<ReadableObj>();
         boolean didSplit = false;
         while (true)
         {
             didSplit = false;
             for (int i=0; i<currentObjs.size(); i++)
             {
-                Obj currentObj = currentObjs.get(i);
+                ReadableObj currentObj = currentObjs.get(i);
                 if (OBJ_SPLIT_PREDICATE.test(currentObj))
                 {
                     List<Obj> parts = splitSingle(currentObj);
@@ -103,7 +103,7 @@ class ObjSplitting
             {
                 break;
             }
-            nextObjs = new ArrayList<Obj>();
+            nextObjs = new ArrayList<ReadableObj>();
         }
         return currentObjs;
     }
@@ -114,7 +114,7 @@ class ObjSplitting
      * @param obj The input OBJ
      * @return The list containing the parts
      */
-    private static List<Obj> splitSingle(Obj obj)
+    private static List<Obj> splitSingle(ReadableObj obj)
     {
         logger.log(level,
             "Splitting OBJ with " + obj.getNumVertices() + " vertices");

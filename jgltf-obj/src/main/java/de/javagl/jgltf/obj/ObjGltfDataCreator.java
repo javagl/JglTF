@@ -65,6 +65,7 @@ import de.javagl.obj.ObjData;
 import de.javagl.obj.ObjGroup;
 import de.javagl.obj.ObjReader;
 import de.javagl.obj.ObjUtils;
+import de.javagl.obj.ReadableObj;
 
 /**
  * A class for creating {@link GltfData} objects from OBJ files 
@@ -128,7 +129,6 @@ public class ObjGltfDataCreator
      */
     private BufferCreator bufferCreator;
     
-    
     /**
      * The {@link TechniqueHandler} that maintains the {@link Technique}s
      * that are required for the {@link GlTF}
@@ -140,6 +140,19 @@ public class ObjGltfDataCreator
      * {@link Texture}s that are required for the {@link GlTF}
      */
     private TextureHandler textureHandler;
+    
+    /**
+     * The component type for the indices of the resulting glTF. 
+     * For glTF 1.0, this may at most be GL_UNSIGNED_SHORT.  
+     */
+    private final int indicesComponentType = GltfConstants.GL_UNSIGNED_SHORT;
+    
+    /**
+     * A function that will receive all OBJ groups that should be processed,
+     * and may (or may not) split them into multiple parts. 
+     */
+    private final Function<? super ReadableObj, List<? extends ReadableObj>> 
+        objSplitter;
     
     /**
      * Default constructor
@@ -157,8 +170,8 @@ public class ObjGltfDataCreator
     public ObjGltfDataCreator(BufferStrategy bufferStrategy)
     {
         this.bufferStrategy = bufferStrategy;
+        this.objSplitter = obj -> ObjSplitting.split(obj);
     }
-    
     
     /**
      * Create a {@link GltfData} from the OBJ file with the given URI
@@ -470,10 +483,10 @@ public class ObjGltfDataCreator
         Obj obj, String idSuffix)
     {
         List<MeshPrimitive> meshPrimitives = new ArrayList<MeshPrimitive>();
-        List<Obj> parts = ObjSplitting.split(obj);
+        List<? extends ReadableObj> parts = objSplitter.apply(obj);
         for (int i = 0; i < parts.size(); i++)
         {
-            Obj part = parts.get(i);
+            ReadableObj part = parts.get(i);
             String partIdSuffix = idSuffix;
             if (parts.size() > 1)
             {
@@ -495,7 +508,7 @@ public class ObjGltfDataCreator
             // Generate a MeshPrimitive for the current OBJ data
             MeshPrimitive meshPrimitive = 
                 bufferCreator.createMeshPrimitive(partIdSuffix, 
-                    objIndices, GltfConstants.GL_UNSIGNED_SHORT, 
+                    objIndices, indicesComponentType, 
                     objVertices, objTexCoords, objNormals);
             meshPrimitives.add(meshPrimitive);
             
