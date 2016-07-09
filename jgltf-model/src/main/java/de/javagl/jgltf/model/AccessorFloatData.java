@@ -28,6 +28,7 @@ package de.javagl.jgltf.model;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -185,6 +186,48 @@ public final class AccessorFloatData
         int elementIndex = globalComponentIndex / numComponentsPerElement;
         int componentIndex = globalComponentIndex % numComponentsPerElement;
         return get(elementIndex, componentIndex);
+    }
+    
+    /**
+     * Returns an array containing the minimum component values of all elements 
+     * of this accessor data. This will be an array whose length is the 
+     * {@link #getNumComponentsPerElement() number of components per element}.
+     * 
+     * @return The minimum values
+     */
+    public float[] getMin()
+    {
+        float result[] = new float[getNumComponentsPerElement()];
+        Arrays.fill(result, Float.MAX_VALUE);
+        for (int e = 0; e < getNumElements(); e++)
+        {
+            for (int c = 0; c < getNumComponentsPerElement(); c++)
+            {
+                result[c] = Math.min(result[c], get(e, c));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Returns an array containing the maximum component values of all elements 
+     * of this accessor data. This will be an array whose length is the 
+     * {@link #getNumComponentsPerElement() number of components per element}.
+     * 
+     * @return The minimum values
+     */
+    public float[] getMax()
+    {
+        float result[] = new float[getNumComponentsPerElement()];
+        Arrays.fill(result, -Float.MAX_VALUE);
+        for (int e = 0; e < getNumElements(); e++)
+        {
+            for (int c = 0; c < getNumComponentsPerElement(); c++)
+            {
+                result[c] = Math.max(result[c], get(e, c));
+            }
+        }
+        return result;
     }
     
     /**

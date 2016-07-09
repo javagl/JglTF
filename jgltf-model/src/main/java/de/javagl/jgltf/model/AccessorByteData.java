@@ -28,6 +28,7 @@ package de.javagl.jgltf.model;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -240,8 +241,91 @@ public final class AccessorByteData
         return unsigned ? Byte.toUnsignedInt(value) : value;
     }
     
+    /**
+     * Returns an array containing the minimum component values of all elements 
+     * of this accessor data. This will be an array whose length is the 
+     * {@link #getNumComponentsPerElement() number of components per element}.
+     * 
+     * @return The minimum values
+     */
+    public byte[] getMin()
+    {
+        byte result[] = new byte[getNumComponentsPerElement()];
+        Arrays.fill(result, Byte.MAX_VALUE);
+        for (int e = 0; e < getNumElements(); e++)
+        {
+            for (int c = 0; c < getNumComponentsPerElement(); c++)
+            {
+                result[c] = (byte) Math.min(result[c], get(e, c));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Returns an array containing the maximum component values of all elements 
+     * of this accessor data. This will be an array whose length is the 
+     * {@link #getNumComponentsPerElement() number of components per element}.
+     * 
+     * @return The minimum values
+     */
+    public byte[] getMax()
+    {
+        byte result[] = new byte[getNumComponentsPerElement()];
+        Arrays.fill(result, Byte.MIN_VALUE);
+        for (int e = 0; e < getNumElements(); e++)
+        {
+            for (int c = 0; c < getNumComponentsPerElement(); c++)
+            {
+                result[c] = (byte) Math.max(result[c], get(e, c));
+            }
+        }
+        return result;
+    }
     
-    
+    /**
+     * Returns an array containing the minimum component values of all elements 
+     * of this accessor data. This will be an array whose length is the 
+     * {@link #getNumComponentsPerElement() number of components per element}.
+     * These values are computed based on {@link #getInt(int, int)}.
+     * 
+     * @return The minimum values
+     */
+    public int[] getMinInt()
+    {
+        int result[] = new int[getNumComponentsPerElement()];
+        Arrays.fill(result, Integer.MAX_VALUE);
+        for (int e = 0; e < getNumElements(); e++)
+        {
+            for (int c = 0; c < getNumComponentsPerElement(); c++)
+            {
+                result[c] = Math.min(result[c], getInt(e, c));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Returns an array containing the maximum component values of all elements 
+     * of this accessor data. This will be an array whose length is the 
+     * {@link #getNumComponentsPerElement() number of components per element}.
+     * These values are computed based on {@link #getInt(int, int)}.
+     * 
+     * @return The minimum values
+     */
+    public int[] getMaxInt()
+    {
+        int result[] = new int[getNumComponentsPerElement()];
+        Arrays.fill(result, Integer.MIN_VALUE);
+        for (int e = 0; e < getNumElements(); e++)
+        {
+            for (int c = 0; c < getNumComponentsPerElement(); c++)
+            {
+                result[c] = Math.max(result[c], getInt(e, c));
+            }
+        }
+        return result;
+    }
     
     /**
      * Creates a new, direct byte buffer (with native byte order) that
