@@ -155,7 +155,7 @@ class JacksonUtils
     
     /**
      * Perform a default configuration of the given object mapper for
-     * the use in the glTF rendering demo
+     * parsing glTF data
      * 
      * @param objectMapper The object mapper
      * @param jsonErrorConsumer The consumer for {@link JsonError}s. If this 

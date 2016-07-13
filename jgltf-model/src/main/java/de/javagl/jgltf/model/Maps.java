@@ -38,6 +38,9 @@ public class Maps
      * If the given map is not <code>null</code>, pass the key-value pairs
      * of the given map to the given consumer
      * 
+     * @param <K> The key type
+     * @param <V> The value type
+     * 
      * @param map The map
      * @param biConsumer The consumer
      */
