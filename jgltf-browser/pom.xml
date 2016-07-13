@@ -59,7 +59,7 @@
     <dependency>
       <groupId>de.javagl</groupId>
       <artifactId>swing-tasks</artifactId>
-      <version>0.0.3-SNAPSHOT</version>
+      <version>0.0.3</version>
     </dependency>
     <dependency>
       <groupId>de.javagl</groupId>
