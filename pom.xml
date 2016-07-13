@@ -31,9 +31,118 @@
     <module>jgltf-impl</module>
     <module>jgltf-model</module>
     <module>jgltf-browser</module>
+    <module>jgltf-obj</module>
   </modules>
 
   <build>
+  
+    <plugins>
+
+      <!-- Copy all JARs of the submodules and dependencies into the target 
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.10</version>
+        <executions>
+
+          <execution>
+            <id>copy-artifact</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>${project.artifactId}</artifactId>
+                  <version>${project.version}</version>
+                  <type>${project.packaging}</type>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>../target</outputDirectory>
+            </configuration>
+          </execution>
+          
+          <execution>
+            <id>copy-artifact-sources</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>${project.artifactId}</artifactId>
+                  <version>${project.version}</version>
+                  <classifier>sources</classifier>
+                  <type>${project.packaging}</type>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>../target/sources</outputDirectory>
+            </configuration>
+          </execution>
+
+          <execution>
+            <id>copy-artifact-javadoc</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>${project.artifactId}</artifactId>
+                  <version>${project.version}</version>
+                  <classifier>javadoc</classifier>
+                  <type>${project.packaging}</type>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>../target/javadoc</outputDirectory>
+            </configuration>
+          </execution>
+          
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>../target</outputDirectory>
+            </configuration>
+          </execution>
+          
+          <execution>
+            <id>copy-dependencies-sources</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <classifier>sources</classifier>
+              <outputDirectory>../target/sources</outputDirectory>
+            </configuration>
+          </execution>
+
+          <execution>
+            <id>copy-dependencies-javadoc</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <classifier>javadoc</classifier>
+              <outputDirectory>../target/javadoc</outputDirectory>
+            </configuration>
+          </execution>
+          
+        </executions>
+      </plugin>
+      -->
+    </plugins>
+  
     <pluginManagement>
       <plugins>
 
