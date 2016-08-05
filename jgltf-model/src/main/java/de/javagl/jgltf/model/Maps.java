@@ -49,8 +49,7 @@ public class Maps
     {
         if (map != null)
         {
-            map.entrySet().stream().forEach(
-                e -> biConsumer.accept(e.getKey(), e.getValue()));
+            map.forEach(biConsumer);
         }
     }
     
