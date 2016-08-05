@@ -36,7 +36,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -45,8 +44,6 @@ import java.nio.file.Paths;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 
@@ -72,6 +69,7 @@ import de.javagl.jgltf.model.io.GltfDataToEmbeddedConverter;
 import de.javagl.jgltf.model.io.GltfDataWriter;
 import de.javagl.jgltf.model.io.IO;
 import de.javagl.jgltf.obj.ObjGltfDataCreator;
+import de.javagl.jgltf.obj.ObjGltfDataCreator.BufferStrategy;
 import de.javagl.swing.tasks.SwingTask;
 import de.javagl.swing.tasks.SwingTaskExecutors;
 
@@ -140,11 +138,11 @@ class GltfBrowserApplication
     };
 
     /**
-     * The Action for importing a file
+     * The Action for importing an OBJ file
      * 
-     * @see #importFile()
+     * @see #importObjFile()
      */
-    private final Action importFileAction = new AbstractAction()
+    private final Action importObjFileAction = new AbstractAction()
     {
         /**
          * Serial UID
@@ -154,15 +152,15 @@ class GltfBrowserApplication
 
         // Initialization
         {
-            putValue(NAME, "Import file...");
-            putValue(SHORT_DESCRIPTION, "Import a non-glTF file");
+            putValue(NAME, "Import OBJ file...");
+            putValue(SHORT_DESCRIPTION, "Import an OBJ file");
             putValue(MNEMONIC_KEY, new Integer(KeyEvent.VK_I));
         }
         
         @Override
         public void actionPerformed(ActionEvent e)
         {
-            importFile();
+            importObjFile();
         }
     };
     
@@ -334,9 +332,9 @@ class GltfBrowserApplication
     private final JFileChooser openFileChooser;
 
     /**
-     * The FileChooser for importing files
+     * The FileChooser for importing OBJ files
      */
-    private final JFileChooser importFileChooser;
+    private final JFileChooser importObjFileChooser;
     
     /**
      * The FileChooser for saving glTF files
@@ -359,6 +357,11 @@ class GltfBrowserApplication
      * {@link GltfBrowserPanel}
      */
     private JInternalFrame selectedInternalFrame;
+    
+    /**
+     * The {@link ObjImportAccessoryPanel}
+     */
+    private ObjImportAccessoryPanel objImportAccessoryPanel;
     
     /**
      * The property change listener that will be added to all internal frames, 
@@ -404,7 +407,11 @@ class GltfBrowserApplication
         JMenuBar menuBar = new JMenuBar();
         menuBar.add(createFileMenu());
         menuBar.add(createConvertMenu());
-        menuBar.add(createSampleModelsMenu());
+        
+        SampleModelsMenuFactory sampleModelsMenuFactory =
+            new SampleModelsMenuFactory(frame, uri -> openUriInBackground(uri));
+        menuBar.add(sampleModelsMenuFactory.createSampleModelsMenu());
+
         frame.setJMenuBar(menuBar);
         
         openFileChooser = new JFileChooser(".");
@@ -412,10 +419,13 @@ class GltfBrowserApplication
             new FileNameExtensionFilter(
                 "glTF Files (.gltf, .glb)", "gltf", "glb"));
         
-        importFileChooser = new JFileChooser(".");
-        importFileChooser.setFileFilter(
+        importObjFileChooser = new JFileChooser(".");
+        
+        objImportAccessoryPanel = new ObjImportAccessoryPanel();
+        importObjFileChooser.setAccessory(objImportAccessoryPanel);
+        importObjFileChooser.setFileFilter(
             new FileNameExtensionFilter(
-                "Importable Files (.obj)", "obj"));
+                "OBJ files (.obj)", "obj"));
         
         saveFileChooser = new JFileChooser(".");
         saveBinaryFileChooser = new JFileChooser(".");
@@ -445,7 +455,7 @@ class GltfBrowserApplication
         fileMenu.add(recentUrisMenu);
         fileMenu.add(new JSeparator());
 
-        fileMenu.add(new JMenuItem(importFileAction));
+        fileMenu.add(new JMenuItem(importObjFileAction));
         fileMenu.add(new JSeparator());
         
         fileMenu.add(new JMenuItem(saveAsAction));
@@ -561,114 +571,6 @@ class GltfBrowserApplication
     
     
 
-    /**
-     * Create the menu containing shortcuts for loading the sample models
-     * 
-     * @return The menu
-     */
-    private JMenu createSampleModelsMenu()
-    {
-        JMenu sampleModelsMenu = new JMenu("Sample models");
-
-        Properties sampleModelsProperties = loadProperties(
-            "/sampleModels.properties");
-        if (sampleModelsProperties == null)
-        {
-            JMenuItem errorMenuItem = new JMenuItem(
-                "Could not load sample model definitions");
-            errorMenuItem.setEnabled(false);
-            sampleModelsMenu.add(errorMenuItem);
-            return sampleModelsMenu;
-        }
-        
-        Object basePathObject = sampleModelsProperties.get("basePath");
-        if (basePathObject == null)
-        {
-            JMenuItem errorMenuItem = new JMenuItem(
-                "Could not find sample models base path");
-            errorMenuItem.setEnabled(false);
-            sampleModelsMenu.add(errorMenuItem);
-            return sampleModelsMenu;
-        }
-        
-        String basePath = String.valueOf(basePathObject);
-        for (Entry<Object, Object> entry : sampleModelsProperties.entrySet())
-        {
-            String keyString = String.valueOf(entry.getKey());
-            if (keyString.startsWith("sampleModel"))
-            {
-                Object valueObject = entry.getValue();
-                if (valueObject == null)
-                {
-                    continue;
-                }
-                String valueString = String.valueOf(valueObject);
-                sampleModelsMenu.add(
-                    createSampleModelMenu(basePath, valueString));
-            }
-        }
-        return sampleModelsMenu;
-    }
-    
-    /**
-     * Create a menu containing the shortcuts for loading the sample model
-     * with the given name, in different formats
-     * 
-     * @param basePath The base path
-     * @param name The name of the sample model
-     * @return The menu
-     */
-    private JMenu createSampleModelMenu(String basePath, String name)
-    {
-        JMenu sampleModelMenu = new JMenu(name);
-        
-        sampleModelMenu.add(createSampleModelMenuItem(
-            basePath, name, "glTF", "gltf"));
-        sampleModelMenu.add(createSampleModelMenuItem(
-            basePath, name, "glTF-Embedded", "gltf"));
-        sampleModelMenu.add(createSampleModelMenuItem(
-            basePath, name, "glTF-Binary", "glb"));
-        sampleModelMenu.add(createSampleModelMenuItem(
-            basePath, name, "glTF-MaterialsCommon", "gltf"));
-        return sampleModelMenu;
-    }
-    
-    /**
-     * Create a menu item for loading the specified sample model.
-     * 
-     * @param basePath The base path
-     * @param name The name of the sample model
-     * @param type The type, e.g. "glTF-Binary"
-     * @param extensionWithoutDot The expected file extension, without a dot
-     * @return The menu item
-     */
-    private JMenuItem createSampleModelMenuItem(
-        String basePath, String name, String type, String extensionWithoutDot)
-    {
-        String uriString = 
-            basePath + "/" + name + "/" + type + "/" + 
-            name + "." + extensionWithoutDot;
-        JMenuItem menuItem = new JMenuItem(
-            "<html>" + type + " <font size=-2>(" + 
-            uriString + ")</font></html>");
-        menuItem.addActionListener(event -> 
-        {
-            URI uri = null;
-            try
-            {
-                uri = new URI(uriString);
-            } 
-            catch (URISyntaxException e)
-            {
-                JOptionPane.showMessageDialog(
-                    frame, "Invalid URI: " + e.getMessage(), 
-                    "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            openUriInBackground(uri);
-        });
-        return menuItem;
-    }
 
     
     /**
@@ -758,67 +660,69 @@ class GltfBrowserApplication
     
     
     /**
-     * Open the file chooser to select a file which will be 
+     * Open the file chooser to select an OBJ file which will be 
      * imported upon confirmation
      */
-    private void importFile()
+    private void importObjFile()
     {
-        int returnState = importFileChooser.showOpenDialog(frame);
+        int returnState = importObjFileChooser.showOpenDialog(frame);
         if (returnState == JFileChooser.APPROVE_OPTION) 
         {
-            File file = importFileChooser.getSelectedFile();
-            importUriInBackground(file.toURI());
+            File file = importObjFileChooser.getSelectedFile();
+            importObjUriInBackground(file.toURI());
         }        
     }
     
     /**
-     * Import the data from the specified URI in a background thread
+     * Import the data from the specified OBJ URI in a background thread
      *  
      * @param uri The URI
      */
-    private void importUriInBackground(URI uri)
+    private void importObjUriInBackground(URI uri)
     {
-        // TODO Improve this crude "file type detection"...  
-        if (uri.toString().toLowerCase().endsWith(".obj"))
+        BufferStrategy bufferStrategy = 
+            objImportAccessoryPanel.getSelectedBufferStrategy();
+        Integer indicesComponentType = 
+            objImportAccessoryPanel.getSelectedIndicesComponentType();
+        boolean assigningRandomColorsToParts =
+            objImportAccessoryPanel.isAssigningRandomColorsToParts();
+        SwingTask<GltfData, ?> swingTask = new SwingTask<GltfData, Void>()
         {
-            SwingTask<GltfData, ?> swingTask = new SwingTask<GltfData, Void>()
+            @Override
+            protected GltfData doInBackground() throws Exception
             {
-                @Override
-                protected GltfData doInBackground() throws Exception
-                {
-                    return new ObjGltfDataCreator().create(uri);
-                }
-                
-                @Override
-                protected void done()
-                {
-                    try
-                    {
-                        GltfData gltfData = get();
-                        String frameTitle =
-                            "glTF for " + IO.extractFileName(uri);
-                        createGltfBrowserPanel(frameTitle, gltfData);
-                    } 
-                    catch (InterruptedException e)
-                    {
-                        Thread.currentThread().interrupt();
-                    }
-                    catch (ExecutionException e)
-                    {
-                        JOptionPane.showMessageDialog(frame, 
-                            "Could not read " + uri + ": " + e.getMessage(), 
-                            "Error", JOptionPane.ERROR_MESSAGE);
-                    }
-                }
-            };
-            SwingTaskExecutors.create(swingTask)
-                .build()
-                .execute();            
-        }
-        else
+                ObjGltfDataCreator objGltfDataCreator = 
+                    new ObjGltfDataCreator(bufferStrategy);
+                objGltfDataCreator.setIndicesComponentType(
+                    indicesComponentType);
+                objGltfDataCreator.setAssigningRandomColorsToParts(
+                    assigningRandomColorsToParts);
+                return objGltfDataCreator.create(uri);
+            }
+        };
+        swingTask.addDoneCallback(task -> 
         {
-            logger.warning("Unknown file format: " + uri);
-        }
+            try
+            {
+                GltfData gltfData = task.get();
+                String frameTitle =
+                    "glTF for " + IO.extractFileName(uri);
+                createGltfBrowserPanel(frameTitle, gltfData);
+            } 
+            catch (InterruptedException e)
+            {
+                Thread.currentThread().interrupt();
+            }
+            catch (ExecutionException e)
+            {
+                JOptionPane.showMessageDialog(frame, 
+                    "Could not read " + uri + ": " + e.getMessage(), 
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        SwingTaskExecutors.create(swingTask)
+            .build()
+            .execute();            
     }
 
     /**
@@ -984,7 +888,8 @@ class GltfBrowserApplication
         }
         try
         {
-            new GltfDataWriter().writeGltfData(gltfData, file.getAbsolutePath());
+            new GltfDataWriter().writeGltfData(
+                gltfData, file.getAbsolutePath());
         } 
         catch (IOException e)
         {
@@ -1057,43 +962,5 @@ class GltfBrowserApplication
         frame.dispose();
     }
 
-    /**
-     * Load the properties from the specified resource. Returns 
-     * <code>null</code> if any error occurs.
-     *  
-     * @param resource The resource
-     * @return The properties
-     */
-    private static Properties loadProperties(String resource)
-    {
-        Properties properties = new Properties();
-        InputStream inputStream =  
-            GltfBrowserApplication.class.getResourceAsStream(resource);
-        if (inputStream == null)
-        {
-            return null;
-        }
-        try 
-        {    
-            properties.load(inputStream);
-        }
-        catch (IOException e)
-        {
-            logger.warning("Could not load properties: " + e.getMessage());
-            return null;
-        }
-        finally
-        {
-            try
-            {
-                inputStream.close();
-            } 
-            catch (IOException e)
-            {
-                logger.warning("Could not close stream: " + e.getMessage());
-            }
-        }
-        return properties;
-    }
    
 }

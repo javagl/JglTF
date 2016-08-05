@@ -45,6 +45,9 @@ import de.javagl.jgltf.obj.ObjGltfDataCreator.BufferStrategy;
  */
 public class ObjToGltf
 {
+    // TODO Offer an option to set the indices component type,
+    // via ObjGltfDataCreator#setIndicesComponentType
+    
     /**
      * The logger used in this class
      */

@@ -32,6 +32,7 @@ import java.net.URI;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -73,6 +74,13 @@ import de.javagl.obj.ReadableObj;
  */
 public class ObjGltfDataCreator
 {
+    // TODO The configuration, consisting of the BufferStrategy,
+    // the indicesComponentType and the OBJ splitter, should be
+    // summarized in a dedicated class, to ensure consistency:
+    // Currently, the splitter does not consider the indices
+    // component type, but always splits assuming that the 
+    // component type should be GL_UNSIGNED_SHORT
+    
     /**
      * The logger used in this class
      */
@@ -98,7 +106,7 @@ public class ObjGltfDataCreator
      * An enumeration of strategies for the creation of {@link Buffer}
      * instances
      */
-    enum BufferStrategy
+    public enum BufferStrategy
     {
         /**
          * Create one {@link Buffer} for the whole OBJ file
@@ -121,7 +129,7 @@ public class ObjGltfDataCreator
     /**
      * The {@link BufferStrategy} that should be used
      */
-    private final BufferStrategy bufferStrategy;
+    private BufferStrategy bufferStrategy;
     
     /**
      * The {@link BufferCreator} that will receive the geometry information
@@ -146,7 +154,7 @@ public class ObjGltfDataCreator
      * The component type for the indices of the resulting glTF. 
      * For glTF 1.0, this may at most be GL_UNSIGNED_SHORT.  
      */
-    private final int indicesComponentType = GltfConstants.GL_UNSIGNED_SHORT;
+    private int indicesComponentType = GltfConstants.GL_UNSIGNED_SHORT;
     
     /**
      * A function that will receive all OBJ groups that should be processed,
@@ -154,6 +162,12 @@ public class ObjGltfDataCreator
      */
     private final Function<? super ReadableObj, List<? extends ReadableObj>> 
         objSplitter;
+    
+    /**
+     * For testing: Assign a material with a random color to each 
+     * mesh primitive that was created during the splitting process
+     */
+    private boolean assigningRandomColorsToParts = false;
     
     /**
      * Default constructor
@@ -172,6 +186,51 @@ public class ObjGltfDataCreator
     {
         this.bufferStrategy = bufferStrategy;
         this.objSplitter = obj -> ObjSplitting.split(obj);
+    }
+    
+    /**
+     * Set the {@link BufferStrategy} to use
+     * 
+     * @param bufferStrategy The {@link BufferStrategy}
+     */
+    public void setBufferStrategy(BufferStrategy bufferStrategy)
+    {
+        this.bufferStrategy = bufferStrategy;
+    }
+    
+    /**
+     * Set the component type for the indices of the {@link MeshPrimitive}s
+     * 
+     * @param indicesComponentType The component type
+     * @throws IllegalArgumentException If the given type is not
+     * GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT or GL_UNSIGNED_INT
+     */
+    public void setIndicesComponentType(int indicesComponentType)
+    {
+        List<Integer> validTypes = Arrays.asList(
+            GltfConstants.GL_UNSIGNED_BYTE,
+            GltfConstants.GL_UNSIGNED_SHORT,
+            GltfConstants.GL_UNSIGNED_INT);
+        if (!validTypes.contains(indicesComponentType))
+        {
+            throw new IllegalArgumentException(
+                "The indices component type must be GL_UNSIGNED_BYTE," + 
+                "GL_UNSIGNED_SHORT or GL_UNSIGNED_INT, but is " +
+                GltfConstants.stringFor(indicesComponentType));
+        }
+        this.indicesComponentType = indicesComponentType;
+    }
+    
+    /**
+     * For testing and debugging: Assign random colors to the parts that
+     * are created when splitting the OBJ data
+     * 
+     * @param assigningRandomColorsToParts The flag
+     */
+    public void setAssigningRandomColorsToParts(
+        boolean assigningRandomColorsToParts)
+    {
+        this.assigningRandomColorsToParts = assigningRandomColorsToParts;
     }
     
     /**
@@ -352,11 +411,7 @@ public class ObjGltfDataCreator
         List<MeshPrimitive> meshPrimitives = 
             createPartMeshPrimitives(obj, "");
         
-        // For testing: Assign a material with a random color to each 
-        // mesh primitive
-        boolean assignRandomColorsToParts = false;
-        assignRandomColorsToParts = true;
-        if (assignRandomColorsToParts)
+        if (assigningRandomColorsToParts)
         {
             Random random = new Random(0);
             boolean withNormals = obj.getNumNormals() > 0;
