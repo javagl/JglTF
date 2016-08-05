@@ -43,6 +43,7 @@ import de.javagl.jgltf.impl.Material;
 import de.javagl.jgltf.impl.Mesh;
 import de.javagl.jgltf.impl.Node;
 import de.javagl.jgltf.impl.Program;
+import de.javagl.jgltf.impl.Sampler;
 import de.javagl.jgltf.impl.Scene;
 import de.javagl.jgltf.impl.Shader;
 import de.javagl.jgltf.impl.Technique;
@@ -315,6 +316,33 @@ class Gltfs
     {
         String id = generateId("texture", gltf.getTextures());
         add(gltf::setTextures, gltf::getTextures, id, value);
+        return id;
+    }
+
+    /**
+     * Add the {@link Sampler} with the given ID to the given {@link GlTF}.
+     *
+     * @param gltf The {@link GlTF}
+     * @param id The ID
+     * @param value The value
+     */
+    static void addSampler(GlTF gltf, String id, Sampler value)
+    {
+        add(gltf::setSamplers, gltf::getSamplers, id, value);
+    }
+
+    /**
+     * Add the given {@link Sampler} to the given {@link GlTF}, and return
+     * the ID that has been generated for it.
+     *
+     * @param gltf The {@link GlTF}
+     * @param value The value
+     * @return The generated ID
+     */
+    static String addSampler(GlTF gltf, Sampler value)
+    {
+        String id = generateId("sampler", gltf.getSamplers());
+        add(gltf::setSamplers, gltf::getSamplers, id, value);
         return id;
     }
 

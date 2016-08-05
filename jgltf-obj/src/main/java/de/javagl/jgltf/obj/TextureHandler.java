@@ -31,6 +31,7 @@ import java.util.Map;
 
 import de.javagl.jgltf.impl.GlTF;
 import de.javagl.jgltf.impl.Image;
+import de.javagl.jgltf.impl.Sampler;
 import de.javagl.jgltf.impl.Texture;
 import de.javagl.jgltf.model.GltfConstants;
 
@@ -48,6 +49,13 @@ class TextureHandler
     private final GlTF gltf;
     
     /**
+     * The ID of the common {@link Sampler} that will be used for all 
+     * {@link Texture}s. The {@link Sampler} will be created on demand
+     * and added to the {@link GlTF}
+     */
+    private String samplerId;
+    
+    /**
      * A mapping from {@link Image#getUri() image URIs} to {@link Texture} IDs
      */
     private final Map<String, String> imageUriToTextureId;
@@ -61,6 +69,7 @@ class TextureHandler
     TextureHandler(GlTF gltf)
     {
         this.gltf = gltf;
+        this.samplerId = null;
         this.imageUriToTextureId = new LinkedHashMap<String, String>();
     }
     
@@ -75,6 +84,13 @@ class TextureHandler
      */
     String getTextureId(String imageUri)
     {
+        // Create the common (default) sampler if it was not created yet
+        if (samplerId == null)
+        {
+            Sampler sampler = new Sampler();
+            samplerId = Gltfs.addSampler(gltf, sampler);
+        }
+        
         String textureId = imageUriToTextureId.get(imageUri);
         if (textureId != null)
         {
@@ -93,6 +109,7 @@ class TextureHandler
         texture.setSource(imageId);
         texture.setTarget(GltfConstants.GL_TEXTURE_2D);
         texture.setType(GltfConstants.GL_UNSIGNED_BYTE);
+        texture.setSampler(samplerId);
         textureId = Gltfs.addTexture(gltf, texture);
 
         imageUriToTextureId.put(imageUri, textureId);

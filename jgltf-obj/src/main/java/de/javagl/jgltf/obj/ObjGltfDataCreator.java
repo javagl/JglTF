@@ -42,6 +42,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.javagl.jgltf.impl.Accessor;
+import de.javagl.jgltf.impl.Asset;
 import de.javagl.jgltf.impl.Buffer;
 import de.javagl.jgltf.impl.BufferView;
 import de.javagl.jgltf.impl.GlTF;
@@ -187,6 +188,7 @@ public class ObjGltfDataCreator
         
         // Basic setup 
         gltf = new GlTF();
+        gltf.setAsset(createAsset());
         gltfData = new GltfData(gltf);
         techniqueHandler = new TechniqueHandler(gltf);
         textureHandler = new TextureHandler(gltf);
@@ -260,6 +262,18 @@ public class ObjGltfDataCreator
         return gltfData;
     }
     
+    /**
+     * Create the {@link Asset} for the generated {@link GlTF} 
+     * 
+     * @return The {@link Asset}
+     */
+    private static Asset createAsset()
+    {
+        Asset asset = new Asset();
+        asset.setGenerator("jgltf-obj from https://github.com/javagl/JglTF");
+        asset.setVersion("1.0.0");
+        return asset;
+    }
 
     /**
      * Create the {@link MeshPrimitive}s for the given OBJ- and MTL data
