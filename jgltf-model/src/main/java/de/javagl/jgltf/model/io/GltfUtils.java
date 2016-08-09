@@ -96,6 +96,7 @@ class GltfUtils
         copy.setBuffer(bufferView.getBuffer());
         copy.setByteOffset(bufferView.getByteOffset());
         copy.setByteLength(bufferView.getByteLength());
+        copy.setTarget(bufferView.getTarget());
         return copy;
     }
     
