@@ -1,0 +1,113 @@
+{
+  "techniques": {
+    "technique0": {
+      "parameters": {
+        "singleInt": {
+          "type": 5124, 
+          "value": 123
+        }, 
+        "singleUnsignedInt": {
+          "type": 5125, 
+          "value": 123
+        }, 
+        "singleFloat": {
+          "type": 5126, 
+          "value": 1.23
+        }, 
+        "singleIntVec3": {
+          "type": 35668, 
+          "value": [
+            123, 
+            456, 
+            789
+          ]
+        }, 
+        "singleFloatVec3": {
+          "type": 35665, 
+          "value": [
+            1.23, 
+            4.56, 
+            7.89
+          ]
+        }, 
+        "singleElementIntArray": {
+          "type": 5124, 
+          "count": 1, 
+          "value": [
+            123
+          ]
+        }, 
+        "singleElementUnsignedIntArray": {
+          "type": 5125, 
+          "count": 1, 
+          "value": [
+            123
+          ]
+        }, 
+        "singleElementFloatArray": {
+          "type": 5126, 
+          "count": 1, 
+          "value": [
+            1.23
+          ]
+        }, 
+        "singleElementIntVec3Array": {
+          "type": 35668, 
+          "count": 1, 
+          "value": [
+            123, 
+            456, 
+            789
+          ]
+        }, 
+        "singleElementFloatVec3Array": {
+          "type": 35665, 
+          "count": 1, 
+          "value": [
+            1.23, 
+            4.56, 
+            7.89
+          ]
+        }, 
+        "intVec3Array": {
+          "type": 35668, 
+          "count": 2, 
+          "value": [
+            123, 
+            456, 
+            789, 
+            321, 
+            654, 
+            987
+          ]
+        }, 
+        "floatVec3Array": {
+          "type": 35665, 
+          "count": 2, 
+          "value": [
+            1.23, 
+            4.56, 
+            7.89, 
+            3.21, 
+            6.54, 
+            9.87
+          ]
+        }
+      }, 
+      "uniforms": {
+        "singleInt": "singleInt", 
+        "singleUnsignedInt": "singleUnsignedInt", 
+        "singleFloat": "singleFloat", 
+        "singleIntVec3": "singleIntVec3", 
+        "singleFloatVec3": "singleFloatVec3", 
+        "singleElementIntArray": "singleElementIntArray", 
+        "singleElementUnsignedIntArray": "singleElementUnsignedIntArray", 
+        "singleElementFloatArray": "singleElementFloatArray", 
+        "singleElementIntVec3Array": "singleElementIntVec3Array", 
+        "singleElementFloatVec3Array": "singleElementFloatVec3Array", 
+        "intVec3Array": "intVec3Array", 
+        "floatVec3Array": "floatVec3Array"
+      }
+    }
+  }
+}

@@ -74,9 +74,13 @@ public class GltfModels
      * {@link TechniqueParameters#getType()}:
      * <pre><code>
      * GL_INT
-     * GL_UNSIGNED_INT   : Integer
+     * GL_UNSIGNED_INT   : Integer if technique.parameters.count is null.
+     *                     An int[] array with the appropriate size if 
+     *                     technique.parameters.count is non-null    
      * 
-     * GL_FLOAT          : Float
+     * GL_FLOAT          : Float if technique.parameters.count is null.
+     *                     A float[] array with the appropriate size if 
+     *                     technique.parameters.count is non-null    
      * 
      * GL_FLOAT_MAT3
      * GL_FLOAT_MAT4
@@ -88,11 +92,9 @@ public class GltfModels
      * GL_INT_VEC3
      * GL_INT_VEC4       : An int[] array of appropriate size
      * </code></pre> 
-     * 
-     * TODO : This method does not yet support arrays/lists of values. 
-     * When the technique.parameters.count of the respective uniform
-     * is defined and greater than 1, then the return type should
-     * be a List of the types summarized above. 
+     * <br>
+     * The returned suppliers MAY always return the same array instances.
+     * So callers MUST NOT store or modify these arrays.
      * 
      * @param uniformName The uniform name
      * @param technique The {@link Technique}
@@ -113,34 +115,24 @@ public class GltfModels
             case GltfConstants.GL_INT:
             case GltfConstants.GL_UNSIGNED_INT:
             {
-                return () ->
+                if (techniqueParameters.getCount() == null)
                 {
-                    Object object = getUniformValueObject(
+                    return createSingleIntSupplier(
                         uniformName, technique, material);
-                    if (object == null)
-                    {
-                        return null;
-                    }
-                    Number number = (Number)object;
-                    Integer value = number.intValue();
-                    return value;
-                };
+                }
+                return createIntArraySupplier(
+                    uniformName, technique, material);
             }
 
             case GltfConstants.GL_FLOAT: 
             {
-                return () ->
+                if (techniqueParameters.getCount() == null)
                 {
-                    Object object = getUniformValueObject(
+                    return createSingleFloatSupplier(
                         uniformName, technique, material);
-                    if (object == null)
-                    {
-                        return null;
-                    }
-                    Number number = (Number)object;
-                    Float value = number.floatValue();
-                    return value;
-                };
+                }
+                return createFloatArraySupplier(
+                    uniformName, technique, material);
             }
 
             case GltfConstants.GL_FLOAT_MAT3:   
@@ -149,50 +141,16 @@ public class GltfModels
             case GltfConstants.GL_FLOAT_VEC3:   
             case GltfConstants.GL_FLOAT_VEC4:   
             {
-                Supplier<float[]> supplier = new Supplier<float[]>()
-                {
-                    private float value[] = null;
-                    
-                    @Override
-                    public float[] get()
-                    {
-                        Object object = getUniformValueObject(
-                            uniformName, technique, material);
-                        if (object == null)
-                        {
-                            return null;
-                        }
-                        List<? extends Number> list = asNumberList(object);
-                        value = toFloatArray(list, value);
-                        return value;
-                    }
-                };
-                return supplier;
+                return createFloatArraySupplier(
+                    uniformName, technique, material);
             }
 
             case GltfConstants.GL_INT_VEC2:   
             case GltfConstants.GL_INT_VEC3:   
             case GltfConstants.GL_INT_VEC4:   
             {
-                Supplier<int[]> supplier = new Supplier<int[]>()
-                {
-                    private int value[] = null;
-                    
-                    @Override
-                    public int[] get()
-                    {
-                        Object object = getUniformValueObject(
-                            uniformName, technique, material);
-                        if (object == null)
-                        {
-                            return null;
-                        }
-                        List<? extends Number> list = asNumberList(object);
-                        value = toIntArray(list, value);
-                        return value;
-                    }
-                };
-                return supplier;
+                return createIntArraySupplier(
+                    uniformName, technique, material);
             }
                
             // These types are not supported as uniform types in OpenGL
@@ -214,7 +172,129 @@ public class GltfModels
         throw new IllegalArgumentException(
             "Invalid parameter type: "+ techniqueParameters.getType());
     }
+
+
+
+
+    /**
+     * Returns a supplier for the specified uniform value, which is assumed
+     * to be a single (signed or unsigned) integer. 
+     * 
+     * @param uniformName The uniform name
+     * @param technique The {@link Technique}
+     * @param material The {@link Material}
+     * @return The supplier
+     */
+    private static Supplier<?> createSingleIntSupplier(
+        String uniformName, Technique technique, Material material)
+    {
+        return () ->
+        {
+            Object object = getUniformValueObject(
+                uniformName, technique, material);
+            if (object == null)
+            {
+                return null;
+            }
+            Number number = (Number)object;
+            Integer value = number.intValue();
+            return value;
+        };
+    }
+
+    /**
+     * Returns a supplier for the specified uniform value, which is assumed
+     * to be a an integer array. 
+     * 
+     * @param uniformName The uniform name
+     * @param technique The {@link Technique}
+     * @param material The {@link Material}
+     * @return The supplier
+     */
+    private static Supplier<?> createIntArraySupplier(
+        String uniformName, Technique technique, Material material)
+    {
+        Supplier<int[]> supplier = new Supplier<int[]>()
+        {
+            private int value[] = null;
+            
+            @Override
+            public int[] get()
+            {
+                Object object = getUniformValueObject(
+                    uniformName, technique, material);
+                if (object == null)
+                {
+                    return null;
+                }
+                List<? extends Number> list = asNumberList(object);
+                value = toIntArray(list, value);
+                return value;
+            }
+        };
+        return supplier;
+    }
     
+    /**
+     * Returns a supplier for the specified uniform value, which is assumed
+     * to be a single float value. 
+     * 
+     * @param uniformName The uniform name
+     * @param technique The {@link Technique}
+     * @param material The {@link Material}
+     * @return The supplier
+     */
+    private static Supplier<?> createSingleFloatSupplier(String uniformName,
+        Technique technique, Material material)
+    {
+        return () ->
+        {
+            Object object = getUniformValueObject(
+                uniformName, technique, material);
+            if (object == null)
+            {
+                return null;
+            }
+            Number number = (Number)object;
+            Float value = number.floatValue();
+            return value;
+        };
+    }
+    
+    /**
+     * Returns a supplier for the specified uniform value, which is assumed
+     * to be a float array 
+     * 
+     * @param uniformName The uniform name
+     * @param technique The {@link Technique}
+     * @param material The {@link Material}
+     * @return The supplier
+     */
+    private static Supplier<?> createFloatArraySupplier(String uniformName,
+        Technique technique, Material material)
+    {
+        Supplier<float[]> supplier = new Supplier<float[]>()
+        {
+            private float value[] = null;
+            
+            @Override
+            public float[] get()
+            {
+                Object object = getUniformValueObject(
+                    uniformName, technique, material);
+                if (object == null)
+                {
+                    return null;
+                }
+                List<? extends Number> list = asNumberList(object);
+                value = toFloatArray(list, value);
+                return value;
+            }
+        };
+        return supplier;
+    }
+    
+
     /**
      * Write the elements of the given list into the given array. The given
      * list may not be <code>null</code> and may not contain <code>null</code>
