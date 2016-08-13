@@ -91,6 +91,8 @@ public class GltfModels
      * GL_INT_VEC2
      * GL_INT_VEC3
      * GL_INT_VEC4       : An int[] array of appropriate size
+     * 
+     * GL_SAMPLER_2D     : A String containing the texture ID
      * </code></pre> 
      * <br>
      * The returned suppliers MAY always return the same array instances.
@@ -152,7 +154,17 @@ public class GltfModels
                 return createIntArraySupplier(
                     uniformName, technique, material);
             }
-               
+            
+            case GltfConstants.GL_SAMPLER_2D:
+            {
+                return () ->
+                {
+                    Object object = getUniformValueObject(
+                        uniformName, technique, material);
+                    return object == null ? null : String.valueOf(object);
+                };
+            }
+            
             // These types are not supported as uniform types in OpenGL
             case GltfConstants.GL_FLOAT_MAT2:   
             case GltfConstants.GL_BOOL: 
