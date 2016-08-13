@@ -92,6 +92,10 @@
             6.54, 
             9.87
           ]
+        },
+        "sampler2D": {
+          "type": 35678, 
+          "value": "textureId"
         }
       }, 
       "uniforms": {
@@ -106,7 +110,8 @@
         "singleElementIntVec3Array": "singleElementIntVec3Array", 
         "singleElementFloatVec3Array": "singleElementFloatVec3Array", 
         "intVec3Array": "intVec3Array", 
-        "floatVec3Array": "floatVec3Array"
+        "floatVec3Array": "floatVec3Array",
+        "sampler2D": "sampler2D"
       }
     }
   }

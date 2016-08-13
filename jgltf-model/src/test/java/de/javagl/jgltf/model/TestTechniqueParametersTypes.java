@@ -86,6 +86,11 @@ public class TestTechniqueParametersTypes
         assertReturnTypeIs(GltfModels.createGenericSupplier(
             "floatVec3Array", technique, material), 
             float[].class, 2 * 3);
+        
+        assertReturnTypeIs(GltfModels.createGenericSupplier(
+            "sampler2D", technique, material), 
+            String.class, -1);
+        
    }
     
     private static void assertReturnTypeIs(
