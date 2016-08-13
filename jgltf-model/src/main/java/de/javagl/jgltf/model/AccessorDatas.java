@@ -113,6 +113,7 @@ public class AccessorDatas
      * @param bufferViewByteBuffer The  byte buffer of the 
      * {@link BufferView} referenced by the {@link Accessor}
      * @return The {@link AccessorByteData}
+     * @throws NullPointerException If any argument is <code>null</code>
      * @throws IllegalArgumentException If the 
      * {@link Accessor#getComponentType() component type} of the given
      * accessor is not <code>GL_BYTE</code> or <code>GL_UNSIGNED_BYTE</code>
@@ -198,6 +199,7 @@ public class AccessorDatas
      * @param bufferViewByteBuffer The  byte buffer of the 
      * {@link BufferView} referenced by the {@link Accessor}
      * @return The {@link AccessorShortData}
+     * @throws NullPointerException If any argument is <code>null</code>
      * @throws IllegalArgumentException If the 
      * {@link Accessor#getComponentType() component type} of the given
      * accessor is not <code>GL_SHORT</code> or <code>GL_UNSIGNED_SHORT</code>
@@ -282,6 +284,7 @@ public class AccessorDatas
      * @param bufferViewByteBuffer The  byte buffer of the 
      * {@link BufferView} referenced by the {@link Accessor}
      * @return The {@link AccessorIntData}
+     * @throws NullPointerException If any argument is <code>null</code>
      * @throws IllegalArgumentException If the 
      * {@link Accessor#getComponentType() component type} of the given
      * accessor is not <code>GL_INT</code> or <code>GL_UNSIGNED_INT</code>
@@ -360,6 +363,7 @@ public class AccessorDatas
      * @param bufferViewByteBuffer The  byte buffer of the 
      * {@link BufferView} referenced by the {@link Accessor}
      * @return The {@link AccessorFloatData}
+     * @throws NullPointerException If any argument is <code>null</code>
      * @throws IllegalArgumentException If the 
      * {@link Accessor#getComponentType() component type} of the given
      * accessor is not <code>GL_FLOAT</code>

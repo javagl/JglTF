@@ -26,6 +26,10 @@
  */
 package de.javagl.jgltf.model;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
+
 import de.javagl.jgltf.impl.Technique;
 import de.javagl.jgltf.impl.TechniqueParameters;
 
@@ -34,6 +38,58 @@ import de.javagl.jgltf.impl.TechniqueParameters;
  */
 public class Techniques
 {
+    /**
+     * Return the {@link TechniqueParameters} for the uniform with the
+     * given name from the given {@link Technique}. If there are no
+     * uniforms or parameters in the given {@link Technique}, or the
+     * matching parameter is not found, then the optional will be empty.
+     * 
+     * @param technique The {@link Technique}
+     * @param uniformName The uniform name
+     * @return The optional {@link TechniqueParameters}
+     */
+    public static Optional<TechniqueParameters> 
+        getOptionalUniformTechniqueParameters(
+            Technique technique, String uniformName)
+    {
+        // The technique.uniforms map the uniform names to the
+        // technique parameter IDs. The technique.parameters map
+        // the technique parameter IDs to the TechniqueParameters.
+        Optional<String> techniqueParameterId = 
+            Optional.ofNullable(technique.getUniforms())
+                .map(u -> u.get(uniformName));
+        Optional<TechniqueParameters> techniqueParameters = 
+            Optional.ofNullable(technique.getParameters())
+                .flatMap(p -> techniqueParameterId.map(t -> p.get(t)));
+        return techniqueParameters;
+    }
+    
+    /**
+     * Return the {@link TechniqueParameters} for the program attribute with 
+     * the given name from the given {@link Technique}. If there are no
+     * attributes or parameters in the given {@link Technique}, or the
+     * matching parameter is not found, then the optional will be empty.
+     *  
+     * @param technique The {@link Technique}
+     * @param attributeName The program attribute name
+     * @return The {@link TechniqueParameters}
+     */
+    public static Optional<TechniqueParameters> 
+        getOptionalAttributeTechniqueParameters(
+            Technique technique, String attributeName)
+    {
+        // The technique.attributes map GLSL program attribute names 
+        // to technique parameter IDs. The technique.parameters
+        // map technique parameter IDs to TechniqueParameters.
+        Optional<String> techniqueParameterId = 
+            Optional.ofNullable(technique.getAttributes())
+                .map(u -> u.get(attributeName));
+        Optional<TechniqueParameters> techniqueParameters = 
+            Optional.ofNullable(technique.getParameters())
+                .flatMap(p -> techniqueParameterId.map(t -> p.get(t)));
+        return techniqueParameters;
+    }
+    
 
     /**
      * Return the {@link TechniqueParameters} for the uniform with the
@@ -51,22 +107,28 @@ public class Techniques
     {
         // The technique.uniforms map the uniform names to the
         // technique parameter IDs. The technique.parameters map
-        // the technique parameter IDs to the TechniqueParameters. 
-        String techniqueParameterId = 
-            technique.getUniforms().get(uniformName);
+        // the technique parameter IDs to the TechniqueParameters.
+        Map<String, String> uniforms = Optional
+            .ofNullable(technique.getUniforms())
+            .orElse(Collections.emptyMap());
+        String techniqueParameterId = uniforms.get(uniformName);
         if (techniqueParameterId == null)
         {
             throw new GltfException(
                 "No technique parameter ID for uniform with name " + 
                 uniformName + " found in technique");
         }
+        Map<String, TechniqueParameters> parameters = Optional
+            .ofNullable(technique.getParameters())
+            .orElse(Collections.emptyMap());
         TechniqueParameters techniqueParameters = 
-            technique.getParameters().get(techniqueParameterId);
+            parameters.get(techniqueParameterId);
         if (techniqueParameters == null)
         {
             throw new GltfException(
                 "No technique parameters for technique parameter ID " +
-                techniqueParameterId + " found in technique");
+                techniqueParameterId + " for uniform with name " +
+                uniformName + " found in technique");
         }
         return techniqueParameters;
     }
@@ -88,16 +150,21 @@ public class Techniques
         // The technique.attributes map GLSL program attribute names 
         // to technique parameter IDs. The technique.parameters
         // map technique parameter IDs to TechniqueParameters.
-        String techniqueParameterId = 
-            technique.getAttributes().get(attributeName);
+        Map<String, String> attributes = Optional
+            .ofNullable(technique.getAttributes())
+            .orElse(Collections.emptyMap());
+        String techniqueParameterId = attributes.get(attributeName);
         if (techniqueParameterId == null)
         {
             throw new GltfException(
                 "No technique parameter ID for attribue with name " + 
-                    attributeName + " found in technique");
+                 attributeName + " found in technique");
         }
+        Map<String, TechniqueParameters> parameters = Optional
+            .ofNullable(technique.getParameters())
+            .orElse(Collections.emptyMap());
         TechniqueParameters techniqueParameters = 
-            technique.getParameters().get(techniqueParameterId);
+            parameters.get(techniqueParameterId);
         if (techniqueParameters == null)
         {
             throw new GltfException(

@@ -28,7 +28,6 @@ package de.javagl.jgltf.model;
 
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.javagl.jgltf.impl.Accessor;
@@ -296,8 +295,8 @@ public class GltfAnimations
     private static AnimationListener createTranslationAnimationListener(
         GlTF gltf, String nodeId)
     {
-        Node node = GltfModel.getOptional(
-            gltf.getNodes(), nodeId, "animated node", Level.WARNING);
+        Node node = GltfModel.getExpected(
+            gltf.getNodes(), nodeId, "animated node");
         if (node == null)
         {
             return null;
@@ -319,14 +318,12 @@ public class GltfAnimations
      * @param gltf The {@link GlTF}
      * @param nodeId The {@link Node} ID
      * @return The {@link AnimationListener}
-     * @throws GltfException If there is no {@link Node} with the given
-     * ID in the given {@link GlTF} 
      */
     private static AnimationListener createRotationAnimationListener(
         GlTF gltf, String nodeId)
     {
-        Node node = GltfModel.getOptional(
-            gltf.getNodes(), nodeId, "animated node", Level.WARNING);
+        Node node = GltfModel.getExpected(
+            gltf.getNodes(), nodeId, "animated node");
         if (node == null)
         {
             return null;
@@ -352,8 +349,8 @@ public class GltfAnimations
     private static AnimationListener createScaleAnimationListener(
         GlTF gltf, String nodeId)
     {
-        Node node = GltfModel.getOptional(
-            gltf.getNodes(), nodeId, "animated node", Level.WARNING);
+        Node node = GltfModel.getExpected(
+            gltf.getNodes(), nodeId, "animated node");
         if (node == null)
         {
             return null;

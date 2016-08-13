@@ -57,7 +57,7 @@ import de.javagl.jgltf.impl.TechniqueParameters;
  * <br>
  * Note: The suppliers that are provided by this class may throw a
  * {@link GltfException} when they encounter an invalid state (for
- * example, an ID that are not mapped to a valid object).
+ * example, an ID that is not mapped to a valid object).
  */
 public final class GltfModel
 {
@@ -555,16 +555,16 @@ public final class GltfModel
         return () ->
         {
             String cameraNodeId = cameraNodeIdSupplier.get();
-            Node node = getOptional(
-                gltf.getNodes(), cameraNodeId, "camera node", Level.WARNING);
+            Node node = getExpected(
+                gltf.getNodes(), cameraNodeId, "camera node");
             if (node == null)
             {
                 MathUtils.setIdentity4x4(result);  
                 return result;
             }
             String cameraId = node.getCamera();
-            Camera camera = getOptional(
-                gltf.getCameras(), cameraId, "camera", Level.WARNING);
+            Camera camera = getExpected(
+                gltf.getCameras(), cameraId, "camera");
             if (camera == null)
             {
                 MathUtils.setIdentity4x4(result);  
@@ -820,8 +820,8 @@ public final class GltfModel
         MathUtils.setIdentity4x4(globalTransform);
         while (currentNodeId != null)
         {
-            Node currentNode = getOptional(
-                gltf.getNodes(), currentNodeId, "node", Level.WARNING);
+            Node currentNode = getExpected(
+                gltf.getNodes(), currentNodeId, "node");
             if (currentNode != null)
             {
                 Nodes.computeLocalTransform(currentNode, tempLocalTransform);
@@ -855,8 +855,8 @@ public final class GltfModel
     {
         float localTransform[] = new float[16];
         MathUtils.setIdentity4x4(localTransform);
-        Node node = getOptional(gltf.getNodes(), 
-            nodeId, "node for the local transform", Level.WARNING);
+        Node node = getExpected(gltf.getNodes(), nodeId, 
+            "node for the local transform");
         if (node == null)
         {
             return () -> localTransform;
@@ -901,30 +901,33 @@ public final class GltfModel
     
     /**
      * Obtains the value for the given ID from the given map. If the given 
-     * map is <code>null</code>, or there is no non-<code>null</code> value 
-     * found for the given ID, then a log message with the given level 
-     * will be printed, and <code>null</code> will be returned.
+     * ID is <code>null</code>, or the map is <code>null</code>, or there 
+     * is no non-<code>null</code> value found for the given ID, then a 
+     * warning will be printed, and <code>null</code> will be returned.
      * 
      * @param map The map
      * @param id The ID
      * @param description A description of what was looked up in the map.
      * This will be part of the possible log message
-     * @param level The level for log messages
      * @return The value that was found in the map
      */
-    static <T> T getOptional(
-        Map<String, T> map, String id, String description, Level level)
+    static <T> T getExpected(Map<String, T> map, String id, String description)
     {
+        if (id == null)
+        {
+            logger.warning("The ID of " + description + " is null");
+            return null;
+        }
         if (map == null)
         {
-            logger.log(level, 
+            logger.warning( 
                 "No map for looking up " + description + " with ID " + id);
             return null;
         }
         T result = map.get(id);
         if (result == null)
         {
-            logger.log(level, 
+            logger.warning( 
                 "The " + description + " with ID " + id + " does not exist");
         }
         return result;
