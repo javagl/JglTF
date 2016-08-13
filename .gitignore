@@ -15,3 +15,11 @@
 /jgltf-model/.settings
 /jgltf-model/target
 /jgltf-model/.classpath
+/jgltf-model/src/test/resources/testModels/testBox/output-glTF-to-glTF-Embedded
+/jgltf-model/src/test/resources/testModels/testBox/output-glTF-to-glTF
+/jgltf-model/src/test/resources/testModels/testBox/output-glTF-to-glTF-Binary
+/target
+/jgltf-obj/.classpath
+/jgltf-obj/.project
+/jgltf-obj/.settings
+/jgltf-obj/target
