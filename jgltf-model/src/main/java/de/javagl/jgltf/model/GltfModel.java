@@ -142,6 +142,16 @@ public final class GltfModel
     }
     
     /**
+     * Returns the {@link GltfData} that this model was created from
+     * 
+     * @return The {@link GltfData}
+     */
+    public GltfData getGltfData()
+    {
+        return gltfData;
+    }
+    
+    /**
      * Compute the mapping from {@link Node} IDs to their parent node IDs
      * 
      * @return The mapping
