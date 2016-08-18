@@ -27,6 +27,7 @@
 package de.javagl.jgltf.model;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
@@ -69,7 +70,39 @@ public class GltfAnimations
     {
         AnimationManager animationManager = 
             new AnimationManager(animationPolicy);
-
+        addAnimations(animationManager, gltfData);
+        return animationManager;
+    }
+    
+    /**
+     * Create a new {@link AnimationManager} using the given 
+     * {@link AnimationPolicy}
+     * 
+     * @param animationPolicy The {@link AnimationPolicy}
+     * @return The {@link AnimationManager}
+     */
+    public static AnimationManager createAnimationManager(
+        AnimationPolicy animationPolicy)
+    {
+        AnimationManager animationManager = 
+            new AnimationManager(animationPolicy);
+        return animationManager;
+    }
+    
+    /**
+     * Add all animations from the given {@link GltfData} to the given
+     * {@link AnimationManager}
+     * 
+     * @param animationManager The {@link AnimationManager}
+     * @param gltfData The {@link GltfData}
+     */
+    public static void addAnimations(
+        AnimationManager animationManager, GltfData gltfData)
+    {
+        Objects.requireNonNull(animationManager, 
+            "The animationManager may not be null");
+        Objects.requireNonNull(gltfData, 
+            "The gltfData may not be null");
         GlTF gltf = gltfData.getGltf();
         Map<String, Animation> animations = gltf.getAnimations();
         if (animations != null)
@@ -82,7 +115,6 @@ public class GltfAnimations
                     animation, animationManager);
             }
         }
-        return animationManager;
     }
     
     /**
