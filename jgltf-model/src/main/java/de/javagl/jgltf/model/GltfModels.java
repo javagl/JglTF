@@ -27,6 +27,7 @@
 package de.javagl.jgltf.model;
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import de.javagl.jgltf.impl.Material;
@@ -40,8 +41,10 @@ public class GltfModels
 {
     /**
      * Obtain the value for the uniform with the given name from the given
-     * {@link Material}. If the value is not contained in the given 
-     * {@link Material}, then return the default value that is specified 
+     * {@link Material}. If the parameter ID for the given uniform name
+     * can not be looked up via the given technique, the <code>null</code>
+     * is returned. If the value for the parameter is not contained in the 
+     * given {@link Material}, then return the default value that is specified 
      * by the {@link Technique}. (Note that this value may still be 
      * <code>null</code>).
      *   
@@ -53,7 +56,12 @@ public class GltfModels
     static Object getUniformValueObject(
         String uniformName, Technique technique, Material material)
     {
-        String uniformParameterId = technique.getUniforms().get(uniformName);
+        Map<String, String> uniforms = technique.getUniforms();
+        if (uniforms == null)
+        {
+            return null;
+        }
+        String uniformParameterId = uniforms.get(uniformName);
         if (material.getValues() != null)
         {
             Object materialValue = 
@@ -63,8 +71,17 @@ public class GltfModels
                 return materialValue;
             }
         }
+        Map<String, TechniqueParameters> parameters = technique.getParameters();
+        if (parameters == null)
+        {
+            return null;
+        }
         TechniqueParameters uniformParameter = 
-            technique.getParameters().get(uniformParameterId);
+            parameters.get(uniformParameterId);
+        if (uniformParameter == null)
+        {
+            return null;
+        }
         return uniformParameter.getValue();
     }
     
@@ -96,7 +113,11 @@ public class GltfModels
      * </code></pre> 
      * <br>
      * The returned suppliers MAY always return the same array instances.
-     * So callers MUST NOT store or modify these arrays.
+     * So callers MUST NOT store or modify these arrays.<br>
+     * <br>
+     * If the {@link TechniqueParameters} for the specified uniform can
+     * not be looked up via the given {@link Technique}, then <code>null</code>
+     * is returned.
      * 
      * @param uniformName The uniform name
      * @param technique The {@link Technique}
@@ -109,9 +130,13 @@ public class GltfModels
     public static Supplier<?> createGenericSupplier(
         String uniformName, Technique technique, Material material)
     {
-        String uniformParameterId = technique.getUniforms().get(uniformName);
         TechniqueParameters techniqueParameters = 
-            technique.getParameters().get(uniformParameterId);
+            Techniques.getOptionalUniformTechniqueParameters(
+                technique, uniformName);
+        if (techniqueParameters == null)
+        {
+            return null;
+        }
         switch (techniqueParameters.getType())
         {
             case GltfConstants.GL_INT:
@@ -137,6 +162,7 @@ public class GltfModels
                     uniformName, technique, material);
             }
 
+            case GltfConstants.GL_FLOAT_MAT2:   
             case GltfConstants.GL_FLOAT_MAT3:   
             case GltfConstants.GL_FLOAT_MAT4:   
             case GltfConstants.GL_FLOAT_VEC2:   
@@ -166,7 +192,6 @@ public class GltfModels
             }
             
             // These types are not supported as uniform types in OpenGL
-            case GltfConstants.GL_FLOAT_MAT2:   
             case GltfConstants.GL_BOOL: 
             case GltfConstants.GL_BYTE:
             case GltfConstants.GL_UNSIGNED_BYTE:

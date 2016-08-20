@@ -295,9 +295,8 @@ public final class GltfModel
      * The actual contents of these joint matrices is computed from the
      * {@link Skin#getBindShapeMatrix() bind shape matrix}, the
      * {@link Skin#getInverseBindMatrices() inverse bind matrices} and the
-     * {@link #computeGlobalTransform(String, float[]) global transform}
-     * of the given node and the joint node. See the glTF specification
-     * for details.<br>
+     * global transform of the given node and the joint node. See the glTF 
+     * specification for details.<br>
      * <br>
      * 
      * @param uniformName The uniform name
