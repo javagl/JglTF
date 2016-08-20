@@ -181,6 +181,17 @@ public class Accessor
     }
 
     /**
+     * Returns the default value of the byteStride<br> 
+     * @see #getByteStride 
+     * 
+     * @return The default byteStride
+     * 
+     */
+    public Integer defaultByteStride() {
+        return  0;
+    }
+
+    /**
      * The datatype of components in the attribute. (required)<br> 
      * Valid values: [5120, 5121, 5122, 5123, 5126] 
      * 

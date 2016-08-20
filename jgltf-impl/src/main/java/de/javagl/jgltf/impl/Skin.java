@@ -8,6 +8,7 @@
 
 package de.javagl.jgltf.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -92,6 +93,17 @@ public class Skin
     }
 
     /**
+     * Returns the default value of the bindShapeMatrix<br> 
+     * @see #getBindShapeMatrix 
+     * 
+     * @return The default bindShapeMatrix
+     * 
+     */
+    public float[] defaultBindShapeMatrix() {
+        return new float[] { 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F };
+    }
+
+    /**
      * The ID of the accessor containing the floating-point 4x4 inverse-bind 
      * matrices. (required) 
      * 
@@ -145,6 +157,50 @@ public class Skin
      */
     public List<String> getJointNames() {
         return this.jointNames;
+    }
+
+    /**
+     * Add the given jointNames. The jointNames of this instance will be 
+     * replaced with a list that contains all previous elements, and 
+     * additionally the new element. 
+     * 
+     * @param element The element
+     * @throws NullPointerException If the given element is <code>null</code>
+     * 
+     */
+    public void addJointNames(String element) {
+        if (element == null) {
+            throw new NullPointerException("The element may not be null");
+        }
+        List<String> oldList = this.jointNames;
+        List<String> newList = new ArrayList<String>();
+        if (oldList!= null) {
+            newList.addAll(oldList);
+        }
+        newList.add(element);
+        this.jointNames = newList;
+    }
+
+    /**
+     * Remove the given jointNames. The jointNames of this instance will be 
+     * replaced with a list that contains all previous elements, except for 
+     * the removed one. 
+     * 
+     * @param element The element
+     * @throws NullPointerException If the given element is <code>null</code>
+     * 
+     */
+    public void removeJointNames(String element) {
+        if (element == null) {
+            throw new NullPointerException("The element may not be null");
+        }
+        List<String> oldList = this.jointNames;
+        List<String> newList = new ArrayList<String>();
+        if (oldList!= null) {
+            newList.addAll(oldList);
+        }
+        newList.remove(element);
+        this.jointNames = newList;
     }
 
 }

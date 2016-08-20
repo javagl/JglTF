@@ -8,6 +8,7 @@
 
 package de.javagl.jgltf.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -160,6 +161,67 @@ public class Node
     }
 
     /**
+     * Add the given children. The children of this instance will be replaced 
+     * with a list that contains all previous elements, and additionally the 
+     * new element. 
+     * 
+     * @param element The element
+     * @throws NullPointerException If the given element is <code>null</code>
+     * 
+     */
+    public void addChildren(String element) {
+        if (element == null) {
+            throw new NullPointerException("The element may not be null");
+        }
+        List<String> oldList = this.children;
+        List<String> newList = new ArrayList<String>();
+        if (oldList!= null) {
+            newList.addAll(oldList);
+        }
+        newList.add(element);
+        this.children = newList;
+    }
+
+    /**
+     * Remove the given children. The children of this instance will be 
+     * replaced with a list that contains all previous elements, except for 
+     * the removed one.<br> 
+     * If this new list would be empty, then it will be set to 
+     * <code>null</code>. 
+     * 
+     * @param element The element
+     * @throws NullPointerException If the given element is <code>null</code>
+     * 
+     */
+    public void removeChildren(String element) {
+        if (element == null) {
+            throw new NullPointerException("The element may not be null");
+        }
+        List<String> oldList = this.children;
+        List<String> newList = new ArrayList<String>();
+        if (oldList!= null) {
+            newList.addAll(oldList);
+        }
+        newList.remove(element);
+        if (newList.isEmpty()) {
+            this.children = null;
+        } else {
+            this.children = newList;
+        }
+    }
+
+    /**
+     * Returns the default value of the children<br> 
+     * @see #getChildren 
+     * 
+     * @return The default children
+     * 
+     */
+    public List<String> defaultChildren() {
+        return new ArrayList<String>();
+    }
+
+    /**
      * The ID of skeleton nodes. (optional)<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;The elements of this array (optional) 
@@ -185,6 +247,56 @@ public class Node
      */
     public List<String> getSkeletons() {
         return this.skeletons;
+    }
+
+    /**
+     * Add the given skeletons. The skeletons of this instance will be 
+     * replaced with a list that contains all previous elements, and 
+     * additionally the new element. 
+     * 
+     * @param element The element
+     * @throws NullPointerException If the given element is <code>null</code>
+     * 
+     */
+    public void addSkeletons(String element) {
+        if (element == null) {
+            throw new NullPointerException("The element may not be null");
+        }
+        List<String> oldList = this.skeletons;
+        List<String> newList = new ArrayList<String>();
+        if (oldList!= null) {
+            newList.addAll(oldList);
+        }
+        newList.add(element);
+        this.skeletons = newList;
+    }
+
+    /**
+     * Remove the given skeletons. The skeletons of this instance will be 
+     * replaced with a list that contains all previous elements, except for 
+     * the removed one.<br> 
+     * If this new list would be empty, then it will be set to 
+     * <code>null</code>. 
+     * 
+     * @param element The element
+     * @throws NullPointerException If the given element is <code>null</code>
+     * 
+     */
+    public void removeSkeletons(String element) {
+        if (element == null) {
+            throw new NullPointerException("The element may not be null");
+        }
+        List<String> oldList = this.skeletons;
+        List<String> newList = new ArrayList<String>();
+        if (oldList!= null) {
+            newList.addAll(oldList);
+        }
+        newList.remove(element);
+        if (newList.isEmpty()) {
+            this.skeletons = null;
+        } else {
+            this.skeletons = newList;
+        }
     }
 
     /**
@@ -280,6 +392,17 @@ public class Node
     }
 
     /**
+     * Returns the default value of the matrix<br> 
+     * @see #getMatrix 
+     * 
+     * @return The default matrix
+     * 
+     */
+    public float[] defaultMatrix() {
+        return new float[] { 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F };
+    }
+
+    /**
      * The IDs of the meshes in this node. (optional)<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;The elements of this array (optional) 
@@ -305,6 +428,56 @@ public class Node
      */
     public List<String> getMeshes() {
         return this.meshes;
+    }
+
+    /**
+     * Add the given meshes. The meshes of this instance will be replaced 
+     * with a list that contains all previous elements, and additionally the 
+     * new element. 
+     * 
+     * @param element The element
+     * @throws NullPointerException If the given element is <code>null</code>
+     * 
+     */
+    public void addMeshes(String element) {
+        if (element == null) {
+            throw new NullPointerException("The element may not be null");
+        }
+        List<String> oldList = this.meshes;
+        List<String> newList = new ArrayList<String>();
+        if (oldList!= null) {
+            newList.addAll(oldList);
+        }
+        newList.add(element);
+        this.meshes = newList;
+    }
+
+    /**
+     * Remove the given meshes. The meshes of this instance will be replaced 
+     * with a list that contains all previous elements, except for the 
+     * removed one.<br> 
+     * If this new list would be empty, then it will be set to 
+     * <code>null</code>. 
+     * 
+     * @param element The element
+     * @throws NullPointerException If the given element is <code>null</code>
+     * 
+     */
+    public void removeMeshes(String element) {
+        if (element == null) {
+            throw new NullPointerException("The element may not be null");
+        }
+        List<String> oldList = this.meshes;
+        List<String> newList = new ArrayList<String>();
+        if (oldList!= null) {
+            newList.addAll(oldList);
+        }
+        newList.remove(element);
+        if (newList.isEmpty()) {
+            this.meshes = null;
+        } else {
+            this.meshes = newList;
+        }
     }
 
     /**
@@ -350,6 +523,17 @@ public class Node
     }
 
     /**
+     * Returns the default value of the rotation<br> 
+     * @see #getRotation 
+     * 
+     * @return The default rotation
+     * 
+     */
+    public float[] defaultRotation() {
+        return new float[] { 0.0F, 0.0F, 0.0F, 1.0F };
+    }
+
+    /**
      * The node's non-uniform scale. (optional)<br> 
      * Default: [1.0,1.0,1.0]<br> 
      * Number of items: 3<br> 
@@ -390,6 +574,17 @@ public class Node
     }
 
     /**
+     * Returns the default value of the scale<br> 
+     * @see #getScale 
+     * 
+     * @return The default scale
+     * 
+     */
+    public float[] defaultScale() {
+        return new float[] { 1.0F, 1.0F, 1.0F };
+    }
+
+    /**
      * The node's translation. (optional)<br> 
      * Default: [0.0,0.0,0.0]<br> 
      * Number of items: 3<br> 
@@ -427,6 +622,17 @@ public class Node
      */
     public float[] getTranslation() {
         return this.translation;
+    }
+
+    /**
+     * Returns the default value of the translation<br> 
+     * @see #getTranslation 
+     * 
+     * @return The default translation
+     * 
+     */
+    public float[] defaultTranslation() {
+        return new float[] { 0.0F, 0.0F, 0.0F };
     }
 
 }

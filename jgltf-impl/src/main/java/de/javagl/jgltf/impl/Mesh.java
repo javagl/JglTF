@@ -8,6 +8,7 @@
 
 package de.javagl.jgltf.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -65,6 +66,67 @@ public class Mesh
      */
     public List<MeshPrimitive> getPrimitives() {
         return this.primitives;
+    }
+
+    /**
+     * Add the given primitives. The primitives of this instance will be 
+     * replaced with a list that contains all previous elements, and 
+     * additionally the new element. 
+     * 
+     * @param element The element
+     * @throws NullPointerException If the given element is <code>null</code>
+     * 
+     */
+    public void addPrimitives(MeshPrimitive element) {
+        if (element == null) {
+            throw new NullPointerException("The element may not be null");
+        }
+        List<MeshPrimitive> oldList = this.primitives;
+        List<MeshPrimitive> newList = new ArrayList<MeshPrimitive>();
+        if (oldList!= null) {
+            newList.addAll(oldList);
+        }
+        newList.add(element);
+        this.primitives = newList;
+    }
+
+    /**
+     * Remove the given primitives. The primitives of this instance will be 
+     * replaced with a list that contains all previous elements, except for 
+     * the removed one.<br> 
+     * If this new list would be empty, then it will be set to 
+     * <code>null</code>. 
+     * 
+     * @param element The element
+     * @throws NullPointerException If the given element is <code>null</code>
+     * 
+     */
+    public void removePrimitives(MeshPrimitive element) {
+        if (element == null) {
+            throw new NullPointerException("The element may not be null");
+        }
+        List<MeshPrimitive> oldList = this.primitives;
+        List<MeshPrimitive> newList = new ArrayList<MeshPrimitive>();
+        if (oldList!= null) {
+            newList.addAll(oldList);
+        }
+        newList.remove(element);
+        if (newList.isEmpty()) {
+            this.primitives = null;
+        } else {
+            this.primitives = newList;
+        }
+    }
+
+    /**
+     * Returns the default value of the primitives<br> 
+     * @see #getPrimitives 
+     * 
+     * @return The default primitives
+     * 
+     */
+    public List<MeshPrimitive> defaultPrimitives() {
+        return new ArrayList<MeshPrimitive>();
     }
 
 }

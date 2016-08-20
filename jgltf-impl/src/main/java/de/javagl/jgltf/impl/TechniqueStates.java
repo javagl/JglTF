@@ -8,6 +8,7 @@
 
 package de.javagl.jgltf.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -74,6 +75,67 @@ public class TechniqueStates
      */
     public List<Integer> getEnable() {
         return this.enable;
+    }
+
+    /**
+     * Add the given enable. The enable of this instance will be replaced 
+     * with a list that contains all previous elements, and additionally the 
+     * new element. 
+     * 
+     * @param element The element
+     * @throws NullPointerException If the given element is <code>null</code>
+     * 
+     */
+    public void addEnable(Integer element) {
+        if (element == null) {
+            throw new NullPointerException("The element may not be null");
+        }
+        List<Integer> oldList = this.enable;
+        List<Integer> newList = new ArrayList<Integer>();
+        if (oldList!= null) {
+            newList.addAll(oldList);
+        }
+        newList.add(element);
+        this.enable = newList;
+    }
+
+    /**
+     * Remove the given enable. The enable of this instance will be replaced 
+     * with a list that contains all previous elements, except for the 
+     * removed one.<br> 
+     * If this new list would be empty, then it will be set to 
+     * <code>null</code>. 
+     * 
+     * @param element The element
+     * @throws NullPointerException If the given element is <code>null</code>
+     * 
+     */
+    public void removeEnable(Integer element) {
+        if (element == null) {
+            throw new NullPointerException("The element may not be null");
+        }
+        List<Integer> oldList = this.enable;
+        List<Integer> newList = new ArrayList<Integer>();
+        if (oldList!= null) {
+            newList.addAll(oldList);
+        }
+        newList.remove(element);
+        if (newList.isEmpty()) {
+            this.enable = null;
+        } else {
+            this.enable = newList;
+        }
+    }
+
+    /**
+     * Returns the default value of the enable<br> 
+     * @see #getEnable 
+     * 
+     * @return The default enable
+     * 
+     */
+    public List<Integer> defaultEnable() {
+        return new ArrayList<Integer>();
     }
 
     /**

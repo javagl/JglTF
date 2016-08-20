@@ -98,6 +98,17 @@ public class Buffer
     }
 
     /**
+     * Returns the default value of the byteLength<br> 
+     * @see #getByteLength 
+     * 
+     * @return The default byteLength
+     * 
+     */
+    public Integer defaultByteLength() {
+        return  0;
+    }
+
+    /**
      * XMLHttpRequest `responseType`. (optional)<br> 
      * Default: "arraybuffer"<br> 
      * Valid values: ["arraybuffer", "text"] 
@@ -128,6 +139,17 @@ public class Buffer
      */
     public String getType() {
         return this.type;
+    }
+
+    /**
+     * Returns the default value of the type<br> 
+     * @see #getType 
+     * 
+     * @return The default type
+     * 
+     */
+    public String defaultType() {
+        return "arraybuffer";
     }
 
 }

@@ -93,6 +93,17 @@ public class Texture
     }
 
     /**
+     * Returns the default value of the format<br> 
+     * @see #getFormat 
+     * 
+     * @return The default format
+     * 
+     */
+    public Integer defaultFormat() {
+        return  6408;
+    }
+
+    /**
      * The texture's internal format. (optional)<br> 
      * Default: 6408<br> 
      * Valid values: [6406, 6407, 6408, 6409, 6410] 
@@ -123,6 +134,17 @@ public class Texture
      */
     public Integer getInternalFormat() {
         return this.internalFormat;
+    }
+
+    /**
+     * Returns the default value of the internalFormat<br> 
+     * @see #getInternalFormat 
+     * 
+     * @return The default internalFormat
+     * 
+     */
+    public Integer defaultInternalFormat() {
+        return  6408;
     }
 
     /**
@@ -207,6 +229,17 @@ public class Texture
     }
 
     /**
+     * Returns the default value of the target<br> 
+     * @see #getTarget 
+     * 
+     * @return The default target
+     * 
+     */
+    public Integer defaultTarget() {
+        return  3553;
+    }
+
+    /**
      * Texel datatype. (optional)<br> 
      * Default: 5121<br> 
      * Valid values: [5121, 33635, 32819, 32820] 
@@ -237,6 +270,17 @@ public class Texture
      */
     public Integer getType() {
         return this.type;
+    }
+
+    /**
+     * Returns the default value of the type<br> 
+     * @see #getType 
+     * 
+     * @return The default type
+     * 
+     */
+    public Integer defaultType() {
+        return  5121;
     }
 
 }

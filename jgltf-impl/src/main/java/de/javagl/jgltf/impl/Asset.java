@@ -129,6 +129,17 @@ public class Asset
     }
 
     /**
+     * Returns the default value of the premultipliedAlpha<br> 
+     * @see #isPremultipliedAlpha 
+     * 
+     * @return The default premultipliedAlpha
+     * 
+     */
+    public Boolean defaultPremultipliedAlpha() {
+        return false;
+    }
+
+    /**
      * The profile of this Asset (optional)<br> 
      * Default: {} 
      * 
@@ -152,6 +163,17 @@ public class Asset
      */
     public AssetProfile getProfile() {
         return this.profile;
+    }
+
+    /**
+     * Returns the default value of the profile<br> 
+     * @see #getProfile 
+     * 
+     * @return The default profile
+     * 
+     */
+    public AssetProfile defaultProfile() {
+        return new AssetProfile();
     }
 
     /**

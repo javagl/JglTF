@@ -8,6 +8,7 @@
 
 package de.javagl.jgltf.impl;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 
@@ -80,6 +81,71 @@ public class Technique
     }
 
     /**
+     * Add the given parameters. The parameters of this instance will be 
+     * replaced with a map that contains all previous mappings, and 
+     * additionally the new mapping. 
+     * 
+     * @param key The key
+     * @param value The value
+     * @throws NullPointerException If the given key or value is <code>null</code>
+     * 
+     */
+    public void addParameters(String key, TechniqueParameters value) {
+        if (key == null) {
+            throw new NullPointerException("The key may not be null");
+        }
+        if (value == null) {
+            throw new NullPointerException("The value may not be null");
+        }
+        Map<String, TechniqueParameters> oldMap = this.parameters;
+        Map<String, TechniqueParameters> newMap = new LinkedHashMap<String, TechniqueParameters>();
+        if (oldMap!= null) {
+            newMap.putAll(oldMap);
+        }
+        newMap.put(key, value);
+        this.parameters = newMap;
+    }
+
+    /**
+     * Remove the given parameters. The parameters of this instance will be 
+     * replaced with a map that contains all previous mappings, except for 
+     * the one with the given key.<br> 
+     * If this new map would be empty, then it will be set to 
+     * <code>null</code>. 
+     * 
+     * @param key The key
+     * @throws NullPointerException If the given key is <code>null</code>
+     * 
+     */
+    public void removeParameters(String key) {
+        if (key == null) {
+            throw new NullPointerException("The key may not be null");
+        }
+        Map<String, TechniqueParameters> oldMap = this.parameters;
+        Map<String, TechniqueParameters> newMap = new LinkedHashMap<String, TechniqueParameters>();
+        if (oldMap!= null) {
+            newMap.putAll(oldMap);
+        }
+        newMap.remove(key);
+        if (newMap.isEmpty()) {
+            this.parameters = null;
+        } else {
+            this.parameters = newMap;
+        }
+    }
+
+    /**
+     * Returns the default value of the parameters<br> 
+     * @see #getParameters 
+     * 
+     * @return The default parameters
+     * 
+     */
+    public Map<String, TechniqueParameters> defaultParameters() {
+        return new LinkedHashMap<String, TechniqueParameters>();
+    }
+
+    /**
      * A dictionary object of strings that maps GLSL attribute names to 
      * technique parameter IDs. (optional)<br> 
      * Default: {} 
@@ -105,6 +171,71 @@ public class Technique
      */
     public Map<String, String> getAttributes() {
         return this.attributes;
+    }
+
+    /**
+     * Add the given attributes. The attributes of this instance will be 
+     * replaced with a map that contains all previous mappings, and 
+     * additionally the new mapping. 
+     * 
+     * @param key The key
+     * @param value The value
+     * @throws NullPointerException If the given key or value is <code>null</code>
+     * 
+     */
+    public void addAttributes(String key, String value) {
+        if (key == null) {
+            throw new NullPointerException("The key may not be null");
+        }
+        if (value == null) {
+            throw new NullPointerException("The value may not be null");
+        }
+        Map<String, String> oldMap = this.attributes;
+        Map<String, String> newMap = new LinkedHashMap<String, String>();
+        if (oldMap!= null) {
+            newMap.putAll(oldMap);
+        }
+        newMap.put(key, value);
+        this.attributes = newMap;
+    }
+
+    /**
+     * Remove the given attributes. The attributes of this instance will be 
+     * replaced with a map that contains all previous mappings, except for 
+     * the one with the given key.<br> 
+     * If this new map would be empty, then it will be set to 
+     * <code>null</code>. 
+     * 
+     * @param key The key
+     * @throws NullPointerException If the given key is <code>null</code>
+     * 
+     */
+    public void removeAttributes(String key) {
+        if (key == null) {
+            throw new NullPointerException("The key may not be null");
+        }
+        Map<String, String> oldMap = this.attributes;
+        Map<String, String> newMap = new LinkedHashMap<String, String>();
+        if (oldMap!= null) {
+            newMap.putAll(oldMap);
+        }
+        newMap.remove(key);
+        if (newMap.isEmpty()) {
+            this.attributes = null;
+        } else {
+            this.attributes = newMap;
+        }
+    }
+
+    /**
+     * Returns the default value of the attributes<br> 
+     * @see #getAttributes 
+     * 
+     * @return The default attributes
+     * 
+     */
+    public Map<String, String> defaultAttributes() {
+        return new LinkedHashMap<String, String>();
     }
 
     /**
@@ -160,6 +291,71 @@ public class Technique
     }
 
     /**
+     * Add the given uniforms. The uniforms of this instance will be replaced 
+     * with a map that contains all previous mappings, and additionally the 
+     * new mapping. 
+     * 
+     * @param key The key
+     * @param value The value
+     * @throws NullPointerException If the given key or value is <code>null</code>
+     * 
+     */
+    public void addUniforms(String key, String value) {
+        if (key == null) {
+            throw new NullPointerException("The key may not be null");
+        }
+        if (value == null) {
+            throw new NullPointerException("The value may not be null");
+        }
+        Map<String, String> oldMap = this.uniforms;
+        Map<String, String> newMap = new LinkedHashMap<String, String>();
+        if (oldMap!= null) {
+            newMap.putAll(oldMap);
+        }
+        newMap.put(key, value);
+        this.uniforms = newMap;
+    }
+
+    /**
+     * Remove the given uniforms. The uniforms of this instance will be 
+     * replaced with a map that contains all previous mappings, except for 
+     * the one with the given key.<br> 
+     * If this new map would be empty, then it will be set to 
+     * <code>null</code>. 
+     * 
+     * @param key The key
+     * @throws NullPointerException If the given key is <code>null</code>
+     * 
+     */
+    public void removeUniforms(String key) {
+        if (key == null) {
+            throw new NullPointerException("The key may not be null");
+        }
+        Map<String, String> oldMap = this.uniforms;
+        Map<String, String> newMap = new LinkedHashMap<String, String>();
+        if (oldMap!= null) {
+            newMap.putAll(oldMap);
+        }
+        newMap.remove(key);
+        if (newMap.isEmpty()) {
+            this.uniforms = null;
+        } else {
+            this.uniforms = newMap;
+        }
+    }
+
+    /**
+     * Returns the default value of the uniforms<br> 
+     * @see #getUniforms 
+     * 
+     * @return The default uniforms
+     * 
+     */
+    public Map<String, String> defaultUniforms() {
+        return new LinkedHashMap<String, String>();
+    }
+
+    /**
      * Fixed-function rendering states. (optional)<br> 
      * Default: {} 
      * 
@@ -183,6 +379,17 @@ public class Technique
      */
     public TechniqueStates getStates() {
         return this.states;
+    }
+
+    /**
+     * Returns the default value of the states<br> 
+     * @see #getStates 
+     * 
+     * @return The default states
+     * 
+     */
+    public TechniqueStates defaultStates() {
+        return new TechniqueStates();
     }
 
 }

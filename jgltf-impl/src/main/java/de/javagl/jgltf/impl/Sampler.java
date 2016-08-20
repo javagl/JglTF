@@ -83,6 +83,17 @@ public class Sampler
     }
 
     /**
+     * Returns the default value of the magFilter<br> 
+     * @see #getMagFilter 
+     * 
+     * @return The default magFilter
+     * 
+     */
+    public Integer defaultMagFilter() {
+        return  9729;
+    }
+
+    /**
      * Minification filter. (optional)<br> 
      * Default: 9986<br> 
      * Valid values: [9728, 9729, 9984, 9985, 9986, 9987] 
@@ -113,6 +124,17 @@ public class Sampler
      */
     public Integer getMinFilter() {
         return this.minFilter;
+    }
+
+    /**
+     * Returns the default value of the minFilter<br> 
+     * @see #getMinFilter 
+     * 
+     * @return The default minFilter
+     * 
+     */
+    public Integer defaultMinFilter() {
+        return  9986;
     }
 
     /**
@@ -149,6 +171,17 @@ public class Sampler
     }
 
     /**
+     * Returns the default value of the wrapS<br> 
+     * @see #getWrapS 
+     * 
+     * @return The default wrapS
+     * 
+     */
+    public Integer defaultWrapS() {
+        return  10497;
+    }
+
+    /**
      * t wrapping mode. (optional)<br> 
      * Default: 10497<br> 
      * Valid values: [33071, 33648, 10497] 
@@ -179,6 +212,17 @@ public class Sampler
      */
     public Integer getWrapT() {
         return this.wrapT;
+    }
+
+    /**
+     * Returns the default value of the wrapT<br> 
+     * @see #getWrapT 
+     * 
+     * @return The default wrapT
+     * 
+     */
+    public Integer defaultWrapT() {
+        return  10497;
     }
 
 }

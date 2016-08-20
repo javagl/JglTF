@@ -8,6 +8,7 @@
 
 package de.javagl.jgltf.impl;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 
@@ -81,6 +82,71 @@ public class Material
      */
     public Map<String, Object> getValues() {
         return this.values;
+    }
+
+    /**
+     * Add the given values. The values of this instance will be replaced 
+     * with a map that contains all previous mappings, and additionally the 
+     * new mapping. 
+     * 
+     * @param key The key
+     * @param value The value
+     * @throws NullPointerException If the given key or value is <code>null</code>
+     * 
+     */
+    public void addValues(String key, Object value) {
+        if (key == null) {
+            throw new NullPointerException("The key may not be null");
+        }
+        if (value == null) {
+            throw new NullPointerException("The value may not be null");
+        }
+        Map<String, Object> oldMap = this.values;
+        Map<String, Object> newMap = new LinkedHashMap<String, Object>();
+        if (oldMap!= null) {
+            newMap.putAll(oldMap);
+        }
+        newMap.put(key, value);
+        this.values = newMap;
+    }
+
+    /**
+     * Remove the given values. The values of this instance will be replaced 
+     * with a map that contains all previous mappings, except for the one 
+     * with the given key.<br> 
+     * If this new map would be empty, then it will be set to 
+     * <code>null</code>. 
+     * 
+     * @param key The key
+     * @throws NullPointerException If the given key is <code>null</code>
+     * 
+     */
+    public void removeValues(String key) {
+        if (key == null) {
+            throw new NullPointerException("The key may not be null");
+        }
+        Map<String, Object> oldMap = this.values;
+        Map<String, Object> newMap = new LinkedHashMap<String, Object>();
+        if (oldMap!= null) {
+            newMap.putAll(oldMap);
+        }
+        newMap.remove(key);
+        if (newMap.isEmpty()) {
+            this.values = null;
+        } else {
+            this.values = newMap;
+        }
+    }
+
+    /**
+     * Returns the default value of the values<br> 
+     * @see #getValues 
+     * 
+     * @return The default values
+     * 
+     */
+    public Map<String, Object> defaultValues() {
+        return new LinkedHashMap<String, Object>();
     }
 
 }

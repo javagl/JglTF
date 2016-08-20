@@ -134,6 +134,17 @@ public class BufferView
     }
 
     /**
+     * Returns the default value of the byteLength<br> 
+     * @see #getByteLength 
+     * 
+     * @return The default byteLength
+     * 
+     */
+    public Integer defaultByteLength() {
+        return  0;
+    }
+
+    /**
      * The target that the WebGL buffer should be bound to. (optional)<br> 
      * Valid values: [34962, 34963] 
      * 

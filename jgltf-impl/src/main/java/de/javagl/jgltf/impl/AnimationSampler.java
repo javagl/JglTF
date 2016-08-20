@@ -101,6 +101,17 @@ public class AnimationSampler
     }
 
     /**
+     * Returns the default value of the interpolation<br> 
+     * @see #getInterpolation 
+     * 
+     * @return The default interpolation
+     * 
+     */
+    public String defaultInterpolation() {
+        return "LINEAR";
+    }
+
+    /**
      * The ID of a parameter in this animation to use as keyframe output. 
      * (required) 
      * 

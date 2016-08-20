@@ -185,6 +185,17 @@ public class TechniqueStatesFunctions
     }
 
     /**
+     * Returns the default value of the blendColor<br> 
+     * @see #getBlendColor 
+     * 
+     * @return The default blendColor
+     * 
+     */
+    public float[] defaultBlendColor() {
+        return new float[] { 0.0F, 0.0F, 0.0F, 0.0F };
+    }
+
+    /**
      * Integer values passed to `blendEquationSeparate()`. (optional)<br> 
      * Default: [32774,32774]<br> 
      * Number of items: 2<br> 
@@ -229,6 +240,17 @@ public class TechniqueStatesFunctions
      */
     public int[] getBlendEquationSeparate() {
         return this.blendEquationSeparate;
+    }
+
+    /**
+     * Returns the default value of the blendEquationSeparate<br> 
+     * @see #getBlendEquationSeparate 
+     * 
+     * @return The default blendEquationSeparate
+     * 
+     */
+    public int[] defaultBlendEquationSeparate() {
+        return new int[] { 32774, 32774 };
     }
 
     /**
@@ -281,6 +303,17 @@ public class TechniqueStatesFunctions
     }
 
     /**
+     * Returns the default value of the blendFuncSeparate<br> 
+     * @see #getBlendFuncSeparate 
+     * 
+     * @return The default blendFuncSeparate
+     * 
+     */
+    public int[] defaultBlendFuncSeparate() {
+        return new int[] { 1, 1, 0, 0 };
+    }
+
+    /**
      * Boolean values passed to `colorMask()`. [red, green, blue, alpha]. 
      * (optional)<br> 
      * Default: [true,true,true,true]<br> 
@@ -320,6 +353,17 @@ public class TechniqueStatesFunctions
      */
     public boolean[] getColorMask() {
         return this.colorMask;
+    }
+
+    /**
+     * Returns the default value of the colorMask<br> 
+     * @see #getColorMask 
+     * 
+     * @return The default colorMask
+     * 
+     */
+    public boolean[] defaultColorMask() {
+        return new boolean[] {true, true, true, true };
     }
 
     /**
@@ -370,6 +414,17 @@ public class TechniqueStatesFunctions
     }
 
     /**
+     * Returns the default value of the cullFace<br> 
+     * @see #getCullFace 
+     * 
+     * @return The default cullFace
+     * 
+     */
+    public int[] defaultCullFace() {
+        return new int[] { 1029 };
+    }
+
+    /**
      * Integer values passed to `depthFunc()`. (optional)<br> 
      * Default: [513]<br> 
      * Number of items: 1<br> 
@@ -417,6 +472,17 @@ public class TechniqueStatesFunctions
     }
 
     /**
+     * Returns the default value of the depthFunc<br> 
+     * @see #getDepthFunc 
+     * 
+     * @return The default depthFunc
+     * 
+     */
+    public int[] defaultDepthFunc() {
+        return new int[] { 513 };
+    }
+
+    /**
      * Boolean value passed to `depthMask()`. (optional)<br> 
      * Default: [true]<br> 
      * Number of items: 1<br> 
@@ -454,6 +520,17 @@ public class TechniqueStatesFunctions
      */
     public boolean[] getDepthMask() {
         return this.depthMask;
+    }
+
+    /**
+     * Returns the default value of the depthMask<br> 
+     * @see #getDepthMask 
+     * 
+     * @return The default depthMask
+     * 
+     */
+    public boolean[] defaultDepthMask() {
+        return new boolean[] {true };
     }
 
     /**
@@ -496,6 +573,17 @@ public class TechniqueStatesFunctions
      */
     public float[] getDepthRange() {
         return this.depthRange;
+    }
+
+    /**
+     * Returns the default value of the depthRange<br> 
+     * @see #getDepthRange 
+     * 
+     * @return The default depthRange
+     * 
+     */
+    public float[] defaultDepthRange() {
+        return new float[] { 0.0F, 1.0F };
     }
 
     /**
@@ -546,6 +634,17 @@ public class TechniqueStatesFunctions
     }
 
     /**
+     * Returns the default value of the frontFace<br> 
+     * @see #getFrontFace 
+     * 
+     * @return The default frontFace
+     * 
+     */
+    public int[] defaultFrontFace() {
+        return new int[] { 2305 };
+    }
+
+    /**
      * Floating-point value passed to `lineWidth()`. (optional)<br> 
      * Default: [1.0]<br> 
      * Number of items: 1<br> 
@@ -593,6 +692,17 @@ public class TechniqueStatesFunctions
     }
 
     /**
+     * Returns the default value of the lineWidth<br> 
+     * @see #getLineWidth 
+     * 
+     * @return The default lineWidth
+     * 
+     */
+    public float[] defaultLineWidth() {
+        return new float[] { 1.0F };
+    }
+
+    /**
      * Floating-point value passed to `polygonOffset()`. [factor, units] 
      * (optional)<br> 
      * Default: [0.0,0.0]<br> 
@@ -635,6 +745,17 @@ public class TechniqueStatesFunctions
     }
 
     /**
+     * Returns the default value of the polygonOffset<br> 
+     * @see #getPolygonOffset 
+     * 
+     * @return The default polygonOffset
+     * 
+     */
+    public float[] defaultPolygonOffset() {
+        return new float[] { 0.0F, 0.0F };
+    }
+
+    /**
      * Floating-point value passed to `scissor()`. [x, y, width, height]. 
      * (optional)<br> 
      * Default: [0.0,0.0,0.0,0.0]<br> 
@@ -674,6 +795,17 @@ public class TechniqueStatesFunctions
      */
     public float[] getScissor() {
         return this.scissor;
+    }
+
+    /**
+     * Returns the default value of the scissor<br> 
+     * @see #getScissor 
+     * 
+     * @return The default scissor
+     * 
+     */
+    public float[] defaultScissor() {
+        return new float[] { 0.0F, 0.0F, 0.0F, 0.0F };
     }
 
 }

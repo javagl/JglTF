@@ -8,6 +8,7 @@
 
 package de.javagl.jgltf.impl;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 
@@ -73,6 +74,71 @@ public class MeshPrimitive
      */
     public Map<String, String> getAttributes() {
         return this.attributes;
+    }
+
+    /**
+     * Add the given attributes. The attributes of this instance will be 
+     * replaced with a map that contains all previous mappings, and 
+     * additionally the new mapping. 
+     * 
+     * @param key The key
+     * @param value The value
+     * @throws NullPointerException If the given key or value is <code>null</code>
+     * 
+     */
+    public void addAttributes(String key, String value) {
+        if (key == null) {
+            throw new NullPointerException("The key may not be null");
+        }
+        if (value == null) {
+            throw new NullPointerException("The value may not be null");
+        }
+        Map<String, String> oldMap = this.attributes;
+        Map<String, String> newMap = new LinkedHashMap<String, String>();
+        if (oldMap!= null) {
+            newMap.putAll(oldMap);
+        }
+        newMap.put(key, value);
+        this.attributes = newMap;
+    }
+
+    /**
+     * Remove the given attributes. The attributes of this instance will be 
+     * replaced with a map that contains all previous mappings, except for 
+     * the one with the given key.<br> 
+     * If this new map would be empty, then it will be set to 
+     * <code>null</code>. 
+     * 
+     * @param key The key
+     * @throws NullPointerException If the given key is <code>null</code>
+     * 
+     */
+    public void removeAttributes(String key) {
+        if (key == null) {
+            throw new NullPointerException("The key may not be null");
+        }
+        Map<String, String> oldMap = this.attributes;
+        Map<String, String> newMap = new LinkedHashMap<String, String>();
+        if (oldMap!= null) {
+            newMap.putAll(oldMap);
+        }
+        newMap.remove(key);
+        if (newMap.isEmpty()) {
+            this.attributes = null;
+        } else {
+            this.attributes = newMap;
+        }
+    }
+
+    /**
+     * Returns the default value of the attributes<br> 
+     * @see #getAttributes 
+     * 
+     * @return The default attributes
+     * 
+     */
+    public Map<String, String> defaultAttributes() {
+        return new LinkedHashMap<String, String>();
     }
 
     /**
@@ -156,6 +222,17 @@ public class MeshPrimitive
      */
     public Integer getMode() {
         return this.mode;
+    }
+
+    /**
+     * Returns the default value of the mode<br> 
+     * @see #getMode 
+     * 
+     * @return The default mode
+     * 
+     */
+    public Integer defaultMode() {
+        return  4;
     }
 
 }

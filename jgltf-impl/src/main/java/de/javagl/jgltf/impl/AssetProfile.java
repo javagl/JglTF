@@ -60,6 +60,17 @@ public class AssetProfile
     }
 
     /**
+     * Returns the default value of the api<br> 
+     * @see #getApi 
+     * 
+     * @return The default api
+     * 
+     */
+    public String defaultApi() {
+        return "WebGL";
+    }
+
+    /**
      * The API version. (optional)<br> 
      * Default: "1.0.3" 
      * 
@@ -83,6 +94,17 @@ public class AssetProfile
      */
     public String getVersion() {
         return this.version;
+    }
+
+    /**
+     * Returns the default value of the version<br> 
+     * @see #getVersion 
+     * 
+     * @return The default version
+     * 
+     */
+    public String defaultVersion() {
+        return "1.0.3";
     }
 
 }

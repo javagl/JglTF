@@ -8,6 +8,7 @@
 
 package de.javagl.jgltf.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -69,6 +70,67 @@ public class Program
      */
     public List<String> getAttributes() {
         return this.attributes;
+    }
+
+    /**
+     * Add the given attributes. The attributes of this instance will be 
+     * replaced with a list that contains all previous elements, and 
+     * additionally the new element. 
+     * 
+     * @param element The element
+     * @throws NullPointerException If the given element is <code>null</code>
+     * 
+     */
+    public void addAttributes(String element) {
+        if (element == null) {
+            throw new NullPointerException("The element may not be null");
+        }
+        List<String> oldList = this.attributes;
+        List<String> newList = new ArrayList<String>();
+        if (oldList!= null) {
+            newList.addAll(oldList);
+        }
+        newList.add(element);
+        this.attributes = newList;
+    }
+
+    /**
+     * Remove the given attributes. The attributes of this instance will be 
+     * replaced with a list that contains all previous elements, except for 
+     * the removed one.<br> 
+     * If this new list would be empty, then it will be set to 
+     * <code>null</code>. 
+     * 
+     * @param element The element
+     * @throws NullPointerException If the given element is <code>null</code>
+     * 
+     */
+    public void removeAttributes(String element) {
+        if (element == null) {
+            throw new NullPointerException("The element may not be null");
+        }
+        List<String> oldList = this.attributes;
+        List<String> newList = new ArrayList<String>();
+        if (oldList!= null) {
+            newList.addAll(oldList);
+        }
+        newList.remove(element);
+        if (newList.isEmpty()) {
+            this.attributes = null;
+        } else {
+            this.attributes = newList;
+        }
+    }
+
+    /**
+     * Returns the default value of the attributes<br> 
+     * @see #getAttributes 
+     * 
+     * @return The default attributes
+     * 
+     */
+    public List<String> defaultAttributes() {
+        return new ArrayList<String>();
     }
 
     /**
