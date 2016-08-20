@@ -223,7 +223,7 @@ class MeshPrimitiveCreator
         BufferView bufferView = createSimpleBufferView(
             GltfConstants.GL_ELEMENT_ARRAY_BUFFER, byteBuffer);
 
-        Gltfs.addBufferView(gltf, indicesBufferViewId, bufferView);
+        gltf.addBufferViews(indicesBufferViewId, bufferView);
         
         Accessor accessor = 
             createSimpleAccessor(indicesComponentType, "SCALAR", 
@@ -232,7 +232,7 @@ class MeshPrimitiveCreator
         accessor.setMin(computeMin(accessor, byteBuffer));
         accessor.setMax(computeMax(accessor, byteBuffer));
         
-        Gltfs.addAccessor(gltf, indicesAccessorId, accessor);
+        gltf.addAccessors(indicesAccessorId, accessor);
     }
     
     /**
@@ -375,7 +375,7 @@ class MeshPrimitiveCreator
         BufferView bufferView = createSimpleBufferView(
             GltfConstants.GL_ARRAY_BUFFER, byteBuffer);
 
-        Gltfs.addBufferView(gltf, verticesBufferViewId, bufferView);
+        gltf.addBufferViews(verticesBufferViewId, bufferView);
 
         Accessor accessor = createSimpleAccessor(
             GltfConstants.GL_FLOAT, "VEC3", 
@@ -386,7 +386,7 @@ class MeshPrimitiveCreator
         accessor.setMin(accessorData.getMin());
         accessor.setMax(accessorData.getMax());
         
-        Gltfs.addAccessor(gltf, verticesAccessorId, accessor);
+        gltf.addAccessors(verticesAccessorId, accessor);
         
     }
     
@@ -407,7 +407,7 @@ class MeshPrimitiveCreator
         BufferView bufferView = createSimpleBufferView(
             GltfConstants.GL_ARRAY_BUFFER, byteBuffer);
 
-        Gltfs.addBufferView(gltf, texCoordsBufferViewId, bufferView);
+        gltf.addBufferViews(texCoordsBufferViewId, bufferView);
 
         Accessor accessor = createSimpleAccessor(
             GltfConstants.GL_FLOAT, "VEC2", 
@@ -418,7 +418,7 @@ class MeshPrimitiveCreator
         accessor.setMin(accessorData.getMin());
         accessor.setMax(accessorData.getMax());
 
-        Gltfs.addAccessor(gltf, texCoordsAccessorId, accessor);
+        gltf.addAccessors(texCoordsAccessorId, accessor);
     }
     
     /**
@@ -438,7 +438,7 @@ class MeshPrimitiveCreator
         BufferView bufferView = createSimpleBufferView(
             GltfConstants.GL_ARRAY_BUFFER, byteBuffer);
 
-        Gltfs.addBufferView(gltf, normalsBufferViewId, bufferView);
+        gltf.addBufferViews(normalsBufferViewId, bufferView);
 
         Accessor accessor = createSimpleAccessor(
             GltfConstants.GL_FLOAT, "VEC3", 
@@ -449,7 +449,7 @@ class MeshPrimitiveCreator
         accessor.setMin(accessorData.getMin());
         accessor.setMax(accessorData.getMax());
 
-        Gltfs.addAccessor(gltf, normalsAccessorId, accessor);
+        gltf.addAccessors(normalsAccessorId, accessor);
     }
 
     /**

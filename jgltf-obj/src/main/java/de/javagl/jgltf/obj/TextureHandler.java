@@ -88,7 +88,8 @@ class TextureHandler
         if (samplerId == null)
         {
             Sampler sampler = new Sampler();
-            samplerId = Gltfs.addSampler(gltf, sampler);
+            samplerId = Gltfs.generateId("sampler", gltf.getSamplers());
+            gltf.addSamplers(samplerId, sampler);
         }
         
         String textureId = imageUriToTextureId.get(imageUri);
@@ -100,7 +101,8 @@ class TextureHandler
         // Create the image 
         Image image = new Image();
         image.setUri(imageUri);
-        String imageId = Gltfs.addImage(gltf, image);
+        String imageId = Gltfs.generateId("image", gltf.getImages());
+        gltf.addImages(imageId, image);
         
         // Create the texture that refers to the image
         Texture texture = new Texture();
@@ -110,7 +112,8 @@ class TextureHandler
         texture.setTarget(GltfConstants.GL_TEXTURE_2D);
         texture.setType(GltfConstants.GL_UNSIGNED_BYTE);
         texture.setSampler(samplerId);
-        textureId = Gltfs.addTexture(gltf, texture);
+        textureId = Gltfs.generateId("texture", gltf.getTextures()); 
+        gltf.addTextures(textureId, texture);
 
         imageUriToTextureId.put(imageUri, textureId);
         return textureId;

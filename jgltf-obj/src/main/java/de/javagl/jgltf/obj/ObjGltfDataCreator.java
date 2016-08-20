@@ -289,15 +289,18 @@ public class ObjGltfDataCreator
         // (containing the MeshPrimitives) in a single Node in a single Scene
         Mesh mesh = new Mesh();
         mesh.setPrimitives(meshPrimitives);
-        String meshId = Gltfs.addMesh(gltf, mesh);
+        String meshId = Gltfs.generateId("mesh", gltf.getMeshes());
+        gltf.addMeshes(meshId, mesh);
 
         Node node = new Node();
         node.setMeshes(Collections.singletonList(meshId));
-        String nodeId = Gltfs.addNode(gltf, node);
+        String nodeId = Gltfs.generateId("node", gltf.getNodes());
+        gltf.addNodes(nodeId, node);
         
         Scene scene = new Scene();
         scene.setNodes(Collections.singletonList(nodeId));
-        String sceneId = Gltfs.addScene(gltf, scene);
+        String sceneId = Gltfs.generateId("scene", gltf.getScenes());
+        gltf.addScenes(sceneId, scene);
         
         gltf.setScene(sceneId);
 
@@ -381,7 +384,10 @@ public class ObjGltfDataCreator
                 material = createMaterialWithColor(
                     withNormals, 0.75f, 0.75f, 0.75f);
             }
-            String materialId = Gltfs.addMaterial(gltf, material);
+            
+            String materialId = 
+                Gltfs.generateId("material", gltf.getMaterials());
+            gltf.addMaterials(materialId, material);
             for (MeshPrimitive subMeshPrimitive : subMeshPrimitives)
             {
                 subMeshPrimitive.setMaterial(materialId);
@@ -422,7 +428,9 @@ public class ObjGltfDataCreator
                 float b = random.nextFloat(); 
                 Material material = 
                     createMaterialWithColor(withNormals, r, g, b);
-                String materialId = Gltfs.addMaterial(gltf, material);
+                String materialId = 
+                    Gltfs.generateId("material", gltf.getMaterials());
+                gltf.addMaterials(materialId, material);
                 meshPrimitive.setMaterial(materialId);
             }
         }
@@ -433,7 +441,9 @@ public class ObjGltfDataCreator
             boolean withNormals = obj.getNumNormals() > 0;
             Material material = createMaterialWithColor(
                 withNormals, 0.75f, 0.75f, 0.75f);
-            String materialId = Gltfs.addMaterial(gltf, material);
+            String materialId = 
+                Gltfs.generateId("material", gltf.getMaterials());
+            gltf.addMaterials(materialId, material);
             for (MeshPrimitive meshPrimitive : meshPrimitives)
             {
                 meshPrimitive.setMaterial(materialId);

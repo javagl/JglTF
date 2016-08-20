@@ -131,7 +131,7 @@ class BufferCreator
     void commitBuffer()
     {
         Buffer buffer = createBuffer();
-        Gltfs.addBuffer(gltf, bufferId, buffer);
+        gltf.addBuffers(bufferId, buffer);
         ByteBuffer bufferData = createBufferData();
         bufferDatas.put(bufferId, bufferData);
         bufferId = null;

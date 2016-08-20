@@ -191,22 +191,21 @@ class TechniqueHandler
                 return;
             }
         }
-        int programCounter = Gltfs.getSize(gltf.getPrograms());
+        String programId = Gltfs.generateId("program", gltf.getPrograms()); 
         
         Shader vertexShader = new Shader();
         vertexShader.setUri(vertexShaderUri);
         vertexShader.setType(GltfConstants.GL_VERTEX_SHADER);
         String vertexShaderId = Gltfs.generateId(
-            "vertexShader" + programCounter, gltf.getShaders());
+            "vertexShader_for_" + programId, gltf.getShaders());
+        gltf.addShaders(vertexShaderId, vertexShader);
         
         Shader fragmentShader = new Shader();
         fragmentShader.setUri(fragmentShaderUri);
         fragmentShader.setType(GltfConstants.GL_FRAGMENT_SHADER);
         String fragmentShaderId = Gltfs.generateId(
-            "fragmentShader" + programCounter, gltf.getShaders());
-        
-        Gltfs.addShader(gltf, vertexShaderId, vertexShader);
-        Gltfs.addShader(gltf, fragmentShaderId, fragmentShader);
+            "fragmentShader_for_" + programId, gltf.getShaders());
+        gltf.addShaders(fragmentShaderId, fragmentShader);
         
         Program program = new Program();
         program.setVertexShader(vertexShaderId);
@@ -222,7 +221,7 @@ class TechniqueHandler
             programAttributes.add("a_normal");
         }
         program.setAttributes(programAttributes);
-        String programId = Gltfs.addProgram(gltf, program);
+        gltf.addPrograms(programId, program);
         
         
         Technique technique = new Technique();
@@ -316,7 +315,7 @@ class TechniqueHandler
         techniqueUniforms.put("u_projectionMatrix", "projectionMatrix");
         technique.setUniforms(techniqueUniforms);
         
-        Gltfs.addTechnique(gltf, techniqueId, technique);
+        gltf.addTechniques(techniqueId, technique);
     }
     
     /**
