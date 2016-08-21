@@ -30,11 +30,10 @@ import java.util.List;
 
 import de.javagl.jgltf.impl.GlTF;
 import de.javagl.jgltf.impl.Node;
-import de.javagl.jgltf.impl.Scene;
 import de.javagl.jgltf.impl.Skin;
 
 /**
- * A class for validating {@link Scene}s
+ * A class for validating {@link Node}s
  */
 class NodeValidator extends AbstractGltfValidator
 {
