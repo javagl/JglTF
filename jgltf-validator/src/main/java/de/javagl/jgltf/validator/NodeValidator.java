@@ -30,7 +30,6 @@ import java.util.List;
 
 import de.javagl.jgltf.impl.GlTF;
 import de.javagl.jgltf.impl.Node;
-import de.javagl.jgltf.impl.Skin;
 
 /**
  * A class for validating {@link Node}s
@@ -143,7 +142,7 @@ class NodeValidator extends AbstractGltfValidator
                     context);
                 return validatorResult;
             }
-            Skin skin = getGltf().getSkins().get(skinId);
+            //Skin skin = getGltf().getSkins().get(skinId);
 
             for (int i = 0; i < skeletons.size(); i++)
             {
@@ -155,20 +154,10 @@ class NodeValidator extends AbstractGltfValidator
                     return validatorResult;
                 }
                 
+                /* TODO Skins are not explicitly validated yet
                 Node skeletonNode = getGltf().getNodes().get(skeleton);
                 String jointName = skeletonNode.getJointName();
-                
-                // TODO Skins are not explicitly validated yet, so the 
-                // existence of skin.jointNames is not guaranteed here! 
-                List<String> jointNames = skin.getJointNames();
-                if (!jointNames.contains(jointName))
-                {
-                    validatorResult.addError(
-                        "Node has jointName " + jointName + ", but skin " + 
-                        skinId + " only has jointNames " + jointNames,
-                        context);
-                    return validatorResult;
-                }
+                */
             }
         }
         
