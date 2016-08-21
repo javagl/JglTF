@@ -26,9 +26,11 @@
  */
 package de.javagl.jgltf.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 import de.javagl.jgltf.impl.Accessor;
@@ -70,7 +72,9 @@ public class GltfAnimations
     {
         AnimationManager animationManager = 
             new AnimationManager(animationPolicy);
-        addAnimations(animationManager, gltfData);
+        List<de.javagl.jgltf.model.animation.Animation> modelAnimations =
+            createModelAnimations(gltfData);
+        animationManager.addAnimations(modelAnimations);
         return animationManager;
     }
     
@@ -90,19 +94,19 @@ public class GltfAnimations
     }
     
     /**
-     * Add all animations from the given {@link GltfData} to the given
-     * {@link AnimationManager}
+     * Create all model {@link de.javagl.jgltf.model.animation.Animation} 
+     * instances from the {@link Animation}s in the given {@link GltfData}
      * 
-     * @param animationManager The {@link AnimationManager}
      * @param gltfData The {@link GltfData}
+     * @return The model animations
      */
-    public static void addAnimations(
-        AnimationManager animationManager, GltfData gltfData)
+    public static List<de.javagl.jgltf.model.animation.Animation> 
+        createModelAnimations(GltfData gltfData)
     {
-        Objects.requireNonNull(animationManager, 
-            "The animationManager may not be null");
         Objects.requireNonNull(gltfData, 
             "The gltfData may not be null");
+        List<de.javagl.jgltf.model.animation.Animation> allModelAnimations =
+            new ArrayList<de.javagl.jgltf.model.animation.Animation>();
         GlTF gltf = gltfData.getGltf();
         Map<String, Animation> animations = gltf.getAnimations();
         if (animations != null)
@@ -111,16 +115,18 @@ public class GltfAnimations
             {
                 String animationId = entry.getKey();
                 Animation animation = entry.getValue();
-                processAnimation(gltfData, animationId, 
-                    animation, animationManager);
+                List<de.javagl.jgltf.model.animation.Animation> 
+                    modelAnimations = createModelAnimations(
+                        gltfData, animationId, animation);
+                allModelAnimations.addAll(modelAnimations);
             }
         }
+        return allModelAnimations;
     }
     
     /**
-     * Process the given {@link Animation}, create one 
-     * {@link de.javagl.jgltf.model.animation.Animation} for each
-     * of its channels and add them to the given {@link AnimationManager}.
+     * Create one {@link de.javagl.jgltf.model.animation.Animation} for each
+     * {@link AnimationChannel} of the given {@link Animation}.
      * If there is any error or inconsistency in the given data, then a 
      * warning will be printed and the respective animation will be
      * skipped.
@@ -128,23 +134,27 @@ public class GltfAnimations
      * @param gltfData The {@link GltfData}
      * @param animationId The ID of the {@link Animation} (only for logging)
      * @param animation The {@link Animation}
-     * @param animationManager The {@link AnimationManager}
+     * @return The list of model animations
      */
-    private static void processAnimation(
-        GltfData gltfData, String animationId, Animation animation, 
-        AnimationManager animationManager)
+    private static List<de.javagl.jgltf.model.animation.Animation> 
+        createModelAnimations(
+            GltfData gltfData, String animationId, Animation animation)
     {
+        List<de.javagl.jgltf.model.animation.Animation> modelAnimations =
+            new ArrayList<de.javagl.jgltf.model.animation.Animation>();
         for (AnimationChannel animationChannel : animation.getChannels())
         {
             de.javagl.jgltf.model.animation.Animation modelAnimation = 
-                createAnimation(gltfData, animationId, 
+                createModelAnimation(gltfData, animationId, 
                     animation, animationChannel);
             if (modelAnimation != null)
             {
-                animationManager.addAnimation(modelAnimation);
+                modelAnimations.add(modelAnimation);
             }
         }
+        return modelAnimations;
     }
+    
     
     /**
      * Create the {@link de.javagl.jgltf.model.animation.Animation} for 
@@ -160,9 +170,10 @@ public class GltfAnimations
      * @return The {@link de.javagl.jgltf.model.animation.Animation},
      * or <code>null</code>.
      */
-    private static de.javagl.jgltf.model.animation.Animation createAnimation(
-        GltfData gltfData, String animationId, Animation animation,
-        AnimationChannel animationChannel)
+    private static de.javagl.jgltf.model.animation.Animation 
+        createModelAnimation(
+            GltfData gltfData, String animationId, Animation animation,
+            AnimationChannel animationChannel)
     {
         GlTF gltf = gltfData.getGltf();
 

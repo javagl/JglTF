@@ -26,7 +26,9 @@
  */
 package de.javagl.jgltf.model.animation;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -74,7 +76,7 @@ public final class AnimationManager
     private long currentNs;
     
     /**
-     * The {@link Animation} instances maintained by this manager
+     * The list of {@link Animation} instances maintained by this manager
      */
     private final List<Animation> animations;
     
@@ -135,8 +137,22 @@ public final class AnimationManager
      */
     public void addAnimation(Animation animation)
     {
+        Objects.requireNonNull(animation, "The animation may not be null");
         animations.add(animation);
-        maxEndTimeS = Math.max(maxEndTimeS, animation.getEndTimeS());
+        updateMaxEndTime();
+    }
+    
+    /**
+     * Add all {@link Animation}s of the given sequence to this manager
+     * 
+     * @param animations The {@link Animation}s to add
+     */
+    public void addAnimations(Iterable<? extends Animation> animations)
+    {
+        for (Animation animation : animations)
+        {
+            addAnimation(animation);
+        }
     }
     
     
@@ -145,9 +161,47 @@ public final class AnimationManager
      * 
      * @param animation The {@link Animation} to remove
      */
-    void removeAnimation(Animation animation)
+    public void removeAnimation(Animation animation)
     {
         animations.remove(animation);
+        updateMaxEndTime();
+    }
+    
+    /**
+     * Remove all {@link Animation}s of the given sequence from this manager
+     * 
+     * @param animations The {@link Animation}s to remove
+     */
+    public void removeAnimations(Iterable<? extends Animation> animations)
+    {
+        for (Animation animation : animations)
+        {
+            removeAnimation(animation);
+        }
+    }
+    
+    /**
+     * Returns an unmodifiable view on the animations that are stored
+     * in this manager
+     * 
+     * @return The animations
+     */
+    public List<Animation> getAnimations()
+    {
+        return Collections.unmodifiableList(animations);
+    }
+    
+    /**
+     * Update the {@link #maxEndTimeS}, the maximum end time of any 
+     * {@link Animation}
+     */
+    private void updateMaxEndTime()
+    {
+        maxEndTimeS = 0.0f;
+        for (Animation animation : animations)
+        {
+            maxEndTimeS = Math.max(maxEndTimeS, animation.getEndTimeS());
+        }
     }
     
     /**
