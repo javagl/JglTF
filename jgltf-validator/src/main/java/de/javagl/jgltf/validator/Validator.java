@@ -90,7 +90,7 @@ public class Validator extends AbstractGltfValidator
      * 
      * @return The {@link ValidatorResult}
      */
-    private ValidatorResult validate()
+    public ValidatorResult validate()
     {
         ValidatorContext context = new ValidatorContext("glTF");
         ValidatorResult validatorResult = new ValidatorResult();

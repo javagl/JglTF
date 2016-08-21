@@ -29,7 +29,7 @@ package de.javagl.jgltf.validator;
 /**
  * A warning- or error message that was created by a {@link Validator}
  */
-final class ValidatorMessage
+public final class ValidatorMessage
 {
     /**
      * The message
@@ -60,7 +60,7 @@ final class ValidatorMessage
      * 
      * @return The message
      */
-    String getMessage()
+    public String getMessage()
     {
         return message;
     }
@@ -71,7 +71,7 @@ final class ValidatorMessage
      * 
      * @return The {@link ValidatorContext}
      */
-    ValidatorContext getContext()
+    public ValidatorContext getContext()
     {
         return context;
     }

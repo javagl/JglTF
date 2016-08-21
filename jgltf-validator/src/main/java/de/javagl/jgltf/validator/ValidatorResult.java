@@ -35,7 +35,7 @@ import java.util.logging.Logger;
 /**
  * A class summarizing the result produced by a {@link Validator}.
  */
-class ValidatorResult
+public final class ValidatorResult
 {
     /**
      * The {@link ValidatorMessage}s that indicate errors
@@ -87,7 +87,7 @@ class ValidatorResult
      * 
      * @return The errors
      */
-    List<ValidatorMessage> getErrors()
+    public List<ValidatorMessage> getErrors()
     {
         return Collections.unmodifiableList(errors);
     }
@@ -98,7 +98,7 @@ class ValidatorResult
      * 
      * @return Whether this result contains errors
      */
-    boolean hasErrors()
+    public boolean hasErrors()
     {
         return !errors.isEmpty();
     }
@@ -124,7 +124,7 @@ class ValidatorResult
      * 
      * @return The warnings
      */
-    List<ValidatorMessage> getWarnings()
+    public List<ValidatorMessage> getWarnings()
     {
         return Collections.unmodifiableList(warnings);
     }
@@ -135,12 +135,51 @@ class ValidatorResult
      * 
      * @return Whether this result contains warnings
      */
-    boolean hasWarnings()
+    public boolean hasWarnings()
     {
         return !warnings.isEmpty();
     }
     
-    
+    /**
+     * Create a formatted string representation of this result. The exact
+     * format is unspecified, but generally appropriate to be displayed
+     * to a user.
+     * 
+     * @return The string representation
+     */
+    public String createString()
+    {
+        StringBuilder sb = new StringBuilder();
+        if (hasErrors())
+        {
+            List<ValidatorMessage> errors = getErrors();
+            sb.append("Errors (" + errors.size() + ")\n");
+            for (ValidatorMessage error : errors)
+            {
+                sb.append("  Message: " + error.getMessage() + "\n");
+                sb.append("  Context: " + error.getContext() + "\n");
+            }
+        }
+        else
+        {
+            sb.append("No errors");
+        }
+        if (hasWarnings())
+        {
+            List<ValidatorMessage> warnings = getWarnings();
+            sb.append("Warnings (" + warnings.size() + ")\n");
+            for (ValidatorMessage warning : warnings)
+            {
+                sb.append("  Message: " + warning.getMessage() + "\n");
+                sb.append("  Context: " + warning.getContext() + "\n");
+            }
+        }
+        else
+        {
+            sb.append("No warnings");
+        }
+        return sb.toString();
+    }
     
     /**
      * If this validator result {@link #hasErrors() has errors}, then they 

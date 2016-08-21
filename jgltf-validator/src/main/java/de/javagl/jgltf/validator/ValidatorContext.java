@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
  * example, be a path of a JSON tree. Instances of this class are 
  * immutable. 
  */
-final class ValidatorContext
+public final class ValidatorContext
 {
     /**
      * The elements describing the breadcrumbs of the validation context
