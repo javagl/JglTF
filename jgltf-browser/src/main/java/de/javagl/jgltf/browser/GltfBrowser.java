@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.LogManager;
 
+import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -48,6 +49,7 @@ public class GltfBrowser
     {
         initLogging();
         setPlatformLookAndFeel();
+        JPopupMenu.setDefaultLightWeightPopupEnabled(false);
         SwingUtilities.invokeLater(() -> new GltfBrowserApplication());
     }
     

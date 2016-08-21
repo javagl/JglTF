@@ -53,6 +53,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.JViewport;
@@ -70,6 +71,7 @@ import de.javagl.jgltf.browser.ObjectTrees.NodeEntry;
 import de.javagl.jgltf.browser.Resolver.ResolvedEntity;
 import de.javagl.jgltf.impl.GlTF;
 import de.javagl.jgltf.model.GltfData;
+import de.javagl.jgltf.viewer.GltfViewer;
 
 /**
  * A panel for browsing through the {@link GlTF} of a {@link GltfData}
@@ -142,6 +144,17 @@ class GltfBrowserPanel extends JPanel
     };
     
     /**
+     * The main tabbed pane showing the info components and the 
+     * {@link GltfViewerPanel}
+     */
+    private final JTabbedPane mainTabbedPane;
+    
+    /**
+     * The {@link GltfViewerPanel}
+     */
+    private final GltfViewerPanel gltfViewerPanel;
+
+    /**
      * A container for the panels that show information about the
      * entities that are selected in the tree
      */
@@ -178,8 +191,24 @@ class GltfBrowserPanel extends JPanel
         mainSplitPane.setLeftComponent(
             createTreePanel(gltfData.getGltf()));
         
+        mainTabbedPane = new JTabbedPane();
+        mainSplitPane.setRightComponent(mainTabbedPane);
+        
         infoPanelContainer = new JPanel(new GridLayout(1,1));
-        mainSplitPane.setRightComponent(infoPanelContainer);
+        mainTabbedPane.addTab("Info", infoPanelContainer);
+        
+        gltfViewerPanel = new GltfViewerPanel(gltfData);
+        mainTabbedPane.addTab("View", gltfViewerPanel);
+    }
+    
+    /**
+     * Dispose the current {@link GltfViewer}. This will stop all animations,
+     * remove the {@link GltfData} from the viewer, and set the viewer to
+     * <code>null</code>
+     */
+    void disposeGltfViewer()
+    {
+        gltfViewerPanel.disposeGltfViewer();
     }
     
     /**

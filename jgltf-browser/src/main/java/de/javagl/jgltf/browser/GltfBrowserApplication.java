@@ -60,6 +60,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import de.javagl.jgltf.model.GltfData;
@@ -742,7 +744,7 @@ class GltfBrowserApplication
         JInternalFrame internalFrame = new JInternalFrame(
             frameTitle, resizable, closable , maximizable, iconifiable);
         internalFrame.addPropertyChangeListener(selectedInternalFrameTracker);
-        Component gltfBrowserPanel = new GltfBrowserPanel(gltfData);
+        GltfBrowserPanel gltfBrowserPanel = new GltfBrowserPanel(gltfData);
         internalFrame.getContentPane().add(gltfBrowserPanel);
         internalFrame.setSize(
             desktopPane.getWidth(), 
@@ -758,6 +760,15 @@ class GltfBrowserApplication
             // Ignored
         }
         internalFrame.setVisible(true);
+        
+        internalFrame.addInternalFrameListener(new InternalFrameAdapter()
+        {
+            @Override
+            public void internalFrameClosed(InternalFrameEvent e)
+            {
+                gltfBrowserPanel.disposeGltfViewer();
+            }
+        });
     }
     
     /**
