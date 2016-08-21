@@ -35,6 +35,7 @@ import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_T;
 import static org.lwjgl.opengl.GL11.GL_TRUE;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_BYTE;
 import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.lwjgl.opengl.GL11.glDeleteTextures;
 import static org.lwjgl.opengl.GL11.glDrawArrays;
 import static org.lwjgl.opengl.GL11.glDrawElements;
 import static org.lwjgl.opengl.GL11.glGenTextures;
@@ -49,6 +50,7 @@ import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
 import static org.lwjgl.opengl.GL15.glBindBuffer;
 import static org.lwjgl.opengl.GL15.glBufferData;
+import static org.lwjgl.opengl.GL15.glDeleteBuffers;
 import static org.lwjgl.opengl.GL15.glGenBuffers;
 import static org.lwjgl.opengl.GL20.GL_COMPILE_STATUS;
 import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
@@ -59,6 +61,7 @@ import static org.lwjgl.opengl.GL20.glAttachShader;
 import static org.lwjgl.opengl.GL20.glCompileShader;
 import static org.lwjgl.opengl.GL20.glCreateProgram;
 import static org.lwjgl.opengl.GL20.glCreateShader;
+import static org.lwjgl.opengl.GL20.glDeleteProgram;
 import static org.lwjgl.opengl.GL20.glDeleteShader;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glGetAttribLocation;
@@ -81,6 +84,7 @@ import static org.lwjgl.opengl.GL20.glUseProgram;
 import static org.lwjgl.opengl.GL20.glValidateProgram;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
+import static org.lwjgl.opengl.GL30.glDeleteVertexArrays;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 import java.nio.ByteBuffer;
@@ -239,43 +243,15 @@ class GlContextLwjgl implements GlContext
     }
     
     @Override
-    public int createGlTexture(
-        ByteBuffer pixelDataARGB, int internalFormat, 
-        int width, int height, int format, int type)
+    public void useGlProgram(int glProgram)
     {
-        int glTexture = glGenTextures();
-
-        glBindTexture(GL_TEXTURE_2D, glTexture);
-        glTexImage2D(
-            GL_TEXTURE_2D, 0, GL_RGBA, width, height, 
-            0, GL_BGRA, GL_UNSIGNED_BYTE, pixelDataARGB);
-        
-        return glTexture;
+        glUseProgram(glProgram);
     }
     
     @Override
-    public void setGlTextureParameters(int glTexture, 
-        int minFilter, int magFilter, int wrapS, int wrapT)
+    public void deleteGlProgram(int glProgram)
     {
-        glBindTexture(GL_TEXTURE_2D, glTexture);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapS); 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapT); 
-    }
-    
-    @Override
-    public int createGlBufferView(
-        int target, int byteLength, ByteBuffer bufferViewData)
-    {
-        int glBufferView = glGenBuffers();
-        glBindBuffer(target, glBufferView);
-        ByteBuffer data = bufferViewData.slice();
-        data.limit(byteLength);
-        glBufferData(target, bufferViewData, GL_STATIC_DRAW);
-        return glBufferView;
+        glDeleteProgram(glProgram);
     }
     
     @Override
@@ -291,33 +267,6 @@ class GlContextLwjgl implements GlContext
         glUseProgram(glProgram);
         return glGetAttribLocation(glProgram, attributeName);
     }
-    
-    
-    @Override
-    public int createGlVertexArray()
-    {
-        int glVertexArray = glGenVertexArrays();
-        return glVertexArray;
-    }
-    
-    @Override
-    public void createVertexAttribute(int glVertexArray, 
-        int target, int glBufferView, int attributeLocation, 
-        int size, int type, int stride, int offset)
-    {
-        glBindVertexArray(glVertexArray);
-        glBindBuffer(target, glBufferView);
-        glVertexAttribPointer(
-            attributeLocation, size, type, false, stride, offset);
-        glEnableVertexAttribArray(attributeLocation);
-    }
-    
-    @Override
-    public void useProgram(int glProgram)
-    {
-        glUseProgram(glProgram);
-    }
-    
     
     @Override
     public void setUniformiv(int type, int location, int count, int value[])
@@ -429,7 +378,84 @@ class GlContextLwjgl implements GlContext
         glBindTexture(GL_TEXTURE_2D, glTexture);
         glUniform1i(location, textureIndex);
     }
+
     
+    @Override
+    public int createGlVertexArray()
+    {
+        int glVertexArray = glGenVertexArrays();
+        return glVertexArray;
+    }
+    
+    @Override
+    public void deleteGlVertexArray(int glVertexArray)
+    {
+        glDeleteVertexArrays(glVertexArray);
+    }
+
+    @Override
+    public int createGlBufferView(
+        int target, int byteLength, ByteBuffer bufferViewData)
+    {
+        int glBufferView = glGenBuffers();
+        glBindBuffer(target, glBufferView);
+        ByteBuffer data = bufferViewData.slice();
+        data.limit(byteLength);
+        glBufferData(target, bufferViewData, GL_STATIC_DRAW);
+        return glBufferView;
+    }
+    
+    @Override
+    public void createVertexAttribute(int glVertexArray, 
+        int target, int glBufferView, int attributeLocation, 
+        int size, int type, int stride, int offset)
+    {
+        glBindVertexArray(glVertexArray);
+        glBindBuffer(target, glBufferView);
+        glVertexAttribPointer(
+            attributeLocation, size, type, false, stride, offset);
+        glEnableVertexAttribArray(attributeLocation);
+    }
+    
+    @Override
+    public void deleteGlBufferView(int glBufferView)
+    {
+        glDeleteBuffers(glBufferView);
+    }
+    
+    @Override
+    public int createGlTexture(
+        ByteBuffer pixelDataARGB, int internalFormat, 
+        int width, int height, int format, int type)
+    {
+        int glTexture = glGenTextures();
+
+        glBindTexture(GL_TEXTURE_2D, glTexture);
+        glTexImage2D(
+            GL_TEXTURE_2D, 0, GL_RGBA, width, height, 
+            0, GL_BGRA, GL_UNSIGNED_BYTE, pixelDataARGB);
+        
+        return glTexture;
+    }
+    
+    @Override
+    public void setGlTextureParameters(int glTexture, 
+        int minFilter, int magFilter, int wrapS, int wrapT)
+    {
+        glBindTexture(GL_TEXTURE_2D, glTexture);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapS); 
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapT); 
+    }
+    
+    @Override
+    public void deleteGlTexture(int glTexture)
+    {
+        glDeleteTextures(glTexture);
+    }
     
     @Override
     public void renderIndexed(

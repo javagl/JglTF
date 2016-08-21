@@ -35,6 +35,7 @@ import static org.lwjgl.opengl.GL11.glEnable;
 
 import java.awt.Canvas;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.util.logging.Logger;
 
 import org.lwjgl.LWJGLException;
@@ -99,6 +100,10 @@ public class GltfViewerLwjgl extends AbstractGltfViewer
             logger.severe("Could not create AWTGLCanvas");
             this.glComponent = new Canvas();
         }
+        
+        // Without setting the minimum size, the canvas cannot 
+        // be resized when it is embedded in a JSplitPane
+        this.glComponent.setMinimumSize(new Dimension(10, 10));
         
         this.glContext = new GlContextLwjgl();
     }

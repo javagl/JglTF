@@ -28,7 +28,11 @@ package de.javagl.jgltf.viewer;
 
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -65,6 +69,11 @@ class GltfRenderData
      */
     private static final Logger logger =
         Logger.getLogger(GltfRenderData.class.getName());
+    
+    /**
+     * The GL vertex array objects
+     */
+    private final List<Integer> glVertexArrays;
     
     /**
      * The mapping from glTF {@link Program} IDs to GL programs
@@ -112,9 +121,30 @@ class GltfRenderData
         
         this.gltf = gltfData.getGltf();
         
+        this.glVertexArrays = new ArrayList<Integer>();
         this.programIdToGlProgram = new LinkedHashMap<String, Integer>();
         this.textureIdToGlTexture = new LinkedHashMap<String, Integer>();
         this.bufferViewIdToGlBufferView = new LinkedHashMap<String, Integer>();
+    }
+
+    /**
+     * Add the given GL vertex array 
+     * 
+     * @param glVertexArray The GL vertex array
+     */
+    void addGlVertexArray(int glVertexArray)
+    {
+        glVertexArrays.add(glVertexArray);
+    }
+    
+    /**
+     * Returns an unmodifiable view on the GL vertex arrays
+     *  
+     * @return The GL vertex arrays
+     */
+    Collection<Integer> getGlVertexArrays()
+    {
+        return Collections.unmodifiableList(glVertexArrays);
     }
     
     /**
@@ -197,7 +227,16 @@ class GltfRenderData
         return glProgram;
     }
     
-
+    /**
+     * Returns an unmodifiable view on the GL programs
+     * 
+     * @return The GL programs
+     */
+    Collection<Integer> getGlPrograms()
+    {
+        return Collections.unmodifiableCollection(
+            programIdToGlProgram.values());
+    }
     
     
     /**
@@ -295,6 +334,16 @@ class GltfRenderData
         return glTexture;
     }
 
+    /**
+     * Returns an unmodifiable view on the GL textures
+     * 
+     * @return The GL textures
+     */
+    Collection<Integer> getGlTextures()
+    {
+        return Collections.unmodifiableCollection(
+            textureIdToGlTexture.values());
+    }
     
     /**
      * Obtain the OpenGL buffer for the given glTF {@link BufferView} ID.<br>
@@ -368,5 +417,17 @@ class GltfRenderData
             " DONE");
         return glBufferView;
     }
+
+    /**
+     * Returns an unmodifiable view on the GL buffer views
+     * 
+     * @return The GL buffer views
+     */
+    Collection<Integer> getGlBufferViews()
+    {
+        return Collections.unmodifiableCollection(
+            bufferViewIdToGlBufferView.values());
+    }
+
     
 }

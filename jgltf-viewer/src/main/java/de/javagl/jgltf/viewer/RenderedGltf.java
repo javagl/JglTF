@@ -28,7 +28,9 @@ package de.javagl.jgltf.viewer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -105,14 +107,14 @@ public class RenderedGltf
      * The list of IDs of {@link Node}s that contain a non-null
      * {@link Node#getCamera() camera ID} 
      */
-    private final List<String> cameraNodeIds;
+    private final Map<String, String> cameraIdToNodeId;
     
     /**
      * A {@link SettableSupplier} that provides the ID of the current 
      * camera node. That is, it provides the ID of the {@link Node} 
      * that contains a {@link Node#getCamera() camera ID} that refers
      * to the {@link Camera} that should be used for rendering. 
-     * See {@link #setCurrentCameraNodeId(String)}
+     * See {@link #setCurrentCameraId(String)}
      */
     private SettableSupplier<String> currentCameraNodeIdSupplier;
     
@@ -167,7 +169,7 @@ public class RenderedGltf
         
         this.renderCommands = new ArrayList<Runnable>();
         
-        this.cameraNodeIds = new ArrayList<String>();
+        this.cameraIdToNodeId = new LinkedHashMap<String, String>();
         this.currentCameraNodeIdSupplier = new SettableSupplier<String>();
 
         this.viewMatrixSupplier = 
@@ -175,17 +177,58 @@ public class RenderedGltf
         this.projectionMatrixSupplier = 
             createProjectionMatrixSupplier(externalProjectionMatrixSupplier);
         
-        logger.info("Processing scenes...");
+        logger.fine("Processing scenes...");
         Maps.forEachEntry(gltf.getScenes(), this::processScene);
-        logger.info("Processing scenes DONE...");
+        logger.fine("Processing scenes DONE...");
         
         if (externalViewMatrixSupplier == null)
         {
-            if (!cameraNodeIds.isEmpty())
+            if (!cameraIdToNodeId.isEmpty())
             {
-                setCurrentCameraNodeId(cameraNodeIds.get(0));
+                String cameraId = cameraIdToNodeId.keySet().iterator().next();
+                setCurrentCameraId(cameraId);
             }
         }
+    }
+    
+    /**
+     * Delete this object by removing its GL data from the {@link GlContext}.
+     * <br>
+     * After this method has been called, attempting to {@link #render()}
+     * this object will result in a warning to be printed.
+     */
+    void delete()
+    {
+        Collection<Integer> glTextures = 
+            gltfRenderData.getGlTextures();
+        for (int glTexture : glTextures)
+        {
+            glContext.deleteGlTexture(glTexture);
+        }
+        Collection<Integer> glBufferViews = 
+            gltfRenderData.getGlBufferViews();
+        for (int glBufferView : glBufferViews)
+        {
+            glContext.deleteGlBufferView(glBufferView);
+        }
+        Collection<Integer> glPrograms = 
+            gltfRenderData.getGlPrograms();
+        for (int glProgram : glPrograms)
+        {
+            glContext.deleteGlProgram(glProgram);
+        }
+        Collection<Integer> glVertexArrays = 
+            gltfRenderData.getGlVertexArrays();
+        for (int glVertexArray : glVertexArrays)
+        {
+            glContext.deleteGlVertexArray(glVertexArray);
+        }
+        
+        renderCommands.clear();
+        renderCommands.add(() ->
+        {
+            logger.warning("Rendered object has been deleted");
+        });
     }
 
     /**
@@ -206,8 +249,8 @@ public class RenderedGltf
      * The resulting supplier will supply a view matrix as follows:
      * <ul>
      *   <li> 
-     *     If a non-<code>null</code> {@link #setCurrentCameraNodeId(String)
-     *     current camera node ID} has been set, then the view matrix from
+     *     If a non-<code>null</code> {@link #setCurrentCameraId(String)
+     *     current camera ID} has been set, then the view matrix from
      *     the {@link GltfModel} will be returned
      *   </li>
      *   <li>
@@ -252,8 +295,8 @@ public class RenderedGltf
      * The resulting supplier will supply a projection matrix as follows:
      * <ul>
      *   <li> 
-     *     If a non-<code>null</code> {@link #setCurrentCameraNodeId(String)
-     *     current camera node ID} has been set, then the projection matrix 
+     *     If a non-<code>null</code> {@link #setCurrentCameraId(String)
+     *     current camera ID} has been set, then the projection matrix 
      *     from the {@link GltfModel} will be returned
      *   </li>
      *   <li>
@@ -308,45 +351,43 @@ public class RenderedGltf
     
     
     /**
-     * Returns an unmodifiable (possibly empty) view on the list of IDs 
-     * of {@link Node}s that contain the {@link Node#getCamera() ID} of
-     * a {@link Camera}.
+     * Returns an unmodifiable (possibly empty) view on the collection of IDs 
+     * of {@link Camera}s.
      *  
-     * @return The {@link Camera} {@link Node} IDs
+     * @return The {@link Camera} IDs
      */
-    List<String> getCameraNodeIds()
+    Collection<String> getCameraIds()
     {
-        return Collections.unmodifiableList(cameraNodeIds);
+        return Collections.unmodifiableCollection(cameraIdToNodeId.keySet());
     }
     
     /**
-     * Set the ID of the {@link Node} that contains the the 
-     * {@link Node#getCamera() ID} of a {@link Camera} that should
-     * be used for rendering.<br>
+     * Set the ID of the {@link Camera} that should be used for rendering.<br>
      * <br>
      * If the given ID is <code>null</code>, then the external camera
      * will be used.
      *  
-     * @param cameraNodeId The ID of the {@link Node} with the {@link Camera}
+     * @param cameraId The ID of the {@link Camera}
      * @throws IllegalArgumentException If the given ID is not <code>null</code>
-     * and not contained in the {@link #getCameraNodeIds() camera node IDs}
+     * and not contained in the {@link #getCameraIds() camera IDs}
      */
-    void setCurrentCameraNodeId(String cameraNodeId)
+    void setCurrentCameraId(String cameraId)
     {
-        if (cameraNodeId == null)
+        if (cameraId == null)
         {
             currentCameraNodeIdSupplier.set(null);
             return;
         }
-        if (!cameraNodeIds.contains(cameraNodeId))
+        if (!cameraIdToNodeId.containsKey(cameraId))
         {
             throw new IllegalArgumentException(
-                "The ID " + cameraNodeId + " is not a valid ID for " + 
-                "a camera node. Valid IDs are " + cameraNodeIds);
+                "The ID " + cameraId + " is not a valid ID for " + 
+                "a camera. Valid IDs are " + cameraIdToNodeId.keySet());
         }
+        String cameraNodeId = cameraIdToNodeId.get(cameraId);
         currentCameraNodeIdSupplier.set(cameraNodeId);
     }
-
+    
     /**
      * Process the given {@link Scene}, passing all its nodes to the
      * {@link #processNode(String)} method
@@ -356,14 +397,14 @@ public class RenderedGltf
      */
     private void processScene(String sceneId, Scene scene)
     {
-        logger.fine("Processing scene " + sceneId);
+        logger.info("Processing scene " + sceneId);
         
         List<String> sceneNodes = optional(scene.getNodes());
         for (String sceneNodeId : sceneNodes)
         {
             processNode(sceneNodeId);
         }
-        logger.fine("Processing scene " + sceneId + " DONE");
+        logger.info("Processing scene " + sceneId + " DONE");
     }
     
     
@@ -394,9 +435,10 @@ public class RenderedGltf
             }
         }
         
-        if (node.getCamera() != null)
+        String cameraId = node.getCamera();
+        if (cameraId != null)
         {
-            cameraNodeIds.add(nodeId);
+            cameraIdToNodeId.put(cameraId, nodeId);
         }
         
         List<String> children = optional(node.getChildren());
@@ -422,7 +464,7 @@ public class RenderedGltf
     private void processMeshPrimitive(
         MeshPrimitive meshPrimitive, String nodeId)
     {
-        logger.info("Processing meshPrimitive...");
+        logger.fine("Processing meshPrimitive...");
         
         String materialId = meshPrimitive.getMaterial();
         Material material = gltf.getMaterials().get(materialId);
@@ -440,7 +482,7 @@ public class RenderedGltf
         }
         
         // Create the command to enable the program
-        renderCommands.add(() -> glContext.useProgram(glProgram));
+        renderCommands.add(() -> glContext.useGlProgram(glProgram));
         
         // Create the commands to set the uniforms
         List<Runnable> uniformSettingCommands = 
@@ -450,6 +492,7 @@ public class RenderedGltf
         
         // Create the vertex array and the attributes for the mesh primitive
         int glVertexArray = glContext.createGlVertexArray();
+        gltfRenderData.addGlVertexArray(glVertexArray);
         createAttributes(glVertexArray, meshPrimitive);
 
         // Finally, create the command for rendering the mesh primitive
@@ -457,7 +500,7 @@ public class RenderedGltf
             createRenderCommand(meshPrimitive, glVertexArray);
         renderCommands.add(renderCommand);
         
-        logger.info("Processing meshPrimitive DONE");
+        logger.fine("Processing meshPrimitive DONE");
     }
 
 
@@ -500,7 +543,7 @@ public class RenderedGltf
                 createUniformValueSupplier(
                     uniformName, technique, material, 
                     nodeId, techniqueParameters);
-
+            
             // Create the command for setting the uniform value
             // in the GL context
             int location = 

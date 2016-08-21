@@ -28,6 +28,7 @@ package de.javagl.jgltf.viewer;
 
 import java.awt.Component;
 
+import de.javagl.jgltf.impl.Camera;
 import de.javagl.jgltf.impl.GlTF;
 import de.javagl.jgltf.model.GltfData;
 
@@ -85,4 +86,27 @@ public interface GltfViewer
      */
     void addGltfData(GltfData gltfData);
 
+    /**
+     * Remove the given {@link GltfData} from this viewer. This will trigger
+     * a new rendering pass, and at the beginning of the rendering pass, the
+     * internal data structures will be deleted.
+     * 
+     * @param gltfData The {@link GltfData} to remove
+     */
+    void removeGltfData(GltfData gltfData);
+
+    /**
+     * Set the ID of the {@link Camera} that should be used for rendering
+     * the given {@link GltfData}. If the given ID is <code>null</code>,
+     * then the external camera will be used. See
+     * {@link #setExternalCamera(ExternalCamera)}.
+     *  
+     * @param gltfData The {@link GltfData}
+     * @param cameraId The {@link Camera} ID
+     * @throws IllegalArgumentException If the given {@link GltfData} is
+     * not contained in this viewer
+     * @throws IllegalArgumentException If the given ID is not a valid
+     * camera ID for the given {@link GltfData}
+     */
+    void setCurrentCameraId(GltfData gltfData, String cameraId);
 }

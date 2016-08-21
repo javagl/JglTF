@@ -130,6 +130,18 @@ class GlContextJogl implements GlContext
         return glProgram;
     }
     
+    @Override
+    public void useGlProgram(int glProgram)
+    {
+        gl.glUseProgram(glProgram);
+    }
+    
+    @Override
+    public void deleteGlProgram(int glProgram)
+    {
+        gl.glDeleteProgram(glProgram);
+    }
+    
     /**
      * Creates an OpenGL shader with the given type, from the given source
      * code, and returns the GL shader object. If the shader cannot be 
@@ -156,48 +168,6 @@ class GlContextJogl implements GlContext
     }
     
     @Override
-    public int createGlTexture(
-        ByteBuffer pixelDataARGB, int internalFormat, 
-        int width, int height, int format, int type)
-    {
-        int textureArray[] = {0};
-        gl.glGenTextures(1, textureArray, 0);
-        int glTexture = textureArray[0];
-
-        gl.glBindTexture(GL_TEXTURE_2D, glTexture);
-        gl.glTexImage2D(
-            GL_TEXTURE_2D, 0, GL_RGBA, width, height, 
-            0, GL_BGRA, GL_UNSIGNED_BYTE, pixelDataARGB);
-        
-        return glTexture;
-    }
-    
-    @Override
-    public void setGlTextureParameters(int glTexture, 
-        int minFilter, int magFilter, int wrapS, int wrapT)
-    {
-        gl.glBindTexture(GL_TEXTURE_2D, glTexture);
-        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
-        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
-        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapS); 
-        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapT); 
-    }
-    
-    @Override
-    public int createGlBufferView(
-        int target, int byteLength, ByteBuffer bufferViewData)
-    {
-        int bufferViewArray[] = {0};
-        gl.glGenBuffers(1, bufferViewArray, 0);
-        int glBufferView = bufferViewArray[0];
-        gl.glBindBuffer(target, glBufferView);
-        gl.glBufferData(target, byteLength, bufferViewData, GL_STATIC_DRAW);
-        return glBufferView;
-    }
-    
-    @Override
     public int getUniformLocation(int glProgram, String uniformName)
     {
         gl.glUseProgram(glProgram);
@@ -210,35 +180,6 @@ class GlContextJogl implements GlContext
         gl.glUseProgram(glProgram);
         return gl.glGetAttribLocation(glProgram, attributeName);
     }
-    
-    
-    @Override
-    public int createGlVertexArray()
-    {
-        int vertexArrayArray[] = {0};
-        gl.glGenVertexArrays(1, vertexArrayArray, 0);
-        int glVertexArray = vertexArrayArray[0];
-        return glVertexArray;
-    }
-    
-    @Override
-    public void createVertexAttribute(int glVertexArray, 
-        int target, int glBufferView, int attributeLocation, 
-        int size, int type, int stride, int offset)
-    {
-        gl.glBindVertexArray(glVertexArray);
-        gl.glBindBuffer(target, glBufferView);
-        gl.glVertexAttribPointer(
-            attributeLocation, size, type, false, stride, offset);
-        gl.glEnableVertexAttribArray(attributeLocation);
-    }
-    
-    @Override
-    public void useProgram(int glProgram)
-    {
-        gl.glUseProgram(glProgram);
-    }
-    
     
     @Override
     public void setUniformiv(int type, int location, int count, int value[])
@@ -339,6 +280,90 @@ class GlContextJogl implements GlContext
         gl.glBindTexture(GL_TEXTURE_2D, glTexture);
         gl.glUniform1i(location, textureIndex);
     }
+    
+    @Override
+    public int createGlVertexArray()
+    {
+        int vertexArrayArray[] = {0};
+        gl.glGenVertexArrays(1, vertexArrayArray, 0);
+        int glVertexArray = vertexArrayArray[0];
+        return glVertexArray;
+    }
+    
+    @Override
+    public void deleteGlVertexArray(int glVertexArray)
+    {
+        gl.glDeleteVertexArrays(1, new int[] { glVertexArray }, 0);
+    }
+
+    @Override
+    public int createGlBufferView(
+        int target, int byteLength, ByteBuffer bufferViewData)
+    {
+        int bufferViewArray[] = {0};
+        gl.glGenBuffers(1, bufferViewArray, 0);
+        int glBufferView = bufferViewArray[0];
+        gl.glBindBuffer(target, glBufferView);
+        gl.glBufferData(target, byteLength, bufferViewData, GL_STATIC_DRAW);
+        return glBufferView;
+    }
+    
+    @Override
+    public void createVertexAttribute(int glVertexArray, 
+        int target, int glBufferView, int attributeLocation, 
+        int size, int type, int stride, int offset)
+    {
+        gl.glBindVertexArray(glVertexArray);
+        gl.glBindBuffer(target, glBufferView);
+        gl.glVertexAttribPointer(
+            attributeLocation, size, type, false, stride, offset);
+        gl.glEnableVertexAttribArray(attributeLocation);
+    }
+    
+    @Override
+    public void deleteGlBufferView(int glBufferView)
+    {
+        gl.glDeleteBuffers(1, new int[] { glBufferView }, 0);
+    }
+    
+
+    @Override
+    public int createGlTexture(
+        ByteBuffer pixelDataARGB, int internalFormat, 
+        int width, int height, int format, int type)
+    {
+        int textureArray[] = {0};
+        gl.glGenTextures(1, textureArray, 0);
+        int glTexture = textureArray[0];
+
+        gl.glBindTexture(GL_TEXTURE_2D, glTexture);
+        gl.glTexImage2D(
+            GL_TEXTURE_2D, 0, GL_RGBA, width, height, 
+            0, GL_BGRA, GL_UNSIGNED_BYTE, pixelDataARGB);
+        
+        return glTexture;
+    }
+    
+    @Override
+    public void setGlTextureParameters(int glTexture, 
+        int minFilter, int magFilter, int wrapS, int wrapT)
+    {
+        gl.glBindTexture(GL_TEXTURE_2D, glTexture);
+        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
+        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
+        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapS); 
+        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapT); 
+    }
+    
+    @Override
+    public void deleteGlTexture(int glTexture)
+    {
+        gl.glDeleteTextures(1, new int[] { glTexture }, 0);
+    }
+    
+    
     
     
     @Override

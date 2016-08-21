@@ -56,7 +56,14 @@ public interface GlContext
      * 
      * @param glProgram The GL program
      */
-    void useProgram(int glProgram);
+    void useGlProgram(int glProgram);
+
+    /**
+     * Delete the given GL program
+     * 
+     * @param glProgram The GL program
+     */
+    void deleteGlProgram(int glProgram);
     
     /**
      * Returns the location of the specified uniform in the given program
@@ -123,6 +130,13 @@ public interface GlContext
     int createGlVertexArray();
 
     /**
+     * Delete the given GL vertex array object
+     * 
+     * @param glVertexArray The GL vertex array object
+     */
+    void deleteGlVertexArray(int glVertexArray);
+    
+    /**
      * Create an OpenGL buffer view (vertex buffer object) from the given data
      * 
      * @param target The target, GL_ARRAY_BUFFER or GL_ELEMENT_ARRAY_BUFFER
@@ -148,6 +162,13 @@ public interface GlContext
     void createVertexAttribute(int glVertexArray, int target, int glBufferView,
         int attributeLocation, int size, int type, int stride, int offset);
 
+    /**
+     * Delete the given GL buffer
+     * 
+     * @param glBufferView The GL buffer
+     */
+    void deleteGlBufferView(int glBufferView);
+    
     /**
      * Create an OpenGL texture from the given texture parameters
      * 
@@ -175,6 +196,13 @@ public interface GlContext
     void setGlTextureParameters(
         int glTexture, int minFilter, int magFilter, int wrapS, int wrapT);
 
+    /**
+     * Delete the given GL texture
+     * 
+     * @param glTexture The GL texture
+     */
+    void deleteGlTexture(int glTexture);
+    
     /**
      * Render an indexed object, described by the given parameters
      * 

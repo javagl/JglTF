@@ -31,6 +31,7 @@ import static com.jogamp.opengl.GL.GL_DEPTH_BUFFER_BIT;
 import static com.jogamp.opengl.GL.GL_DEPTH_TEST;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.util.logging.Logger;
 
 import com.jogamp.opengl.GL3;
@@ -129,6 +130,11 @@ public class GltfViewerJogl extends AbstractGltfViewer
         
         glComponent = new GLCanvas(capabilities);
         glComponent.addGLEventListener(glEventListener);
+        
+        // Without setting the minimum size, the canvas cannot 
+        // be resized when it is embedded in a JSplitPane
+        glComponent.setMinimumSize(new Dimension(10, 10));
+        
         glContext = new GlContextJogl();
     }
     
