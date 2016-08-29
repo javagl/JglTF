@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>de.javagl</groupId>
+  <artifactId>rendering-interaction</artifactId>
+  <versioning>
+    <versions>
+      <version>0.0.0-SNAPSHOT</version>
+    </versions>
+    <lastUpdated>20160829161742</lastUpdated>
+  </versioning>
+</metadata>

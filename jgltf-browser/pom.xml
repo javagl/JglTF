@@ -11,6 +11,13 @@
   <artifactId>jgltf-browser</artifactId>
   <packaging>jar</packaging>
 
+  <repositories>
+    <repository>
+      <id>localMocalMepository</id>
+      <url>file://${basedir}/localMavenRepository</url>
+    </repository>
+  </repositories>
+
   <build>
     <plugins>
       <plugin>
@@ -36,77 +43,7 @@
           </descriptorRefs>
         </configuration>
       </plugin>
-      
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-install-plugin</artifactId>
-        <version>2.5.2</version>
-        <executions>
-          <execution>
-            <id>install-rendering-core</id>
-            <phase>process-resources</phase>
-            <configuration>
-              <file>${basedir}/lib/rendering-core-0.0.0-SNAPSHOT.jar</file>
-              <repositoryLayout>default</repositoryLayout>
-              <groupId>de.javagl</groupId>
-              <artifactId>rendering-core</artifactId>
-              <version>0.0.0-SNAPSHOT</version>
-              <packaging>jar</packaging>
-              <generatePom>true</generatePom>
-            </configuration>
-            <goals>
-              <goal>install-file</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>install-rendering-interaction</id>
-            <phase>process-resources</phase>
-            <configuration>
-              <file>${basedir}/lib/rendering-interaction-0.0.0-SNAPSHOT.jar</file>
-              <repositoryLayout>default</repositoryLayout>
-              <groupId>de.javagl</groupId>
-              <artifactId>rendering-interaction</artifactId>
-              <version>0.0.0-SNAPSHOT</version>
-              <packaging>jar</packaging>
-              <generatePom>true</generatePom>
-            </configuration>
-            <goals>
-              <goal>install-file</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>      
-
     </plugins>
-    <pluginManagement>
-      <plugins>
-        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-        <plugin>
-          <groupId>org.eclipse.m2e</groupId>
-          <artifactId>lifecycle-mapping</artifactId>
-          <version>1.0.0</version>
-          <configuration>
-            <lifecycleMappingMetadata>
-              <pluginExecutions>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-install-plugin</artifactId>
-                    <versionRange>[2.5.2,)</versionRange>
-                    <goals>
-                      <goal>install-file</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore></ignore>
-                  </action>
-                </pluginExecution>
-              </pluginExecutions>
-            </lifecycleMappingMetadata>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
   </build>
 
   <dependencies>
