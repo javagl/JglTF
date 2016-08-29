@@ -1,6 +1,6 @@
 package de.javagl.jgltf.model.io;
 
-import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -122,10 +122,29 @@ public class TestIO
     {
         Path pathExpected = Paths.get(directoryExpected, fileNameExpected);
         byte bytesExpected[] = Files.readAllBytes(pathExpected);
+        String stringExpected = normalizeLineSeparators(bytesExpected);
         Path pathActual = Paths.get(directoryActual, fileNameActual);
         byte bytesActual[] = Files.readAllBytes(pathActual);
-        assertArrayEquals("Difference in files " + pathExpected + " and "
-            + pathActual, bytesExpected, bytesActual);
-   }
+        String stringActual = normalizeLineSeparators(bytesActual);
+        assertEquals(stringExpected, stringActual);
+    }
+    
+    /**
+     * Convert the given bytes into a string, using the default charset,
+     * and normalize the line separators, by replacing all <code>"\r\n"</code>
+     * and <code>"\r"</code> with <code>"\n"</code>
+     *   
+     * @param bytes The bytes
+     * @return The normalized string
+     */
+    private static String normalizeLineSeparators(byte bytes[])
+    {
+        String s = new String(bytes);
+        s = s.replaceAll("\\r\\n", "\n");
+        s = s.replaceAll("\\r", "\n");
+        return s;
+        
+    }
+    
     
 }
