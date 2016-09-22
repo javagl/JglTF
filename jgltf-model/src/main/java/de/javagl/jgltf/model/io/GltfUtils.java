@@ -210,7 +210,7 @@ class GltfUtils
         {
             return null;
         }
-        String end = uriString.substring(lastDotIndex).toLowerCase();
+        String end = uriString.substring(lastDotIndex + 1).toLowerCase();
         if (end.equals("jpg") || end.equals("jpeg"))
         {
             return "jpeg";
