@@ -137,6 +137,7 @@ public class BinaryGltfDataWriter
             ByteBuffer.wrap(headerData).order(ByteOrder.LITTLE_ENDIAN));
         
         // Finally, write the header, scene and binary glTF buffer 
+        @SuppressWarnings("resource")
         WritableByteChannel writableByteChannel = 
             Channels.newChannel(outputStream);
         writableByteChannel.write(ByteBuffer.wrap(headerData));
