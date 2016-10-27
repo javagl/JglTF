@@ -241,9 +241,6 @@ public abstract class AbstractGltfViewer implements GltfViewer
             projectionMatrixSupplier);
         renderedGltfs.put(gltfData, renderedGltf);
         
-        String cameraId = currentCameraIds.get(gltfData);
-        renderedGltf.setCurrentCameraId(cameraId);
-        
         List<Animation> currentModelAnimations = 
             GltfAnimations.createModelAnimations(gltfData);
         modelAnimations.put(gltfData, currentModelAnimations);
