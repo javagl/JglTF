@@ -28,10 +28,8 @@ package de.javagl.jgltf.viewer.lwjgl;
 
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glClearColor;
-import static org.lwjgl.opengl.GL11.glEnable;
 
 import java.awt.Canvas;
 import java.awt.Component;
@@ -131,10 +129,6 @@ public class GltfViewerLwjgl extends AbstractGltfViewer
     {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
-        // TODO: These should actually be set based on the values
-        // that are found in the glTF.techniques.states
-        glEnable(GL_DEPTH_TEST);
         renderGltfs();
     }
 

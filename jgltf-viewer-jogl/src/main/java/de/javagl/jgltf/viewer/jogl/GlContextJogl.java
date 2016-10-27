@@ -142,6 +142,36 @@ class GlContextJogl implements GlContext
         gl.glDeleteProgram(glProgram);
     }
     
+    @Override
+    public void enable(Iterable<? extends Number> states)
+    {
+        if (states != null)
+        {
+            for (Number state : states)
+            {
+                if (state != null)
+                {
+                    gl.glEnable(state.intValue());
+                }
+            }
+        }
+    }
+
+    @Override
+    public void disable(Iterable<? extends Number> states)
+    {
+        if (states != null)
+        {
+            for (Number state : states)
+            {
+                if (state != null)
+                {
+                    gl.glDisable(state.intValue());
+                }
+            }
+        }
+    }
+    
     /**
      * Creates an OpenGL shader with the given type, from the given source
      * code, and returns the GL shader object. If the shader cannot be 

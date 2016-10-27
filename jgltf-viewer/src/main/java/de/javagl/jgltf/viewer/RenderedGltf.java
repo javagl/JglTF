@@ -51,6 +51,7 @@ import de.javagl.jgltf.impl.Program;
 import de.javagl.jgltf.impl.Scene;
 import de.javagl.jgltf.impl.Technique;
 import de.javagl.jgltf.impl.TechniqueParameters;
+import de.javagl.jgltf.impl.TechniqueStates;
 import de.javagl.jgltf.impl.Texture;
 import de.javagl.jgltf.model.Accessors;
 import de.javagl.jgltf.model.GltfConstants;
@@ -484,6 +485,10 @@ public class RenderedGltf
         // Create the command to enable the program
         renderCommands.add(() -> glContext.useGlProgram(glProgram));
         
+        // Create the commands to set the technique.states
+        renderCommands.add(() -> glContext.disable(getAllStates()));
+        renderCommands.add(() -> glContext.enable(getEnabledStates(technique)));
+        
         // Create the commands to set the uniforms
         List<Runnable> uniformSettingCommands = 
             createUniformSettingCommands(
@@ -503,6 +508,46 @@ public class RenderedGltf
         logger.fine("Processing meshPrimitive DONE");
     }
 
+    /**
+     * Returns a list containing all possible states that may be contained
+     * in a <code>technique.states.enable</code> list.
+     * 
+     * @return All possible states
+     */
+    private static List<Integer> getAllStates()
+    {
+        List<Integer> allStates = Arrays.asList(
+            3042,  // GL_BLEND
+            2884,  // GL_CULL_FACE
+            2929,  // GL_DEPTH_TEST
+            32823, // GL_POLYGON_OFFSET_FILL
+            32926, // GL_SAMPLE_ALPHA_TO_COVERAGE
+            3089   // GL_SCISSOR_TEST
+        );
+        return allStates;
+    }
+    
+    /**
+     * Returns the set of states that should be enabled for the given 
+     * {@link Technique}
+     * 
+     * @param technique The {@link Technique}
+     * @return The enabled states
+     */
+    private List<Integer> getEnabledStates(Technique technique)
+    {
+        TechniqueStates states = technique.getStates();
+        if (states == null)
+        {
+            return new TechniqueStates().defaultEnable();
+        }
+        List<Integer> enable = states.getEnable();
+        if (enable == null)
+        {
+            return states.defaultEnable();
+        }
+        return enable;
+    }
 
     /**
      * Create a list of commands that set the values of the uniforms of the 
@@ -602,10 +647,11 @@ public class RenderedGltf
     {
         return () ->
         {
-            if (logger.isLoggable(Level.FINEST))
+            Level level = Level.FINEST;
+            if (logger.isLoggable(level))
             {
                 String valueString = debugString(uniformValueSupplier.get());
-                logger.finest(
+                logger.log(level,
                     "For uniform " + uniformName + " setting " + valueString);
             }
             delegate.run();

@@ -28,7 +28,6 @@ package de.javagl.jgltf.viewer.jogl;
 
 import static com.jogamp.opengl.GL.GL_COLOR_BUFFER_BIT;
 import static com.jogamp.opengl.GL.GL_DEPTH_BUFFER_BIT;
-import static com.jogamp.opengl.GL.GL_DEPTH_TEST;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -163,10 +162,6 @@ public class GltfViewerJogl extends AbstractGltfViewer
     {
         gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
-        // TODO: These should actually be set based on the values
-        // that are found in the glTF.techniques.states
-        gl.glEnable(GL_DEPTH_TEST);
         renderGltfs();
     }
 

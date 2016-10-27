@@ -27,6 +27,7 @@
 package de.javagl.jgltf.viewer;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 
 /**
  * An interface intended as a minimal abstraction layer for different
@@ -64,6 +65,22 @@ public interface GlContext
      * @param glProgram The GL program
      */
     void deleteGlProgram(int glProgram);
+    
+    /**
+     * Enable all the states that are found in the given list, by calling
+     * <code>glEnable</code> for all of them.
+     * 
+     * @param states The states
+     */
+    void enable(Iterable<? extends Number> states);
+
+    /**
+     * Disable all the states that are found in the given list, by calling
+     * <code>glDisable</code> for all of them.
+     * 
+     * @param states The states
+     */
+    void disable(Iterable<? extends Number> states);
     
     /**
      * Returns the location of the specified uniform in the given program

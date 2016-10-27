@@ -36,8 +36,10 @@ import static org.lwjgl.opengl.GL11.GL_TRUE;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_BYTE;
 import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL11.glDeleteTextures;
+import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glDrawArrays;
 import static org.lwjgl.opengl.GL11.glDrawElements;
+import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glGenTextures;
 import static org.lwjgl.opengl.GL11.glTexImage2D;
 import static org.lwjgl.opengl.GL11.glTexParameteri;
@@ -92,6 +94,7 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.charset.Charset;
+import java.util.List;
 import java.util.logging.Logger;
 
 import de.javagl.jgltf.model.GltfConstants;
@@ -252,6 +255,36 @@ class GlContextLwjgl implements GlContext
     public void deleteGlProgram(int glProgram)
     {
         glDeleteProgram(glProgram);
+    }
+    
+    @Override
+    public void enable(Iterable<? extends Number> states)
+    {
+        if (states != null)
+        {
+            for (Number state : states)
+            {
+                if (state != null)
+                {
+                    glEnable(state.intValue());
+                }
+            }
+        }
+    }
+
+    @Override
+    public void disable(Iterable<? extends Number> states)
+    {
+        if (states != null)
+        {
+            for (Number state : states)
+            {
+                if (state != null)
+                {
+                    glDisable(state.intValue());
+                }
+            }
+        }
     }
     
     @Override
