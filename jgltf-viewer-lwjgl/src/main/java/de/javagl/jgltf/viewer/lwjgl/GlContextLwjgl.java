@@ -94,7 +94,6 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.charset.Charset;
-import java.util.List;
 import java.util.logging.Logger;
 
 import de.javagl.jgltf.model.GltfConstants;
@@ -304,6 +303,11 @@ class GlContextLwjgl implements GlContext
     @Override
     public void setUniformiv(int type, int location, int count, int value[])
     {
+        if (value == null)
+        {
+            logger.warning("Invalid uniform value: " + value);
+            return;
+        }
         switch (type)
         {
             case GltfConstants.GL_INT:
@@ -340,6 +344,11 @@ class GlContextLwjgl implements GlContext
     @Override
     public void setUniformfv(int type, int location, int count, float value[])
     {
+        if (value == null)
+        {
+            logger.warning("Invalid uniform value: " + value);
+            return;
+        }
         switch (type)
         {
             case GltfConstants.GL_FLOAT:
@@ -377,6 +386,11 @@ class GlContextLwjgl implements GlContext
     public void setUniformMatrixfv(
         int type, int location, int count, float value[])
     {
+        if (value == null)
+        {
+            logger.warning("Invalid uniform value: " + value);
+            return;
+        }
         switch (type)
         {
             case GltfConstants.GL_FLOAT_MAT2:
