@@ -45,6 +45,7 @@ import de.javagl.jgltf.impl.Sampler;
 import de.javagl.jgltf.impl.Texture;
 import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.GltfData;
+import de.javagl.jgltf.model.Shaders;
 
 /**
  * A class maintaining the data for rendering a glTF with OpenGL.<br>
@@ -189,12 +190,27 @@ class GltfRenderData
     private Integer createGlProgram(String programId)
     {
         logger.fine("Creating GL program for program " + programId);
-
-        Program program = gltf.getPrograms().get(programId);
+        
+        Program program = null;
+        if (GltfDefaults.isDefaultProgramId(programId))
+        {
+            program = GltfDefaults.getDefaultProgram();
+        }
+        else
+        {
+            program = gltf.getPrograms().get(programId);
+        }
         
         String vertexShaderId = program.getVertexShader();
-        String vertexShaderSource = 
-            gltfData.getShaderAsString(vertexShaderId);
+        String vertexShaderSource = null;
+        if (GltfDefaults.isDefaultVertexShaderId(vertexShaderId))
+        {
+            vertexShaderSource = Shaders.getDefaultVertexShaderCode();
+        }
+        else
+        {
+            vertexShaderSource = gltfData.getShaderAsString(vertexShaderId);
+        }
         if (vertexShaderSource == null)
         {
             logger.warning("Source of vertex shader " + 
@@ -203,8 +219,15 @@ class GltfRenderData
         }
         
         String fragmentShaderId = program.getFragmentShader();
-        String fragmentShaderSource = 
-            gltfData.getShaderAsString(fragmentShaderId);
+        String fragmentShaderSource = null;
+        if (GltfDefaults.isDefaultFragmentShaderId(fragmentShaderId))
+        {
+            fragmentShaderSource = Shaders.getDefaultFragmentShaderCode();
+        }
+        else
+        {
+            fragmentShaderSource = gltfData.getShaderAsString(fragmentShaderId);
+        }
         if (fragmentShaderSource == null)
         {
             logger.warning("Source of fragment shader " + 

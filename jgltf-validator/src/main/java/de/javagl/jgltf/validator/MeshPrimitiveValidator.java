@@ -35,6 +35,7 @@ import de.javagl.jgltf.impl.Material;
 import de.javagl.jgltf.impl.MeshPrimitive;
 import de.javagl.jgltf.impl.Technique;
 import de.javagl.jgltf.impl.TechniqueParameters;
+import de.javagl.jgltf.model.Techniques;
 
 /**
  * A class for validating {@link MeshPrimitive}es
@@ -88,8 +89,18 @@ class MeshPrimitiveValidator extends AbstractGltfValidator
         }
         
         Material material = getGltf().getMaterials().get(materialId);
+        
         String techniqueId = material.getTechnique();
-        Technique technique = getGltf().getTechniques().get(techniqueId);
+        Technique technique = null;
+        if (techniqueId == null)
+        {
+            String dummyProgramId = "de.javagl.jgltf.validator.DUMMY_ID";
+            technique = Techniques.createDefaultTechnique(dummyProgramId);
+        }
+        else
+        {
+            technique = getGltf().getTechniques().get(techniqueId);
+        }
         
         // Check that the attributes of the technique are mapped to valid
         // accessors via the meshPrimitive.attributes map

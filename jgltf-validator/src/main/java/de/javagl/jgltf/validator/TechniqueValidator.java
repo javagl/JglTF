@@ -80,14 +80,6 @@ class TechniqueValidator extends AbstractGltfValidator
             .with("techniques[" + techniqueId + "]");
         ValidatorResult validatorResult = new ValidatorResult();
         
-        // TODO When the technique ID is null, a default technique
-        // should be assumed. This is currently not really supported.
-        if (techniqueId == null)
-        {
-            validatorResult.addError("The technique ID is null", context);
-            return validatorResult;
-        }
-
         // Validate the ID
         validatorResult.add(validateMapEntry(
             getGltf().getTechniques(), techniqueId, context));

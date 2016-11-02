@@ -470,7 +470,16 @@ public class RenderedGltf
         String materialId = meshPrimitive.getMaterial();
         Material material = gltf.getMaterials().get(materialId);
         String techniqueId = material.getTechnique();
-        Technique technique = gltf.getTechniques().get(techniqueId);
+        Technique theTechnique = null;
+        if (techniqueId == null)
+        {
+            theTechnique = GltfDefaults.getDefaultTechnique();
+        }
+        else
+        {
+            theTechnique = gltf.getTechniques().get(techniqueId);
+        }
+        Technique technique = theTechnique;
 
         // Obtain the GL program for the Program of the Technique
         String programId = technique.getProgram();
@@ -722,7 +731,16 @@ public class RenderedGltf
         String materialId = meshPrimitive.getMaterial();
         Material material = gltf.getMaterials().get(materialId);
         String techniqueId = material.getTechnique();
-        Technique technique = gltf.getTechniques().get(techniqueId);
+        
+        Technique technique = null;
+        if (techniqueId == null)
+        {
+            technique = GltfDefaults.getDefaultTechnique();
+        }
+        else
+        {
+            technique = gltf.getTechniques().get(techniqueId);
+        }
 
         // Obtain the GL program for the Program of the Technique
         String programId = technique.getProgram();

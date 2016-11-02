@@ -26,18 +26,94 @@
  */
 package de.javagl.jgltf.model;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
+import de.javagl.jgltf.impl.Material;
+import de.javagl.jgltf.impl.Program;
 import de.javagl.jgltf.impl.Technique;
 import de.javagl.jgltf.impl.TechniqueParameters;
+import de.javagl.jgltf.impl.TechniqueStates;
 
 /**
  * Utility methods related to {@link Technique}s
  */
 public class Techniques
 {
+    /**
+     * Create a default {@link Technique} with the given {@link Program} ID,
+     * which is assumed to refer to a {@link Programs#createDefaultProgram(
+     * String, String) default program}.<br>
+     * <br>
+     * The returned {@link Technique} is the {@link Technique} for the 
+     * default {@link Material}, as described in 
+     * https://github.com/KhronosGroup/glTF/blob/master/specification/README.md#appendix-a
+     * 
+     * @param programId The {@link Program} ID
+     * @return The default {@link Technique}
+     */
+    public static Technique createDefaultTechnique(String programId)
+    {
+        Technique technique = new Technique();
+        technique.addAttributes("a_position", "position");
+        technique.addParameters("modelViewMatrix", 
+            createDefaultTechniqueParameters(
+                "MODELVIEW", GltfConstants.GL_FLOAT_MAT4, null));
+        technique.addParameters("projectionMatrix", 
+            createDefaultTechniqueParameters(
+                "PROJECTION", GltfConstants.GL_FLOAT_MAT4, null));
+        technique.addParameters("emission", 
+            createDefaultTechniqueParameters(
+                null, GltfConstants.GL_FLOAT_VEC4, 
+                Arrays.asList(0.5f, 0.5f, 0.5f, 1.0f)));
+        technique.addParameters("position", 
+            createDefaultTechniqueParameters(
+                "POSITION", GltfConstants.GL_FLOAT_VEC3, null));
+        technique.setStates(createDefaultTechniqueStates());
+        technique.setProgram(programId);
+        
+        technique.addUniforms("u_modelViewMatrix", "modelViewMatrix");
+        technique.addUniforms("u_projectionMatrix", "projectionMatrix");
+        technique.addUniforms("u_emission", "emission");
+        
+        return technique;
+    }
+    
+    /**
+     * Create the default {@link TechniqueStates}
+     * 
+     * @return The default {@link TechniqueStates}
+     */
+    private static TechniqueStates createDefaultTechniqueStates()
+    {
+        TechniqueStates techniqueStates = new TechniqueStates();
+        techniqueStates.addEnable(2884); // GL_CULL_FACE
+        techniqueStates.addEnable(2929); // GL_DEPTH_TEST
+        return techniqueStates;
+    }
+
+    /**
+     * Create default {@link TechniqueParameters} with the given semantic,
+     * type and value
+     * 
+     * @param semantic The semantic
+     * @param type The type
+     * @param value The value
+     * @return The default {@link TechniqueParameters}
+     */
+    private static TechniqueParameters createDefaultTechniqueParameters(
+        String semantic, Integer type, Object value)
+    {
+        TechniqueParameters techniqueParameters = new TechniqueParameters();
+        techniqueParameters.setSemantic(semantic);
+        techniqueParameters.setType(type);
+        techniqueParameters.setValue(value);
+        return techniqueParameters;
+    }
+    
+    
     /**
      * Return the {@link TechniqueParameters} for the uniform with the
      * given name from the given {@link Technique}. If there are no
