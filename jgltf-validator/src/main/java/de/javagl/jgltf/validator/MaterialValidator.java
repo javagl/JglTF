@@ -78,11 +78,14 @@ class MaterialValidator extends AbstractGltfValidator
         
         // Validate the material.technique
         String techniqueId = material.getTechnique();
-        validatorResult.add(techniqueValidator.validateTechnique(
-            techniqueId, context));
-        if (validatorResult.hasErrors())
+        if (techniqueId != null)
         {
-            return validatorResult;
+            validatorResult.add(techniqueValidator.validateTechnique(
+                techniqueId, context));
+            if (validatorResult.hasErrors())
+            {
+                return validatorResult;
+            }
         }
         
         // TODO The material.getValues() override the values from 
