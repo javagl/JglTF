@@ -130,8 +130,8 @@ class TechniqueHandler
         if (withTexture && withNormals)
         {
             String techniqueId = TECHNIQUE_TEXTURE_NORMALS_ID;
-            String vertexShaderUri = "vs_texture_normals.glsl";
-            String fragmentShaderUri = "fs_texture_normals.glsl";
+            String vertexShaderUri = "texture_normals.vert";
+            String fragmentShaderUri = "texture_normals.frag";
             createTechnique(techniqueId,
                 withTexture, withNormals, 
                 vertexShaderUri, fragmentShaderUri);
@@ -140,8 +140,8 @@ class TechniqueHandler
         if (withTexture && !withNormals)
         {
             String techniqueId = TECHNIQUE_TEXTURE_ID;
-            String vertexShaderUri = "vs_texture.glsl";
-            String fragmentShaderUri = "fs_texture.glsl";
+            String vertexShaderUri = "texture.vert";
+            String fragmentShaderUri = "texture.frag";
             createTechnique(techniqueId,
                 withTexture, withNormals, 
                 vertexShaderUri, fragmentShaderUri);
@@ -150,16 +150,16 @@ class TechniqueHandler
         if (!withTexture && withNormals)
         {
             String techniqueId = TECHNIQUE_NORMALS_ID;
-            String vertexShaderUri = "vs_normals.glsl";
-            String fragmentShaderUri = "fs_normals.glsl";
+            String vertexShaderUri = "normals.vert";
+            String fragmentShaderUri = "normals.frag";
             createTechnique(techniqueId,
                 withTexture, withNormals, 
                 vertexShaderUri, fragmentShaderUri);
             return techniqueId;
         }
         String techniqueId = TECHNIQUE_NONE_ID;
-        String vertexShaderUri = "vs_none.glsl";
-        String fragmentShaderUri = "fs_none.glsl";
+        String vertexShaderUri = "none.vert";
+        String fragmentShaderUri = "none.frag";
         createTechnique(techniqueId,
             withTexture, withNormals, 
             vertexShaderUri, fragmentShaderUri);
