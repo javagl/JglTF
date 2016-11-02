@@ -27,7 +27,6 @@
 package de.javagl.jgltf.viewer;
 
 import java.nio.ByteBuffer;
-import java.util.List;
 
 /**
  * An interface intended as a minimal abstraction layer for different
