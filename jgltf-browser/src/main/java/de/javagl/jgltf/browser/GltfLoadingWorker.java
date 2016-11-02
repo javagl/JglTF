@@ -26,6 +26,8 @@
  */
 package de.javagl.jgltf.browser;
 
+import java.awt.Dimension;
+import java.awt.Font;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -37,6 +39,8 @@ import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 import de.javagl.jgltf.browser.io.GltfDataReaderThreaded;
 import de.javagl.jgltf.model.GltfData;
@@ -185,11 +189,17 @@ final class GltfLoadingWorker extends SwingTask<GltfData, Object>
         {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
-            StringBuilder sb = new StringBuilder();
-            sb.append("Loading error: " + e.getMessage() + 
+            
+            JTextArea textArea = new JTextArea();
+            textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
+            textArea.setEditable(false);
+            textArea.append("Loading error: " + e.getMessage() + 
                 "\n" + sw.toString());
+            JScrollPane scrollPane = new JScrollPane(textArea);
+            scrollPane.setPreferredSize(new Dimension(800, 600));
+            
             JOptionPane.showMessageDialog(frame,
-                sb.toString(), "Error",
+                scrollPane, "Error",
                 JOptionPane.ERROR_MESSAGE);
             return;
         }
