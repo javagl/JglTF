@@ -460,7 +460,8 @@ public class GltfDataReaderThreaded
     
     /**
      * Create an input stream for reading from the given URI, forwarding
-     * progress information to the given consumer
+     * progress information to the given consumer. The caller is responsible
+     * for closing the returned stream.
      * 
      * @param uri The URI
      * @param totalNumBytesReadConsumer The consumer for the number of 
@@ -468,6 +469,7 @@ public class GltfDataReaderThreaded
      * @return The input stream
      * @throws IOException If the stream can not be opened
      */
+    @SuppressWarnings("resource")
     private static InputStream createInputStream(
         URI uri, LongConsumer totalNumBytesReadConsumer) 
             throws IOException
