@@ -96,17 +96,20 @@ public class Validator extends AbstractGltfValidator
         ValidatorResult validatorResult = new ValidatorResult();
         
         String defaultSceneId = getGltf().getScene();
-        validatorResult.add(sceneValidator.validateScene(
-            defaultSceneId, context.with("scene")));
-        if (validatorResult.hasErrors())
+        if (defaultSceneId != null)
         {
-            return validatorResult;
+            validatorResult.add(sceneValidator.validateScene(
+                defaultSceneId, context.with("scene")));
+            if (validatorResult.hasErrors())
+            {
+                return validatorResult;
+            }
         }
         
         Map<String, Scene> scenes = getGltf().getScenes();
         for (String sceneId : scenes.keySet())
         {
-            if (!sceneId.equals(defaultSceneId))
+            if (defaultSceneId == null || !sceneId.equals(defaultSceneId))
             {
                 validatorResult.add(sceneValidator.validateScene(
                     sceneId, context));
