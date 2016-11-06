@@ -256,6 +256,7 @@ class GltfUtils
      * @return The image format string
      * @throws IOException If the image format can not be detected
      */
+    @SuppressWarnings("resource")
     private static String guessImageMimeTypeString(ByteBuffer imageData) 
         throws IOException
     {

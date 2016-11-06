@@ -127,8 +127,9 @@ public class GltfDataWriter
         try
         {
             String fileName = Paths.get(path, uriString).toString();
-            try (WritableByteChannel writableByteChannel = 
-                Channels.newChannel(new FileOutputStream(fileName)))
+            try (@SuppressWarnings("resource")
+                WritableByteChannel writableByteChannel = 
+                    Channels.newChannel(new FileOutputStream(fileName)))
             {
                 logger.log(level, 
                     "Writing buffer " + id + " to " + fileName);
@@ -175,8 +176,9 @@ public class GltfDataWriter
         try
         {
             String fileName = Paths.get(path, uriString).toString();
-            try (WritableByteChannel writableByteChannel = 
-                Channels.newChannel(new FileOutputStream(fileName)))
+            try (@SuppressWarnings("resource")
+                WritableByteChannel writableByteChannel = 
+                    Channels.newChannel(new FileOutputStream(fileName)))
             {
                 logger.log(level, 
                     "Writing image " + id + " to " + fileName);
@@ -223,8 +225,9 @@ public class GltfDataWriter
         try
         {
             String fileName = Paths.get(path, uriString).toString();
-            try (WritableByteChannel writableByteChannel = 
-                Channels.newChannel(new FileOutputStream(fileName)))
+            try (@SuppressWarnings("resource")
+                WritableByteChannel writableByteChannel = 
+                    Channels.newChannel(new FileOutputStream(fileName)))
             {
                 logger.log(level, 
                     "Writing shader " + id + " to " + fileName);
