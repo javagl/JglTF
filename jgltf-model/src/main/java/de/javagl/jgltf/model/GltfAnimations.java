@@ -179,30 +179,16 @@ public class GltfAnimations
 
         String animationChannelSamplerId = animationChannel.getSampler();
         AnimationSampler animationSampler =
-            GltfModel.getChecked(animation.getSamplers(), 
+            GltfModel.getExpected(animation.getSamplers(), 
                 animationChannelSamplerId, "animation channel sampler");
-
-        // Do basic sanity checks of whether the sampler input is valid
-        String inputParameterId = animationSampler.getInput();
-        if (!isFloatParameter(gltf, animation, inputParameterId))
+        if (animationSampler == null)
         {
-            logger.warning("Animation channel sampler with ID " + 
-                animationChannelSamplerId + " of animation with ID " + 
-                animationId + " refers to invalid input parameter " +
-                "with ID " + inputParameterId + ". It may only refer " + 
-                "to parameters with GL_FLOAT component type.");
             return null;
         }
-        
-        // Do basic sanity checks of whether the sampler output is valid
-        String outputParameterId = animationSampler.getOutput();
-        if (!isFloatParameter(gltf, animation, outputParameterId))
+
+        if (!validateSampler(gltfData, animationId, 
+            animation, animationChannel))
         {
-            logger.warning("Animation channel sampler with ID " + 
-                animationChannelSamplerId + " of animation with ID " + 
-                animationId + " refers to invalid output parameter " +
-                "with ID " + outputParameterId + ". It may only refer " + 
-                "to parameters with GL_FLOAT component type.");
             return null;
         }
         
@@ -272,12 +258,27 @@ public class GltfAnimations
         }
         
         // If everything went well create the actual model animation
-        AccessorFloatData inputParameterData =
-            getFloatParameterData(
+        AccessorFloatData inputParameterData = null;
+        AccessorFloatData outputParameterData = null;
+        
+        if (GltfUtils.compareVersions(GltfUtils.getVersion(gltf), "1.1.0") < 0)
+        {
+            String inputParameterId = animationSampler.getInput();
+            inputParameterData = getFloatParameterData(
                 gltfData, animation, inputParameterId);
-        AccessorFloatData outputParameterData =
-            getFloatParameterData(
+            String outputParameterId = animationSampler.getOutput();
+            outputParameterData = getFloatParameterData(
                 gltfData, animation, outputParameterId);
+        }
+        else
+        {
+            String inputAccessorId = animationSampler.getInput();
+            inputParameterData = getFloatAccessorData(
+                gltfData, inputAccessorId);
+            String outputAccessorId = animationSampler.getOutput();
+            outputParameterData = getFloatAccessorData(
+                gltfData, outputAccessorId);
+        }
 
         de.javagl.jgltf.model.animation.Animation modelAnimation = 
             createAnimation(inputParameterData, outputParameterData, 
@@ -286,7 +287,90 @@ public class GltfAnimations
         return modelAnimation;
     }
 
-    
+    /**
+     * Do basic sanity checks of the {@link AnimationSampler} of the given
+     * {@link Animation}. If there are inconsistencies or errors, then a
+     * warning will be printed, and <code>false</code> will be returned.
+     * 
+     * @param gltfData The {@link GltfData}
+     * @param animationId The {@link Animation} ID
+     * @param animation The {@link Animation}
+     * @param animationChannel The {@link AnimationChannel}
+     * @return Whether the {@link AnimationSampler} is valid
+     */
+    private static boolean validateSampler(
+        GltfData gltfData, String animationId, 
+        Animation animation, AnimationChannel animationChannel)
+    {
+        GlTF gltf = gltfData.getGltf();
+        
+        String animationChannelSamplerId = animationChannel.getSampler();
+        AnimationSampler animationSampler =
+            GltfModel.getExpected(animation.getSamplers(), 
+                animationChannelSamplerId, "animation channel sampler");
+        if (animationSampler == null)
+        {
+            return false;
+        }
+
+        // In glTF 1.0, the animation.sampler.input and animation.sampler.output
+        // properties referred to the animation.parameters dictionary. Since
+        // glTF version 1.1, the animation.parameters dictionary is omitted, 
+        // and the input/output properties directly refer to accessors.
+        if (GltfUtils.compareVersions(GltfUtils.getVersion(gltf), "1.1.0") < 0)
+        {
+            // Do basic sanity checks of whether the sampler input is valid
+            String inputParameterId = animationSampler.getInput();
+            if (!isFloatParameter(gltf, animation, inputParameterId))
+            {
+                logger.warning("Animation channel sampler with ID " + 
+                    animationChannelSamplerId + " of animation with ID " + 
+                    animationId + " refers to invalid input parameter " +
+                    "with ID " + inputParameterId + ". It may only refer " + 
+                    "to parameters with GL_FLOAT component type.");
+                return false;
+            }
+            
+            // Do basic sanity checks of whether the sampler output is valid
+            String outputParameterId = animationSampler.getOutput();
+            if (!isFloatParameter(gltf, animation, outputParameterId))
+            {
+                logger.warning("Animation channel sampler with ID " + 
+                    animationChannelSamplerId + " of animation with ID " + 
+                    animationId + " refers to invalid output parameter " +
+                    "with ID " + outputParameterId + ". It may only refer " + 
+                    "to parameters with GL_FLOAT component type.");
+                return false;
+            }
+        }
+        else
+        {
+            // Do basic sanity checks of whether the sampler input is valid
+            String inputAccessorId = animationSampler.getInput();
+            if (!isFloatAccessor(gltf, inputAccessorId))
+            {
+                logger.warning("Animation channel sampler with ID " + 
+                    animationChannelSamplerId + " of animation with ID " + 
+                    animationId + " refers to invalid input accessor " +
+                    "with ID " + inputAccessorId + ". It may only refer " + 
+                    "to accessors with GL_FLOAT component type.");
+                return false;
+            }
+            // Do basic sanity checks of whether the sampler output is valid
+            String outputAccessorId = animationSampler.getInput();
+            if (!isFloatAccessor(gltf, outputAccessorId))
+            {
+                logger.warning("Animation channel sampler with ID " + 
+                    animationChannelSamplerId + " of animation with ID " + 
+                    animationId + " refers to invalid output accessor " +
+                    "with ID " + outputAccessorId + ". It may only refer " + 
+                    "to accessors with GL_FLOAT component type.");
+                return false;
+            }
+        }
+        return true;
+    }
+
     /**
      * Creates a new {@link de.javagl.jgltf.model.animation.Animation} from 
      * the given input data
@@ -422,10 +506,29 @@ public class GltfAnimations
     private static boolean isFloatParameter(
         GlTF gltf, Animation animation, String animationSamplerParameterId)
     {
+        Map<String, String> parameters = animation.getParameters();
+        if (parameters == null)
+        {
+            return false;
+        }
         String animationSamplerParameterAccessorId = 
-            animation.getParameters().get(animationSamplerParameterId);
+            parameters.get(animationSamplerParameterId);
+        return isFloatAccessor(gltf, animationSamplerParameterAccessorId);
+    }
+    
+    /**
+     * Returns whether the {@link Accessor} that is referred to by the
+     * given ID has <code>float</code> components
+     * 
+     * @param gltf The {@link GlTF}
+     * @param accessorId The {@link Accessor} ID
+     * @return Whether the accessor has <code>float</code> components
+     */
+    private static boolean isFloatAccessor(
+        GlTF gltf, String accessorId)
+    {
         Accessor animationSamplerParameterAccessor = 
-            gltf.getAccessors().get(animationSamplerParameterAccessorId);
+            gltf.getAccessors().get(accessorId);
         return AccessorDatas.hasFloatComponents(
             animationSamplerParameterAccessor);
     }
@@ -443,20 +546,48 @@ public class GltfAnimations
      * parameter
      * @throws IllegalArgumentException If the 
      * {@link Accessor#getComponentType() component type} of the 
-     * accessor that is used for the data is not <code>GL_FLOAT</code>
+     * accessor that is used for the data is not <code>GL_FLOAT</code>,
+     * or the animation does not contain parameters. 
      */
     private static AccessorFloatData getFloatParameterData(
         GltfData gltfData, Animation animation, 
         String animationSamplerParameterId)
     {
+        Map<String, String> parameters = animation.getParameters();
+        if (parameters == null)
+        {
+            throw new IllegalArgumentException(
+                "The animation does not contain parameters for looking up " + 
+                "parameter with ID " + animationSamplerParameterId);
+        }
         String animationSamplerParameterAccessorId = 
-            animation.getParameters().get(animationSamplerParameterId);
+            parameters.get(animationSamplerParameterId);
+        return getFloatAccessorData(
+            gltfData, animationSamplerParameterAccessorId);
+    }
+    
+    /**
+     * Returns the {@link AccessorFloatData} for the data {@link Accessor}
+     * that is referred to by the given ID
+     * 
+     * @param gltfData The {@link GltfData}
+     * @param accessorId The {@link Accessor} ID
+     * @return The {@link AccessorFloatData} for the {@link Animation}
+     * parameter
+     * @throws IllegalArgumentException If the 
+     * {@link Accessor#getComponentType() component type} of the 
+     * accessor that is used for the data is not <code>GL_FLOAT</code>
+     */
+    private static AccessorFloatData getFloatAccessorData(
+        GltfData gltfData, String accessorId)
+    {
         GlTF gltf = gltfData.getGltf();
         Accessor animationSamplerParameterAccessor = 
-            gltf.getAccessors().get(animationSamplerParameterAccessorId);
+            gltf.getAccessors().get(accessorId);
         return AccessorDatas.createFloat(
             animationSamplerParameterAccessor, gltfData);
     }
+    
     
     /**
      * Private constructor to prevent instantiation
