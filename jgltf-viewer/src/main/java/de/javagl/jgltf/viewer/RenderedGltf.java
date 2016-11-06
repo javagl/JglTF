@@ -467,11 +467,20 @@ public class RenderedGltf
     {
         logger.fine("Processing meshPrimitive...");
         
+        Material material = null;
         String materialId = meshPrimitive.getMaterial();
-        Material material = gltf.getMaterials().get(materialId);
+        if (materialId == null)
+        {
+            material = GltfDefaults.getDefaultMaterial();
+        }
+        else
+        {
+            material = gltf.getMaterials().get(materialId);
+        }
         String techniqueId = material.getTechnique();
         Technique theTechnique = null;
-        if (techniqueId == null)
+        if (techniqueId == null || 
+            GltfDefaults.isDefaultTechniqueId(techniqueId))
         {
             theTechnique = GltfDefaults.getDefaultTechnique();
         }
@@ -729,11 +738,20 @@ public class RenderedGltf
         MeshPrimitive meshPrimitive)
     {
         String materialId = meshPrimitive.getMaterial();
-        Material material = gltf.getMaterials().get(materialId);
+        Material material = null;
+        if (materialId == null)
+        {
+            material = GltfDefaults.getDefaultMaterial();
+        }
+        else
+        {
+            material = gltf.getMaterials().get(materialId);
+        }
         String techniqueId = material.getTechnique();
         
         Technique technique = null;
-        if (techniqueId == null)
+        if (techniqueId == null || 
+            GltfDefaults.isDefaultTechniqueId(techniqueId))
         {
             technique = GltfDefaults.getDefaultTechnique();
         }

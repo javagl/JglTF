@@ -81,58 +81,65 @@ class MeshPrimitiveValidator extends AbstractGltfValidator
         
         // Validate the meshPrimitive.material
         String materialId = meshPrimitive.getMaterial();
-        validatorResult.add(materialValidator.validateMaterial(
-            materialId, context));
-        if (validatorResult.hasErrors())
-        {
-            return validatorResult;
-        }
         
-        Material material = getGltf().getMaterials().get(materialId);
-        
-        String techniqueId = material.getTechnique();
-        Technique technique = null;
-        if (techniqueId == null)
+        // The material ID is optional as of glTF 1.1
+        if (materialId != null)
         {
-            String dummyProgramId = "de.javagl.jgltf.validator.DUMMY_ID";
-            technique = Techniques.createDefaultTechnique(dummyProgramId);
-        }
-        else
-        {
-            technique = getGltf().getTechniques().get(techniqueId);
-        }
-        
-        // Check that the attributes of the technique are mapped to valid
-        // accessors via the meshPrimitive.attributes map
-        Map<String, String> attributes = Optional
-            .ofNullable(technique.getAttributes())
-            .orElse(Collections.emptyMap());
-        for (String attributeName : attributes.keySet())
-        {
-            String techniqueParameterId = attributes.get(attributeName);
-            Map<String, TechniqueParameters> parameters = 
-                technique.getParameters();
-            TechniqueParameters techniqueParameters =
-                parameters.get(techniqueParameterId);
-            String semantic = techniqueParameters.getSemantic();
-
-            Map<String, String> meshPrimitiveAttributes = 
-                meshPrimitive.getAttributes();
-            if (meshPrimitiveAttributes == null)
-            {
-                validatorResult.addError(
-                    "The attributes are null", context);
-                return validatorResult;
-            }
-            String accessorId = meshPrimitiveAttributes.get(semantic);
-            
-            validatorResult.add(accessorValidator.validateAccessor(accessorId, 
-                context.with("accessor for attribute " + attributeName)));
+            validatorResult.add(materialValidator.validateMaterial(
+                materialId, context));
             if (validatorResult.hasErrors())
             {
                 return validatorResult;
             }
+            
+            Material material = getGltf().getMaterials().get(materialId);
+            
+            String techniqueId = material.getTechnique();
+            Technique technique = null;
+            if (techniqueId == null)
+            {
+                String dummyProgramId = "de.javagl.jgltf.validator.DUMMY_ID";
+                technique = Techniques.createDefaultTechnique(dummyProgramId);
+            }
+            else
+            {
+                technique = getGltf().getTechniques().get(techniqueId);
+            }
+            
+            // Check that the attributes of the technique are mapped to valid
+            // accessors via the meshPrimitive.attributes map
+            Map<String, String> attributes = Optional
+                .ofNullable(technique.getAttributes())
+                .orElse(Collections.emptyMap());
+            for (String attributeName : attributes.keySet())
+            {
+                String techniqueParameterId = attributes.get(attributeName);
+                Map<String, TechniqueParameters> parameters = 
+                    technique.getParameters();
+                TechniqueParameters techniqueParameters =
+                    parameters.get(techniqueParameterId);
+                String semantic = techniqueParameters.getSemantic();
+
+                Map<String, String> meshPrimitiveAttributes = 
+                    meshPrimitive.getAttributes();
+                if (meshPrimitiveAttributes == null)
+                {
+                    validatorResult.addError(
+                        "The attributes are null", context);
+                    return validatorResult;
+                }
+                String accessorId = meshPrimitiveAttributes.get(semantic);
+                
+                validatorResult.add(accessorValidator.validateAccessor(accessorId, 
+                    context.with("accessor for attribute " + attributeName)));
+                if (validatorResult.hasErrors())
+                {
+                    return validatorResult;
+                }
+            }
+            
         }
+        
         
         // If the meshPrimitive contains indices, validate the 
         // meshPrimitive.indices accessor
