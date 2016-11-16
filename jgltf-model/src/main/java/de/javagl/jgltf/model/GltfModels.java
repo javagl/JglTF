@@ -215,7 +215,9 @@ public class GltfModels
 
     /**
      * Returns a supplier for the specified uniform value, which is assumed
-     * to be a single (signed or unsigned) integer. 
+     * to be a single (signed or unsigned) integer, or a list containing 
+     * at least one integer value. (The latter is the case even for 
+     * single-value parameters, as of glTF 1.1) 
      * 
      * @param uniformName The uniform name
      * @param technique The {@link Technique}
@@ -233,7 +235,16 @@ public class GltfModels
             {
                 return null;
             }
-            Number number = (Number)object;
+            Number number = null;
+            if (object instanceof Number)
+            {
+                number = (Number)object;
+            }
+            else
+            {
+                List<? extends Number> list = asNumberList(object);
+                number = list.get(0);
+            }
             Integer value = number.intValue();
             return value;
         };
@@ -274,7 +285,9 @@ public class GltfModels
     
     /**
      * Returns a supplier for the specified uniform value, which is assumed
-     * to be a single float value. 
+     * to be a single float value, or a list containing 
+     * at least one float value. (The latter is the case even for 
+     * single-value parameters, as of glTF 1.1)
      * 
      * @param uniformName The uniform name
      * @param technique The {@link Technique}
@@ -292,7 +305,16 @@ public class GltfModels
             {
                 return null;
             }
-            Number number = (Number)object;
+            Number number = null;
+            if (object instanceof Number)
+            {
+                number = (Number)object;
+            }
+            else
+            {
+                List<? extends Number> list = asNumberList(object);
+                number = list.get(0);
+            }
             Float value = number.floatValue();
             return value;
         };
