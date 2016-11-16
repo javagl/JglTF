@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -690,9 +691,57 @@ public class RenderedGltf
         }
         if (value instanceof float[])
         {
-            return Arrays.toString((float[])value);
+            float array[] = (float[])value;
+            if (array.length == 16)
+            {
+                return "\n"+createMatrixString(array, 4);
+            }
+            if (array.length == 9)
+            {
+                return "\n"+createMatrixString(array, 3);
+            }
+            return Arrays.toString(array);
         }
         return String.valueOf(value);
+    }
+    
+    /**
+     * Create an unspecified string for the given matrix, suitable for debug
+     * output.
+     * 
+     * @param matrix The matrix
+     * @param columns The number of columns
+     * @return The matrix string
+     */
+    private static String createMatrixString(float matrix[], int columns)
+    {
+        String format = "%8.3f";
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        int rows = matrix.length / columns;
+        for (int r = 0; r < rows; r++)
+        {
+            if (r > 0)
+            {
+                sb.append("\n");
+                sb.append(" ");
+            }
+            for (int c = 0; c < columns; c++)
+            {
+                if (c > 0)
+                {
+                    sb.append("  ");
+                }
+                int index = c + r * columns;
+                if (index < matrix.length)
+                {
+                    float value = matrix[index];
+                    sb.append(String.format(Locale.ENGLISH, format, value));
+                }
+            }
+        }
+        sb.append("]");
+        return sb.toString();
     }
     
     /**
