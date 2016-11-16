@@ -35,12 +35,21 @@ import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_T;
 import static org.lwjgl.opengl.GL11.GL_TRUE;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_BYTE;
 import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.lwjgl.opengl.GL11.glColorMask;
+import static org.lwjgl.opengl.GL11.glCullFace;
 import static org.lwjgl.opengl.GL11.glDeleteTextures;
+import static org.lwjgl.opengl.GL11.glDepthFunc;
+import static org.lwjgl.opengl.GL11.glDepthMask;
+import static org.lwjgl.opengl.GL11.glDepthRange;
 import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glDrawArrays;
 import static org.lwjgl.opengl.GL11.glDrawElements;
 import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glFrontFace;
 import static org.lwjgl.opengl.GL11.glGenTextures;
+import static org.lwjgl.opengl.GL11.glLineWidth;
+import static org.lwjgl.opengl.GL11.glPolygonOffset;
+import static org.lwjgl.opengl.GL11.glScissor;
 import static org.lwjgl.opengl.GL11.glTexImage2D;
 import static org.lwjgl.opengl.GL11.glTexParameteri;
 import static org.lwjgl.opengl.GL12.GL_BGRA;
@@ -48,6 +57,8 @@ import static org.lwjgl.opengl.GL12.GL_TEXTURE_BASE_LEVEL;
 import static org.lwjgl.opengl.GL12.GL_TEXTURE_MAX_LEVEL;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
+import static org.lwjgl.opengl.GL14.glBlendColor;
+import static org.lwjgl.opengl.GL14.glBlendFuncSeparate;
 import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
 import static org.lwjgl.opengl.GL15.glBindBuffer;
@@ -60,6 +71,7 @@ import static org.lwjgl.opengl.GL20.GL_INFO_LOG_LENGTH;
 import static org.lwjgl.opengl.GL20.GL_VALIDATE_STATUS;
 import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;
 import static org.lwjgl.opengl.GL20.glAttachShader;
+import static org.lwjgl.opengl.GL20.glBlendEquationSeparate;
 import static org.lwjgl.opengl.GL20.glCompileShader;
 import static org.lwjgl.opengl.GL20.glCreateProgram;
 import static org.lwjgl.opengl.GL20.glCreateShader;
@@ -521,6 +533,78 @@ class GlContextLwjgl implements GlContext
         glDrawArrays(mode, 0, numVertices);
     }
     
+    @Override
+    public void setBlendColor(float r, float g, float b, float a)
+    {
+        glBlendColor(r, g, b, a);
+    }
+
+    @Override
+    public void setBlendEquationSeparate(int modeRgb, int modeAlpha)
+    {
+        glBlendEquationSeparate(modeRgb, modeAlpha);
+    }
+
+    @Override
+    public void setBlendFuncSeparate(
+        int srcRgb, int dstRgb, int srcAlpha, int dstAlpha)
+    {
+        glBlendFuncSeparate(srcRgb, dstRgb, srcAlpha, dstAlpha);
+    }
+
+    @Override
+    public void setColorMask(boolean r, boolean g, boolean b, boolean a)
+    {
+        glColorMask(r, g, b, a);
+    }
+
+    @Override
+    public void setCullFace(int mode)
+    {
+        glCullFace(mode);
+    }
+
+    @Override
+    public void setDepthFunc(int func)
+    {
+        glDepthFunc(func);
+    }
+
+    @Override
+    public void setDepthMask(boolean mask)
+    {
+        glDepthMask(mask);
+    }
+
+    @Override
+    public void setDepthRange(float zNear, float zFar)
+    {
+        glDepthRange(zNear, zFar);
+    }
+
+    @Override
+    public void setFrontFace(int mode)
+    {
+        glFrontFace(mode);
+    }
+
+    @Override
+    public void setLineWidth(float width)
+    {
+        glLineWidth(width);
+    }
+
+    @Override
+    public void setPolygonOffset(float factor, float units)
+    {
+        glPolygonOffset(factor, units);
+    }
+
+    @Override
+    public void setScissor(int x, int y, int width, int height)
+    {
+        glScissor(x, y, width, height);
+    }
 
     /**
      * For debugging: Print shader log info

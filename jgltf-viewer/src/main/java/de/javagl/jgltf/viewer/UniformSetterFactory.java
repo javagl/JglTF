@@ -61,9 +61,9 @@ class UniformSetterFactory
      * matches the required type for the uniform. That is, the return
      * type is assumed to be the one described in this table:  
      * <pre><code>
-     *  GL_INT          : Integer if count==1, and int[count] otherwise
-     *  GL_UNSIGNED_INT : Integer if count==1, and int[count] otherwise
-     *  GL_FLOAT        : Float if count==1, and float[count] otherwise
+     *  GL_INT          : Integer or int[1] if count==1, or int[count]
+     *  GL_UNSIGNED_INT : Integer or int[1] if count==1, or int[count]
+     *  GL_FLOAT        : Float or float[1] if count==1, or float[count]
      *  GL_FLOAT_MAT2   : float[2*2*count]
      *  GL_FLOAT_MAT3   : float[3*3*count]
      *  GL_FLOAT_MAT3   : float[4*4*count]

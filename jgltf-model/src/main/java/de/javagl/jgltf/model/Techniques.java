@@ -26,6 +26,7 @@
  */
 package de.javagl.jgltf.model;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
@@ -36,6 +37,7 @@ import de.javagl.jgltf.impl.Program;
 import de.javagl.jgltf.impl.Technique;
 import de.javagl.jgltf.impl.TechniqueParameters;
 import de.javagl.jgltf.impl.TechniqueStates;
+import de.javagl.jgltf.impl.TechniqueStatesFunctions;
 
 /**
  * Utility methods related to {@link Technique}s
@@ -89,9 +91,47 @@ public class Techniques
     private static TechniqueStates createDefaultTechniqueStates()
     {
         TechniqueStates techniqueStates = new TechniqueStates();
-        techniqueStates.addEnable(2884); // GL_CULL_FACE
-        techniqueStates.addEnable(2929); // GL_DEPTH_TEST
+        techniqueStates.setEnable(
+            new ArrayList<Integer>(techniqueStates.defaultEnable()));
+        techniqueStates.setFunctions(createDefaultTechniqueStatesFunctions());
         return techniqueStates;
+    }
+    
+    /**
+     * Create the default {@link TechniqueStatesFunctions}
+     *  
+     * @return The default {@link TechniqueStatesFunctions}
+     */
+    private static TechniqueStatesFunctions 
+        createDefaultTechniqueStatesFunctions()
+    {
+        TechniqueStatesFunctions techniqueStatesFunctions = 
+            new TechniqueStatesFunctions();
+        techniqueStatesFunctions.setBlendColor(
+            techniqueStatesFunctions.defaultBlendColor().clone());
+        techniqueStatesFunctions.setBlendEquationSeparate(
+            techniqueStatesFunctions.defaultBlendEquationSeparate().clone());
+        techniqueStatesFunctions.setBlendFuncSeparate(
+            techniqueStatesFunctions.defaultBlendFuncSeparate().clone());
+        techniqueStatesFunctions.setColorMask(
+            techniqueStatesFunctions.defaultColorMask().clone());
+        techniqueStatesFunctions.setCullFace(
+            techniqueStatesFunctions.defaultCullFace().clone());
+        techniqueStatesFunctions.setDepthFunc(
+            techniqueStatesFunctions.defaultDepthFunc().clone());
+        techniqueStatesFunctions.setDepthMask(
+            techniqueStatesFunctions.defaultDepthMask().clone());
+        techniqueStatesFunctions.setDepthRange(
+            techniqueStatesFunctions.defaultDepthRange().clone());
+        techniqueStatesFunctions.setFrontFace(
+            techniqueStatesFunctions.defaultFrontFace().clone());
+        techniqueStatesFunctions.setLineWidth(
+            techniqueStatesFunctions.defaultLineWidth().clone());
+        techniqueStatesFunctions.setPolygonOffset(
+            techniqueStatesFunctions.defaultPolygonOffset().clone());
+        techniqueStatesFunctions.setScissor(
+            techniqueStatesFunctions.defaultScissor().clone());
+        return techniqueStatesFunctions;
     }
 
     /**

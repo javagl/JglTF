@@ -53,6 +53,7 @@ import de.javagl.jgltf.impl.Scene;
 import de.javagl.jgltf.impl.Technique;
 import de.javagl.jgltf.impl.TechniqueParameters;
 import de.javagl.jgltf.impl.TechniqueStates;
+import de.javagl.jgltf.impl.TechniqueStatesFunctions;
 import de.javagl.jgltf.impl.Texture;
 import de.javagl.jgltf.model.Accessors;
 import de.javagl.jgltf.model.GltfConstants;
@@ -504,9 +505,12 @@ public class RenderedGltf
         // Create the command to enable the program
         renderCommands.add(() -> glContext.useGlProgram(glProgram));
         
-        // Create the commands to set the technique.states
+        // Create the commands to set the technique.states and 
+        // the techniqe.states.functions values 
         renderCommands.add(() -> glContext.disable(getAllStates()));
         renderCommands.add(() -> glContext.enable(getEnabledStates(technique)));
+        renderCommands.addAll(
+            createTechniqeStatesFunctionsSettingCommands(technique));
         
         // Create the commands to set the uniforms
         List<Runnable> uniformSettingCommands = 
@@ -536,12 +540,12 @@ public class RenderedGltf
     private static List<Integer> getAllStates()
     {
         List<Integer> allStates = Arrays.asList(
-            3042,  // GL_BLEND
-            2884,  // GL_CULL_FACE
-            2929,  // GL_DEPTH_TEST
-            32823, // GL_POLYGON_OFFSET_FILL
-            32926, // GL_SAMPLE_ALPHA_TO_COVERAGE
-            3089   // GL_SCISSOR_TEST
+            GlConstants.GL_BLEND,
+            GlConstants.GL_CULL_FACE,
+            GlConstants.GL_DEPTH_TEST,
+            GlConstants.GL_POLYGON_OFFSET_FILL,
+            GlConstants.GL_SAMPLE_ALPHA_TO_COVERAGE,
+            GlConstants.GL_SCISSOR_TEST
         );
         return allStates;
     }
@@ -567,6 +571,157 @@ public class RenderedGltf
         }
         return enable;
     }
+    
+    /**
+     * Create the functions that, when executed, call the functions
+     * in the {@link GlContext} for setting the states that have been 
+     * defined in the {@link TechniqueStatesFunctions}. When any 
+     * information is missing, the default values will be set.
+     * 
+     * @param technique The {@link Technique}
+     * @return The list of commands
+     */
+    private List<Runnable> createTechniqeStatesFunctionsSettingCommands(
+        Technique technique)
+    {
+        TechniqueStates states = technique.getStates();
+        if (states == null)
+        {
+            states = GltfDefaults.getDefaultTechnique().getStates();
+        }
+        TechniqueStatesFunctions functions = states.getFunctions();
+        if (functions == null)
+        {
+            TechniqueStates defaultStates = 
+                GltfDefaults.getDefaultTechnique().getStates();
+            functions = defaultStates.getFunctions();
+        }
+        List<Runnable> commands = new ArrayList<Runnable>();
+        
+        float[] blendColor = optional(
+            functions.getBlendColor(), 
+            functions.defaultBlendColor());
+        commands.add(() ->
+        {
+            glContext.setBlendColor(
+                blendColor[0], blendColor[1], 
+                blendColor[2], blendColor[3]);
+        });
+        
+        int[] blendEquationSeparate = optional(
+            functions.getBlendEquationSeparate(),
+            functions.defaultBlendEquationSeparate());
+        commands.add(() ->
+        {
+            glContext.setBlendEquationSeparate(
+                blendEquationSeparate[0], blendEquationSeparate[1]);
+        });
+        
+        int[] blendFuncSeparate = optional(
+            functions.getBlendFuncSeparate(),
+            functions.defaultBlendFuncSeparate());
+        commands.add(() ->
+        {
+            glContext.setBlendFuncSeparate(
+                blendFuncSeparate[0], blendFuncSeparate[1],
+                blendFuncSeparate[2], blendFuncSeparate[3]);
+        });
+        
+        boolean[] colorMask = optional(
+            functions.getColorMask(),
+            functions.defaultColorMask());
+        commands.add(() ->
+        {
+            glContext.setColorMask(
+                colorMask[0], colorMask[1],
+                colorMask[2], colorMask[3]);
+        });
+        
+        int[] cullFace = optional(
+            functions.getCullFace(),
+            functions.defaultCullFace());
+        commands.add(() ->
+        {
+            glContext.setCullFace(cullFace[0]);
+        });
+        
+        int[] depthFunc = optional(
+            functions.getDepthFunc(),
+            functions.defaultDepthFunc());
+        commands.add(() ->
+        {
+            glContext.setDepthFunc(depthFunc[0]);
+        });
+        
+        boolean[] depthMask = optional(
+            functions.getDepthMask(),
+            functions.defaultDepthMask());
+        commands.add(() ->
+        {
+            glContext.setDepthMask(depthMask[0]);
+        });
+        
+        float[] depthRange = optional(
+            functions.getDepthRange(),
+            functions.defaultDepthRange());
+        commands.add(() ->
+        {
+            glContext.setDepthRange(depthRange[0], depthRange[1]);
+        });
+        
+        int[] frontFace = optional(
+            functions.getFrontFace(),
+            functions.defaultFrontFace());
+        commands.add(() ->
+        {
+            glContext.setFrontFace(frontFace[0]);
+        });
+        
+        float[] lineWidth = optional(
+            functions.getLineWidth(),
+            functions.defaultLineWidth());
+        commands.add(() ->
+        {
+            glContext.setLineWidth(lineWidth[0]);
+        });
+        
+        float[] polygonOffset = optional( 
+            functions.getPolygonOffset(),
+            functions.defaultPolygonOffset());
+        commands.add(() ->
+        {
+            glContext.setPolygonOffset(
+                polygonOffset[0], polygonOffset[1]);
+        });
+        
+        // Scissor was removed in glTF 1.1, but still handled here
+        float[] theScissor = functions.getScissor();
+        float[] scissor;
+        if (theScissor != null)
+        {
+            scissor = theScissor;
+        }
+        else
+        {
+            // The fact that no sensible default values for the scissor
+            // width and height can be given here was one of the reasons
+            // of why it was removed in glTF 1.1
+            float defaultWidth = Short.MAX_VALUE;
+            float defaultHeight = Short.MAX_VALUE;
+            scissor = new float[] {
+                0.0f, 0.0f, defaultWidth, defaultHeight
+            };
+        }
+        commands.add(() ->
+        {
+            glContext.setScissor(
+                (int)scissor[0], (int)scissor[1], 
+                (int)scissor[2], (int)scissor[3]);
+        });
+        
+        return commands;
+    }
+    
 
     /**
      * Create a list of commands that set the values of the uniforms of the 
@@ -954,7 +1109,7 @@ public class RenderedGltf
      */
     private static <T> List<T> optional(List<T> list)
     {
-        return Optional.ofNullable(list).orElse(Collections.emptyList());
+        return list != null ? list : Collections.emptyList();
     }
     
     /**
@@ -966,8 +1121,19 @@ public class RenderedGltf
      */
     private static <K, V> Map<K, V> optional(Map<K, V> map)
     {
-        return Optional.ofNullable(map).orElse(Collections.emptyMap());
+        return map != null ? map : Collections.emptyMap();
     }
     
-    
+    /**
+     * Returns the given value, or the given default value if the
+     * given value is <code>null</code>
+     * 
+     * @param t The value
+     * @param defaultValue The default value
+     * @return The value or the default value
+     */
+    private static <T> T optional(T t, T defaultValue)
+    {
+        return t != null ? t : defaultValue;
+    }
 }

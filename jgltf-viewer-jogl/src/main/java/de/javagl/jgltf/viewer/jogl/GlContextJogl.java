@@ -428,6 +428,80 @@ class GlContextJogl implements GlContext
         gl.glDrawArrays(mode, 0, numVertices);
     }
     
+    
+    @Override
+    public void setBlendColor(float r, float g, float b, float a)
+    {
+        gl.glBlendColor(r, g, b, a);
+    }
+
+    @Override
+    public void setBlendEquationSeparate(int modeRgb, int modeAlpha)
+    {
+        gl.glBlendEquationSeparate(modeRgb, modeAlpha);
+    }
+
+    @Override
+    public void setBlendFuncSeparate(
+        int srcRgb, int dstRgb, int srcAlpha, int dstAlpha)
+    {
+        gl.glBlendFuncSeparate(srcRgb, dstRgb, srcAlpha, dstAlpha);
+    }
+
+    @Override
+    public void setColorMask(boolean r, boolean g, boolean b, boolean a)
+    {
+        gl.glColorMask(r, g, b, a);
+    }
+
+    @Override
+    public void setCullFace(int mode)
+    {
+        gl.glCullFace(mode);
+    }
+
+    @Override
+    public void setDepthFunc(int func)
+    {
+        gl.glDepthFunc(func);
+    }
+
+    @Override
+    public void setDepthMask(boolean mask)
+    {
+        gl.glDepthMask(mask);
+    }
+
+    @Override
+    public void setDepthRange(float zNear, float zFar)
+    {
+        gl.glDepthRange(zNear, zFar);
+    }
+
+    @Override
+    public void setFrontFace(int mode)
+    {
+        gl.glFrontFace(mode);
+    }
+
+    @Override
+    public void setLineWidth(float width)
+    {
+        gl.glLineWidth(width);
+    }
+
+    @Override
+    public void setPolygonOffset(float factor, float units)
+    {
+        gl.glPolygonOffset(factor, units);
+    }
+
+    @Override
+    public void setScissor(int x, int y, int width, int height)
+    {
+        gl.glScissor(x, y, width, height);
+    }
+    
 
     /**
      * For debugging: Print shader log info
@@ -486,6 +560,5 @@ class GlContextJogl implements GlContext
             logger.warning("program log:\n"+infoLogString);
         }
     }
-
 
 }

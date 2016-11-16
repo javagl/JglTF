@@ -241,4 +241,132 @@ public interface GlContext
      */
     void renderNonIndexed(int glVertexArray, int mode, int numVertices);
 
+    // The remaining functions are solely intended for setting the
+    // values of the techniqe.state.functions. They are directly 
+    // passed to the underlying OpenGL binding.
+    
+    /**
+     * Set the blend color<br>
+     * <br>
+     * (See <code>glBlendColor</code>)
+     * 
+     * @param r red
+     * @param g green
+     * @param b blue
+     * @param a alpha
+     */
+    void setBlendColor(float r, float g, float b, float a);    
+    
+    /**
+     * Set the blend equation mode<br>
+     * <br>
+     * (See <code>glBlendEquationSeparate</code>)
+     * 
+     * @param modeRgb The mode for the RBG part
+     * @param modeAlpha The mode for alpha
+     */
+    void setBlendEquationSeparate(int modeRgb, int modeAlpha);
+
+    /**
+     * Set the blend function<br>
+     * <br>
+     * (See <code>glBlendFuncSeparate</code>)
+     * 
+     * @param srcRgb The source RGB function 
+     * @param dstRgb The destination RGB function
+     * @param srcAlpha  The source alpha function
+     * @param dstAlpha  The destination alpha function
+     */
+    void setBlendFuncSeparate(
+        int srcRgb, int dstRgb, int srcAlpha, int dstAlpha);
+
+    /**
+     * Set the color mask<br>
+     * <br>
+     * (See <code>glColorMask</code>)
+     * 
+     * @param r red
+     * @param g green
+     * @param b blue
+     * @param a alpha
+     */
+    void setColorMask(boolean r, boolean g, boolean b, boolean a);    
+
+    /**
+     * Set the face culling<br>
+     * <br>
+     * (See <code>glCullFace</code>)
+     * 
+     * @param mode The culling mode
+     */
+    void setCullFace(int mode);    
+
+    /**
+     * Set the depth test function<br>
+     * <br>
+     * (See <code>glDepthFunc</code>)
+     * 
+     * @param func The depth test function
+     */
+    void setDepthFunc(int func);    
+
+    /**
+     * Set the depth test mask<br>
+     * <br>
+     * (See <code>glDepthMask</code>)
+     * 
+     * @param mask The depth test mask
+     */
+    void setDepthMask(boolean mask);    
+    
+    /**
+     * Set the depth range<br>
+     * <br>
+     * (See <code>glDepthRange</code>)
+     * 
+     * @param zNear The near range 
+     * @param zFar The far range 
+     */
+    void setDepthRange(float zNear, float zFar);    
+    
+    /**
+     * Set the front face mode<br>
+     * <br>
+     * (See <code>glFrontFace</code>)
+     * 
+     * @param mode The front face mode
+     */
+    void setFrontFace(int mode);    
+    
+    /**
+     * Set the line width<br>
+     * <br>
+     * (See <code>glLineWidth</code>)
+     * 
+     * @param width The line width
+     */
+    void setLineWidth(float width);    
+ 
+    /**
+     * Set the polygon offset<br>
+     * <br>
+     * (See <code>glPolygonOffset</code>)
+     * 
+     * @param factor The factor 
+     * @param units The units 
+     */
+    void setPolygonOffset(float factor, float units);    
+    
+    /**
+     * Set the scissor<br>
+     * <br>
+     * (See <code>glScissor</code>)
+     * 
+     * @param x The x-coordinate 
+     * @param y The y-coordinate 
+     * @param width The width 
+     * @param height The height 
+     */
+    void setScissor(int x, int y, int width, int height);    
+    
 }
