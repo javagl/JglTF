@@ -562,7 +562,7 @@ public class RenderedGltf
         TechniqueStates states = technique.getStates();
         if (states == null)
         {
-            return new TechniqueStates().defaultEnable();
+            states = GltfDefaults.getDefaultTechnique().getStates();
         }
         List<Integer> enable = states.getEnable();
         if (enable == null)
