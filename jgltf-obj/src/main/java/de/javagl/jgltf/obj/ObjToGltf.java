@@ -180,7 +180,7 @@ public class ObjToGltf
         System.out.println("======");
         System.out.println("");
         System.out.println("  -i=<file> : The input file name");
-        System.out.println("  -o=<file> : The input file name");
+        System.out.println("  -o=<file> : The output file name");
         System.out.println("  -e        : Write the output as embedded glTF");
         System.out.println("  -b        : Write the output as binary glTF");
         System.out.println("  -s=       : The buffer strategy:");
