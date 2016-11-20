@@ -242,7 +242,7 @@ public interface GlContext
     void renderNonIndexed(int glVertexArray, int mode, int numVertices);
 
     // The remaining functions are solely intended for setting the
-    // values of the techniqe.state.functions. They are directly 
+    // values of the technique.state.functions. They are directly 
     // passed to the underlying OpenGL binding.
     
     /**
