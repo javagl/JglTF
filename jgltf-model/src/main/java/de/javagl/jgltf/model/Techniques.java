@@ -108,29 +108,29 @@ public class Techniques
         TechniqueStatesFunctions techniqueStatesFunctions = 
             new TechniqueStatesFunctions();
         techniqueStatesFunctions.setBlendColor(
-            techniqueStatesFunctions.defaultBlendColor().clone());
+            techniqueStatesFunctions.defaultBlendColor());
         techniqueStatesFunctions.setBlendEquationSeparate(
-            techniqueStatesFunctions.defaultBlendEquationSeparate().clone());
+            techniqueStatesFunctions.defaultBlendEquationSeparate());
         techniqueStatesFunctions.setBlendFuncSeparate(
-            techniqueStatesFunctions.defaultBlendFuncSeparate().clone());
+            techniqueStatesFunctions.defaultBlendFuncSeparate());
         techniqueStatesFunctions.setColorMask(
-            techniqueStatesFunctions.defaultColorMask().clone());
+            techniqueStatesFunctions.defaultColorMask());
         techniqueStatesFunctions.setCullFace(
-            techniqueStatesFunctions.defaultCullFace().clone());
+            techniqueStatesFunctions.defaultCullFace());
         techniqueStatesFunctions.setDepthFunc(
-            techniqueStatesFunctions.defaultDepthFunc().clone());
+            techniqueStatesFunctions.defaultDepthFunc());
         techniqueStatesFunctions.setDepthMask(
-            techniqueStatesFunctions.defaultDepthMask().clone());
+            techniqueStatesFunctions.defaultDepthMask());
         techniqueStatesFunctions.setDepthRange(
-            techniqueStatesFunctions.defaultDepthRange().clone());
+            techniqueStatesFunctions.defaultDepthRange());
         techniqueStatesFunctions.setFrontFace(
-            techniqueStatesFunctions.defaultFrontFace().clone());
+            techniqueStatesFunctions.defaultFrontFace());
         techniqueStatesFunctions.setLineWidth(
-            techniqueStatesFunctions.defaultLineWidth().clone());
+            techniqueStatesFunctions.defaultLineWidth());
         techniqueStatesFunctions.setPolygonOffset(
-            techniqueStatesFunctions.defaultPolygonOffset().clone());
+            techniqueStatesFunctions.defaultPolygonOffset());
         techniqueStatesFunctions.setScissor(
-            techniqueStatesFunctions.defaultScissor().clone());
+            techniqueStatesFunctions.defaultScissor());
         return techniqueStatesFunctions;
     }
 
