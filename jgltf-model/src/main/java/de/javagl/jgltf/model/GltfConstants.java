@@ -230,6 +230,204 @@ public class GltfConstants
     public static final int GL_ELEMENT_ARRAY_BUFFER = 34963;
     
     
+    // glEnable for technique.states
+    
+    /**
+     * The GL_BLEND constant (3042)
+     */
+    public static final int GL_BLEND = 3042;
+    
+    /**
+     * The GL_CULL_FACE constant (2884)
+     */
+    public static final int GL_CULL_FACE = 2884;
+    
+    /**
+     * The GL_DEPTH_TEST constant (2929)
+     */
+    public static final int GL_DEPTH_TEST = 2929;
+    
+    /**
+     * The GL_POLYGON_OFFSET_FILL constant (32823)
+     */
+    public static final int GL_POLYGON_OFFSET_FILL = 32823;
+    
+    /**
+     * The GL_SAMPLE_ALPHA_TO_COVERAGE constant (32926)
+     */
+    public static final int GL_SAMPLE_ALPHA_TO_COVERAGE = 32926;
+    
+    /**
+     * The GL_SCISSOR_TEST constant (3089)
+     */
+    public static final int GL_SCISSOR_TEST = 3089;
+
+    // glBlendEquationSeparate
+    
+    /**
+     * The GL_FUNC_ADD constant (32774)
+     */
+    public static final int GL_FUNC_ADD = 32774;
+    
+    /**
+     * The GL_FUNC_SUBTRACT constant (32778)
+     */
+    public static final int GL_FUNC_SUBTRACT = 32778;
+    
+    /**
+     * The GL_FUNC_REVERSE_SUBTRACT constant (32779)
+     */
+    public static final int GL_FUNC_REVERSE_SUBTRACT = 32779;
+
+    // glBlendFuncSeparate
+    
+    /**
+     * The GL_ZERO constant (0)
+     */
+    public static final int GL_ZERO = 0;
+    
+    /**
+     * The GL_ONE constant (1)
+     */
+    public static final int GL_ONE = 1;
+    
+    /**
+     * The GL_SRC_COLOR constant (768)
+     */
+    public static final int GL_SRC_COLOR = 768;
+    
+    /**
+     * The GL_ONE_MINUS_SRC_COLOR constant (769)
+     */
+    public static final int GL_ONE_MINUS_SRC_COLOR = 769;
+    
+    /**
+     * The GL_DST_COLOR constant (774)
+     */
+    public static final int GL_DST_COLOR = 774;
+    
+    /**
+     * The GL_ONE_MINUS_DST_COLOR constant (775)
+     */
+    public static final int GL_ONE_MINUS_DST_COLOR = 775;
+    
+    /**
+     * The GL_SRC_ALPHA constant (770)
+     */
+    public static final int GL_SRC_ALPHA = 770;
+    
+    /**
+     * The GL_ONE_MINUS_SRC_ALPHA constant (771)
+     */
+    public static final int GL_ONE_MINUS_SRC_ALPHA = 771;
+    
+    /**
+     * The GL_DST_ALPHA constant (772)
+     */
+    public static final int GL_DST_ALPHA = 772;
+    
+    /**
+     * The GL_ONE_MINUS_DST_ALPHA constant (773)
+     */
+    public static final int GL_ONE_MINUS_DST_ALPHA = 773;
+    
+    /**
+     * The GL_CONSTANT_COLOR constant (32769)
+     */
+    public static final int GL_CONSTANT_COLOR = 32769;
+    
+    /**
+     * The GL_ONE_MINUS_CONSTANT_COLOR constant (32770)
+     */
+    public static final int GL_ONE_MINUS_CONSTANT_COLOR = 32770;
+    
+    /**
+     * The GL_CONSTANT_ALPHA constant (32771)
+     */
+    public static final int GL_CONSTANT_ALPHA = 32771;
+    
+    /**
+     * The GL_ONE_MINUS_CONSTANT_ALPHA constant (32772)
+     */
+    public static final int GL_ONE_MINUS_CONSTANT_ALPHA = 32772;
+    
+    /**
+     * The GL_SRC_ALPHA_SATURATE constant (776)
+     */
+    public static final int GL_SRC_ALPHA_SATURATE = 776;
+
+    // glCullFace
+    
+    /**
+     * The GL_FRONT constant (1028)
+     */
+    public static final int GL_FRONT = 1028;
+    
+    /**
+     * The GL_BACK constant (1029)
+     */
+    public static final int GL_BACK = 1029;
+    
+    /**
+     * The GL_FRONT_AND_BACK constant (1032)
+     */
+    public static final int GL_FRONT_AND_BACK = 1032;
+
+    // glDepthFunc
+    
+    /**
+     * The GL_NEVER constant (512)
+     */
+    public static final int GL_NEVER = 512;
+    
+    /**
+     * The GL_LESS constant (513)
+     */
+    public static final int GL_LESS = 513;
+    
+    /**
+     * The GL_LEQUAL constant (515)
+     */
+    public static final int GL_LEQUAL = 515;
+    
+    /**
+     * The GL_EQUAL constant (514)
+     */
+    public static final int GL_EQUAL = 514;
+    
+    /**
+     * The GL_GREATER constant (516)
+     */
+    public static final int GL_GREATER = 516;
+    
+    /**
+     * The GL_NOTEQUAL constant (517)
+     */
+    public static final int GL_NOTEQUAL = 517;
+    
+    /**
+     * The GL_GEQUAL constant (518)
+     */
+    public static final int GL_GEQUAL = 518;
+    
+    /**
+     * The GL_ALWAYS constant (519)
+     */
+    public static final int GL_ALWAYS = 519;
+
+    // glFrontFace
+    
+    /**
+     * The GL_CW constant (2304)
+     */
+    public static final int GL_CW = 2304;
+    
+    /**
+     * The GL_CCW constant (2305)
+     */
+    public static final int GL_CCW = 2305;    
+    
+    
     /**
      * Returns the String representation of the given constant
      * 
@@ -268,8 +466,8 @@ public class GltfConstants
             case GL_FLOAT_MAT4 : return "GL_FLOAT_MAT4";
             case GL_SAMPLER_2D : return "GL_SAMPLER_2D";
             
-            case GL_POINTS: return "GL_POINTS";
-            case GL_LINES: return "GL_LINES";
+            case GL_POINTS: return "GL_ZERO or GL_POINTS";
+            case GL_LINES: return "GL_ONE or GL_LINES";
             case GL_LINE_LOOP: return "GL_LINE_LOOP";
             case GL_LINE_STRIP: return "GL_LINE_STRIP";
             case GL_TRIANGLES: return "GL_TRIANGLES";
@@ -282,6 +480,58 @@ public class GltfConstants
 
             case GL_ARRAY_BUFFER: return "GL_ARRAY_BUFFER";
             case GL_ELEMENT_ARRAY_BUFFER: return "GL_ELEMENT_ARRAY_BUFFER";
+            
+            // glEnable for technique.states
+            case GL_BLEND: return "GL_BLEND";
+            case GL_CULL_FACE: return "GL_CULL_FACE";
+            case GL_DEPTH_TEST: return "GL_DEPTH_TEST";
+            case GL_POLYGON_OFFSET_FILL: return "GL_POLYGON_OFFSET_FILL";
+            case GL_SAMPLE_ALPHA_TO_COVERAGE: 
+                return "GL_SAMPLE_ALPHA_TO_COVERAGE";
+            case GL_SCISSOR_TEST: return "GL_SCISSOR_TEST";
+
+            // glBlendEquationSeparate
+            case GL_FUNC_ADD: return "GL_FUNC_ADD";
+            case GL_FUNC_SUBTRACT: return "GL_FUNC_SUBTRACT";
+            case GL_FUNC_REVERSE_SUBTRACT: return "GL_FUNC_REVERSE_SUBTRACT";
+
+            // glBlendFuncSeparate
+            //case GL_ZERO: return "GL_ZERO"; // see GL_POINTS
+            //case GL_ONE: return "GL_ONE"; // see GL_LINES
+            case GL_SRC_COLOR: return "GL_SRC_COLOR";
+            case GL_ONE_MINUS_SRC_COLOR: return "GL_ONE_MINUS_SRC_COLOR";
+            case GL_DST_COLOR: return "GL_DST_COLOR";
+            case GL_ONE_MINUS_DST_COLOR: return "GL_ONE_MINUS_DST_COLOR";
+            case GL_SRC_ALPHA: return "GL_SRC_ALPHA";
+            case GL_ONE_MINUS_SRC_ALPHA: return "GL_ONE_MINUS_SRC_ALPHA";
+            case GL_DST_ALPHA: return "GL_DST_ALPHA";
+            case GL_ONE_MINUS_DST_ALPHA: return "GL_ONE_MINUS_DST_ALPHA";
+            case GL_CONSTANT_COLOR: return "GL_CONSTANT_COLOR";
+            case GL_ONE_MINUS_CONSTANT_COLOR: 
+                return "GL_ONE_MINUS_CONSTANT_COLOR";
+            case GL_CONSTANT_ALPHA: return "GL_CONSTANT_ALPHA";
+            case GL_ONE_MINUS_CONSTANT_ALPHA: 
+                return "GL_ONE_MINUS_CONSTANT_ALPHA";
+            case GL_SRC_ALPHA_SATURATE: return "GL_SRC_ALPHA_SATURATE";
+
+            // glCullFace
+            case GL_FRONT: return "GL_FRONT";
+            case GL_BACK: return "GL_BACK";
+            case GL_FRONT_AND_BACK: return "GL_FRONT_AND_BACK";
+
+            // glDepthFunc
+            case GL_NEVER: return "GL_NEVER";
+            case GL_LESS: return "GL_LESS";
+            case GL_LEQUAL: return "GL_LEQUAL";
+            case GL_EQUAL: return "GL_EQUAL";
+            case GL_GREATER: return "GL_GREATER";
+            case GL_NOTEQUAL: return "GL_NOTEQUAL";
+            case GL_GEQUAL: return "GL_GEQUAL";
+            case GL_ALWAYS: return "GL_ALWAYS";
+
+            // glFrontFace
+            case GL_CW: return "GL_CW";
+            case GL_CCW: return "GL_CCW";
             
             default:
                 return "UNKNOWN_GL_CONSTANT["+constant+"]";
