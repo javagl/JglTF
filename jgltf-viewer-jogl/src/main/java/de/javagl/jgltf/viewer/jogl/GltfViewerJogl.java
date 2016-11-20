@@ -160,8 +160,12 @@ public class GltfViewerJogl extends AbstractGltfViewer
     @Override
     protected void render()
     {
-        gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        // Enable the color and depth mask explicitly before calling glClear.
+        // When they are not enabled, they will not be cleared!
+        gl.glColorMask(true, true, true, true);
+        gl.glDepthMask(true); 
         gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        
         renderGltfs();
     }
 

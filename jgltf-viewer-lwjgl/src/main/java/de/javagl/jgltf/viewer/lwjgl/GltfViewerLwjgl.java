@@ -29,7 +29,8 @@ package de.javagl.jgltf.viewer.lwjgl;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glClearColor;
+import static org.lwjgl.opengl.GL11.glColorMask;
+import static org.lwjgl.opengl.GL11.glDepthMask;
 
 import java.awt.Canvas;
 import java.awt.Component;
@@ -127,8 +128,12 @@ public class GltfViewerLwjgl extends AbstractGltfViewer
     @Override
     protected void render()
     {
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        // Enable the color and depth mask explicitly before calling glClear.
+        // When they are not enabled, they will not be cleared!
+        glColorMask(true, true, true, true);
+        glDepthMask(true); 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         renderGltfs();
     }
 
