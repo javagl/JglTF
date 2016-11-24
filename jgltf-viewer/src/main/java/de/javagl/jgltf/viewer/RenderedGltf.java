@@ -136,9 +136,16 @@ public class RenderedGltf
     private final Supplier<float[]> projectionMatrixSupplier;
 
     /**
-     * The list of commands that have to be executed for rendering
+     * The list of commands that have to be executed for rendering the
+     * opaque mesh primitives
      */
-    private final List<Runnable> renderCommands;
+    private final List<Runnable> opaqueRenderCommands;
+
+    /**
+     * The list of commands that have to be executed for rendering the
+     * transparent mesh primitives
+     */
+    private final List<Runnable> transparentRenderCommands;
     
     /**
      * Creates a new instance that renders the given {@link GltfModel} using 
@@ -172,7 +179,8 @@ public class RenderedGltf
         this.gltf = gltfData.getGltf();
         this.gltfRenderData = new GltfRenderData(gltfData, glContext);
         
-        this.renderCommands = new ArrayList<Runnable>();
+        this.opaqueRenderCommands = new ArrayList<Runnable>();
+        this.transparentRenderCommands = new ArrayList<Runnable>();
         
         this.cameraIdToNodeId = new LinkedHashMap<String, String>();
         this.currentCameraNodeIdSupplier = new SettableSupplier<String>();
@@ -229,8 +237,9 @@ public class RenderedGltf
             glContext.deleteGlVertexArray(glVertexArray);
         }
         
-        renderCommands.clear();
-        renderCommands.add(() ->
+        opaqueRenderCommands.clear();
+        transparentRenderCommands.clear();
+        opaqueRenderCommands.add(() ->
         {
             logger.warning("Rendered object has been deleted");
         });
@@ -241,7 +250,11 @@ public class RenderedGltf
      */
     public void render()
     {
-        for (Runnable renderCommand : renderCommands)
+        for (Runnable renderCommand : opaqueRenderCommands)
+        {
+            renderCommand.run();
+        }
+        for (Runnable renderCommand : transparentRenderCommands)
         {
             renderCommand.run();
         }
@@ -529,6 +542,7 @@ public class RenderedGltf
             @Override
             public void run()
             {
+                
                 //logger.info("Executing " + this);
                 for (Runnable command : commands)
                 {
@@ -599,7 +613,15 @@ public class RenderedGltf
             }
             
         };
-        renderCommands.add(meshPrimitiveRenderCommand);
+        
+        if (enabledStates.contains(GltfConstants.GL_BLEND))
+        {
+            transparentRenderCommands.add(meshPrimitiveRenderCommand);
+        }
+        else
+        {
+            opaqueRenderCommands.add(meshPrimitiveRenderCommand);
+        }
         
         logger.fine("Processing meshPrimitive DONE");
     }
