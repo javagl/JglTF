@@ -29,10 +29,7 @@ package de.javagl.jgltf.model;
 import de.javagl.jgltf.impl.Node;
 
 /**
- * Utility methods related to {@link Node}s.<br>
- * <br>
- * Unless otherwise noted, none of the arguments to these methods may 
- * be <code>null</code>.
+ * Utility methods related to {@link Node}s.
  */
 class Nodes
 {
@@ -41,37 +38,55 @@ class Nodes
      * is either taken from the {@link Node#getMatrix()} (if it is not
      * <code>null</code>), or computed from the {@link Node#getTranslation()}, 
      * {@link Node#getRotation()} and {@link Node#getScale()}, if they
-     * are not <code>null</code>, respectively.
-     * 
+     * are not <code>null</code>, respectively.<br>
+     * <br>
      * The result will be written to the given array, as a 4x4 matrix in 
-     * column major order. The given array must at least have a length of 16. 
+     * column major order. If the given array is <code>null</code>, then
+     * a new array with length 16 will be created and returned. Otherwise,
+     * the given array must at least have a length of 16.
      * 
-     * @param node The node
-     * @param localTransform The array that will store the result
+     * @param node The node. May not be <code>null</code>.
+     * @param localTransform The optional array that will store the result
+     * @return The result
      */
-    static void computeLocalTransform(Node node, float localTransform[])
+    static float[] computeLocalTransform(
+        Node node, float localTransform[])
     {
+        float result[] = localTransform;
+        if (localTransform == null)
+        {
+            result = new float[16];
+        }
+        else
+        {
+            if (localTransform.length < 16)
+            {
+                throw new IllegalArgumentException(
+                    "Array length must at least be 16, but is " + 
+                    localTransform.length);
+            }
+        }
         if (node.getMatrix() != null)
         {
             float m[] = node.getMatrix();
-            System.arraycopy(m, 0, localTransform, 0, m.length);
-            return;
+            System.arraycopy(m, 0, result, 0, m.length);
+            return result;
         }
         
-        MathUtils.setIdentity4x4(localTransform);
+        MathUtils.setIdentity4x4(result);
         if (node.getTranslation() != null)
         {
             float t[] = node.getTranslation();
-            localTransform[12] = t[0]; 
-            localTransform[13] = t[1]; 
-            localTransform[14] = t[2]; 
+            result[12] = t[0]; 
+            result[13] = t[1]; 
+            result[14] = t[2]; 
         }
         if (node.getRotation() != null)
         {
             float q[] = node.getRotation();
             float m[] = new float[16];
             MathUtils.quaternionToMatrix4x4(q, m);
-            MathUtils.mul4x4(localTransform, m, localTransform);
+            MathUtils.mul4x4(result, m, result);
         }
         if (node.getScale() != null)
         {
@@ -81,8 +96,9 @@ class Nodes
             m[ 5] = s[1];
             m[10] = s[2];
             m[15] = 1.0f;
-            MathUtils.mul4x4(localTransform, m, localTransform);
+            MathUtils.mul4x4(result, m, result);
         }
+        return result;
     }
 
     /**
