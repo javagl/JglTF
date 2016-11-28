@@ -42,8 +42,7 @@ public class Materials
      * String) default technique}.<br>
      * <br>
      * The returned {@link Material} is the default {@link Material}, as 
-     * described in https://github.com/KhronosGroup/glTF/blob/master/specification/README.md#appendix-a
-     * 
+     * described in "Appendix A" of the specification. 
      * 
      * @param techniqueId The {@link Technique} ID
      * @return The default {@link Material}

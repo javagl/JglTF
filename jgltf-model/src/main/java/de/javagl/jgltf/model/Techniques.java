@@ -50,8 +50,8 @@ public class Techniques
      * String, String) default program}.<br>
      * <br>
      * The returned {@link Technique} is the {@link Technique} for the 
-     * default {@link Material}, as described in 
-     * https://github.com/KhronosGroup/glTF/blob/master/specification/README.md#appendix-a
+     * default {@link Material}, as described in "Appendix A" of the 
+     * specification. 
      * 
      * @param programId The {@link Program} ID
      * @return The default {@link Technique}

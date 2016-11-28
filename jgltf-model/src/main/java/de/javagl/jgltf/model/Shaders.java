@@ -73,8 +73,8 @@ public class Shaders
      * representation of the source code in form of a data URI.<br>
      * <br>
      * The returned {@link Shader} is the vertex {@link Shader} for the 
-     * default {@link Material}, as described in 
-     * https://github.com/KhronosGroup/glTF/blob/master/specification/README.md#appendix-a 
+     * default {@link Material}, as described in "Appendix A" of the 
+     * specification. 
      * 
      * @return The default {@link Shader}
      */
@@ -95,8 +95,8 @@ public class Shaders
      * representation of the source code in form of a data URI.<br>
      * <br>
      * The returned {@link Shader} is the fragment {@link Shader} for the 
-     * default {@link Material}, as described in 
-     * https://github.com/KhronosGroup/glTF/blob/master/specification/README.md#appendix-a 
+     * default {@link Material}, as described in "Appendix A" of the 
+     * specification. 
      * 
      * @return The default {@link Shader}
      */
