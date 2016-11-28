@@ -247,6 +247,36 @@ class GltfUtils
     
     
     /**
+     * Tries to find an <code>ImageReader</code> that is capable of reading
+     * the given image data. The returned image reader will be initialized
+     * by passing an ImageInputStream that is created from the given data
+     * to its <code>setInput</code> method. The caller is responsible for 
+     * disposing the returned image reader.
+     *  
+     * @param imageData The image data
+     * @return The image reader
+     * @throws IOException If no matching image reader can be found
+     */
+    @SuppressWarnings("resource")
+    private static ImageReader findImageReader(ByteBuffer imageData) 
+        throws IOException
+    {
+        InputStream inputStream = 
+            Buffers.createByteBufferInputStream(imageData.slice());
+        ImageInputStream imageInputStream = 
+            ImageIO.createImageInputStream(inputStream);
+        Iterator<ImageReader> imageReaders = 
+            ImageIO.getImageReaders(imageInputStream);
+        if (imageReaders.hasNext())
+        {
+            ImageReader imageReader = imageReaders.next();
+            imageReader.setInput(imageInputStream);
+            return imageReader;
+        }
+        throw new IOException("Could not find ImageReader for image data");
+    }
+    
+    /**
      * Tries to detect the format of the given image data, and return the
      * corresponding string of the <code>"image/..."</code> MIME type.
      * This may, for example, be <code>"png"</code> or <code>"gif"</code>
@@ -256,23 +286,25 @@ class GltfUtils
      * @return The image format string
      * @throws IOException If the image format can not be detected
      */
-    @SuppressWarnings("resource")
     private static String guessImageMimeTypeString(ByteBuffer imageData) 
         throws IOException
     {
-        InputStream inputStream = 
-            Buffers.createByteBufferInputStream(imageData.slice());
-        ImageInputStream imageInputStream = 
-            ImageIO.createImageInputStream(inputStream);
-        Iterator<ImageReader> imageReaders = 
-            ImageIO.getImageReaders(imageInputStream);
-        while (imageReaders.hasNext())
+        ImageReader imageReader = null;
+        try
         {
-            ImageReader imageReader = imageReaders.next();
+            imageReader = findImageReader(imageData);
             return imageReader.getFormatName();
         }
-        throw new IOException("Could not detect format of image data");
+        finally
+        {
+            if (imageReader != null)
+            {
+                imageReader.dispose();
+            }
+        }
+        
     }
+    
     
     
     /**

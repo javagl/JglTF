@@ -26,11 +26,21 @@
  */
 package de.javagl.jgltf.model;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.util.Iterator;
+
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
+
 import de.javagl.jgltf.impl.Buffer;
 import de.javagl.jgltf.impl.BufferView;
 import de.javagl.jgltf.impl.GlTFProperty;
 import de.javagl.jgltf.impl.Image;
 import de.javagl.jgltf.impl.Shader;
+import de.javagl.jgltf.model.io.Buffers;
 
 /**
  * Utility methods related to the binary glTF extension
@@ -97,6 +107,85 @@ public class BinaryGltf
         GltfExtensions.setExtensionPropertyValue(
             gltfProperty, KHRONOS_BINARY_GLTF_EXTENSION_NAME, 
             "bufferView", bufferViewId);
+    }
+    
+    /**
+     * Set the properties for the given {@link Image} that is stored 
+     * as a <code>"KHR_binary_glTF"</code> image. These properties
+     * are
+     * <ul> 
+     *   <li>The image <code>width</code></li>
+     *   <li>The image <code>height</code></li>
+     *   <li>The image <code>mimeType</code></li>
+     * </ul>
+     * (Note that the buffer view ID is set explicitly with 
+     * {@link #setBinaryGltfBufferViewId(GlTFProperty, String)})
+     * 
+     * @param image The image
+     * @param imageData The raw image data
+     * @throws GltfException If the image data cannot be analyzed to derive
+     * the required information
+     */
+    public static void setBinaryGltfImageProperties(
+        Image image, ByteBuffer imageData)
+    {
+        ImageReader imageReader = null;
+        try
+        {
+            imageReader = findImageReader(imageData);
+            int width = imageReader.getWidth(0);
+            int height = imageReader.getHeight(0);
+            String mimeType = "image/" + imageReader.getFormatName();
+
+            GltfExtensions.setExtensionPropertyValue(image,
+                KHRONOS_BINARY_GLTF_EXTENSION_NAME, "width", width);
+            GltfExtensions.setExtensionPropertyValue(image,
+                KHRONOS_BINARY_GLTF_EXTENSION_NAME, "height", height);
+            GltfExtensions.setExtensionPropertyValue(image,
+                KHRONOS_BINARY_GLTF_EXTENSION_NAME, "mimeType", mimeType);
+        }
+        catch (IOException e)
+        {
+            throw new GltfException(
+                "Could not derive image properties for binary glTF", e);
+        }
+        finally
+        {
+            if (imageReader != null)
+            {
+                imageReader.dispose();
+            }
+        }
+    }
+    
+    /**
+     * Tries to find an <code>ImageReader</code> that is capable of reading
+     * the given image data. The returned image reader will be initialized
+     * by passing an ImageInputStream that is created from the given data
+     * to its <code>setInput</code> method. The caller is responsible for 
+     * disposing the returned image reader.
+     *  
+     * @param imageData The image data
+     * @return The image reader
+     * @throws IOException If no matching image reader can be found
+     */
+    @SuppressWarnings("resource")
+    private static ImageReader findImageReader(ByteBuffer imageData) 
+        throws IOException
+    {
+        InputStream inputStream = 
+            Buffers.createByteBufferInputStream(imageData.slice());
+        ImageInputStream imageInputStream = 
+            ImageIO.createImageInputStream(inputStream);
+        Iterator<ImageReader> imageReaders = 
+            ImageIO.getImageReaders(imageInputStream);
+        if (imageReaders.hasNext())
+        {
+            ImageReader imageReader = imageReaders.next();
+            imageReader.setInput(imageInputStream);
+            return imageReader;
+        }
+        throw new IOException("Could not find ImageReader for image data");
     }
 
     /**

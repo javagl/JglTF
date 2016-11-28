@@ -161,6 +161,10 @@ public class GltfDataToBinaryConverter
             BinaryGltf.setBinaryGltfBufferViewId(
                 newImage, generatedBufferViewId);
             
+            // Set the width, height and mimeType properties for the
+            // extension object
+            BinaryGltf.setBinaryGltfImageProperties(newImage, imageData);
+            
             newImages.put(id, newImage);
         }
         
