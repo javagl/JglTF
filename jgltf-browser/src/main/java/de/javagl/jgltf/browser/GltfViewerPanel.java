@@ -45,9 +45,12 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
+import javax.vecmath.Point3f;
+import javax.vecmath.Vector3f;
 
 import de.javagl.jgltf.impl.Camera;
 import de.javagl.jgltf.impl.GlTF;
+import de.javagl.jgltf.model.BoundingBoxes;
 import de.javagl.jgltf.model.GltfData;
 import de.javagl.jgltf.validator.Validator;
 import de.javagl.jgltf.validator.ValidatorResult;
@@ -105,6 +108,11 @@ class GltfViewerPanel extends JPanel
     private DefaultComboBoxModel<String> cameraIdsComboBoxModel;
     
     /**
+     * The external camera 
+     */
+    private final ExternalCameraRendering externalCamera;
+    
+    /**
      * Creates a new viewer panel for the given {@link GltfData}
      * 
      * @param gltfData The {@link GltfData}
@@ -116,6 +124,8 @@ class GltfViewerPanel extends JPanel
 
         viewerComponentContainer = new JPanel(new GridLayout(1,1));
         add(viewerComponentContainer, BorderLayout.CENTER);
+        
+        this.externalCamera = new ExternalCameraRendering();
         
         Validator validator = new Validator(gltfData.getGltf());
         ValidatorResult validatorResult = validator.validate();
@@ -154,19 +164,20 @@ class GltfViewerPanel extends JPanel
      */
     private JPanel createControlPanel()
     {
-        JPanel controlPanel = new JPanel(new FlowLayout());
+        JPanel mainControlPanel = 
+            new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 1));
         
         // The button to show the current glTF
         JButton showButton = new JButton("Show current glTF");
         showButton.setEnabled(gltfDataIsValid);
-        controlPanel.add(showButton);
+        mainControlPanel.add(showButton);
 
         // The combo box for selecting the JOGL- or LWJGL viewer implementation
-        controlPanel.add(new JLabel("Viewer implementation:"));
+        mainControlPanel.add(new JLabel("Viewer implementation:"));
         JComboBox<String> viewerImplementationComboBox =
             new JComboBox<String>(new String[] { "JOGL", "LWJGL" });
         viewerImplementationComboBox.setSelectedIndex(0);
-        controlPanel.add(viewerImplementationComboBox);
+        mainControlPanel.add(viewerImplementationComboBox);
         
         // When the "show" button is clicked or a viewer implementation
         // is selected, then create the viewer component
@@ -190,10 +201,13 @@ class GltfViewerPanel extends JPanel
                     animationsRunningButton.isSelected());
             }
         });
-        controlPanel.add(animationsRunningButton);
+        mainControlPanel.add(animationsRunningButton);
+        
+        JPanel cameraControlPanel = 
+            new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 1));
         
         // The combo box for selecting the camera
-        controlPanel.add(new JLabel("Camera:"));
+        cameraControlPanel.add(new JLabel("Camera:"));
         cameraIdsComboBoxModel = new DefaultComboBoxModel<String>();
         JComboBox<String> cameraIdsComboBox = 
             new JComboBox<String>(cameraIdsComboBoxModel);
@@ -214,9 +228,20 @@ class GltfViewerPanel extends JPanel
             }
         });
         updateCameraIdsComboBox();
-        controlPanel.add(cameraIdsComboBox);
+        cameraControlPanel.add(cameraIdsComboBox);
         
-        return controlPanel;
+        JButton resetCameraButton = new JButton("Reset camera");
+        resetCameraButton.addActionListener(e -> resetExternalCamera());
+        cameraControlPanel.add(resetCameraButton);
+        
+        JButton fitCameraButton = new JButton("Fit camera");
+        fitCameraButton.addActionListener(e -> fitExternalCamera());
+        cameraControlPanel.add(fitCameraButton);
+        
+        JPanel p = new JPanel(new GridLayout(0,1));
+        p.add(mainControlPanel);
+        p.add(cameraControlPanel);
+        return p;
     }
 
     /**
@@ -258,6 +283,73 @@ class GltfViewerPanel extends JPanel
             }
         }
     }
+    
+    /**
+     * Reset the external camera to its initial configuration
+     */
+    private void resetExternalCamera()
+    {
+        de.javagl.rendering.core.view.Camera camera = 
+            externalCamera.getCamera();
+        camera.setEyePoint(new Point3f(0, 0, 1));
+        camera.setViewPoint(new Point3f(0, 0, 0)); 
+        camera.setUpVector(new Vector3f(0, 1, 0));
+        camera.setFovDegY(60.0f);            
+    }
+    
+    /**
+     * Fit the external camera to show the whole scene contents 
+     */
+    private void fitExternalCamera()
+    {
+        // Note: This is a VERY simple implementation that does not 
+        // guarantee the "tightest fitting" view configuration, but 
+        // generously moves the camera so that for usual scenes 
+        // everything is visible, regardless of the aspect ratio
+        
+        float minMax[] = BoundingBoxes.computeBoundingBoxMinMax(gltfData);
+        
+        // Compute diagonal length and center of the bounding box
+        Point3f min = new Point3f();
+        min.x = minMax[0];
+        min.y = minMax[1];
+        min.z = minMax[2];
+        
+        Point3f max = new Point3f();
+        max.x = minMax[3];
+        max.y = minMax[4];
+        max.z = minMax[5];
+
+        float diagonalLength = max.distance(min);
+
+        Point3f center = new Point3f();
+        Point3f size = new Point3f();
+        size.sub(max, min);
+        center.scaleAdd(0.5f, size, min);
+        
+        // Compute the normal of the view plane (i.e. the normalized
+        // direction from the view point to the eye point)
+        de.javagl.rendering.core.view.Camera camera = 
+            externalCamera.getCamera();
+        Vector3f viewPlaneNormal = new Vector3f();
+        Point3f eyePoint = camera.getEyePoint();
+        Point3f viewPoint = camera.getViewPoint();
+        viewPlaneNormal.sub(eyePoint, viewPoint);
+        viewPlaneNormal.normalize();
+        
+        // Compute the required viewing distance, and apply
+        // it to the camera
+        float fovRadY = (float) Math.toRadians(camera.getFovDegY());
+        float distance = 
+            (float) (diagonalLength * 0.5 / Math.tan(fovRadY * 0.5));
+        
+        Point3f newViewPoint = new Point3f(center);
+        Point3f newEyePoint = new Point3f();
+        newEyePoint.scaleAdd(distance, viewPlaneNormal, newViewPoint);
+
+        camera.setEyePoint(newEyePoint);
+        camera.setViewPoint(newViewPoint); 
+    }
 
     /**
      * Create the viewer component using the given constructor. 
@@ -275,9 +367,11 @@ class GltfViewerPanel extends JPanel
             gltfViewer = constructor.get();
             gltfViewer.setAnimationsRunning(false);
             gltfViewer.addGltfData(gltfData);
+            
             Component renderComponent = gltfViewer.getRenderComponent();
-            gltfViewer.setExternalCamera(
-                new ExternalCameraRendering(renderComponent));
+            externalCamera.setComponent(renderComponent);
+            
+            gltfViewer.setExternalCamera(externalCamera);
             viewerComponentContainer.add(renderComponent);
             animationsRunningButton.setEnabled(true);
         }

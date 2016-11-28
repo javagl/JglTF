@@ -29,6 +29,7 @@ package de.javagl.jgltf.browser;
 import java.awt.Component;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.util.Objects;
 
 import javax.vecmath.Matrix4f;
@@ -50,9 +51,19 @@ import de.javagl.rendering.interaction.camera.CameraControls;
 class ExternalCameraRendering implements ExternalCamera
 {
     /**
+     * The {@link Control} summarizing the mouse interaction
+     */
+    private final Control control;
+    
+    /**
      * The {@link View}
      */
     private final View view;
+    
+    /**
+     * The component that the listeners are attached to
+     */
+    private Component component;
     
     /**
      * The view matrix
@@ -65,41 +76,41 @@ class ExternalCameraRendering implements ExternalCamera
     private final float projectionMatrix[];
     
     /**
-     * Create a new external camera. The viewport and aspect ratio will
-     * be taken from the given component, and the default (mouse) controls
-     * for interaction will be attached to the given component.
-     *  
-     * @param component The rendering component
+     * A listener for the {@link #component} that will update the aspect
+     * ratio and viewport of the {@link View} when the size of the 
+     * component changes
      */
-    public ExternalCameraRendering(Component component)
+    private final ComponentListener componentListener = new ComponentAdapter()
     {
-        Objects.requireNonNull(component, "The component may not be null");
-        
+        @Override
+        public void componentResized(ComponentEvent e)
+        {
+            updateView();
+        }
+    };
+    
+    /**
+     * Create a new external camera. Use {@link #setComponent(Component)} to
+     * attach the interaction of this camera to a rendering component.
+     */
+    ExternalCameraRendering()
+    {
         this.view = Views.create();
         this.viewMatrix = new float[16];
         this.projectionMatrix = new float[16];
         
-        component.addComponentListener(new ComponentAdapter()
-        {
-            @Override
-            public void componentResized(ComponentEvent e)
-            {
-                int w = component.getWidth();
-                int h = component.getHeight();
-                view.setViewport(Rectangles.create(0, 0, w, h));
-                view.setAspect((float)w/h);
-            }
-        });
         view.getCamera().addCameraListener(new CameraListener()
         {
             @Override
             public void cameraChanged(Camera camera)
             {
-                component.repaint();
+                if (component != null)
+                {
+                    component.repaint();
+                }
             }
         });
-        Control control = CameraControls.createDefaultTrackballControl(view);
-        control.attachTo(component);
+        control = CameraControls.createDefaultTrackballControl(view);
     }
 
     @Override
@@ -147,6 +158,62 @@ class ExternalCameraRendering implements ExternalCamera
         a[i++] = m.m13;
         a[i++] = m.m23;
         a[i++] = m.m33;
+    }
+    
+    /**
+     * Set the component that will receive the mouse events for controlling
+     * this camera
+     * 
+     * @param newComponent The component. May not be <code>null</code>.
+     */
+    void setComponent(Component newComponent)
+    {
+        Objects.requireNonNull(newComponent, "The component may not be null");
+        
+        if (component != null)
+        {
+            component.removeComponentListener(componentListener);
+            control.detachFrom(component);
+        }
+        
+        component = newComponent;
+        
+        component.addComponentListener(componentListener);
+        control.attachTo(component);
+        updateView();
+        
+    }
+
+    /**
+     * Update the aspect ratio and viewport of the {@link View} based on 
+     * the current size of the {@link #component}
+     */
+    private void updateView()
+    {
+        int w = component.getWidth();
+        int h = component.getHeight();
+        view.setViewport(Rectangles.create(0, 0, w, h));
+        view.setAspect((float)w/h);
+    }
+    
+    /**
+     * Returns the {@link View} that is wrapped in this instance
+     * 
+     * @return The {@link View}
+     */
+    View getView()
+    {
+        return view;
+    }
+    
+    /**
+     * Returns the {@link Camera} that is wrapped in this instance
+     * 
+     * @return The {@link Camera}
+     */
+    Camera getCamera()
+    {
+        return view.getCamera();
     }
     
 }

@@ -40,7 +40,7 @@ import java.util.Arrays;
  * <br>
  * Unless otherwise noted, each 4x4 matrix is assumed to have a length of 
  * at least 16, and each 3x3 matrix is assumed to have a length of 
- * at least 9.
+ * at least 9. Points in 3D are assumed to have a length of at least 3.
  */
 class MathUtils
 {
@@ -482,6 +482,34 @@ class MathUtils
             sum += a[i] * b[i];
         }
         return sum;
+    }
+    
+    
+    /**
+     * Transform the given 3D point with the given 4x4 matrix (thus, 
+     * treating the non-present fourth component of the point as 
+     * being 1.0), and write the result into the given result array.
+     * 
+     * @param matrix4x4 The matrix
+     * @param point3D The input point
+     * @param result3D The result point
+     */
+    static void transformPoint3D(
+        float matrix4x4[], float point3D[], float result3D[])
+    {
+        Arrays.fill(result3D, 0.0f);
+        for (int r=0; r<3; r++)
+        {
+            for (int c=0; c<3; c++)
+            {
+                int index = c * 4 + r;
+                float m = matrix4x4[index];
+                result3D[r] += m * point3D[c];
+            }
+            int index = 3 * 4 + r;
+            float m = matrix4x4[index];
+            result3D[r] += m;
+        }
     }
     
     /**
