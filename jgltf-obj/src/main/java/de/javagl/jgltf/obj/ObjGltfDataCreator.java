@@ -333,7 +333,7 @@ public class ObjGltfDataCreator
     {
         Asset asset = new Asset();
         asset.setGenerator("jgltf-obj from https://github.com/javagl/JglTF");
-        asset.setVersion("1.0.0");
+        asset.setVersion("1.1.0");
         return asset;
     }
 
