@@ -28,6 +28,7 @@ package de.javagl.jgltf.obj;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,11 +68,13 @@ class MtlMaterialValues
         }
         else
         {
-            materialValues.put(TechniqueHandler.DIFFUSE_NAME, textureId);
+            materialValues.put(TechniqueHandler.DIFFUSE_NAME, 
+                Collections.singletonList(textureId));
         }
         materialValues.put(TechniqueHandler.SPECULAR_NAME, 
             createMaterialValue(mtl.getKs()));
-        materialValues.put(TechniqueHandler.SHININESS_NAME, mtl.getNs());
+        materialValues.put(TechniqueHandler.SHININESS_NAME, 
+            Collections.singletonList(mtl.getNs()));
         return materialValues;
     }
 
