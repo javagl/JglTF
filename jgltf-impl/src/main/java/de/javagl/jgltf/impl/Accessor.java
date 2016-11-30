@@ -72,7 +72,7 @@ public class Accessor
      * &nbsp;&nbsp;The elements of this array (optional) 
      * 
      */
-    private float[] max;
+    private Number[] max;
     /**
      * Minimum value of each component in this attribute. (optional)<br> 
      * Minimum number of items: 1<br> 
@@ -81,7 +81,7 @@ public class Accessor
      * &nbsp;&nbsp;The elements of this array (optional) 
      * 
      */
-    private float[] min;
+    private Number[] min;
 
     /**
      * The ID of the bufferView. (required) 
@@ -300,7 +300,7 @@ public class Accessor
      * the given constraints
      * 
      */
-    public void setMax(float[] max) {
+    public void setMax(Number[] max) {
         if (max == null) {
             this.max = max;
             return ;
@@ -324,7 +324,7 @@ public class Accessor
      * @return The max
      * 
      */
-    public float[] getMax() {
+    public Number[] getMax() {
         return this.max;
     }
 
@@ -340,7 +340,7 @@ public class Accessor
      * the given constraints
      * 
      */
-    public void setMin(float[] min) {
+    public void setMin(Number[] min) {
         if (min == null) {
             this.min = min;
             return ;
@@ -364,7 +364,7 @@ public class Accessor
      * @return The min
      * 
      */
-    public float[] getMin() {
+    public Number[] getMin() {
         return this.min;
     }
 

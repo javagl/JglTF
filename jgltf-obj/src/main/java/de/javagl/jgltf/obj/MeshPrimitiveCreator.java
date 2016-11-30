@@ -246,7 +246,7 @@ class MeshPrimitiveCreator
      * unknown {@link Accessor#getComponentType()} that is not a valid 
      * integral type
      */
-    private static float[] computeMin(Accessor accessor, ByteBuffer byteBuffer)
+    private static Number[] computeMin(Accessor accessor, ByteBuffer byteBuffer)
     {
         switch (accessor.getComponentType())
         {
@@ -255,7 +255,7 @@ class MeshPrimitiveCreator
             {
                 AccessorByteData accessorData = 
                     AccessorDatas.createByte(accessor, byteBuffer);
-                return asFloat(accessorData.getMinInt());
+                return NumberArrays.asNumbers(accessorData.getMinInt());
             }
             
             case GltfConstants.GL_SHORT:
@@ -263,7 +263,7 @@ class MeshPrimitiveCreator
             {
                 AccessorShortData accessorData = 
                     AccessorDatas.createShort(accessor, byteBuffer);
-                return asFloat(accessorData.getMinInt());
+                return NumberArrays.asNumbers(accessorData.getMinInt());
             }
             
             case GltfConstants.GL_INT:
@@ -271,7 +271,7 @@ class MeshPrimitiveCreator
             {
                 AccessorIntData accessorData = 
                     AccessorDatas.createInt(accessor, byteBuffer);
-                return asFloat(accessorData.getMinLong());
+                return NumberArrays.asNumbers(accessorData.getMinLong());
             }
             default:
                 break;
@@ -291,7 +291,7 @@ class MeshPrimitiveCreator
      * unknown {@link Accessor#getComponentType()} that is not a valid 
      * integral type
      */
-    private static float[] computeMax(Accessor accessor, ByteBuffer byteBuffer)
+    private static Number[] computeMax(Accessor accessor, ByteBuffer byteBuffer)
     {
         switch (accessor.getComponentType())
         {
@@ -300,7 +300,7 @@ class MeshPrimitiveCreator
             {
                 AccessorByteData accessorData = 
                     AccessorDatas.createByte(accessor, byteBuffer);
-                return asFloat(accessorData.getMaxInt());
+                return NumberArrays.asNumbers(accessorData.getMaxInt());
             }
             
             case GltfConstants.GL_SHORT:
@@ -308,7 +308,7 @@ class MeshPrimitiveCreator
             {
                 AccessorShortData accessorData = 
                     AccessorDatas.createShort(accessor, byteBuffer);
-                return asFloat(accessorData.getMaxInt());
+                return NumberArrays.asNumbers(accessorData.getMaxInt());
             }
             
             case GltfConstants.GL_INT:
@@ -316,7 +316,7 @@ class MeshPrimitiveCreator
             {
                 AccessorIntData accessorData = 
                     AccessorDatas.createInt(accessor, byteBuffer);
-                return asFloat(accessorData.getMaxLong());
+                return NumberArrays.asNumbers(accessorData.getMaxLong());
             }
             default:
                 break;
@@ -325,39 +325,7 @@ class MeshPrimitiveCreator
             "Invalid component type " + accessor.getComponentType());
     }
     
-    
-    /**
-     * Convert the given array into a float array
-     * 
-     * @param array The array
-     * @return the result
-     */
-    private static float[] asFloat(int array[])
-    {
-        float result[] = new float[array.length];
-        for (int i = 0; i < array.length; i++)
-        {
-            result[i] = array[i];
-        }
-        return result;
-    }    
 
-    /**
-     * Convert the given array into a float array
-     * 
-     * @param array The array
-     * @return the result
-     */
-    private static float[] asFloat(long array[])
-    {
-        float result[] = new float[array.length];
-        for (int i = 0; i < array.length; i++)
-        {
-            result[i] = array[i];
-        }
-        return result;
-    }    
-    
     /**
      * Add the elements the {@link GlTF} that are required for representing
      * the given vertices. This will create the {@link BufferView} and the
@@ -383,8 +351,8 @@ class MeshPrimitiveCreator
 
         AccessorFloatData accessorData = 
             AccessorDatas.createFloat(accessor, byteBuffer);
-        accessor.setMin(accessorData.getMin());
-        accessor.setMax(accessorData.getMax());
+        accessor.setMin(NumberArrays.asNumbers(accessorData.getMin()));
+        accessor.setMax(NumberArrays.asNumbers(accessorData.getMax()));
         
         gltf.addAccessors(verticesAccessorId, accessor);
         
@@ -415,8 +383,8 @@ class MeshPrimitiveCreator
         
         AccessorFloatData accessorData = 
             AccessorDatas.createFloat(accessor, byteBuffer);
-        accessor.setMin(accessorData.getMin());
-        accessor.setMax(accessorData.getMax());
+        accessor.setMin(NumberArrays.asNumbers(accessorData.getMin()));
+        accessor.setMax(NumberArrays.asNumbers(accessorData.getMax()));
 
         gltf.addAccessors(texCoordsAccessorId, accessor);
     }
@@ -446,8 +414,8 @@ class MeshPrimitiveCreator
 
         AccessorFloatData accessorData = 
             AccessorDatas.createFloat(accessor, byteBuffer);
-        accessor.setMin(accessorData.getMin());
-        accessor.setMax(accessorData.getMax());
+        accessor.setMin(NumberArrays.asNumbers(accessorData.getMin()));
+        accessor.setMax(NumberArrays.asNumbers(accessorData.getMax()));
 
         gltf.addAccessors(normalsAccessorId, accessor);
     }
