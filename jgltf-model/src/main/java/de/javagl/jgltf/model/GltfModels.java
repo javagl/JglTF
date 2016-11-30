@@ -187,7 +187,7 @@ public class GltfModels
                 {
                     Object object = getUniformValueObject(
                         uniformName, technique, material);
-                    return object == null ? null : String.valueOf(object);
+                    return object == null ? null : object;
                 };
             }
             
