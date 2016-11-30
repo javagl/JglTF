@@ -199,33 +199,21 @@ class SampleModelsMenuFactory
     private static Properties loadProperties(String resource)
     {
         Properties properties = new Properties();
-        InputStream inputStream =  
-            GltfBrowserApplication.class.getResourceAsStream(resource);
-        if (inputStream == null)
+        try (InputStream inputStream =  
+            GltfBrowserApplication.class.getResourceAsStream(resource))
         {
-            return null;
-        }
-        try 
-        {    
+            if (inputStream == null)
+            {
+                return null;
+            }
             properties.load(inputStream);
+            return properties;
         }
         catch (IOException e)
         {
             logger.warning("Could not load properties: " + e.getMessage());
             return null;
         }
-        finally
-        {
-            try
-            {
-                inputStream.close();
-            } 
-            catch (IOException e)
-            {
-                logger.warning("Could not close stream: " + e.getMessage());
-            }
-        }
-        return properties;
     }
     
 }
