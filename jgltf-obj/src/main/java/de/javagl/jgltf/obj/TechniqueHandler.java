@@ -36,6 +36,7 @@ import de.javagl.jgltf.impl.Program;
 import de.javagl.jgltf.impl.Shader;
 import de.javagl.jgltf.impl.Technique;
 import de.javagl.jgltf.impl.TechniqueParameters;
+import de.javagl.jgltf.impl.TechniqueStates;
 import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.Semantic;
 
@@ -314,6 +315,10 @@ class TechniqueHandler
         }
         techniqueUniforms.put("u_projectionMatrix", "projectionMatrix");
         technique.setUniforms(techniqueUniforms);
+        
+        TechniqueStates states = new TechniqueStates();
+        states.addEnable(GltfConstants.GL_DEPTH_TEST);
+        technique.setStates(states);
         
         gltf.addTechniques(techniqueId, technique);
     }
