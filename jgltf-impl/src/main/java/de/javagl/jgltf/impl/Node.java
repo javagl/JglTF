@@ -20,7 +20,13 @@ import java.util.List;
  * `material`/`technique` from each `primitive` has parameters with 
  * `JOINT` and `WEIGHT` semantics. A node can have either a `matrix` or 
  * any combination of `translation`/`rotation`/`scale` (TRS) properties. 
- * If none are provided, the transform is the identity. 
+ * TRS properties are converted to matrices and postmultiplied in the `T 
+ * * R * S` order to compose the transformation matrix; first the scale 
+ * is applied to the vertices, then the rotation, and then the 
+ * translation. If none are provided, the transform is the identity. When 
+ * a node is targeted for animation (referenced by an 
+ * animation.channel.target), only TRS properties may be present; 
+ * `matrix` will not be present. 
  * 
  * Auto-generated for node.schema.json 
  * 

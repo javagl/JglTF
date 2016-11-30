@@ -43,7 +43,7 @@ public class TechniqueStatesFunctions
     private int[] blendEquationSeparate;
     /**
      * Integer values passed to `blendFuncSeparate()`. (optional)<br> 
-     * Default: [1,1,0,0]<br> 
+     * Default: [1,0,1,0]<br> 
      * Number of items: 4<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;The elements of this array (optional)<br> 
@@ -255,7 +255,7 @@ public class TechniqueStatesFunctions
 
     /**
      * Integer values passed to `blendFuncSeparate()`. (optional)<br> 
-     * Default: [1,1,0,0]<br> 
+     * Default: [1,0,1,0]<br> 
      * Number of items: 4<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;The elements of this array (optional)<br> 
@@ -288,7 +288,7 @@ public class TechniqueStatesFunctions
 
     /**
      * Integer values passed to `blendFuncSeparate()`. (optional)<br> 
-     * Default: [1,1,0,0]<br> 
+     * Default: [1,0,1,0]<br> 
      * Number of items: 4<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;The elements of this array (optional)<br> 
@@ -310,7 +310,7 @@ public class TechniqueStatesFunctions
      * 
      */
     public int[] defaultBlendFuncSeparate() {
-        return new int[] { 1, 1, 0, 0 };
+        return new int[] { 1, 0, 1, 0 };
     }
 
     /**
