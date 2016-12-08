@@ -199,13 +199,14 @@ public class GltfAnimations
         {
             animationSamplerInterpolation = "LINEAR";
         }
-        if (!"LINEAR".equals(animationSamplerInterpolation))
+        if (!"LINEAR".equals(animationSamplerInterpolation) && 
+            !"STEP".equals(animationSamplerInterpolation))
         {
             logger.warning("Animation sampler with ID " + 
                 animationChannelSamplerId + " of animation with ID " + 
                 animationId + " uses invalid interpolation type " +
                 animationSamplerInterpolation + 
-                ". Only LINEAR is supported");
+                ". Only LINEAR and STEP are supported");
             return null;
         }
         
@@ -225,21 +226,42 @@ public class GltfAnimations
         AnimationListener animationListener = null;
         if (animationChannelTargetPath.equals("translation"))
         {
-            interpolatorType = InterpolatorType.LINEAR;
+            if ("STEP".equals(animationSamplerInterpolation))
+            {
+                interpolatorType = InterpolatorType.STEP;
+            }
+            else
+            {
+                interpolatorType = InterpolatorType.LINEAR;
+            }
             animationListener = 
                 createTranslationAnimationListener(
                     gltf, animationChannelTargetNodeId);
         }
         else if (animationChannelTargetPath.equals("rotation"))
         {
-            interpolatorType = InterpolatorType.SLERP;
+            if ("STEP".equals(animationSamplerInterpolation))
+            {
+                interpolatorType = InterpolatorType.STEP;
+            }
+            else
+            {
+                interpolatorType = InterpolatorType.SLERP;
+            }
             animationListener = 
                 createRotationAnimationListener(
                     gltf, animationChannelTargetNodeId);
         }
         else if (animationChannelTargetPath.equals("scale"))
         {
-            interpolatorType = InterpolatorType.LINEAR;
+            if ("STEP".equals(animationSamplerInterpolation))
+            {
+                interpolatorType = InterpolatorType.STEP;
+            }
+            else
+            {
+                interpolatorType = InterpolatorType.LINEAR;
+            }
             animationListener = 
                 createScaleAnimationListener(
                     gltf, animationChannelTargetNodeId);
@@ -248,7 +270,7 @@ public class GltfAnimations
         {
             logger.warning("Animation channel target path must be "+
                 "\"translation\", \"rotation\" or \"scale\", but is " + 
-                animationSamplerInterpolation);
+                animationChannelTargetPath);
             return null;
         }
         

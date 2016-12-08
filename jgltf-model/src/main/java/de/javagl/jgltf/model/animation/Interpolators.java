@@ -46,7 +46,12 @@ public class Interpolators
          * be assumed to consist of 4 elements, which are interpreted as 
          * quaternions for the interpolation
          */
-        SLERP
+        SLERP,
+        
+        /**
+         * A stepwise interpolation
+         */
+        STEP
     }
     
     /**
@@ -70,6 +75,9 @@ public class Interpolators
 
             case LINEAR:
                 return new LinearInterpolator();
+
+            case STEP:
+                return new StepInterpolator();
 
             default:
                 throw new IllegalArgumentException(
