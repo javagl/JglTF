@@ -43,7 +43,6 @@ import de.javagl.jgltf.impl.CameraOrthographic;
 import de.javagl.jgltf.impl.CameraPerspective;
 import de.javagl.jgltf.impl.GlTF;
 import de.javagl.jgltf.impl.Node;
-import de.javagl.jgltf.impl.Scene;
 import de.javagl.jgltf.impl.Skin;
 import de.javagl.jgltf.impl.Technique;
 import de.javagl.jgltf.impl.TechniqueParameters;
@@ -159,54 +158,35 @@ public final class GltfModel
     private Map<String, String> computeNodeIdToParentNodeIdMap()
     {
         Map<String, String> map = new LinkedHashMap<String, String>();
-        Map<String, Scene> scenes = gltf.getScenes();
-        if (scenes != null)
+        Map<String, Node> nodes = gltf.getNodes();
+        if (nodes != null)
         {
-            for (Scene scene : scenes.values())
+            for (String nodeId : nodes.keySet())
             {
-                List<String> nodes = scene.getNodes();
-                if (nodes != null)
+                Node node = nodes.get(nodeId);
+                if (node == null)
                 {
-                    for (String nodeId : nodes)
+                    logger.severe("No node found for ID "+nodeId);
+                }
+                else
+                {
+                    if (node.getChildren() != null)
                     {
-                        computeNodeIdToParentNodeIdMap(nodeId, map);
+                        for (String childNodeId : node.getChildren())
+                        {
+                            String oldParent = map.put(childNodeId, nodeId);
+                            if (oldParent != null)
+                            {
+                                logger.severe("Node with ID " + childNodeId + 
+                                    " has two parents: " + oldParent + 
+                                    " and " + nodeId);
+                            }
+                        }
                     }
                 }
             }
         }
         return map;
-    }
-    
-    /**
-     * Recursively compute the mapping from {@link Node} IDs to their parent 
-     * node IDs, starting at the given node
-     *  
-     * @param nodeId The current node
-     * @param map The map that will store the result
-     */
-    private void computeNodeIdToParentNodeIdMap(
-        String nodeId, Map<String, String> map)
-    {
-        Map<String, Node> nodes = gltf.getNodes();
-        if (nodes != null)
-        {
-            Node node = nodes.get(nodeId);
-            if (node == null)
-            {
-                logger.severe("No node found for ID "+nodeId);
-            }
-            else
-            {
-                if (node.getChildren() != null)
-                {
-                    for (String childNodeId : node.getChildren())
-                    {
-                        map.put(childNodeId, nodeId);
-                        computeNodeIdToParentNodeIdMap(childNodeId, map);
-                    }
-                }
-            }
-        }
     }
     
     /**
