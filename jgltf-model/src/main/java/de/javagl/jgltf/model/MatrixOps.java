@@ -36,7 +36,7 @@ import java.util.logging.Logger;
 /**
  * A class for building suppliers of float arrays that represent matrices.
  * The suppliers MAY always return the same instances of float arrays,
- * so callers MUST NOT not store or modify the returned arrays.<br>
+ * so callers MUST NOT store or modify the returned arrays.<br>
  * <br>
  * This class does not perform validations of the matrix size. The user
  * has to make sure that the operations are appropriate for the current
