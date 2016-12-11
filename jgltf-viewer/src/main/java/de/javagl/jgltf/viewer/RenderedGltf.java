@@ -920,7 +920,7 @@ public class RenderedGltf
             @Override
             public void run()
             {
-                Level level = Level.FINEST;
+                Level level = Level.FINE;
                 if (logger.isLoggable(level))
                 {
                     String valueString = 
@@ -959,13 +959,25 @@ public class RenderedGltf
         if (value instanceof float[])
         {
             float array[] = (float[])value;
-            if (array.length == 16)
+            if (array.length % 16 == 0)
             {
-                return "\n"+createMatrixString(array, 4);
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < array.length / 16; i++)
+                {
+                    sb.append("\nMatrix " + i + "\n");
+                    sb.append(createMatrixString(array, i * 16, 4, 4));
+                }
+                return sb.toString();
             }
-            if (array.length == 9)
+            if (array.length % 9 == 0)
             {
-                return "\n"+createMatrixString(array, 3);
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < array.length / 9; i++)
+                {
+                    sb.append("\nMatrix " + i + "\n");
+                    sb.append(createMatrixString(array, i * 9, 3, 3));
+                }
+                return sb.toString();
             }
             return Arrays.toString(array);
         }
@@ -977,15 +989,17 @@ public class RenderedGltf
      * output.
      * 
      * @param matrix The matrix
+     * @param rows The number of rows
      * @param columns The number of columns
+     * @param offset The offset inside the matrix array
      * @return The matrix string
      */
-    private static String createMatrixString(float matrix[], int columns)
+    private static String createMatrixString(
+        float matrix[], int offset, int rows, int columns)
     {
         String format = "%8.3f";
         StringBuilder sb = new StringBuilder();
         sb.append("[");
-        int rows = matrix.length / columns;
         for (int r = 0; r < rows; r++)
         {
             if (r > 0)
@@ -999,12 +1013,9 @@ public class RenderedGltf
                 {
                     sb.append("  ");
                 }
-                int index = c + r * columns;
-                if (index < matrix.length)
-                {
-                    float value = matrix[index];
-                    sb.append(String.format(Locale.ENGLISH, format, value));
-                }
+                int index = r + c * rows;
+                float value = matrix[offset + index];
+                sb.append(String.format(Locale.ENGLISH, format, value));
             }
         }
         sb.append("]");
