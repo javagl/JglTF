@@ -26,6 +26,7 @@
  */
 package de.javagl.jgltf.browser.io;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -130,6 +131,13 @@ public class GltfDataReaderThreaded
      * The URI that the data is currently read from
      */
     private URI uri;
+
+    /**
+     * The string that was read from the URI. This may either be the
+     * contents of the input stream that was created from the URI, or
+     * the "scene" part of the binary glTF data.
+     */
+    private String jsonString;
     
     /**
      * The {@link GltfData} that is currently being read
@@ -364,6 +372,18 @@ public class GltfDataReaderThreaded
         this.gltfData = gltfData;
     }
     
+    /**
+     * Returns the JSON string that was read from the URI. This may either 
+     * be the contents of the input stream that was created from the URI, or
+     * the "scene" part of the binary glTF data. Returns <code>null</code> if
+     * no {@link GltfData} was read yet.
+     * 
+     * @return The JSON string
+     */
+    public String getJsonString()
+    {
+        return jsonString;
+    }
     
     /**
      * Returns the base URI, which is the "directory" that contains the
@@ -436,8 +456,13 @@ public class GltfDataReaderThreaded
     private GltfData readGltfData(InputStream inputStream) 
         throws IOException
     {
-        GlTF gltf = gltfReader.readGltf(inputStream);
-        return new GltfData(gltf);
+        byte data[] = IO.readStream(inputStream);
+        jsonString = new String(data);
+        try (ByteArrayInputStream bais = new ByteArrayInputStream(data))
+        {
+            GlTF gltf = gltfReader.readGltf(bais);
+            return new GltfData(gltf);
+        }
     }
     
     /**
@@ -454,6 +479,7 @@ public class GltfDataReaderThreaded
         throws IOException
     {
         byte data[] = IO.readStream(inputStream);
+        jsonString = BinaryGltfDatas.extractJsonString(data);
         return BinaryGltfDatas.create(data, gltfReader);
     }
 

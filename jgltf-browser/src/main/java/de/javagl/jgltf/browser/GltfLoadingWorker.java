@@ -168,7 +168,8 @@ final class GltfLoadingWorker extends SwingTask<GltfData, Object>
         {
             GltfData gltfData = get();
             String fileName = IO.extractFileName(uri);
-            owner.createGltfBrowserPanel(fileName, gltfData);
+            String jsonString = gltfDataReaderThreaded.getJsonString();
+            owner.createGltfBrowserPanel(fileName, gltfData, jsonString);
         } 
         catch (CancellationException e)
         {

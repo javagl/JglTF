@@ -121,6 +121,39 @@ public class BinaryGltfDatas
     }
     
     /**
+     * Extract the JSON part with the scene description of the given binary 
+     * glTF data
+     * 
+     * @param data The binary glTF data
+     * @return The JSON string
+     * @throws IOException If the JSON string could not be extracted
+     */
+    public static String extractJsonString(byte data[]) 
+        throws IOException
+    {
+        // Read the binary glTF header, and perform some sanity checks
+        BinaryGltfHeader binaryGltfHeader = BinaryGltfHeader.read(data);
+        int length = binaryGltfHeader.getLength();
+        int sceneLength = binaryGltfHeader.getSceneLength();
+        int sceneFormat = binaryGltfHeader.getSceneFormat();
+        if (length != data.length)
+        {
+            throw new IOException(
+                "The length field indicated " + length + " bytes, " + 
+                "but only found " + data.length + " have been read");
+        }
+        if (sceneFormat != SCENE_FORMAT_JSON)
+        {
+            throw new IOException(
+                "The scene format is " + sceneFormat + ", but only " + 
+                "JSON (" + SCENE_FORMAT_JSON + ") is supported");
+        }
+        int headerLength = BinaryGltfHeader.BINARY_GLTF_HEADER_LENGTH_IN_BYTES;
+        String jsonString = new String(data, headerLength, sceneLength);
+        return jsonString;
+    }
+    
+    /**
      * Create the mapping from IDs to byte buffers containing the data for 
      * all {@link Image}s in the given {@link GltfData} that have the 
      * binary glTF extension object.

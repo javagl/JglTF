@@ -164,15 +164,19 @@ class GltfBrowserPanel extends JPanel
      * Creates a new browser panel for the given {@link GltfData}
      * 
      * @param gltfData The {@link GltfData}
+     * @param jsonString The JSON string that the glTF was read from.
+     * This may be <code>null</code> if the given {@link GltfData} was
+     * not read, but created programmatically.
      */
-    GltfBrowserPanel(GltfData gltfData)
+    GltfBrowserPanel(GltfData gltfData, String jsonString)
     {
         super(new BorderLayout());
         Objects.requireNonNull(gltfData, "The gltfData may not be null");
         
         this.gltfData = gltfData;
         this.selectionPathHistory = new LinkedList<TreePath>();
-        this.infoComponentFactory = new InfoComponentFactory(gltfData);
+        this.infoComponentFactory = 
+            new InfoComponentFactory(gltfData, jsonString);
         this.resolver = new Resolver(gltfData.getGltf());
         
         add(createControlPanel(), BorderLayout.NORTH);

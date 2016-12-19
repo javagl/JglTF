@@ -29,8 +29,10 @@ package de.javagl.jgltf.browser;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -71,6 +73,8 @@ import de.javagl.jgltf.model.AccessorIntData;
 import de.javagl.jgltf.model.AccessorShortData;
 import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.GltfData;
+import de.javagl.jgltf.model.io.GltfWriter;
+import de.javagl.jgltf.model.io.JsonUtils;
 import de.javagl.swing.tasks.SwingTask;
 import de.javagl.swing.tasks.SwingTaskExecutors;
 
@@ -92,6 +96,11 @@ class InfoComponentFactory
     private final GltfData gltfData;
     
     /**
+     * The JSON string that the glTF was read from
+     */
+    private final String jsonString;
+    
+    /**
      * The FileChooser for saving files
      */
     private final JFileChooser saveFileChooser;
@@ -101,10 +110,14 @@ class InfoComponentFactory
      * that appear in the given {@link GltfData}
      * 
      * @param gltfData The backing {@link GltfData}
+     * @param jsonString The JSON string that the glTF was read from. This 
+     * may be <code>null</code> if the given {@link GltfData} was not read, 
+     * but created programmatically.
      */
-    InfoComponentFactory(GltfData gltfData)
+    InfoComponentFactory(GltfData gltfData, String jsonString)
     {
         this.gltfData = gltfData;
+        this.jsonString = jsonString;
         this.saveFileChooser = new JFileChooser();
     }
     
@@ -136,6 +149,11 @@ class InfoComponentFactory
             }
             logger.fine("selected      "+selectedValueString);
             logger.fine("pathString is "+pathString);
+        }
+        
+        if (pathString.equals("glTF"))
+        {
+            return createJsonInfoComponent();
         }
         
         // Check if the selected path is a GL constant. In this case, 
@@ -170,7 +188,137 @@ class InfoComponentFactory
         return createGenericInfoComponent(selectedValue);
     }
     
+    /**
+     * Creates an info component that shows the JSON string representation
+     * of the {@link GlTF} that was given in the constructor, or allows 
+     * creating the JSON representation of the current {@link GlTF} if
+     * the given one was <code>null</code>.
+     * 
+     * @return The info component
+     */
+    private JComponent createJsonInfoComponent()
+    {
+        JPanel jsonInfoPanel = new JPanel(new FlowLayout());
+        
+        if (jsonString == null)
+        {
+            jsonInfoPanel.add(new JLabel(
+                "<html>The glTF was not read from a JSON input, <br>" + 
+                "but created programmatically.</html>"));
+            JButton createButton = new JButton("Create JSON...");
+            createButton.addActionListener( e -> 
+            {
+                createButton.setText("Creating JSON...");
+                createButton.setEnabled(false);
+                createJson(jsonInfoPanel);
+            });
+            jsonInfoPanel.add(createButton);
+        }
+        else
+        {
+            jsonInfoPanel.setLayout(new BorderLayout());
+            
+            JPanel buttonPanel = new JPanel(new FlowLayout());
+            JButton formatButton = new JButton("Format JSON");
+            formatButton.addActionListener( e -> 
+            {
+                String formattedJsonString = JsonUtils.format(jsonString);
+                JComponent textInfoPanel = 
+                    createTextInfoPanel("JSON:", formattedJsonString);
+                jsonInfoPanel.removeAll();
+                jsonInfoPanel.setLayout(new GridLayout(1,1));
+                jsonInfoPanel.add(textInfoPanel);
+                jsonInfoPanel.revalidate();
+            });
+            buttonPanel.add(formatButton);
+            jsonInfoPanel.add(buttonPanel, BorderLayout.NORTH);
+            
+            JComponent textInfoPanel = 
+                createTextInfoPanel("JSON:", jsonString);
+            jsonInfoPanel.add(textInfoPanel, BorderLayout.CENTER);
+            
+            
+        }
+        
+        return jsonInfoPanel;
+    }
     
+    /**
+     * Start a background task to create the component containing the JSON 
+     * representation of the current {@link GlTF}, and place it into the 
+     * given panel.
+     * 
+     * @param jsonInfoPanel The target panel
+     */
+    private void createJson(JPanel jsonInfoPanel)
+    {
+        GlTF gltf = gltfData.getGltf();
+        SwingTask<String, ?> swingTask = new SwingTask<String, Void>()
+        {
+            @Override
+            protected String doInBackground() throws Exception
+            {
+                String createdJsonString = createJsonString(gltf);
+                return createdJsonString;
+            }
+        };
+        swingTask.addDoneCallback(task -> 
+        {
+            try
+            {
+                String createdJsonString = task.get();
+                JComponent textInfoPanel = 
+                    createTextInfoPanel("JSON:", createdJsonString);
+                jsonInfoPanel.removeAll();
+                jsonInfoPanel.setLayout(new GridLayout(1,1));
+                jsonInfoPanel.add(textInfoPanel);
+                jsonInfoPanel.revalidate();
+            } 
+            catch (InterruptedException e)
+            {
+                Thread.currentThread().interrupt();
+            }
+            catch (ExecutionException e)
+            {
+                jsonInfoPanel.removeAll();
+                jsonInfoPanel.setLayout(new GridLayout(1,1));
+                JTextArea textArea = new JTextArea();
+                textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
+                jsonInfoPanel.add(new JScrollPane(textArea));
+                StringWriter sw = new StringWriter();
+                e.printStackTrace(new PrintWriter(sw));
+                textArea.setText(sw.toString());
+                jsonInfoPanel.revalidate();
+            }
+        });
+        SwingTaskExecutors.create(swingTask)
+            .build()
+            .execute();            
+    }
+
+    /**
+     * Creates a JSON string representation of the given glTF. This string
+     * may contain only an error message if creating the actual JSON string
+     * caused an exception.
+     * 
+     * @param gltf The {@link GlTF}
+     * @return The The JSON string
+     */
+    private static String createJsonString(GlTF gltf)
+    {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream())
+        {
+            GltfWriter gltfWriter = new GltfWriter();
+            gltfWriter.writeGltf(gltf, baos);
+            return new String(baos.toByteArray());
+        }
+        catch (IOException e)
+        {
+            return e.getMessage();
+        }
+    }
+    
+
     /**
      * Create an info component for the given selected object, depending
      * on its type. May return <code>null</code> if the given object 
@@ -398,7 +546,7 @@ class InfoComponentFactory
                 "Could not find shader data for " + selectedValue + 
                 "with ID " + key);
         }
-        return createShaderInfoPanel(shaderString);
+        return createTextInfoPanel("Shader source code:", shaderString);
     }
 
     /**
@@ -508,38 +656,39 @@ class InfoComponentFactory
     
     
     /**
-     * Create an info component with the given shader code
+     * Create an info component with the given text
      * 
-     * @param shaderString The shader code
+     * @param title The title for the component
+     * @param text The text
      * @return The component
      */
-    private JComponent createShaderInfoPanel(String shaderString)
+    private JComponent createTextInfoPanel(String title, String text)
     {
-        JPanel shaderInfoPanel = new JPanel(new BorderLayout());
+        JPanel textInfoPanel = new JPanel(new BorderLayout());
         
         JPanel controlPanel = new JPanel(new FlowLayout());
-        controlPanel.add(new JLabel("Shader source code:"));
+        controlPanel.add(new JLabel(title));
         
         JButton saveButton = new JButton("Save as...");
         saveButton.addActionListener(
-            e -> saveShaderAs(shaderInfoPanel, shaderString));
+            e -> saveTextAs(textInfoPanel, text));
         controlPanel.add(saveButton);
         
-        shaderInfoPanel.add(controlPanel, BorderLayout.NORTH);
-        JTextArea textArea = new JTextArea(shaderString);
+        textInfoPanel.add(controlPanel, BorderLayout.NORTH);
+        JTextArea textArea = new JTextArea(text);
         textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        shaderInfoPanel.add(new JScrollPane(textArea), BorderLayout.CENTER);
-        return shaderInfoPanel;
+        textInfoPanel.add(new JScrollPane(textArea), BorderLayout.CENTER);
+        return textInfoPanel;
     }
 
     /**
      * Open the save file chooser offering the option to save the given
-     * shader source code as a file
+     * text as a file
      * 
      * @param parent The parent component
-     * @param shaderString The shader string
+     * @param text The text
      */
-    private void saveShaderAs(JComponent parent, String shaderString)
+    private void saveTextAs(JComponent parent, String text)
     {
         int option = saveFileChooser.showSaveDialog(parent);
         if (option == JFileChooser.APPROVE_OPTION)
@@ -552,7 +701,7 @@ class InfoComponentFactory
                         parent, "File exists. Overwrite?");
                 if (overwriteOption == JOptionPane.CANCEL_OPTION)
                 {
-                    saveShaderAs(parent, shaderString);
+                    saveTextAs(parent, text);
                     return;
                 }
                 if (overwriteOption != JOptionPane.YES_OPTION)
@@ -563,7 +712,7 @@ class InfoComponentFactory
             
             try (FileWriter fileWriter = new FileWriter(file))
             {
-                fileWriter.write(shaderString);
+                fileWriter.write(text);
             }
             catch (IOException e)
             {

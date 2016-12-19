@@ -648,12 +648,14 @@ class GltfBrowserApplication
     /**
      * Execute the task of loading the {@link GltfData} in a background 
      * thread, showing a modal dialog. When the data is loaded, it will 
-     * be passed to {@link #createGltfBrowserPanel(String, GltfData)}
+     * be passed to {@link #createGltfBrowserPanel(String, GltfData, String)}
      * 
      * @param uri The URI to load from
      */
     void openUriInBackground(URI uri)
     {
+        logger.info("Loading " + uri);
+        
         updateRecentUris(uri);
         GltfLoadingWorker gltfLoadingWorker = 
             new GltfLoadingWorker(this, frame, uri);
@@ -709,7 +711,7 @@ class GltfBrowserApplication
                 GltfData gltfData = task.get();
                 String frameTitle =
                     "glTF for " + IO.extractFileName(uri);
-                createGltfBrowserPanel(frameTitle, gltfData);
+                createGltfBrowserPanel(frameTitle, gltfData, null);
             } 
             catch (InterruptedException e)
             {
@@ -734,8 +736,12 @@ class GltfBrowserApplication
      * 
      * @param frameTitle The internal frame title
      * @param gltfData The {@link GltfData}
+     * @param jsonString The JSON string that the glTF was read from. This
+     * may be <code>null</code> if the {@link GltfData} was not read, but
+     * created programmatically.
      */
-    void createGltfBrowserPanel(String frameTitle, GltfData gltfData)
+    void createGltfBrowserPanel(
+        String frameTitle, GltfData gltfData, String jsonString)
     {
         final boolean resizable = true;
         final boolean closable = true;
@@ -744,7 +750,8 @@ class GltfBrowserApplication
         JInternalFrame internalFrame = new JInternalFrame(
             frameTitle, resizable, closable , maximizable, iconifiable);
         internalFrame.addPropertyChangeListener(selectedInternalFrameTracker);
-        GltfBrowserPanel gltfBrowserPanel = new GltfBrowserPanel(gltfData);
+        GltfBrowserPanel gltfBrowserPanel = 
+            new GltfBrowserPanel(gltfData, jsonString);
         internalFrame.getContentPane().add(gltfBrowserPanel);
         internalFrame.setSize(
             desktopPane.getWidth(), 
@@ -814,7 +821,7 @@ class GltfBrowserApplication
             new GltfDataToEmbeddedConverter().convert(gltfData);
         createGltfBrowserPanel(
             "Embedded of " + selectedInternalFrame.getTitle(), 
-            convertedGltfData);
+            convertedGltfData, null);
     }
     
 
@@ -834,7 +841,7 @@ class GltfBrowserApplication
             new GltfDataToBinaryConverter().convert(gltfData);
         createGltfBrowserPanel(
             "Binary of " + selectedInternalFrame.getTitle(), 
-            convertedGltfData);
+            convertedGltfData, null);
     }
     
     /**
