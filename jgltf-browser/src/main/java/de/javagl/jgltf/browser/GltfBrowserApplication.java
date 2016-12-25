@@ -28,6 +28,7 @@ package de.javagl.jgltf.browser;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -60,6 +61,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
+import javax.swing.MenuElement;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -329,6 +331,11 @@ class GltfBrowserApplication
     private final JFrame frame;
 
     /**
+     * The menu bar of the application
+     */
+    private final JMenuBar menuBar;
+    
+    /**
      * The FileChooser for opening glTF files
      */
     private final JFileChooser openFileChooser;
@@ -406,14 +413,9 @@ class GltfBrowserApplication
             new GltfTransferHandler(this);
         frame.setTransferHandler(transferHandler);
         
-        JMenuBar menuBar = new JMenuBar();
+        menuBar = new JMenuBar();
         menuBar.add(createFileMenu());
         menuBar.add(createConvertMenu());
-        
-        SampleModelsMenuFactory sampleModelsMenuFactory =
-            new SampleModelsMenuFactory(frame, uri -> openUriInBackground(uri));
-        menuBar.add(sampleModelsMenuFactory.createSampleModelsMenu());
-
         frame.setJMenuBar(menuBar);
         
         openFileChooser = new JFileChooser(".");
@@ -439,6 +441,76 @@ class GltfBrowserApplication
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
+    
+    
+    /**
+     * Returns an action listener that may will interpret the action 
+     * command as a URI that should be loaded in a background thread
+     * 
+     * @return The action listener
+     */
+    private ActionListener getSampleModelsMenuActionListener()
+    {
+        ActionListener actionListener = event ->
+        {
+            String actionCommand = event.getActionCommand();
+            URI uri = null;
+            try
+            {
+                uri = new URI(actionCommand);
+            } 
+            catch (URISyntaxException e)
+            {
+                JOptionPane.showMessageDialog(
+                    frame, "Invalid URI: " + e.getMessage(), 
+                    "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            openUriInBackground(uri);
+        };
+        return actionListener;
+    }
+    
+    /**
+     * Add the given sample model menus to the menu bar of this application
+     * 
+     * @param menus The menus
+     */
+    void addSampleModelMenus(Iterable<? extends JMenu> menus)
+    {
+        ActionListener actionListener = getSampleModelsMenuActionListener();
+        for (JMenu menu : menus)
+        {
+            attachActionListener(menu, actionListener);
+            menuBar.add(menu);
+        }
+    }
+    
+    /**
+     * Recursively attach the given action listener to all items in the
+     * given menu that have a non-<code>null</code> action command
+     *  
+     * @param menuElement The menu element
+     * @param actionListener The action listener
+     */
+    private static void attachActionListener(
+        MenuElement menuElement, ActionListener actionListener)
+    {
+        if (menuElement instanceof JMenuItem)
+        {
+            JMenuItem menuItem = (JMenuItem)menuElement;
+            if (menuItem.getActionCommand() != null)
+            {
+                menuItem.addActionListener(actionListener);
+            }
+        }
+        MenuElement[] subElements = menuElement.getSubElements();
+        for (MenuElement subElement : subElements)
+        {
+            attachActionListener(subElement, actionListener);
+        }
+    }
+    
     
     /**
      * Create the file menu
