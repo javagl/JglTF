@@ -125,14 +125,14 @@ class GlContextLwjgl implements GlContext
     /**
      * A buffer that will be used temporarily for the values of 
      * integer uniforms. This is a direct buffer that is created
-     * and resized as necessary in {@link #putIntBuffer(int, int[])} 
+     * and resized as necessary in {@link #putIntBuffer(int[])} 
      */
     private IntBuffer uniformIntBuffer = null;
 
     /**
      * A buffer that will be used temporarily for the values of 
      * float uniforms. This is a direct buffer that is created
-     * and resized as necessary in {@link #putFloatBuffer(int, float[])} 
+     * and resized as necessary in {@link #putFloatBuffer(float[])} 
      */
     private FloatBuffer uniformFloatBuffer = null;
 
@@ -141,11 +141,10 @@ class GlContextLwjgl implements GlContext
      * The returned buffer may always be a slice of the same instance.
      * This method is supposed to be called only from the OpenGL thread. 
      * 
-     * @param count The count
      * @param value The value
      * @return The IntBuffer
      */
-    private IntBuffer putIntBuffer(int count, int value[])
+    private IntBuffer putIntBuffer(int value[])
     {
         int total = value.length;
         if (uniformIntBuffer == null || uniformIntBuffer.capacity() < total)
@@ -167,11 +166,10 @@ class GlContextLwjgl implements GlContext
      * The returned buffer may always be a slice of the same instance.
      * This method is supposed to be called only from the OpenGL thread. 
      * 
-     * @param count The count
      * @param value The value
      * @return The IntBuffer
      */
-    private FloatBuffer putFloatBuffer(int count, float value[])
+    private FloatBuffer putFloatBuffer(float value[])
     {
         int total = value.length;
         if (uniformFloatBuffer == null || uniformFloatBuffer.capacity() < total)
@@ -325,25 +323,25 @@ class GlContextLwjgl implements GlContext
             case GltfConstants.GL_INT:
             case GltfConstants.GL_UNSIGNED_INT:
             {
-                IntBuffer b = putIntBuffer(count, value);
+                IntBuffer b = putIntBuffer(value);
                 glUniform1(location, b);
                 break;
             }
             case GltfConstants.GL_INT_VEC2:
             {
-                IntBuffer b = putIntBuffer(count, value);
+                IntBuffer b = putIntBuffer(value);
                 glUniform2(location, b);
                 break;
             }
             case GltfConstants.GL_INT_VEC3:
             {
-                IntBuffer b = putIntBuffer(count, value);
+                IntBuffer b = putIntBuffer(value);
                 glUniform3(location, b);
                 break;
             }
             case GltfConstants.GL_INT_VEC4:   
             {
-                IntBuffer b = putIntBuffer(count, value);
+                IntBuffer b = putIntBuffer(value);
                 glUniform4(location, b);
                 break;
             }
@@ -365,25 +363,25 @@ class GlContextLwjgl implements GlContext
         {
             case GltfConstants.GL_FLOAT:
             {
-                FloatBuffer b = putFloatBuffer(count, value);
+                FloatBuffer b = putFloatBuffer(value);
                 glUniform1(location, b);
                 break;
             }
             case GltfConstants.GL_FLOAT_VEC2:
             {
-                FloatBuffer b = putFloatBuffer(count, value);
+                FloatBuffer b = putFloatBuffer(value);
                 glUniform2(location, b);
                 break;
             }
             case GltfConstants.GL_FLOAT_VEC3:
             {
-                FloatBuffer b = putFloatBuffer(count, value);
+                FloatBuffer b = putFloatBuffer(value);
                 glUniform3(location, b);
                 break;
             }
             case GltfConstants.GL_FLOAT_VEC4:   
             {
-                FloatBuffer b = putFloatBuffer(count, value);
+                FloatBuffer b = putFloatBuffer(value);
                 glUniform4(location, b);
                 break;
             }
@@ -407,19 +405,19 @@ class GlContextLwjgl implements GlContext
         {
             case GltfConstants.GL_FLOAT_MAT2:
             {
-                FloatBuffer b = putFloatBuffer(count, value);
+                FloatBuffer b = putFloatBuffer(value);
                 glUniformMatrix2(location, false, b);
                 break;
             }
             case GltfConstants.GL_FLOAT_MAT3:
             {
-                FloatBuffer b = putFloatBuffer(count, value);
+                FloatBuffer b = putFloatBuffer(value);
                 glUniformMatrix3(location, false, b);
                 break;
             }
             case GltfConstants.GL_FLOAT_MAT4:
             {
-                FloatBuffer b = putFloatBuffer(count, value);
+                FloatBuffer b = putFloatBuffer(value);
                 glUniformMatrix4(location, false, b);
                 break;
             }
