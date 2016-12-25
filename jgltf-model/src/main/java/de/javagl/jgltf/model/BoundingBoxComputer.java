@@ -71,7 +71,7 @@ class BoundingBoxComputer
     }
     
     /**
-     * Compute the bounding box of the {@link GltfModel}
+     * Compute the bounding box of the {@link GltfData}
      * 
      * @return The bounding box
      */
