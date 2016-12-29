@@ -26,6 +26,7 @@
  */
 package de.javagl.jgltf.validator;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
@@ -265,15 +266,32 @@ class TechniqueValidator extends AbstractGltfValidator
             Object value = techniqueParameters.getValue();
             if (value != null)
             {
-                if (!(value instanceof String))
+                String textureId = null;
+                if (value instanceof String)
+                {
+                    textureId = (String)value;
+                }
+                else if (value instanceof Collection<?>)
+                {
+                    Collection<?> collection = (Collection<?>)value;
+                    if (collection.size() == 0)
+                    {
+                        validatorResult.addError(
+                            "The value of techniqueParameters " 
+                            + techniqueParametersId + " is empty", context);
+                        return validatorResult;
+                    }
+                    textureId = String.valueOf(collection.iterator().next());
+                }
+                else
                 {
                     validatorResult.addWarning(
                         "The value of techniqueParameters "
                         + techniqueParametersId + " is "
                         + value.getClass().getSimpleName()
-                        + ", but should be String", context);
+                        + ", but should be String or an array of strings", 
+                        context);
                 }
-                String textureId = String.valueOf(value);
                 validatorResult.add(textureValidator.validateTexture(
                     textureId, context));
                 if (validatorResult.hasErrors())
