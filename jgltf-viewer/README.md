@@ -10,7 +10,7 @@ There are viewer implementations based on different Java OpenGL bindings:
 * [jgltf-viewer-lwjgl](https://github.com/javagl/JglTF/tree/master/jgltf-viewer-lwjgl) - A glTF viewer based on [LWJGL version 2](http://legacy.lwjgl.org/)
 
 The following is a complete, standalone program that downloads the "Duck" model 
-from the [Khronos glTF samples repository](https://github.com/KhronosGroup/glTF/tree/master/sampleModels)
+from the [Khronos glTF samples repository](https://github.com/KhronosGroup/glTF-Sample-Models/)
 and displays it in a frame:
 
 ```Java
@@ -30,8 +30,8 @@ public class GltfViewerMiniDemo
     public static void main(String[] args) throws Exception
     {
         String uriString = 
-            "https://raw.githubusercontent.com/KhronosGroup/glTF/master/" + 
-            "sampleModels/Duck/glTF/Duck.gltf";
+            "https://raw.githubusercontent.com/KhronosGroup/" + 
+            "glTF-Sample-Models/master/1.0/Duck/glTF/Duck.gltf";
         GltfDataReader r = new GltfDataReader();
         GltfData gltfData = r.readGltfData(new URI(uriString));
         SwingUtilities.invokeLater(() -> createAndShowGui(gltfData));
