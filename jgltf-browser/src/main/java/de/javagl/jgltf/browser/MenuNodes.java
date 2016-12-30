@@ -300,12 +300,11 @@ class MenuNodes
         root.children.add(createTutorialNode(basePath, 
             "AnimatedTriangle", "glTF", "glTF-Embedded"));
         root.children.add(createTutorialNode(basePath, 
-            "TriangleWithSimpleMaterial", "glTF", "glTF-Embedded-buffer"));
+            "SimpleMaterial", "glTF", "glTF-Embedded-buffer"));
         root.children.add(createTutorialNode(basePath, 
             "SimpleMeshes", "glTF", "glTF-Embedded"));
         root.children.add(createTutorialNode(basePath, 
-            "SimpleMeshesWithAdvancedMaterial", 
-            "glTF", "glTF-Embedded-buffer"));
+            "AdvancedMaterial", "glTF", "glTF-Embedded-buffer"));
         root.children.add(createTutorialNode(basePath, 
             "SimpleOpacity", "glTF", "glTF-Embedded-buffer"));
         root.children.add(createTutorialNode(basePath, 
