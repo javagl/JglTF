@@ -32,15 +32,10 @@ import de.javagl.jgltf.impl.GlTF;
 import de.javagl.jgltf.impl.Node;
 
 /**
- * A class for validating {@link Node}s
+ * A class for validating {@link Node} objects
  */
 class NodeValidator extends AbstractGltfValidator
 {
-    /**
-     * The {@link MeshValidator}
-     */
-    private final MeshValidator meshValidator;
-    
     /**
      * Default constructor
      * 
@@ -49,7 +44,6 @@ class NodeValidator extends AbstractGltfValidator
     NodeValidator(GlTF gltf)
     {
         super(gltf);
-        this.meshValidator = new MeshValidator(gltf);
     }
 
     /**
@@ -68,7 +62,7 @@ class NodeValidator extends AbstractGltfValidator
             .with("nodes[" + nodeId + "]");
         ValidatorResult validatorResult = new ValidatorResult();
         
-        // Validate the ID
+        // Validate the nodeId
         validatorResult.add(validateMapEntry(
             getGltf().getNodes(), nodeId, context));
         if (validatorResult.hasErrors())
@@ -80,31 +74,20 @@ class NodeValidator extends AbstractGltfValidator
         
         // Validate the node.meshes
         List<String> meshes = node.getMeshes();
-        if (meshes != null)
+        validatorResult.add(validateMapEntries(
+            getGltf().getMeshes(), meshes, "meshes", false, context));
+        if (validatorResult.hasErrors())
         {
-            for (String meshId : meshes)
-            {
-                validatorResult.add(meshValidator.validateMesh(
-                    meshId, context));
-                if (validatorResult.hasErrors())
-                {
-                    return validatorResult;
-                }
-            }
+            return validatorResult;
         }
         
         // Validate the node.children
         List<String> children = node.getChildren();
-        if (children != null)
+        validatorResult.add(validateMapEntries(
+            getGltf().getNodes(), children, "children", false, context));
+        if (validatorResult.hasErrors())
         {
-            for (String childNodeId : children)
-            {
-                validatorResult.add(validateNode(childNodeId, context));
-                if (validatorResult.hasErrors())
-                {
-                    return validatorResult;
-                }
-            }
+            return validatorResult;
         }
         
         // Validate the node.camera
@@ -142,22 +125,12 @@ class NodeValidator extends AbstractGltfValidator
                     context);
                 return validatorResult;
             }
-            //Skin skin = getGltf().getSkins().get(skinId);
 
-            for (int i = 0; i < skeletons.size(); i++)
+            validatorResult.add(validateMapEntries(
+                getGltf().getNodes(), skeletons, "skeletons", false, context));
+            if (validatorResult.hasErrors())
             {
-                String skeleton = skeletons.get(i);
-                validatorResult.add(validateNode(
-                    skeleton, context.with("node.skeletons["+i+"]")));
-                if (validatorResult.hasErrors())
-                {
-                    return validatorResult;
-                }
-                
-                /* TODO Skins are not explicitly validated yet
-                Node skeletonNode = getGltf().getNodes().get(skeleton);
-                String jointName = skeletonNode.getJointName();
-                */
+                return validatorResult;
             }
         }
         

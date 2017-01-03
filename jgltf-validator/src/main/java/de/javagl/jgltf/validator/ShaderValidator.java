@@ -26,12 +26,14 @@
  */
 package de.javagl.jgltf.validator;
 
+import java.util.Arrays;
+import java.util.List;
+
 import de.javagl.jgltf.impl.GlTF;
 import de.javagl.jgltf.impl.Shader;
-import de.javagl.jgltf.model.GltfConstants;
 
 /**
- * A class for validating {@link Shader}s
+ * A class for validating {@link Shader} objects
  */
 class ShaderValidator extends AbstractGltfValidator
 {
@@ -50,13 +52,12 @@ class ShaderValidator extends AbstractGltfValidator
      * {@link ValidatorResult}
      * 
      * @param shaderId The {@link Shader} ID
-     * @param expectedType The expected {@link Shader#getType() type}
      * @param currentContext The optional {@link ValidatorContext} describing 
      * where the given object appeared
      * @return The {@link ValidatorResult}
      */
     ValidatorResult validateShader(
-        String shaderId, int expectedType, ValidatorContext currentContext)
+        String shaderId, ValidatorContext currentContext)
     {
         ValidatorContext context = new ValidatorContext(currentContext)
             .with("shaders[" + shaderId + "]");
@@ -80,11 +81,12 @@ class ShaderValidator extends AbstractGltfValidator
                 "The type is null", context);
             return validatorResult;
         }
-        if (type != expectedType)
+        List<Integer> validTypes = Arrays.asList(35632, 35633);
+        if (!validTypes.contains(type))
         {
             validatorResult.addError(
-                "The type is not " + GltfConstants.stringFor(expectedType) + 
-                ", but " + GltfConstants.stringFor(type), context);
+                "The shader type is " + type + 
+                ", valid types are " + validTypes, context);
             return validatorResult;
         }
         

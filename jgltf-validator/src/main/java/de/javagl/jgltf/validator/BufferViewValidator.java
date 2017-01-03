@@ -30,7 +30,7 @@ import de.javagl.jgltf.impl.BufferView;
 import de.javagl.jgltf.impl.GlTF;
 
 /**
- * A class for validating {@link BufferView}s
+ * A class for validating {@link BufferView} objects
  */
 class BufferViewValidator extends AbstractGltfValidator
 {
@@ -72,9 +72,10 @@ class BufferViewValidator extends AbstractGltfValidator
 
         // Validate the bufferView.buffer
         String bufferId = bufferView.getBuffer();
-        if (bufferId == null)
+        validatorResult.add(validateMapEntry(
+            getGltf().getBuffers(), bufferId, context));
+        if (validatorResult.hasErrors())
         {
-            validatorResult.addError("The buffer ID is null", context);
             return validatorResult;
         }
         
@@ -82,9 +83,13 @@ class BufferViewValidator extends AbstractGltfValidator
         Integer byteLength = bufferView.getByteLength();
         if (byteLength == null)
         {
-            // TODO: This will no longer be valid in glTF 1.0.1
-            validatorResult.addError("The byteLength is null", context);
-            return validatorResult;
+            if (isVersionGreaterThanOrEqual("1.1"))
+            {
+                validatorResult.addError("The byteLength is null", context);
+                return validatorResult;
+            }
+            validatorResult.addWarning("The byteLength is null. " + 
+                "This will no longer be valid in glTF 1.1.", context);
         }
         
         return validatorResult;

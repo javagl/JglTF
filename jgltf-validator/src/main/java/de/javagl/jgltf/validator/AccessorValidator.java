@@ -30,15 +30,10 @@ import de.javagl.jgltf.impl.Accessor;
 import de.javagl.jgltf.impl.GlTF;
 
 /**
- * A class for validating {@link Accessor}s
+ * A class for validating {@link Accessor} objects
  */
 class AccessorValidator extends AbstractGltfValidator
 {
-    /**
-     * The {@link BufferViewValidator}
-     */
-    private final BufferViewValidator bufferViewValidator;
-    
     /**
      * Default constructor
      * 
@@ -47,7 +42,6 @@ class AccessorValidator extends AbstractGltfValidator
     AccessorValidator(GlTF gltf)
     {
         super(gltf);
-        this.bufferViewValidator = new BufferViewValidator(gltf);
     }
 
     /**
@@ -66,7 +60,7 @@ class AccessorValidator extends AbstractGltfValidator
             .with("accessors[" + accessorId + "]");
         ValidatorResult validatorResult = new ValidatorResult();
 
-        // Validate the ID
+        // Validate the accessorId
         validatorResult.add(validateMapEntry(
             getGltf().getAccessors(), accessorId, context));
         if (validatorResult.hasErrors())
@@ -75,15 +69,16 @@ class AccessorValidator extends AbstractGltfValidator
         }
 
         Accessor accessor = getGltf().getAccessors().get(accessorId);
-        
+
         // Validate the accessor.bufferView
         String bufferViewId = accessor.getBufferView();
-        validatorResult.add(bufferViewValidator.validateBufferView(
-            bufferViewId, context.with("bufferView")));
+        validatorResult.add(validateMapEntry(
+            getGltf().getBufferViews(), bufferViewId, context));
         if (validatorResult.hasErrors())
         {
             return validatorResult;
         }
+        
         return validatorResult;
     }
     

@@ -38,12 +38,12 @@ import java.util.logging.Logger;
 public final class ValidatorResult
 {
     /**
-     * The {@link ValidatorMessage}s that indicate errors
+     * The {@link ValidatorMessage} objects that indicate errors
      */
     private final List<ValidatorMessage> errors;
 
     /**
-     * The {@link ValidatorMessage}s that indicate warnings
+     * The {@link ValidatorMessage} objects that indicate warnings
      */
     private final List<ValidatorMessage> warnings;
     
@@ -82,8 +82,8 @@ public final class ValidatorResult
     }
     
     /**
-     * Returns an unmodifiable view on {@link ValidatorMessage}s for errors 
-     * that have been collected in this result
+     * Returns an unmodifiable view on {@link ValidatorMessage} objects for 
+     * errors that have been collected in this result
      * 
      * @return The errors
      */
@@ -94,7 +94,7 @@ public final class ValidatorResult
     
     /**
      * Returns whether this result contains any error 
-     * {@link ValidatorMessage}s
+     * {@link ValidatorMessage} objects
      * 
      * @return Whether this result contains errors
      */
@@ -119,8 +119,8 @@ public final class ValidatorResult
     }
     
     /**
-     * Returns an unmodifiable view on {@link ValidatorMessage}s for warnings 
-     * that have been collected in this result
+     * Returns an unmodifiable view on {@link ValidatorMessage} objects for 
+     * warnings that have been collected in this result
      * 
      * @return The warnings
      */
@@ -131,7 +131,7 @@ public final class ValidatorResult
     
     /**
      * Returns whether this result contains any warning 
-     * {@link ValidatorMessage}s
+     * {@link ValidatorMessage} objects
      * 
      * @return Whether this result contains warnings
      */
@@ -162,7 +162,7 @@ public final class ValidatorResult
         }
         else
         {
-            sb.append("No errors");
+            sb.append("No errors").append("\n");
         }
         if (hasWarnings())
         {
@@ -176,7 +176,7 @@ public final class ValidatorResult
         }
         else
         {
-            sb.append("No warnings");
+            sb.append("No warnings").append("\n");
         }
         return sb.toString();
     }

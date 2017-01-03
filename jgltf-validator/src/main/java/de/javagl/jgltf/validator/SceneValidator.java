@@ -32,15 +32,10 @@ import de.javagl.jgltf.impl.GlTF;
 import de.javagl.jgltf.impl.Scene;
 
 /**
- * A class for validating {@link Scene}s
+ * A class for validating {@link Scene} objects
  */
 class SceneValidator extends AbstractGltfValidator
 {
-    /**
-     * The {@link NodeValidator}
-     */
-    private final NodeValidator nodeValidator;
-    
     /**
      * Default constructor
      * 
@@ -49,7 +44,6 @@ class SceneValidator extends AbstractGltfValidator
     SceneValidator(GlTF gltf)
     {
         super(gltf);
-        this.nodeValidator = new NodeValidator(gltf);
     }
 
     /**
@@ -68,7 +62,7 @@ class SceneValidator extends AbstractGltfValidator
             .with("scenes[" + sceneId + "]");
         ValidatorResult validatorResult = new ValidatorResult();
         
-        // Validate the ID
+        // Validate the sceneId
         validatorResult.add(validateMapEntry(
             getGltf().getScenes(), sceneId, context));
         if (validatorResult.hasErrors())
@@ -80,25 +74,9 @@ class SceneValidator extends AbstractGltfValidator
         
         // Validate the scene.nodes
         List<String> nodes = scene.getNodes();
-        if (nodes == null || nodes.isEmpty())
-        {
-            // A scene without nodes is worth a warning, I guess...
-            validatorResult.addWarning(
-                "Scene " + sceneId + " does not contain any nodes", 
-                context);
-        }
-        else
-        {
-            for (String nodeId : nodes)
-            {
-                validatorResult.add(
-                    nodeValidator.validateNode(nodeId, context));
-                if (validatorResult.hasErrors())
-                {
-                    return validatorResult;
-                }
-            }
-        }
+        validatorResult.add(validateMapEntries(
+            getGltf().getNodes(), nodes, "nodes", true, context));
+
         return validatorResult;
     }
 

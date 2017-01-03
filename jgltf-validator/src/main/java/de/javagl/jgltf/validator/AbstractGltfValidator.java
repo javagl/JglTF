@@ -26,6 +26,7 @@
  */
 package de.javagl.jgltf.validator;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -59,6 +60,22 @@ abstract class AbstractGltfValidator
     protected final GlTF getGltf()
     {
         return gltf;
+    }
+    
+    /**
+     * Returns whether the version of the {@link #getGltf() glTF} of this
+     * instance is greater than or equal to the given semantic version 
+     * string. Details about the validity of the given string are not
+     * specified, but it should be a "usual" semantic version string,
+     * like "1.2" or "1.1.0-beta". 
+     * 
+     * @param versionString The version string
+     * @return Whether the version is greater than or equal to the given one
+     */
+    protected final boolean isVersionGreaterThanOrEqual(String versionString)
+    {
+        return GltfUtils.compareVersions(
+            GltfUtils.getVersion(gltf), versionString) >= 0;
     }
     
     /**
@@ -101,5 +118,48 @@ abstract class AbstractGltfValidator
         return validatorResult;
     }
     
-    
+    /**
+     * Call {@link #validateMapEntry(Map, String, ValidatorContext)} for all
+     * keys in the given list. If the given list is <code>null</code> or
+     * empty, and <code>expected==true</code>, then a warning will be created.
+     * 
+     * @param map The map to pass to {@link #validateMapEntry}
+     * @param keys The keys to validate
+     * @param keysName The name of the keys array (used in messages)
+     * @param expected Whether the given list is expected to be 
+     * non-<code>null</code> and not empty.
+     * @param currentContext The optional {@link ValidatorContext} describing 
+     * where the given object appeared
+     * @return The {@link ValidatorResult}
+     */
+    static ValidatorResult validateMapEntries(
+        Map<String, ?> map, List<String> keys, 
+        String keysName, boolean expected, ValidatorContext currentContext)
+    {
+        ValidatorResult validatorResult = new ValidatorResult();
+        ValidatorContext context = new ValidatorContext(currentContext);
+        
+        if (keys == null || keys.isEmpty())
+        {
+            if (expected)
+            {
+                validatorResult.addWarning(
+                    "Empty '" + keysName + "' array", context);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < keys.size(); i++)
+            {
+                String key = keys.get(i);
+                validatorResult.add(validateMapEntry(map, key,
+                    context.with(keysName + "[" + i + "]")));
+                if (validatorResult.hasErrors())
+                {
+                    return validatorResult;
+                }
+            }
+        }
+        return validatorResult;
+    }
 }

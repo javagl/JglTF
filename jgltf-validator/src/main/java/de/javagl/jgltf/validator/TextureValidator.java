@@ -30,7 +30,7 @@ import de.javagl.jgltf.impl.GlTF;
 import de.javagl.jgltf.impl.Texture;
 
 /**
- * A class for validating {@link Texture}s
+ * A class for validating {@link Texture} objects
  */
 class TextureValidator extends AbstractGltfValidator
 {

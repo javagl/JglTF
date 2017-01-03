@@ -37,21 +37,10 @@ import de.javagl.jgltf.impl.TechniqueParameters;
 import de.javagl.jgltf.model.GltfConstants;
 
 /**
- * A class for validating {@link Technique}s
+ * A class for validating {@link Technique} objects
  */
 class TechniqueValidator extends AbstractGltfValidator
 {
-    /**
-     * The {@link ProgramValidator}
-     */
-    private final ProgramValidator programValidator;
-    
-    /**
-     * The {@link TextureValidator}
-     */
-    private final TextureValidator textureValidator;
-    
-    
     /**
      * Default constructor
      * 
@@ -60,10 +49,7 @@ class TechniqueValidator extends AbstractGltfValidator
     TechniqueValidator(GlTF gltf)
     {
         super(gltf);
-        this.programValidator = new ProgramValidator(gltf);
-        this.textureValidator = new TextureValidator(gltf);
     }
-
     
     /**
      * Validate the given {@link Technique} ID, and return the
@@ -109,8 +95,8 @@ class TechniqueValidator extends AbstractGltfValidator
         
         // Validate the technique.program
         String programId = technique.getProgram();
-        validatorResult.add(programValidator.validateProgram(
-            programId, context));
+        validatorResult.add(validateMapEntry(
+            getGltf().getPrograms(), programId, context));
         if (validatorResult.hasErrors())
         {
             return validatorResult;
@@ -292,8 +278,9 @@ class TechniqueValidator extends AbstractGltfValidator
                         + ", but should be String or an array of strings", 
                         context);
                 }
-                validatorResult.add(textureValidator.validateTexture(
-                    textureId, context));
+                
+                validatorResult.add(validateMapEntry(
+                    getGltf().getTextures(), textureId, context));
                 if (validatorResult.hasErrors())
                 {
                     return validatorResult;

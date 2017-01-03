@@ -28,18 +28,14 @@ package de.javagl.jgltf.validator;
 
 import de.javagl.jgltf.impl.GlTF;
 import de.javagl.jgltf.impl.Program;
+import de.javagl.jgltf.impl.Shader;
 import de.javagl.jgltf.model.GltfConstants;
 
 /**
- * A class for validating {@link Program}s
+ * A class for validating {@link Program} objects
  */
 class ProgramValidator extends AbstractGltfValidator
 {
-    /**
-     * The {@link ShaderValidator}
-     */
-    private final ShaderValidator shaderValidator;
-    
     /**
      * Default constructor
      * 
@@ -48,7 +44,6 @@ class ProgramValidator extends AbstractGltfValidator
     protected ProgramValidator(GlTF gltf)
     {
         super(gltf);
-        this.shaderValidator = new ShaderValidator(gltf);
     }
 
     /**
@@ -67,7 +62,7 @@ class ProgramValidator extends AbstractGltfValidator
             .with("programs[" + programId + "]");
         ValidatorResult validatorResult = new ValidatorResult();
         
-        // Validate the ID
+        // Validate the program ID
         validatorResult.add(validateMapEntry(
             getGltf().getPrograms(), programId, context));
         if (validatorResult.hasErrors())
@@ -79,21 +74,39 @@ class ProgramValidator extends AbstractGltfValidator
 
         // Validate the program.vertexShader
         String vertexShaderId = program.getVertexShader();
-        validatorResult.add(shaderValidator.validateShader(
-            vertexShaderId, GltfConstants.GL_VERTEX_SHADER, 
-            context.with("vertexShader")));
+        validatorResult.add(validateMapEntry(
+            getGltf().getShaders(), vertexShaderId, context));
         if (validatorResult.hasErrors())
         {
+            return validatorResult;
+        }
+        Shader vertexShader = getGltf().getShaders().get(vertexShaderId);
+        Integer vertexShaderType = vertexShader.getType();
+        if (vertexShaderType != GltfConstants.GL_VERTEX_SHADER)
+        {
+            validatorResult.addError(
+                "type should be " + GltfConstants.GL_VERTEX_SHADER + 
+                ", but is " + vertexShaderType, 
+                context.with("vertexShader"));
             return validatorResult;
         }
         
         // Validate the program.fragmentShader
         String fragmentShaderId = program.getFragmentShader();
-        validatorResult.add(shaderValidator.validateShader(
-            fragmentShaderId, GltfConstants.GL_FRAGMENT_SHADER, 
-            context.with("fragmentShader")));
+        validatorResult.add(validateMapEntry(
+            getGltf().getShaders(), fragmentShaderId, context));
         if (validatorResult.hasErrors())
         {
+            return validatorResult;
+        }
+        Shader fragmentShader = getGltf().getShaders().get(fragmentShaderId);
+        Integer fragmentShaderType = fragmentShader.getType();
+        if (fragmentShaderType != GltfConstants.GL_FRAGMENT_SHADER)
+        {
+            validatorResult.addError(
+                "type should be " + GltfConstants.GL_FRAGMENT_SHADER + 
+                ", but is " + fragmentShaderType, 
+                context.with("fragmentShader"));
             return validatorResult;
         }
         

@@ -30,15 +30,10 @@ import de.javagl.jgltf.impl.GlTF;
 import de.javagl.jgltf.impl.Material;
 
 /**
- * A class for validating {@link Material}s
+ * A class for validating {@link Material} objects
  */
 class MaterialValidator extends AbstractGltfValidator
 {
-    /**
-     * The {@link TechniqueValidator}
-     */
-    private final TechniqueValidator techniqueValidator;
-    
     /**
      * Default constructor
      * 
@@ -47,7 +42,6 @@ class MaterialValidator extends AbstractGltfValidator
     protected MaterialValidator(GlTF gltf)
     {
         super(gltf);
-        this.techniqueValidator = new TechniqueValidator(gltf);
     }
 
     /**
@@ -66,7 +60,7 @@ class MaterialValidator extends AbstractGltfValidator
             .with("materials[" + materialId + "]");
         ValidatorResult validatorResult = new ValidatorResult();
         
-        // Validate the ID
+        // Validate the materialId
         validatorResult.add(validateMapEntry(
             getGltf().getMaterials(), materialId, context));
         if (validatorResult.hasErrors())
@@ -80,8 +74,8 @@ class MaterialValidator extends AbstractGltfValidator
         String techniqueId = material.getTechnique();
         if (techniqueId != null)
         {
-            validatorResult.add(techniqueValidator.validateTechnique(
-                techniqueId, context));
+            validatorResult.add(validateMapEntry(
+                getGltf().getTechniques(), techniqueId, context));
             if (validatorResult.hasErrors())
             {
                 return validatorResult;
