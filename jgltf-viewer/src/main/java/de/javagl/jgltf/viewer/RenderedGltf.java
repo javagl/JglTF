@@ -1116,6 +1116,13 @@ public class RenderedGltf
             // Collect the parameters for the GL calls
             int attributeLocation = 
                 glContext.getAttributeLocation(glProgram, attributeName);
+            if (attributeLocation == -1)
+            {
+                logger.severe("No attribute location for attribute " + 
+                    attributeName + " in program " + programId + ". " +
+                    "The attribute name in the shader must match the " +
+                    "key of the 'attributes' dictionary.");
+            }
             int target = Optional
                 .ofNullable(bufferView.getTarget())
                 .orElse(GltfConstants.GL_ARRAY_BUFFER);
