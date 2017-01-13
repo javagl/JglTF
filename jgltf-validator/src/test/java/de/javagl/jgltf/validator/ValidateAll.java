@@ -57,8 +57,8 @@ public class ValidateAll
     
     private static List<String> getTutorialSampleModelsUriStrings()
     {
-        String path = "https://raw.githubusercontent.com/javagl/" + 
-            "gltfTutorialModels/master/";
+        String path = "https://raw.githubusercontent.com/KhronosGroup/" + 
+            "glTF-Sample-Models/master/1.1/";
 
         List<String> tutorialSampleModelUriStrings = Arrays.asList(
             path + "TriangleWithoutIndices/glTF/TriangleWithoutIndices.gltf",
@@ -90,6 +90,7 @@ public class ValidateAll
     {
         String path = "https://raw.githubusercontent.com/KhronosGroup/" + 
             "glTF-Sample-Models/master/1.0/";
+
         List<String> khronosSampleModelUriStrings = Arrays.asList(
             path + "2CylinderEngine/glTF/2CylinderEngine.gltf",
             path + "2CylinderEngine/glTF-Embedded/2CylinderEngine.gltf",
