@@ -33,6 +33,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.util.logging.Logger;
 
+import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLCapabilities;
@@ -73,13 +74,43 @@ public class GltfViewerJogl extends AbstractGltfViewer
         public void init(GLAutoDrawable drawable)
         {
             initComplete = false;
-
-            GL3 gl = (GL3)drawable.getGL();
-            gl.setSwapInterval(0);
+            
+            GL glBase = drawable.getGL();
+            glBase.setSwapInterval(0);
+            
+            if (!(glBase instanceof GL3))
+            {
+                logger.severe("Could not obtain a GL3 instance");
+                logger.severe(createGlContextDebugString(glBase));
+                return;
+            }
+            
             initComplete = true;
         }
         
-        
+        /**
+         * Create a string with debug information about the given GL instance
+         * 
+         * @param glBase The GL instance
+         * @return The string
+         */
+        private String createGlContextDebugString(GL glBase)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.append("GLProfile: " + getGLProfile()).append("\n");
+            
+            sb.append("Availability:").append("\n");
+            for (String profile : GLProfile.GL_PROFILE_LIST_ALL)
+            {
+                sb.append("  " + profile + " : " + 
+                    GLProfile.isAvailable(profile)).append("\n");
+            }
+            sb.append("Context information:\n" + 
+                glBase.getContext().toString()).append("\n");
+            return sb.toString();
+        }
+
+
         @Override
         public void display(GLAutoDrawable drawable) 
         {
@@ -120,9 +151,9 @@ public class GltfViewerJogl extends AbstractGltfViewer
      */
     public GltfViewerJogl()
     {
-        GLProfile profile = GLProfile.getMaxProgrammable(true);
+        GLProfile profile = getGLProfile();
         logger.config("GLProfile: " + profile);
-        
+
         GLCapabilities capabilities = new GLCapabilities(profile);
         capabilities.setNumSamples(2);
         capabilities.setSampleBuffers(true);
@@ -135,6 +166,16 @@ public class GltfViewerJogl extends AbstractGltfViewer
         glComponent.setMinimumSize(new Dimension(10, 10));
         
         glContext = new GlContextJogl();
+    }
+    
+    /**
+     * Returns the GLProfile that should be used for creating the GL context
+     * 
+     * @return The GLProfile
+     */
+    private GLProfile getGLProfile()
+    {
+        return GLProfile.getMaxProgrammable(true);        
     }
     
     @Override
@@ -153,7 +194,10 @@ public class GltfViewerJogl extends AbstractGltfViewer
     protected void prepareRender()
     {
         //gl = new TraceGL3(glComponent.getGL().getGL3(), System.out);
-        gl = glComponent.getGL().getGL3();
+        
+        // The check whether this cast is valid was 
+        // done during the initialization:
+        gl = (GL3)glComponent.getGL();
         glContext.setGL(gl);
     }
     
