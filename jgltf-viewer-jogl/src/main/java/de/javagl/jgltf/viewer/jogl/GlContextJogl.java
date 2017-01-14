@@ -89,8 +89,8 @@ class GlContextJogl implements GlContext
     {
         logger.fine("Creating vertex shader...");
         
-        Integer glVertexShader = 
-            createGlShader(GL_VERTEX_SHADER, vertexShaderSource);
+        Integer glVertexShader = createGlShader(
+            GL_VERTEX_SHADER, vertexShaderSource);
         if (glVertexShader == null)
         {
             logger.warning("Creating vertex shader FAILED");
@@ -100,8 +100,8 @@ class GlContextJogl implements GlContext
         logger.fine("Creating vertex shader DONE");
         
         logger.fine("Creating fragment shader...");
-        Integer glFragmentShader = 
-            createGlShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
+        Integer glFragmentShader = createGlShader(
+            GL_FRAGMENT_SHADER, fragmentShaderSource);
         if (glFragmentShader == null)
         {
             logger.warning("Creating fragment shader FAILED");
@@ -183,6 +183,39 @@ class GlContextJogl implements GlContext
      */
     private Integer createGlShader(int shaderType, String shaderSource)
     {
+        Integer glShader = createGlShaderImpl(shaderType, shaderSource);
+        if (glShader != null)
+        {
+            return glShader;
+        }
+                
+        // If the shader source code does not contain a #version number, 
+        // then, depending on the com.jogamp.opengl.GLProfile that was 
+        // chosen for the viewer, certain warnings may be treated as 
+        // errors. As a workaround, pragmatically insert a version 
+        // number and try again...
+        // (Also see https://github.com/javagl/JglTF/issues/12)
+        if (!shaderSource.contains("#version"))
+        {
+            String versionString = "#version 120";
+            logger.warning("Inserting GLSL version specifier \"" + 
+                versionString + "\" in shader code");
+            String shaderSourceWithVersion = 
+                versionString + "\n" + shaderSource;
+            return createGlShaderImpl(shaderType, shaderSourceWithVersion);
+        }
+        return null;
+    }
+    
+    /**
+     * Implementation for {@link #createGlShader(int, String)}.
+     * 
+     * @param shaderType The shader type
+     * @param shaderSource The shader source code
+     * @return The GL shader, or <code>null</code> if it cannot be compiled
+     */
+    private Integer createGlShaderImpl(int shaderType, String shaderSource)
+    {
         int glShader = gl.glCreateShader(shaderType);
         gl.glShaderSource(
             glShader, 1, new String[]{shaderSource}, null);
@@ -195,7 +228,9 @@ class GlContextJogl implements GlContext
             return null;
         }
         return glShader;
+        
     }
+    
     
     @Override
     public int getUniformLocation(int glProgram, String uniformName)
