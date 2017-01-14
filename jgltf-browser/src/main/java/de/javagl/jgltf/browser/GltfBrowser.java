@@ -32,8 +32,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
@@ -55,40 +59,111 @@ public class GltfBrowser
         Logger.getLogger(GltfBrowser.class.getName());
     
     /**
+     * The set of loggers that have been configured via the command line,
+     * in {@link #processLoggingArgs(Map)}. Instances of these loggers
+     * have to be retained, because otherwise, their settings will be lost.  
+     */
+    private static final Set<Logger> configuredLoggers =
+        new LinkedHashSet<Logger>();
+    
+    /**
      * The entry point of this application
      * 
      * @param args The command line arguments
      */
     public static void main(String[] args)
     {
+        Map<String, String> argsMap = parseArguments(args);
         initLogging();
+        processLoggingArgs(argsMap);
         setPlatformLookAndFeel();
         JPopupMenu.setDefaultLightWeightPopupEnabled(false);
-        SwingUtilities.invokeLater(() -> createAndShowGui(args));
+        SwingUtilities.invokeLater(() -> createAndShowGui(argsMap));
     }
     
+    /**
+     * Process the given command line arguments and set the log levels
+     * accordingly. For each command line argument that ends with 
+     * <code>".level"</code>, the prefix of this string will be 
+     * interpreted as a package name (omitting any leading <code>"-"</code>). 
+     * The corresponding logger for this package will be obtained, and its 
+     * log level will be set to the level that was parsed from the 
+     * corresponding value in the map.
+     * 
+     * @param argsMap The command line arguments
+     */
+    private static void processLoggingArgs(Map<String, String> argsMap)
+    {
+        for (Entry<String, String> entry : argsMap.entrySet())
+        {
+            String key = entry.getKey();
+            if (key.endsWith(".level"))
+            {
+                String packageName = key.substring(0, key.length() - 6);
+                if (packageName.startsWith("-"))
+                {
+                    packageName = packageName.substring(1);
+                }
+                String value = entry.getValue();
+                Level level = parseLogLevel(value);
+                
+                logger.info(
+                    "Setting log level of " + packageName + " to " + level);
+                
+                Logger configuredLogger = Logger.getLogger(packageName);
+                configuredLogger.setLevel(level);
+                configuredLoggers.add(configuredLogger);
+            }
+        }
+    }
     
+    /**
+     * Try to parse a log level from the given value. If the given value
+     * cannot be parsed, then a warning will be printed and <code>INFO</code>
+     * will be returned.
+     * 
+     * @param value The value
+     * @return The log level
+     */
+    private static Level parseLogLevel(String value)
+    {
+        if (value == null)
+        {
+            logger.warning("Invalid log level: "+value);
+            return Level.INFO;
+        }
+        try
+        {
+            return Level.parse(value);
+        }
+        catch (IllegalArgumentException e)
+        {
+            logger.warning("Invalid log level: "+value);
+            return Level.INFO;
+        }
+    }
+
+
     /**
      * Create and show the GUI, to be called on the event dispatch thread
      * 
-     * @param args The command line arguments
+     * @param argsMap The command line arguments
      */
-    private static void createAndShowGui(String args[])
+    private static void createAndShowGui(Map<String, String> argsMap)
     {
         GltfBrowserApplication application = new GltfBrowserApplication();
-        initSampleModelsMenus(application, args);
+        initSampleModelsMenus(application, argsMap);
     }
 
     /**
      * Initialize the menus for the sample models in the given application
      * 
      * @param application The application
-     * @param args The command line arguments
+     * @param argsMap The command line arguments
      */
     private static void initSampleModelsMenus(
-        GltfBrowserApplication application, String args[])
+        GltfBrowserApplication application, Map<String, String> argsMap)
     {
-        Map<String, String> argsMap = parseArguments(args);
 
         // If no "-sampleModels" argument was given, then try to load
         // the default sampleModels, either as a file or a resource
@@ -184,19 +259,19 @@ public class GltfBrowser
         }
         catch (UnsupportedLookAndFeelException e)
         {
-            // Ignored
+            logger.warning(e.getMessage());
         }
         catch (ClassNotFoundException e)
         {
-            // Ignored
+            logger.warning(e.getMessage());
         }
         catch (InstantiationException e)
         {
-            // Ignored
+            logger.warning(e.getMessage());
         }
         catch (IllegalAccessException e)
         {
-            // Ignored
+            logger.warning(e.getMessage());
         }
     }
 
