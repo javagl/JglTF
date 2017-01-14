@@ -432,12 +432,29 @@ class MeshPrimitiveCreator
      */
     private BufferView createSimpleBufferView(int target, ByteBuffer byteBuffer)
     {
+        
         BufferView bufferView = new BufferView();
         bufferView.setBuffer(bufferCreator.getBufferId());
         bufferView.setTarget(target);
+        
+        // Compute the byte offset, inserting padding bytes if necessary.
+        // The alignment for the bufferView is fixed to be 4 here:
+        // For the indices bufferView, it will have no effect, because 
+        // the initial buffer length is 0. For the other bufferViews,
+        // the alignment is always 4, for the float component type.
+        final int alignment = 4;
+        int remainder = bufferCreator.getByteOffset() % alignment;
+        if (remainder > 0)
+        {
+            int paddingBytes = alignment - remainder;
+            bufferCreator.appendPadding(paddingBytes);
+        }
+        
         bufferView.setByteOffset(bufferCreator.getByteOffset());
         bufferView.setByteLength(byteBuffer.capacity());
+        
         bufferCreator.append(byteBuffer);
+        
         return bufferView;
     }
     

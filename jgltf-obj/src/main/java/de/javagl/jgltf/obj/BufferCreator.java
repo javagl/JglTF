@@ -207,6 +207,20 @@ class BufferCreator
     }
     
     /**
+     * Append the given number of padding bytes to the {@link Buffer}
+     * 
+     * @param bytes The number of bytes to append
+     */
+    void appendPadding(int bytes)
+    {
+        if (bytes > 0)
+        {
+            append(ByteBuffer.allocate(bytes));
+        }
+    }
+    
+    
+    /**
      * Returns the byte offset that is implied by the data that has been
      * added to the buffer so far
      *  

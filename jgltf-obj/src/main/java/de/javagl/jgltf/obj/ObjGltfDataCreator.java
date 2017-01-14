@@ -245,13 +245,6 @@ public class ObjGltfDataCreator
         logger.log(level, "Creating glTF with " + bufferStrategy + 
             " buffer strategy");
         
-        // Basic setup 
-        gltf = new GlTF();
-        gltf.setAsset(createAsset());
-        gltfData = new GltfData(gltf);
-        techniqueHandler = new TechniqueHandler(gltf);
-        textureHandler = new TextureHandler(gltf);
-        
         // Obtain the relative path information and file names
         logger.log(level, "Resolving paths from " + objUri);
         URI baseUri = IO.getParent(objUri);
@@ -267,6 +260,29 @@ public class ObjGltfDataCreator
         {
             mtls = readMtls(mtlUri);
         }
+        return convert(obj, mtls, baseName, baseUri);
+    }
+    
+    /**
+     * Convert the given OBJ into {@link GltfData}.  
+     * @param obj The OBJ
+     * @param mtlsMap The mapping from material names to MTL instances
+     * @param baseName The base name for the glTF data
+     * @param baseUri The base URI to resolve shaders and textures against
+     * @return The {@link GltfData}
+     */
+    GltfData convert(
+        ReadableObj obj, Map<String, Mtl> mtlsMap, String baseName, URI baseUri)
+    {
+        Map<String, Mtl> mtls = 
+            mtlsMap == null ? Collections.emptyMap() : mtlsMap;
+        
+        // Basic setup 
+        gltf = new GlTF();
+        gltf.setAsset(createAsset());
+        gltfData = new GltfData(gltf);
+        techniqueHandler = new TechniqueHandler(gltf);
+        textureHandler = new TextureHandler(gltf);
         
         // Prepare creating a Buffer containing the data that the
         // BufferViews of the Accessors of the MeshPrimitives of
@@ -322,7 +338,9 @@ public class ObjGltfDataCreator
         shaderDataResolver.resolveShaders();
 
         return gltfData;
+        
     }
+    
     
     /**
      * Create the {@link Asset} for the generated {@link GlTF} 
@@ -345,7 +363,7 @@ public class ObjGltfDataCreator
      * @return The {@link MeshPrimitive}s
      */
     private List<MeshPrimitive> createMeshPrimitives(
-        Obj obj, Map<String, Mtl> mtls)
+        ReadableObj obj, Map<String, Mtl> mtls)
     {
         // When there are no materials, create the MeshPrimitives for the OBJ
         int numMaterialGroups = obj.getNumMaterialGroups();
@@ -410,7 +428,7 @@ public class ObjGltfDataCreator
      * @param obj The OBJ
      * @return The {@link MeshPrimitive}s
      */
-    private List<MeshPrimitive> createMeshPrimitives(Obj obj)
+    private List<MeshPrimitive> createMeshPrimitives(ReadableObj obj)
     {
         logger.log(level, "Creating MeshPrimitives for OBJ");
         
@@ -559,7 +577,7 @@ public class ObjGltfDataCreator
      * @return The {@link MeshPrimitive}
      */
     private List<MeshPrimitive> createPartMeshPrimitives(
-        Obj obj, String idSuffix)
+        ReadableObj obj, String idSuffix)
     {
         List<MeshPrimitive> meshPrimitives = new ArrayList<MeshPrimitive>();
         List<? extends ReadableObj> parts = objSplitter.apply(obj);
