@@ -2,7 +2,6 @@ package de.javagl.jgltf.obj;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.Map;
