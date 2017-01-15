@@ -31,10 +31,13 @@ import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glColorMask;
 import static org.lwjgl.opengl.GL11.glDepthMask;
+import static org.lwjgl.opengl.GL11.glViewport;
 
 import java.awt.Canvas;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.logging.Logger;
 
 import org.lwjgl.LWJGLException;
@@ -63,6 +66,11 @@ public class GltfViewerLwjgl extends AbstractGltfViewer
      * The {@link GlContext}
      */
     private final GlContextLwjgl glContext;
+
+    /**
+     * Whether the component was resized, and glViewport has to be called
+     */
+    private boolean viewportNeedsUpdate = true;  
     
     /**
      * Creates a new GltfViewerJogl
@@ -77,10 +85,15 @@ public class GltfViewerLwjgl extends AbstractGltfViewer
                  * Serial UID
                  */
                 private static final long serialVersionUID = 1L;
-
+                
                 @Override
                 public void paintGL()
                 {
+                    if (viewportNeedsUpdate)
+                    {
+                        glViewport(0, 0, getWidth(), getHeight());
+                        viewportNeedsUpdate = false;
+                    }
                     doRender();
                     try
                     {
@@ -93,6 +106,15 @@ public class GltfViewerLwjgl extends AbstractGltfViewer
                 }
                 
             };
+            
+            this.glComponent.addComponentListener(new ComponentAdapter()
+            {
+                @Override
+                public void componentResized(ComponentEvent e)
+                {
+                    viewportNeedsUpdate = true;
+                }
+            });
         }
         catch (LWJGLException e)
         {
