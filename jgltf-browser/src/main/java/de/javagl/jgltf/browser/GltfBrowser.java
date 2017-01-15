@@ -73,6 +73,7 @@ public class GltfBrowser
      */
     public static void main(String[] args)
     {
+        System.setProperty("sun.awt.noerasebackground", "true");
         Map<String, String> argsMap = parseArguments(args);
         initLogging();
         processLoggingArgs(argsMap);
