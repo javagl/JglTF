@@ -37,6 +37,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.LinkedList;
@@ -104,6 +105,13 @@ class GltfBrowserPanel extends JPanel
      * The history of tree paths that have been selected
      */
     private final Deque<TreePath> selectionPathHistory;
+    
+    /**
+     * The last path that was selected in the tree with the mouse, or 
+     * via the popup menu. This is the full path, and may contain elements 
+     * that are not contained in the current (filtered) tree model. 
+     */
+    private TreePath currentSelectionPath;
 
     /**
      * The factory for the info components of selected elements
@@ -250,12 +258,12 @@ class GltfBrowserPanel extends JPanel
             @Override
             public void mousePressed(MouseEvent e)
             {
+                currentSelectionPath = 
+                    tree.getPathForLocation(e.getX(), e.getY());
+                tree.setSelectionPath(currentSelectionPath);
                 if (SwingUtilities.isRightMouseButton(e))
                 {
-                    TreePath treePath = 
-                        tree.getPathForLocation(e.getX(), e.getY());
-                    tree.setSelectionPath(treePath);
-                    preparePopupMenu(popupMenu, treePath);
+                    preparePopupMenu(popupMenu, currentSelectionPath);
                     popupMenu.show(e.getComponent(), e.getX(), e.getY());
                 }
             }
@@ -288,6 +296,8 @@ class GltfBrowserPanel extends JPanel
             
             private void update()
             {
+                TreePath oldSelectionPath = currentSelectionPath;
+                
                 String s = filterTextField.getText();
                 if (s == null || s.trim().length() == 0)
                 {
@@ -297,6 +307,14 @@ class GltfBrowserPanel extends JPanel
                 {
                     filteredTree.setFilter(
                         createNodeEntryModelFilter(s));
+                }
+                
+                if (oldSelectionPath != null)
+                {
+                    TreeModel filteredModel = filteredTree.getFilteredModel();
+                    TreePath newSelectionPath = translatePathPartial(
+                        filteredModel, oldSelectionPath);
+                    tree.setSelectionPath(newSelectionPath);
                 }
             }
         });        
@@ -392,9 +410,9 @@ class GltfBrowserPanel extends JPanel
     private void treeSelectionChanged()
     {
         infoPanelContainer.removeAll();
-        TreePath selectionPath = tree.getSelectionPath();
         JComponent infoComponent = 
-            infoComponentFactory.createInfoComponent(selectionPath);
+            infoComponentFactory.createInfoComponent(
+                tree.getSelectionPath());
         if (infoComponent != null)
         {
             infoPanelContainer.add(infoComponent);
@@ -499,6 +517,8 @@ class GltfBrowserPanel extends JPanel
                 tree.setSelectionPath(treePath);
                 tree.expandPath(treePath);
                 scrollToTop(tree, treePath);
+                
+                currentSelectionPath = treePath;
             }
         });
         return item;
@@ -548,6 +568,72 @@ class GltfBrowserPanel extends JPanel
             tree.scrollRectToVisible(rectangle);
         }
     }
+    
+    /**
+     * Translates one TreePath to a new TreeModel. This methods assumes 
+     * DefaultMutableTreeNodes, and identifies the path based on the
+     * user objects.
+     * 
+     * This method is similar to 
+     * {@link de.javagl.common.ui.JTrees#translatePath(TreeModel, TreePath)},
+     * but returns a "partial" path if the new tree model only contains a
+     * subset of the given path.
+     * 
+     * @param newTreeModel The new tree model
+     * @param oldPath The old tree path
+     * @return The new tree path
+     */
+    public static TreePath translatePathPartial(
+        TreeModel newTreeModel, TreePath oldPath)
+    {
+        Object newRoot = newTreeModel.getRoot();
+        List<Object> newPath = new ArrayList<Object>();
+        newPath.add(newRoot);
+        Object newPreviousElement = newRoot;
+        for (int i=1; i<oldPath.getPathCount(); i++)
+        {
+            Object oldElement = oldPath.getPathComponent(i);
+            DefaultMutableTreeNode oldElementNode = 
+                (DefaultMutableTreeNode)oldElement;
+            Object oldUserObject = oldElementNode.getUserObject();
+            
+            Object newElement = getChildWith(newPreviousElement, oldUserObject);
+            if (newElement == null)
+            {
+                break;
+            }
+            newPath.add(newElement);
+            newPreviousElement = newElement;
+        }
+        return new TreePath(newPath.toArray());
+    }
+    
+    
+    /**
+     * Returns the child with the given user object in the given tree
+     * node. Assumes DefaultMutableTreeNodes.
+     * 
+     * @param node The node
+     * @param userObject The user object
+     * @return The child with the given user object, or <code>null</code>
+     * if no such child can be found.
+     */
+    private static Object getChildWith(Object node, Object userObject)
+    {
+        DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode)node;
+        for (int j=0; j<treeNode.getChildCount(); j++)
+        {
+            TreeNode child = treeNode.getChildAt(j);
+            DefaultMutableTreeNode childNode = (DefaultMutableTreeNode)child;
+            Object childUserObject = childNode.getUserObject();
+            if (Objects.equals(userObject, childUserObject))
+            {
+                return child;
+            }
+        }
+        return null;
+    }
+    
     
     
 }
