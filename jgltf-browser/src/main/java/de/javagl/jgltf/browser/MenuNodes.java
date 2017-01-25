@@ -28,9 +28,7 @@ package de.javagl.jgltf.browser;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -38,10 +36,8 @@ import java.util.stream.Collectors;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 
 /**
  * Utility class for creating JMenu instances from JSON data
@@ -57,7 +53,7 @@ class MenuNodes
     /**
      * Private class representing one node in the menu structure
      */
-    private static class MenuNode
+    static class MenuNode
     {
         /**
          * The label (text) of the node. (Note that for nodes that also
@@ -124,25 +120,6 @@ class MenuNodes
     }
     
     /**
-     * Write the given list of {@link MenuNode} objects as JSON to the
-     * given output stream. The caller is responsible for closing the 
-     * given stream.
-     * 
-     * @param menuNodes The menu nodes
-     * @param outputStream The output stream
-     * @throws IOException If an IO error occurs
-     */
-    private static void write(
-        List<? extends MenuNode> menuNodes, OutputStream outputStream) 
-            throws IOException
-    {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.setSerializationInclusion(Include.NON_NULL);
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-        objectMapper.writeValue(outputStream, menuNodes);
-    }
-    
-    /**
      * Create a list of menu items (which may be JMenu instances) for the 
      * given {@link MenuNode} instances.  
      * 
@@ -189,167 +166,4 @@ class MenuNodes
         }
         return menuItems;        
     }    
-    
-
-    //=========================================================================
-    
-    /**
-     * For internal purposes only
-     * 
-     * @param args Not used
-     * @throws IOException If an IO error occurs
-     */
-    public static void main(String[] args) throws IOException
-    {
-        MenuNode samplesNode = new MenuNode();
-        samplesNode.label = "Samples";
-        samplesNode.children = new ArrayList<MenuNode>();
-        samplesNode.children.add(createKhronosNode10());
-        samplesNode.children.add(createTutorialNode());
-        write(Arrays.asList(samplesNode), System.out);
-    }
-    
-    /**
-     * Create the {@link MenuNode} structure for the Khronos sample models,
-     * version 1.0
-     * 
-     * @return The root {@link MenuNode}
-     */
-    private static MenuNode createKhronosNode10()
-    {
-        String basePath = "https://raw.githubusercontent.com/KhronosGroup/" + 
-            "glTF-Sample-Models/master/1.0";
-        
-        List<String> names = Arrays.asList(
-            "2CylinderEngine",
-            "Box",
-            "BoxAnimated",
-            "BoxSemantics",
-            "BoxTextured",
-            "BoxWithoutIndices",
-            "BrainStem",
-            "Buggy",
-            "CesiumMan",
-            "CesiumMilkTruck",
-            "Duck",
-            "GearboxAssy",
-            "Monster",
-            "ReciprocatingSaw",
-            "RiggedFigure",
-            "RiggedSimple",
-            "VC",
-            "WalkingLady"
-        );
-        
-        List<String> types = Arrays.asList(
-            "glTF",
-            "glTF-Embedded",
-            "glTF-Binary",
-            "glTF-MaterialsCommon"
-        );
-
-        MenuNode root = new MenuNode();
-        root.label = "Khronos Samples, v1.0";
-        root.children = new ArrayList<MenuNode>();
-        
-        for (String name : names)
-        {
-            MenuNode modelNode = new MenuNode();
-            modelNode.label = name;
-            modelNode.children = new ArrayList<MenuNode>();
-            
-            for (String type : types)
-            {
-                MenuNode typeNode = new MenuNode();
-                typeNode.label = type;
-                
-                String extensionWithoutDot = "gltf";
-                if (type.equals("glTF-Binary"))
-                {
-                    extensionWithoutDot = "glb";
-                }
-                typeNode.command = basePath + "/" + name + "/" + type + "/" + 
-                    name + "." + extensionWithoutDot;
-                modelNode.children.add(typeNode);
-            }
-            root.children.add(modelNode);
-        }
-        
-        return root;
-    }
-    
-    
-    /**
-     * Create the {@link MenuNode} structure for the tutorial sample models
-     * 
-     * @return The root {@link MenuNode}
-     */
-    private static MenuNode createTutorialNode()
-    {
-        String basePath = "https://raw.githubusercontent.com/" + 
-            "javagl/gltfTutorialModels/master";
-        
-        MenuNode root = new MenuNode();
-        root.label = "Tutorial Samples";
-        root.children = new ArrayList<MenuNode>();
-        
-        root.children.add(createTutorialNode(basePath, 
-            "TriangleWithoutIndices", "glTF", "glTF-Embedded"));
-        root.children.add(createTutorialNode(basePath, 
-            "Triangle", "glTF", "glTF-Embedded"));
-        root.children.add(createTutorialNode(basePath, 
-            "AnimatedTriangle", "glTF", "glTF-Embedded"));
-        root.children.add(createTutorialNode(basePath, 
-            "SimpleMaterial", "glTF", "glTF-Embedded-buffer"));
-        root.children.add(createTutorialNode(basePath, 
-            "SimpleMeshes", "glTF", "glTF-Embedded"));
-        root.children.add(createTutorialNode(basePath, 
-            "AdvancedMaterial", "glTF", "glTF-Embedded-buffer"));
-        root.children.add(createTutorialNode(basePath, 
-            "SimpleOpacity", "glTF", "glTF-Embedded-buffer"));
-        root.children.add(createTutorialNode(basePath, 
-            "SimpleTexture", "glTF", "glTF-Embedded-buffer"));
-        root.children.add(createTutorialNode(basePath, 
-            "Cameras", "glTF", "glTF-Embedded"));
-        root.children.add(createTutorialNode(basePath, 
-            "SimpleSkin", "glTF", "glTF-Embedded-buffers"));
-        
-        return root;
-    }
-    
-    /**
-     * Create a {@link MenuNode} with the given name as a label and children
-     * that have commands created from the given base path and types
-     * 
-     * @param basePath The base path
-     * @param name The name
-     * @param types The types
-     * @return The {@link MenuNode}
-     */
-    private static MenuNode createTutorialNode(
-        String basePath, String name, String ... types)
-    {
-        MenuNode modelNode = new MenuNode();
-        modelNode.label = name;
-        modelNode.children = new ArrayList<MenuNode>();
-        
-        for (String type : types)
-        {
-            MenuNode typeNode = new MenuNode();
-            typeNode.label = type;
-
-            String extensionWithoutDot = "gltf";
-            if (type.equals("glTF-Binary"))
-            {
-                extensionWithoutDot = "glb";
-            }
-            typeNode.command = basePath + "/" + name + "/" + type + "/" + 
-                name + "." + extensionWithoutDot;
-            modelNode.children.add(typeNode);
-        }
-        
-        return modelNode;
-    }
-    
-    
 }
