@@ -32,12 +32,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Supplier;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.javagl.jgltf.impl.Accessor;
@@ -50,7 +47,6 @@ import de.javagl.jgltf.impl.MeshPrimitive;
 import de.javagl.jgltf.impl.Node;
 import de.javagl.jgltf.impl.Program;
 import de.javagl.jgltf.impl.Scene;
-import de.javagl.jgltf.impl.Shader;
 import de.javagl.jgltf.impl.Technique;
 import de.javagl.jgltf.impl.TechniqueParameters;
 import de.javagl.jgltf.impl.TechniqueStates;
@@ -62,7 +58,6 @@ import de.javagl.jgltf.model.GltfData;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.GltfModels;
 import de.javagl.jgltf.model.Maps;
-import de.javagl.jgltf.model.io.IO;
 
 /**
  * A representation of a rendered {@link GlTF}. This class uses a 
@@ -472,7 +467,6 @@ public class RenderedGltf
     }
     
     
-
     /**
      * Process the given {@link MeshPrimitive} that was found in a {@link Mesh}
      * in a {@link Node} with the given ID. This will create the rendering 
@@ -492,9 +486,9 @@ public class RenderedGltf
         Material material = obtainMaterial(materialId);
         String techniqueId = material.getTechnique();
         Technique technique = obtainTechnique(techniqueId);
+        String programId = technique.getProgram();
 
         // Obtain the GL program for the Program of the Technique
-        String programId = technique.getProgram();
         Integer glProgram = gltfRenderData.obtainGlProgram(programId);
         if (glProgram == null)
         {
@@ -515,6 +509,12 @@ public class RenderedGltf
         // Create the command to enable the program
         commands.add(() -> glContext.useGlProgram(glProgram));
         
+        // Create the commands to set the uniforms
+        List<Runnable> uniformSettingCommands = 
+            createUniformSettingCommands(
+                technique, material, nodeId, glProgram);
+        commands.addAll(uniformSettingCommands);
+
         // Create the commands to set the technique.states and 
         // the technique.states.functions values 
         commands.add(() -> glContext.disable(getAllStates()));
@@ -525,12 +525,6 @@ public class RenderedGltf
         commands.addAll(
             createTechniqueStatesFunctionsSettingCommands(technique));
         
-        // Create the commands to set the uniforms
-        List<Runnable> uniformSettingCommands = 
-            createUniformSettingCommands(
-                technique, material, nodeId, glProgram);
-        commands.addAll(uniformSettingCommands);
-
         // Create the command for the actual render call
         Runnable renderCommand = 
             createRenderCommand(meshPrimitive, glVertexArray);
@@ -542,7 +536,6 @@ public class RenderedGltf
             @Override
             public void run()
             {
-                
                 //logger.info("Executing " + this);
                 for (Runnable command : commands)
                 {
@@ -553,65 +546,10 @@ public class RenderedGltf
             @Override
             public String toString()
             {
-                return createInfoString();
+                return RenderedGltfUtils.createInfoString(
+                    gltf, meshPrimitiveName, techniqueId, 
+                    uniformSettingCommands);
             }
-            
-            /**
-             * Create an elaborate info string for this render command
-             * (solely intended for debugging)
-             * 
-             * @return The info string
-             */
-            private String createInfoString()
-            {
-                StringBuilder sb = new StringBuilder();
-                sb.append("RenderCommand for " + meshPrimitiveName + "\n");
-
-                sb.append("    technique: " + techniqueId + "\n");
-                
-                String programId = technique.getProgram();
-                Program program = gltf.getPrograms().get(programId);
-                String vertexShaderId = program.getVertexShader();
-                String fragmentShaderId = program.getFragmentShader();
-                Shader vertexShader = gltf.getShaders().get(vertexShaderId);
-                Shader fragmentShader = gltf.getShaders().get(fragmentShaderId);
-                String vertexShaderUriString = vertexShader.getUri();
-                String fragmentShaderUriString = fragmentShader.getUri();
-                String shaderNames = "";
-                if (IO.isDataUriString(vertexShaderUriString))
-                {
-                    shaderNames += "v: (data URI), ";
-                }
-                else
-                {
-                    shaderNames += "v: " + vertexShaderUriString + ", ";
-                }
-                if (IO.isDataUriString(fragmentShaderUriString))
-                {
-                    shaderNames += "f: (data URI)";
-                }
-                else
-                {
-                    shaderNames += "f: " + fragmentShaderUriString;
-                }
-                sb.append("    program: " + programId + 
-                    " (" + shaderNames + ")\n");
-                
-                sb.append("    enabledStates: ");
-                for (Integer enabledState : enabledStates)
-                {
-                    sb.append(GltfConstants.stringFor(enabledState)+", ");
-                }
-                sb.append("\n");
-                sb.append("    uniforms:\n");
-                for (Runnable uniformSettingCommand : uniformSettingCommands)
-                {
-                    sb.append("        " + uniformSettingCommand + "\n");
-                }
-                sb.append("\n");
-                return sb.toString();
-            }
-            
         };
         
         if (enabledStates.contains(GltfConstants.GL_BLEND))
@@ -622,9 +560,11 @@ public class RenderedGltf
         {
             opaqueRenderCommands.add(meshPrimitiveRenderCommand);
         }
-        
         logger.fine("Processing meshPrimitive DONE");
     }
+    
+    
+    
 
     /**
      * Returns a list containing all possible states that may be contained
@@ -652,7 +592,7 @@ public class RenderedGltf
      * @param technique The {@link Technique}
      * @return The enabled states
      */
-    private List<Integer> getEnabledStates(Technique technique)
+    static List<Integer> getEnabledStates(Technique technique)
     {
         TechniqueStates states = obtainTechniqueStates(technique);
         List<Integer> enable = states.getEnable();
@@ -847,6 +787,14 @@ public class RenderedGltf
             // in the GL context
             int location = 
                 glContext.getUniformLocation(glProgram, uniformName);
+            
+            if (location == -1)
+            {
+                logger.warning(
+                    "No uniform location for uniform " + uniformName);
+                continue;
+            }
+            
             Integer type = techniqueParameters.getType();
             if (type == GltfConstants.GL_SAMPLER_2D)
             {
@@ -884,143 +832,25 @@ public class RenderedGltf
                 };
                 textureCounter++;
                 uniformSettingCommands.add(
-                    debugUniformSettingCommand(uniformSettingCommand, 
-                        uniformName, uniformValueSupplier));
+                    RenderedGltfUtils.debugUniformSettingCommand(
+                        uniformSettingCommand, uniformName, 
+                        uniformValueSupplier));
             }
             else
             {
-                Integer count = Optional
-                    .ofNullable(techniqueParameters.getCount())
-                    .orElse(1);
+                Integer count = optional(techniqueParameters.getCount(), 1);
                 Runnable uniformSettingCommand = 
                     uniformSetterFactory.createUniformSettingCommand(
                         location, type, count, uniformValueSupplier);
                 uniformSettingCommands.add(
-                    debugUniformSettingCommand(uniformSettingCommand, 
-                        uniformName, uniformValueSupplier));
+                    RenderedGltfUtils.debugUniformSettingCommand(
+                        uniformSettingCommand,  uniformName, 
+                        uniformValueSupplier));
             }
         }
         return uniformSettingCommands;
     }
     
-    /**
-     * For debugging: Create a wrapper around the given delegate that prints 
-     * the value that is set for the specified uniform
-     * 
-     * @param delegate The delegate command
-     * @param uniformName The uniform name
-     * @param uniformValueSupplier The supplier for the uniform value
-     * @return The wrapping command
-     */
-    private static Runnable debugUniformSettingCommand(
-        Runnable delegate, String uniformName, Supplier<?> uniformValueSupplier)
-    {
-        Runnable command = new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                Level level = Level.FINE;
-                if (logger.isLoggable(level))
-                {
-                    String valueString = 
-                        debugString(uniformValueSupplier.get());
-                    logger.log(level,
-                        "For uniform " + uniformName + 
-                        " setting " + valueString);
-                }
-                delegate.run();
-            }
-            
-            @Override
-            public String toString()
-            {
-                String valueString = 
-                    debugString(uniformValueSupplier.get());
-                return "For uniform " + uniformName + 
-                    " setting " + valueString;
-            }
-        };
-        return command;
-    }
-    
-    /**
-     * Create a debugging string for the given uniform value
-     * 
-     * @param value The value
-     * @return The debug string
-     */
-    private static String debugString(Object value)
-    {
-        if (value instanceof int[])
-        {
-            return Arrays.toString((int[])value);
-        }
-        if (value instanceof float[])
-        {
-            float array[] = (float[])value;
-            if (array.length % 16 == 0)
-            {
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < array.length / 16; i++)
-                {
-                    sb.append("\nMatrix " + i + "\n");
-                    sb.append(createMatrixString(array, i * 16, 4, 4));
-                }
-                return sb.toString();
-            }
-            if (array.length % 9 == 0)
-            {
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < array.length / 9; i++)
-                {
-                    sb.append("\nMatrix " + i + "\n");
-                    sb.append(createMatrixString(array, i * 9, 3, 3));
-                }
-                return sb.toString();
-            }
-            return Arrays.toString(array);
-        }
-        return String.valueOf(value);
-    }
-    
-    /**
-     * Create an unspecified string for the given matrix, suitable for debug
-     * output.
-     * 
-     * @param matrix The matrix
-     * @param rows The number of rows
-     * @param columns The number of columns
-     * @param offset The offset inside the matrix array
-     * @return The matrix string
-     */
-    private static String createMatrixString(
-        float matrix[], int offset, int rows, int columns)
-    {
-        String format = "%8.3f";
-        StringBuilder sb = new StringBuilder();
-        sb.append("[");
-        for (int r = 0; r < rows; r++)
-        {
-            if (r > 0)
-            {
-                sb.append("\n");
-                sb.append(" ");
-            }
-            for (int c = 0; c < columns; c++)
-            {
-                if (c > 0)
-                {
-                    sb.append("  ");
-                }
-                int index = r + c * rows;
-                float value = matrix[offset + index];
-                sb.append(String.format(Locale.ENGLISH, format, value));
-            }
-        }
-        sb.append("]");
-        return sb.toString();
-    }
     
     /**
      * Create a supplier that supplies the value for the specified uniform.
@@ -1118,23 +948,20 @@ public class RenderedGltf
                 glContext.getAttributeLocation(glProgram, attributeName);
             if (attributeLocation == -1)
             {
-                logger.severe("No attribute location for attribute " + 
+                logger.warning("No attribute location for attribute " + 
                     attributeName + " in program " + programId + ". " +
                     "The attribute name in the shader must match the " +
                     "key of the 'attributes' dictionary.");
             }
-            int target = Optional
-                .ofNullable(bufferView.getTarget())
-                .orElse(GltfConstants.GL_ARRAY_BUFFER);
+            int target = optional(
+                bufferView.getTarget(), GltfConstants.GL_ARRAY_BUFFER);
             int size = Accessors.getNumComponentsForAccessorType(
                 accessor.getType());
             int type = accessor.getComponentType();
             int numBytesForComponentType = 
                 Accessors.getNumBytesForAccessorComponentType(type);
             int defaultStride = size * numBytesForComponentType;
-            int stride = Optional
-                .ofNullable(accessor.getByteStride())
-                .orElse(defaultStride);
+            int stride = optional(accessor.getByteStride(), defaultStride);
             int offset = accessor.getByteOffset();
             
             glContext.createVertexAttribute(glVertexArray, 
@@ -1155,9 +982,8 @@ public class RenderedGltf
     private Runnable createRenderCommand(
         MeshPrimitive meshPrimitive, int glVertexArray)
     {
-        int mode = Optional
-            .ofNullable(meshPrimitive.getMode())
-            .orElse(meshPrimitive.defaultMode());
+        int mode = optional(
+            meshPrimitive.getMode(), meshPrimitive.defaultMode());
 
         String indicesAccessorId = meshPrimitive.getIndices();
         if (indicesAccessorId != null)
@@ -1258,7 +1084,7 @@ public class RenderedGltf
      * @param technique The {@link Technique}
      * @return The {@link TechniqueStates}
      */
-    TechniqueStates obtainTechniqueStates(Technique technique)
+    private static TechniqueStates obtainTechniqueStates(Technique technique)
     {
         TechniqueStates states = technique.getStates();
         if (states == null)
@@ -1328,4 +1154,10 @@ public class RenderedGltf
     {
         return t != null ? t : defaultValue;
     }
+    
+    
+    
+
+    
+    
 }
