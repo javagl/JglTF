@@ -27,6 +27,7 @@
 package de.javagl.jgltf.browser;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -49,6 +50,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -71,6 +73,7 @@ import de.javagl.common.ui.tree.filtered.TreeModelFilter;
 import de.javagl.jgltf.browser.ObjectTrees.NodeEntry;
 import de.javagl.jgltf.browser.Resolver.ResolvedEntity;
 import de.javagl.jgltf.impl.GlTF;
+import de.javagl.jgltf.impl.Material;
 import de.javagl.jgltf.model.GltfData;
 import de.javagl.jgltf.viewer.GltfViewer;
 
@@ -91,6 +94,12 @@ class GltfBrowserPanel extends JPanel
      */
     private static final long serialVersionUID = 8959452050508861357L;
 
+    /**
+     * Compile-time flag for the debug mode, where material values may
+     * be edited.
+     */
+    private static final boolean ALLOW_MATERIAL_EDITING = false;
+    
     /**
      * The {@link GltfData} that is displayed in this panel
      */
@@ -263,8 +272,12 @@ class GltfBrowserPanel extends JPanel
                 tree.setSelectionPath(currentSelectionPath);
                 if (SwingUtilities.isRightMouseButton(e))
                 {
-                    preparePopupMenu(popupMenu, currentSelectionPath);
-                    popupMenu.show(e.getComponent(), e.getX(), e.getY());
+                    boolean menuContainsEntries = 
+                        preparePopupMenu(popupMenu, currentSelectionPath);
+                    if (menuContainsEntries)
+                    {
+                        popupMenu.show(e.getComponent(), e.getX(), e.getY());
+                    }
                 }
             }
         };
@@ -430,22 +443,36 @@ class GltfBrowserPanel extends JPanel
      *  
      * @param popupMenu The popup menu
      * @param treePath The selection path
+     * @return Whether the menu contains entries
      */
-    private void preparePopupMenu(
+    private boolean preparePopupMenu(
         JPopupMenu popupMenu, TreePath treePath)
     {
         popupMenu.removeAll();
         Object nodeEntryValue = ObjectTrees.getNodeEntryValue(treePath);
         if (nodeEntryValue == null)
         {
-            return;
+            return false;
         }
+        
+        if (ALLOW_MATERIAL_EDITING)
+        {
+            if (nodeEntryValue instanceof Material)
+            {
+                String pathString = ObjectTrees.createPathString(treePath);
+                String materialId =
+                    pathString.substring(pathString.lastIndexOf('.') + 1);
+                popupMenu.add(createMaterialEditingMenuItem(materialId));
+                return true;
+            }
+        }
+        
         String pathString = ObjectTrees.createPathString(treePath);
         ResolvedEntity resolvedEntity = 
             resolver.resolve(pathString, nodeEntryValue);
         if (resolvedEntity == null)
         {
-            return;
+            return false;
         }
         if (resolvedEntity.getMessage() != null)
         {
@@ -456,9 +483,42 @@ class GltfBrowserPanel extends JPanel
             popupMenu.add(createTreeNodeSelectionMenuItem(
                 resolvedEntity.getKey(), resolvedEntity.getValue()));
         }
+        return true;
     }
     
-    
+    /**
+     * Create a menu item for editing the specified {@link Material}
+     *
+     * @param materialId The {@link Material} ID
+     * @return The menu item
+     */
+    private JMenuItem createMaterialEditingMenuItem(
+        String materialId)
+    {
+        JMenuItem item = new JMenuItem("Edit " + materialId);
+        item.addActionListener(e -> showMaterialValuesEditor(materialId));
+        return item;
+    }
+
+    /**
+     * Show the editor for the specified {@link Material}
+     * 
+     * @param materialId The {@link Material} ID
+     */
+    private void showMaterialValuesEditor(String materialId)
+    {
+        GlTF gltf = gltfData.getGltf();
+        JDialog dialog = new JDialog();
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        Component materialValuesEditorPanel =
+            new MaterialValuesEditorPanel(gltf, materialId, 
+                () -> gltfViewerPanel.repaint());
+        dialog.getContentPane().add(materialValuesEditorPanel);
+        dialog.pack();
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
+    }
+
     /**
      * Create a disabled menu item with the given text
      *  

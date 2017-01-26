@@ -407,4 +407,16 @@ class GltfViewerPanel extends JPanel
         viewerComponentContainer.add(new JScrollPane(textArea));
     }
     
+    // For some reason, calling repaint() on this panel does
+    // not trigger an actual repaint of the render component. 
+    // TODO Figure out why, then remove this workaround: 
+    @Override
+    public void repaint(long tm, int x, int y, int width, int height) 
+    {
+        super.repaint(tm, x, y, width, height);
+        if (gltfViewer != null)
+        {
+            gltfViewer.triggerRendering();
+        }
+    }
 }
