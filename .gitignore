@@ -39,3 +39,7 @@
 /jgltf-viewer/target
 /jgltf-viewer-jogl/target
 /jgltf-viewer-lwjgl/target
+/jgltf2-impl/.settings
+/jgltf2-impl/.project
+/jgltf2-impl/target
+/jgltf2-impl/.classpath
