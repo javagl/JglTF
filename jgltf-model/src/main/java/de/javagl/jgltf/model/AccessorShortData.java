@@ -32,13 +32,10 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.Objects;
 
-import de.javagl.jgltf.impl.Accessor;
-import de.javagl.jgltf.impl.BufferView;
-
 /**
- * A class for accessing the data that is described by an {@link Accessor}.
- * It allows accessing the byte buffer of the {@link BufferView} of the
- * {@link Accessor}, depending on the {@link Accessor} parameters.<br>
+ * A class for accessing the data that is described by an accessor.
+ * It allows accessing the byte buffer of the buffer view of the
+ * accessor, depending on the accessor parameters.<br>
  * <br> 
  * This data consists of several elements (for example, 3D short vectors),
  * which consist of several components (for example, the 3 short values).  
@@ -51,7 +48,7 @@ public final class AccessorShortData
     private static final int NUM_BYTES_PER_COMPONENT = Short.BYTES;
     
     /**
-     * The byte buffer of the {@link BufferView} that the {@link Accessor}
+     * The byte buffer of the buffer view that the accessor
      * refers to
      */
     private final ByteBuffer bufferViewByteBuffer;
@@ -67,8 +64,8 @@ public final class AccessorShortData
     private final int numComponentsPerElement;
     
     /**
-     * The offset for the {@link Accessor} inside the byte buffer of
-     * the {@link BufferView}
+     * The offset for the accessor inside the byte buffer of
+     * the buffer view
      */
     private final int byteOffset;
     
@@ -84,39 +81,37 @@ public final class AccessorShortData
     
     /**
      * Creates a new instance for accessing the data in the given 
-     * {@link BufferView} byte buffer, according to the rules 
-     * described by the given {@link Accessor}
+     * byte buffer, according to the rules described by the given
+     * accessor parameters.
      * 
-     * @param accessor The {@link Accessor}
-     * @param bufferViewByteBuffer The byte buffer of the {@link BufferView}
-     * @param unsigned Whether the data should be interpreted as unsigned
-     * @throws NullPointerException If any argument is <code>null</code>
-     * @throws IllegalArgumentException If the 
-     * {@link Accessor#getComponentType() component type} of the given
-     * accessor is not <code>GL_SHORT</code> or <code>GL_UNSIGEND_SHORT</code>
+     * @param bufferViewByteBuffer The byte buffer of the buffer view
+     * @param byteOffset The byte offset in the buffer view 
+     * @param byteStride The byte stride between two elements. If this
+     * is <code>null</code> or <code>0</code>, then the stride will
+     * be the size of one element.
+     * @param componentType The component type
+     * @param numComponentsPerElement The number of components per element
+     * @param count The count (number of elements)
+     * @throws NullPointerException If the bufferViewByteBuffer is 
+     * <code>null</code>
+     * @throws IllegalArgumentException If the component type is not 
+     * <code>GL_SHORT</code> or <code>GL_UNSIGEND_SHORT</code>
      * @throws IllegalArgumentException If the given byte buffer does not
-     * have a sufficient capacity to provide the data for the given 
-     * {@link Accessor}
+     * have a sufficient capacity to provide the data for the accessor 
      */
-    AccessorShortData(Accessor accessor,
-        ByteBuffer bufferViewByteBuffer, boolean unsigned)
+    AccessorShortData(ByteBuffer bufferViewByteBuffer,
+        int byteOffset, Integer byteStride, int componentType,
+        int numComponentsPerElement, int count)
     {
-        Objects.requireNonNull(accessor, "The accessor is null");
         Objects.requireNonNull(bufferViewByteBuffer, 
             "The bufferViewByteBuffer is null");
-        AccessorDatas.validateShortComponents(accessor);
+        AccessorDatas.validateShortType(componentType);
 
         this.bufferViewByteBuffer = bufferViewByteBuffer;
-        this.unsigned = unsigned;
-
-        // Obtain the basic size information for the accessor
-        this.numElements = accessor.getCount();
-        this.numComponentsPerElement = 
-            Accessors.getNumComponentsForAccessorType(accessor.getType());
-
-        // Obtain the byte offset and stride
-        this.byteOffset = accessor.getByteOffset();
-        Integer byteStride = accessor.getByteStride();
+        this.unsigned = AccessorDatas.isUnsignedType(componentType);
+        this.numElements = count;
+        this.numComponentsPerElement = numComponentsPerElement;
+        this.byteOffset = byteOffset;
         if (byteStride == null || byteStride == 0)
         {
             this.byteStridePerElement = 
@@ -329,7 +324,7 @@ public final class AccessorShortData
     
     /**
      * Creates a new, direct byte buffer (with native byte order) that
-     * contains the data for the {@link Accessor}, in a compact form,
+     * contains the data for the accessor, in a compact form,
      * without any offset, and without any additional stride (that is,
      * all elements will be tightly packed).  
      * 

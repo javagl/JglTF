@@ -43,6 +43,151 @@ import de.javagl.jgltf.impl.BufferView;
 public class AccessorDatas
 {
     /**
+     * Returns whether the given constant is <code>GL_BYTE</code> or
+     * <code>GL_UNSIGNED_BYTE</code>. 
+     * 
+     * @param type The type constant
+     * @return Whether the type is a <code>byte</code> type
+     */
+    public static boolean isByteType(int type)
+    {
+        return 
+            type == GltfConstants.GL_BYTE ||
+            type == GltfConstants.GL_UNSIGNED_BYTE;
+    }
+    
+    /**
+     * Returns whether the given constant is <code>GL_SHORT</code> or
+     * <code>GL_UNSIGNED_SHORT</code>. 
+     * 
+     * @param type The type constant
+     * @return Whether the type is a <code>short</code> type
+     */
+    public static boolean isShortType(int type)
+    {
+        return 
+            type == GltfConstants.GL_SHORT ||
+            type == GltfConstants.GL_UNSIGNED_SHORT;
+    }
+
+    /**
+     * Returns whether the given constant is <code>GL_INT</code> or
+     * <code>GL_UNSIGNED_INT</code>. 
+     * 
+     * @param type The type constant
+     * @return Whether the type is an <code>int</code> type
+     */
+    public static boolean isIntType(int type)
+    {
+        return 
+            type == GltfConstants.GL_INT ||
+            type == GltfConstants.GL_UNSIGNED_INT;
+    }
+
+    /**
+     * Returns whether the given constant is <code>GL_FLOAT</code>.
+     * 
+     * @param type The type constant
+     * @return Whether the type is a <code>float</code> type
+     */
+    public static boolean isFloatType(int type)
+    {
+        return type == GltfConstants.GL_FLOAT;
+    }
+
+    /**
+     * Returns whether the given constant is <code>GL_UNSIGNED_BYTE</code>,
+     * <code>GL_UNSIGNED_SHORT</code> or <code>GL_UNSIGNED_INT</code>.
+     * 
+     * @param type The type constant
+     * @return Whether the type is an unsigned type
+     */
+    public static boolean isUnsignedType(int type)
+    {
+        return 
+            type == GltfConstants.GL_UNSIGNED_BYTE ||
+            type == GltfConstants.GL_UNSIGNED_SHORT ||
+            type == GltfConstants.GL_UNSIGNED_INT;
+    }
+    
+    
+    /**
+     * Make sure that the given type is <code>GL_BYTE</code> or 
+     * <code>GL_UNSIGNED_BYTE</code>, and throw an 
+     * <code>IllegalArgumentException</code> if this is not the case.
+     * 
+     * @param type The type constant
+     * @throws IllegalArgumentException If the given type is not 
+     * <code>GL_BYTE</code> or <code>GL_UNSIGNED_BYTE</code>
+     */
+    public static void validateByteType(int type)
+    {
+        if (!isByteType(type))
+        {
+            throw new IllegalArgumentException(
+                "The type is not GL_BYTE or GL_UNSIGNED_BYTE, but " + 
+                GltfConstants.stringFor(type));
+        }
+    }
+
+    /**
+     * Make sure that the given type is <code>GL_SHORT</code> or 
+     * <code>GL_UNSIGNED_SHORT</code>, and throw an 
+     * <code>IllegalArgumentException</code> if this is not the case.
+     * 
+     * @param type The type constant
+     * @throws IllegalArgumentException If the given type is not 
+     * <code>GL_SHORT</code> or <code>GL_UNSIGNED_BYTE</code>
+     */
+    public static void validateShortType(int type)
+    {
+        if (!isShortType(type))
+        {
+            throw new IllegalArgumentException(
+                "The type is not GL_SHORT or GL_UNSIGNED_SHORT, but " + 
+                GltfConstants.stringFor(type));
+        }
+    }
+    
+    /**
+     * Make sure that the given type is <code>GL_INT</code> or 
+     * <code>GL_UNSIGNED_INT</code>, and throw an 
+     * <code>IllegalArgumentException</code> if this is not the case.
+     * 
+     * @param type The type constant
+     * @throws IllegalArgumentException If the given type is not 
+     * <code>GL_INT</code> or <code>GL_UNSIGNED_INT</code>
+     */
+    public static void validateIntType(int type)
+    {
+        if (!isIntType(type))
+        {
+            throw new IllegalArgumentException(
+                "The type is not GL_INT or GL_UNSIGNED_INT, but " + 
+                GltfConstants.stringFor(type));
+        }
+    }
+
+    /**
+     * Make sure that the given type is <code>GL_FLOAT</code>, and throw an 
+     * <code>IllegalArgumentException</code> if this is not the case.
+     * 
+     * @param type The type constant
+     * @throws IllegalArgumentException If the given type is not 
+     * <code>GL_FLOAT</code>
+     */
+    public static void validateFloatType(int type)
+    {
+        if (!isFloatType(type))
+        {
+            throw new IllegalArgumentException(
+                "The type is not GL_FLOAT, but " + 
+                GltfConstants.stringFor(type));
+        }
+    }
+    
+    
+    /**
      * Returns whether the {@link Accessor#getComponentType() component type}
      * of the given {@link Accessor} is <code>GL_BYTE</code> or
      * <code>GL_UNSIGNED_BYTE</code>. 
@@ -53,9 +198,7 @@ public class AccessorDatas
      */
     public static boolean hasByteComponents(Accessor accessor)
     {
-        return 
-            accessor.getComponentType() == GltfConstants.GL_BYTE ||
-            accessor.getComponentType() == GltfConstants.GL_UNSIGNED_BYTE;
+        return isByteType(accessor.getComponentType());
     }
 
     /**
@@ -71,13 +214,7 @@ public class AccessorDatas
      */
     public static void validateByteComponents(Accessor accessor)
     {
-        if (!hasByteComponents(accessor))
-        {
-            throw new IllegalArgumentException(
-                "Component type of accessor is not GL_BYTE or " + 
-                "GL_UNSIGNED_BYTE, but " + 
-                GltfConstants.stringFor(accessor.getComponentType()));
-        }
+        validateByteType(accessor.getComponentType());
     }
     
     /**
@@ -121,9 +258,12 @@ public class AccessorDatas
     public static AccessorByteData createByte(
         Accessor accessor, ByteBuffer bufferViewByteBuffer)
     {
-        boolean unsigned = 
-            accessor.getComponentType() == GltfConstants.GL_UNSIGNED_BYTE;
-        return new AccessorByteData(accessor, bufferViewByteBuffer, unsigned);
+        return new AccessorByteData(bufferViewByteBuffer, 
+            accessor.getByteOffset(),
+            accessor.getByteStride(),
+            accessor.getComponentType(),
+            Accessors.getNumComponentsForAccessorType(accessor.getType()),
+            accessor.getCount());
     }
     
     
@@ -139,9 +279,7 @@ public class AccessorDatas
      */
     public static boolean hasShortComponents(Accessor accessor)
     {
-        return 
-            accessor.getComponentType() == GltfConstants.GL_SHORT ||
-            accessor.getComponentType() == GltfConstants.GL_UNSIGNED_SHORT;
+        return isShortType(accessor.getComponentType());
     }
 
     /**
@@ -157,13 +295,7 @@ public class AccessorDatas
      */
     public static void validateShortComponents(Accessor accessor)
     {
-        if (!hasShortComponents(accessor))
-        {
-            throw new IllegalArgumentException(
-                "Component type of accessor is not GL_SHORT or " + 
-                "GL_UNSIGNED_SHORT, but " + 
-                GltfConstants.stringFor(accessor.getComponentType()));
-        }
+        validateShortType(accessor.getComponentType());
     }
     
     /**
@@ -207,9 +339,12 @@ public class AccessorDatas
     public static AccessorShortData createShort(
         Accessor accessor, ByteBuffer bufferViewByteBuffer)
     {
-        boolean unsigned = 
-            accessor.getComponentType() == GltfConstants.GL_UNSIGNED_SHORT;
-        return new AccessorShortData(accessor, bufferViewByteBuffer, unsigned);
+        return new AccessorShortData(bufferViewByteBuffer, 
+            accessor.getByteOffset(),
+            accessor.getByteStride(),
+            accessor.getComponentType(),
+            Accessors.getNumComponentsForAccessorType(accessor.getType()),
+            accessor.getCount());
     }
     
 
@@ -224,9 +359,7 @@ public class AccessorDatas
      */
     public static boolean hasIntComponents(Accessor accessor)
     {
-        return 
-            accessor.getComponentType() == GltfConstants.GL_INT ||
-            accessor.getComponentType() == GltfConstants.GL_UNSIGNED_INT;
+        return isIntType(accessor.getComponentType());
     }
 
     /**
@@ -242,13 +375,7 @@ public class AccessorDatas
      */
     public static void validateIntComponents(Accessor accessor)
     {
-        if (!hasIntComponents(accessor))
-        {
-            throw new IllegalArgumentException(
-                "Component type of accessor is not GL_INT or " + 
-                "GL_UNSIGNED_INT, but " + 
-                GltfConstants.stringFor(accessor.getComponentType()));
-        }
+        validateIntType(accessor.getComponentType());
     }
     
     /**
@@ -292,9 +419,12 @@ public class AccessorDatas
     public static AccessorIntData createInt(
         Accessor accessor, ByteBuffer bufferViewByteBuffer)
     {
-        boolean unsigned = 
-            accessor.getComponentType() == GltfConstants.GL_UNSIGNED_INT;
-        return new AccessorIntData(accessor, bufferViewByteBuffer, unsigned);
+        return new AccessorIntData(bufferViewByteBuffer, 
+            accessor.getByteOffset(),
+            accessor.getByteStride(),
+            accessor.getComponentType(),
+            Accessors.getNumComponentsForAccessorType(accessor.getType()),
+            accessor.getCount());
     }
     
     
@@ -307,7 +437,7 @@ public class AccessorDatas
      */
     public static boolean hasFloatComponents(Accessor accessor)
     {
-        return accessor.getComponentType() == GltfConstants.GL_FLOAT;
+        return isFloatType(accessor.getComponentType());
     }
 
     /**
@@ -322,12 +452,7 @@ public class AccessorDatas
      */
     public static void validateFloatComponents(Accessor accessor)
     {
-        if (!hasFloatComponents(accessor))
-        {
-            throw new IllegalArgumentException(
-                "Component type of accessor is not GL_FLOAT, but "+
-                GltfConstants.stringFor(accessor.getComponentType()));
-        }
+        validateFloatType(accessor.getComponentType());
     }
     
     /**
@@ -371,7 +496,12 @@ public class AccessorDatas
     public static AccessorFloatData createFloat(
         Accessor accessor, ByteBuffer bufferViewByteBuffer)
     {
-        return new AccessorFloatData(accessor, bufferViewByteBuffer);
+        return new AccessorFloatData(bufferViewByteBuffer, 
+            accessor.getByteOffset(),
+            accessor.getByteStride(),
+            accessor.getComponentType(),
+            Accessors.getNumComponentsForAccessorType(accessor.getType()),
+            accessor.getCount());
     }
 
     /**
