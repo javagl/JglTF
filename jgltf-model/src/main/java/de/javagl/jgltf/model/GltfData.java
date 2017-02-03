@@ -26,22 +26,16 @@
  */
 package de.javagl.jgltf.model;
 
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.imageio.ImageIO;
 
 import de.javagl.jgltf.impl.Buffer;
 import de.javagl.jgltf.impl.BufferView;
 import de.javagl.jgltf.impl.GlTF;
 import de.javagl.jgltf.impl.Image;
 import de.javagl.jgltf.impl.Shader;
-import de.javagl.jgltf.model.io.Buffers;
 
 /**
  * A class storing a {@link GlTF} and the associated (binary) data that was 
@@ -162,26 +156,6 @@ public final class GltfData
     }
     
     /**
-     * Convenience method that obtains the raw data of the {@link Shader} with
-     * the given ID and returns it as a string. Returns <code>null</code> if 
-     * no such data is found.
-     * 
-     * @param id The {@link Shader} ID
-     * @return The shader as a string
-     */
-    public String getShaderAsString(String id)
-    {
-        ByteBuffer shaderData = getShaderData(id);
-        if (shaderData == null)
-        {
-            return null;
-        }
-        byte data[] = new byte[shaderData.capacity()];
-        shaderData.slice().get(data);
-        return new String(data);
-    }
-    
-    /**
      * Store the given byte buffer under the given {@link Image} ID
      * 
      * @param id The {@link Image} ID
@@ -223,33 +197,6 @@ public final class GltfData
     public Map<String, ByteBuffer> getImageDatas()
     {
         return Collections.unmodifiableMap(imageDatas);
-    }
-    
-    /**
-     * Convenience method that obtains the raw data of the {@link Image} with
-     * the given ID, reads a <code>BufferedImage</code> from this data, and
-     * returns it. Returns <code>null</code> if no such data is found, or
-     * the data can not be converted into a buffered image.
-     * 
-     * @param id The {@link Image} ID
-     * @return The buffered image
-     */
-    public BufferedImage getImageAsBufferedImage(String id)
-    {
-        ByteBuffer imageData = getImageData(id);
-        if (imageData == null)
-        {
-            return null;
-        }
-        try (InputStream inputStream = 
-            Buffers.createByteBufferInputStream(imageData.slice()))
-        {
-            return ImageIO.read(inputStream);
-        }
-        catch (IOException e)
-        {
-            return null;
-        }
     }
     
     /**

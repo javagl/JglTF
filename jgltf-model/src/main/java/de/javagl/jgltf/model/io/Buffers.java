@@ -26,16 +26,65 @@
  */
 package de.javagl.jgltf.model.io;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+
+import javax.imageio.ImageIO;
 
 /**
  * Utility methods related to buffers
  */
 public class Buffers
 {
+    /**
+     * Returns the contents of the given byte buffer as a string, using
+     * the platform's default charset, or <code>null</code> if the given 
+     * buffer is <code>null</code>.
+     * 
+     * @param byteBuffer The byte buffer
+     * @return The data as a string
+     */
+    public static String readAsString(ByteBuffer byteBuffer)
+    {
+        if (byteBuffer == null)
+        {
+            return null;
+        }
+        byte array[] = new byte[byteBuffer.capacity()];
+        byteBuffer.slice().get(array);
+        return new String(array);
+    }
+    
+    /**
+     * Returns the contents of the given buffer as a <code>BufferedImage</code>,
+     * or <code>null</code> if the given buffer is <code>null</code>, or
+     * the data can not be converted into a buffered image.
+     * 
+     * TODO TODO_ANDROID This may be moved to a different class
+     * 
+     * @param byteBuffer The byte buffer
+     * @return The buffered image
+     */
+    public static BufferedImage readAsBufferedImage(ByteBuffer byteBuffer)
+    {
+        if (byteBuffer == null)
+        {
+            return null;
+        }
+        try (InputStream inputStream = 
+            createByteBufferInputStream(byteBuffer.slice()))
+        {
+            return ImageIO.read(inputStream);
+        }
+        catch (IOException e)
+        {
+            return null;
+        }
+    }
+    
     /**
      * Create a slice of the given byte buffer, in the specified range.
      * The returned buffer will have the same byte order as the given

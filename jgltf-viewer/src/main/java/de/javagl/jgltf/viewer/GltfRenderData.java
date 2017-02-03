@@ -46,6 +46,7 @@ import de.javagl.jgltf.impl.Texture;
 import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.GltfData;
 import de.javagl.jgltf.model.Shaders;
+import de.javagl.jgltf.model.io.Buffers;
 
 /**
  * A class maintaining the data for rendering a glTF with OpenGL.<br>
@@ -209,7 +210,8 @@ class GltfRenderData
         }
         else
         {
-            vertexShaderSource = gltfData.getShaderAsString(vertexShaderId);
+            ByteBuffer shaderData = gltfData.getShaderData(vertexShaderId);
+            vertexShaderSource = Buffers.readAsString(shaderData);
         }
         if (vertexShaderSource == null)
         {
@@ -226,7 +228,8 @@ class GltfRenderData
         }
         else
         {
-            fragmentShaderSource = gltfData.getShaderAsString(fragmentShaderId);
+            ByteBuffer shaderData = gltfData.getShaderData(fragmentShaderId);
+            fragmentShaderSource = Buffers.readAsString(shaderData);
         }
         if (fragmentShaderSource == null)
         {
@@ -306,8 +309,8 @@ class GltfRenderData
         
         Texture texture = gltf.getTextures().get(textureId);
         String textureImageId = texture.getSource();
-        BufferedImage textureImage = 
-            gltfData.getImageAsBufferedImage(textureImageId);
+        ByteBuffer imageData = gltfData.getImageData(textureImageId);
+        BufferedImage textureImage = Buffers.readAsBufferedImage(imageData);
         if (textureImage == null)
         {
             logger.warning(

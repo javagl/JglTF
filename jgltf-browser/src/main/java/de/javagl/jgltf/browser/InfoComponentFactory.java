@@ -38,6 +38,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.ByteBuffer;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
@@ -73,6 +74,7 @@ import de.javagl.jgltf.model.AccessorIntData;
 import de.javagl.jgltf.model.AccessorShortData;
 import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.GltfData;
+import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.model.io.GltfWriter;
 import de.javagl.jgltf.model.io.JsonUtils;
 import de.javagl.swing.tasks.SwingTask;
@@ -539,7 +541,8 @@ class InfoComponentFactory
         {
             return createMessageInfoPanel("Could not find shader in glTF");
         }
-        String shaderString = gltfData.getShaderAsString(key);
+        ByteBuffer shaderData = gltfData.getShaderData(key);
+        String shaderString = Buffers.readAsString(shaderData);
         if (shaderString == null)
         {
             return createMessageInfoPanel(
@@ -565,7 +568,8 @@ class InfoComponentFactory
         {
             return createMessageInfoPanel("Could not find image in glTF");
         }
-        BufferedImage bufferedImage = gltfData.getImageAsBufferedImage(key);
+        ByteBuffer imageData = gltfData.getImageData(key);
+        BufferedImage bufferedImage = Buffers.readAsBufferedImage(imageData);
         if (bufferedImage == null)
         {
             return createMessageInfoPanel(
