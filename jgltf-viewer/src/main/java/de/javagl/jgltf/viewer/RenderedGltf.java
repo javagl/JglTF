@@ -1131,7 +1131,7 @@ public class RenderedGltf
     }
     
     /**
-     * Returns the given map, or an empty list if the given map 
+     * Returns the given map, or an empty map if the given map 
      * is <code>null</code>
      * 
      * @param map The map
