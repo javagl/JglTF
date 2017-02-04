@@ -28,8 +28,8 @@ package de.javagl.jgltf.model;
 
 import java.nio.ByteBuffer;
 
-import de.javagl.jgltf.impl.Accessor;
-import de.javagl.jgltf.impl.BufferView;
+import de.javagl.jgltf.impl.v1.Accessor;
+import de.javagl.jgltf.impl.v1.BufferView;
 
 /**
  * Methods to create instances of the {@link Accessor} data utility classes

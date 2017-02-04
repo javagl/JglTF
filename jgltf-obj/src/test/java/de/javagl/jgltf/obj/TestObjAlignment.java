@@ -8,9 +8,9 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import de.javagl.jgltf.impl.Accessor;
-import de.javagl.jgltf.impl.BufferView;
-import de.javagl.jgltf.impl.GlTF;
+import de.javagl.jgltf.impl.v1.Accessor;
+import de.javagl.jgltf.impl.v1.BufferView;
+import de.javagl.jgltf.impl.v1.GlTF;
 import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.GltfData;
 import de.javagl.obj.Obj;

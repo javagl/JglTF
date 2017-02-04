@@ -30,12 +30,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import de.javagl.jgltf.impl.Animation;
-import de.javagl.jgltf.impl.AnimationSampler;
-import de.javagl.jgltf.impl.GlTF;
-import de.javagl.jgltf.impl.Technique;
-import de.javagl.jgltf.impl.TechniqueParameters;
-import de.javagl.jgltf.impl.Texture;
+import de.javagl.jgltf.impl.v1.Animation;
+import de.javagl.jgltf.impl.v1.AnimationSampler;
+import de.javagl.jgltf.impl.v1.GlTF;
+import de.javagl.jgltf.impl.v1.Technique;
+import de.javagl.jgltf.impl.v1.TechniqueParameters;
+import de.javagl.jgltf.impl.v1.Texture;
 
 /**
  * Utility class for resolving entities inside a {@link GlTF} based on

@@ -37,15 +37,15 @@ import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.javagl.jgltf.impl.Accessor;
-import de.javagl.jgltf.impl.Camera;
-import de.javagl.jgltf.impl.CameraOrthographic;
-import de.javagl.jgltf.impl.CameraPerspective;
-import de.javagl.jgltf.impl.GlTF;
-import de.javagl.jgltf.impl.Node;
-import de.javagl.jgltf.impl.Skin;
-import de.javagl.jgltf.impl.Technique;
-import de.javagl.jgltf.impl.TechniqueParameters;
+import de.javagl.jgltf.impl.v1.Accessor;
+import de.javagl.jgltf.impl.v1.Camera;
+import de.javagl.jgltf.impl.v1.CameraOrthographic;
+import de.javagl.jgltf.impl.v1.CameraPerspective;
+import de.javagl.jgltf.impl.v1.GlTF;
+import de.javagl.jgltf.impl.v1.Node;
+import de.javagl.jgltf.impl.v1.Skin;
+import de.javagl.jgltf.impl.v1.Technique;
+import de.javagl.jgltf.impl.v1.TechniqueParameters;
 
 /**
  * A class that serves as a data model for a {@link GlTF} and allows obtaining

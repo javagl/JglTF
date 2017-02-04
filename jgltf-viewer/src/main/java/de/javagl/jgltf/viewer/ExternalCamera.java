@@ -26,7 +26,7 @@
  */
 package de.javagl.jgltf.viewer;
 
-import de.javagl.jgltf.impl.Camera;
+import de.javagl.jgltf.impl.v1.Camera;
 
 /**
  * An interface for an external camera. An instance of a class implementing

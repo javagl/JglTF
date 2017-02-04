@@ -28,8 +28,8 @@ package de.javagl.jgltf.model;
 
 import java.util.Arrays;
 
-import de.javagl.jgltf.impl.Material;
-import de.javagl.jgltf.impl.Technique;
+import de.javagl.jgltf.impl.v1.Material;
+import de.javagl.jgltf.impl.v1.Technique;
 
 /**
  * Utility methods for {@link Material}s

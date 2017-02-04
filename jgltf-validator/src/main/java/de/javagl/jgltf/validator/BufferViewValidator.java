@@ -26,8 +26,8 @@
  */
 package de.javagl.jgltf.validator;
 
-import de.javagl.jgltf.impl.BufferView;
-import de.javagl.jgltf.impl.GlTF;
+import de.javagl.jgltf.impl.v1.BufferView;
+import de.javagl.jgltf.impl.v1.GlTF;
 
 /**
  * A class for validating {@link BufferView} objects

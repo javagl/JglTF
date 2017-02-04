@@ -35,11 +35,11 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 
-import de.javagl.jgltf.impl.Buffer;
-import de.javagl.jgltf.impl.BufferView;
-import de.javagl.jgltf.impl.GlTFProperty;
-import de.javagl.jgltf.impl.Image;
-import de.javagl.jgltf.impl.Shader;
+import de.javagl.jgltf.impl.v1.Buffer;
+import de.javagl.jgltf.impl.v1.BufferView;
+import de.javagl.jgltf.impl.v1.GlTFProperty;
+import de.javagl.jgltf.impl.v1.Image;
+import de.javagl.jgltf.impl.v1.Shader;
 import de.javagl.jgltf.model.io.Buffers;
 
 /**

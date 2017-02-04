@@ -32,7 +32,7 @@ import java.util.function.Consumer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import de.javagl.jgltf.impl.GlTF;
+import de.javagl.jgltf.impl.v1.GlTF;
 
 /**
  * A class for reading a {@link GlTF} from an input stream

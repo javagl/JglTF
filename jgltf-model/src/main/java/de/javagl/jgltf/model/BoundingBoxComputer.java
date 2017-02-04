@@ -31,12 +31,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import de.javagl.jgltf.impl.Accessor;
-import de.javagl.jgltf.impl.GlTF;
-import de.javagl.jgltf.impl.Mesh;
-import de.javagl.jgltf.impl.MeshPrimitive;
-import de.javagl.jgltf.impl.Node;
-import de.javagl.jgltf.impl.Scene;
+import de.javagl.jgltf.impl.v1.Accessor;
+import de.javagl.jgltf.impl.v1.GlTF;
+import de.javagl.jgltf.impl.v1.Mesh;
+import de.javagl.jgltf.impl.v1.MeshPrimitive;
+import de.javagl.jgltf.impl.v1.Node;
+import de.javagl.jgltf.impl.v1.Scene;
 
 /**
  * A (package-private!) utility class to compute bounding volumes

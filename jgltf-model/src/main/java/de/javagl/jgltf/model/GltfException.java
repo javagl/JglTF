@@ -26,7 +26,7 @@
  */
 package de.javagl.jgltf.model;
 
-import de.javagl.jgltf.impl.GlTF;
+import de.javagl.jgltf.impl.v1.GlTF;
 
 /**
  * An exception that may be thrown to indicate an error inside a {@link GlTF}.

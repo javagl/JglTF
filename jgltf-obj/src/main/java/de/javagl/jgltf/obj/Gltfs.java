@@ -30,7 +30,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import de.javagl.jgltf.impl.GlTF;
+import de.javagl.jgltf.impl.v1.GlTF;
 
 /**
  * Utility methods for {@link GlTF}s.

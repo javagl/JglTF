@@ -26,7 +26,7 @@
  */
 package de.javagl.jgltf.model;
 
-import de.javagl.jgltf.impl.Accessor;
+import de.javagl.jgltf.impl.v1.Accessor;
 
 /**
  * Utility methods related to {@link Accessor}s.<br>

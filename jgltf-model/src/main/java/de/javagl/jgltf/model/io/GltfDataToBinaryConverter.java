@@ -34,11 +34,11 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Function;
 
-import de.javagl.jgltf.impl.Buffer;
-import de.javagl.jgltf.impl.BufferView;
-import de.javagl.jgltf.impl.GlTF;
-import de.javagl.jgltf.impl.Image;
-import de.javagl.jgltf.impl.Shader;
+import de.javagl.jgltf.impl.v1.Buffer;
+import de.javagl.jgltf.impl.v1.BufferView;
+import de.javagl.jgltf.impl.v1.GlTF;
+import de.javagl.jgltf.impl.v1.Image;
+import de.javagl.jgltf.impl.v1.Shader;
 import de.javagl.jgltf.model.BinaryGltf;
 import de.javagl.jgltf.model.GltfData;
 import de.javagl.jgltf.model.GltfExtensions;

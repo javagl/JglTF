@@ -72,8 +72,8 @@ import de.javagl.common.ui.tree.filtered.FilteredTree;
 import de.javagl.common.ui.tree.filtered.TreeModelFilter;
 import de.javagl.jgltf.browser.ObjectTrees.NodeEntry;
 import de.javagl.jgltf.browser.Resolver.ResolvedEntity;
-import de.javagl.jgltf.impl.GlTF;
-import de.javagl.jgltf.impl.Material;
+import de.javagl.jgltf.impl.v1.GlTF;
+import de.javagl.jgltf.impl.v1.Material;
 import de.javagl.jgltf.model.GltfData;
 import de.javagl.jgltf.viewer.GltfViewer;
 

@@ -26,9 +26,9 @@
  */
 package de.javagl.jgltf.model;
 
-import de.javagl.jgltf.impl.Material;
-import de.javagl.jgltf.impl.Program;
-import de.javagl.jgltf.impl.Shader;
+import de.javagl.jgltf.impl.v1.Material;
+import de.javagl.jgltf.impl.v1.Program;
+import de.javagl.jgltf.impl.v1.Shader;
 
 /**
  * Utility methods for {@link Program}s

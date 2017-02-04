@@ -63,10 +63,10 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.TreePath;
 
-import de.javagl.jgltf.impl.Accessor;
-import de.javagl.jgltf.impl.GlTF;
-import de.javagl.jgltf.impl.Image;
-import de.javagl.jgltf.impl.Shader;
+import de.javagl.jgltf.impl.v1.Accessor;
+import de.javagl.jgltf.impl.v1.GlTF;
+import de.javagl.jgltf.impl.v1.Image;
+import de.javagl.jgltf.impl.v1.Shader;
 import de.javagl.jgltf.model.AccessorByteData;
 import de.javagl.jgltf.model.AccessorDatas;
 import de.javagl.jgltf.model.AccessorFloatData;

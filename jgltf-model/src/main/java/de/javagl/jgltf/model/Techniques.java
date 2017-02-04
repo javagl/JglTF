@@ -32,12 +32,12 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
-import de.javagl.jgltf.impl.Material;
-import de.javagl.jgltf.impl.Program;
-import de.javagl.jgltf.impl.Technique;
-import de.javagl.jgltf.impl.TechniqueParameters;
-import de.javagl.jgltf.impl.TechniqueStates;
-import de.javagl.jgltf.impl.TechniqueStatesFunctions;
+import de.javagl.jgltf.impl.v1.Material;
+import de.javagl.jgltf.impl.v1.Program;
+import de.javagl.jgltf.impl.v1.Technique;
+import de.javagl.jgltf.impl.v1.TechniqueParameters;
+import de.javagl.jgltf.impl.v1.TechniqueStates;
+import de.javagl.jgltf.impl.v1.TechniqueStatesFunctions;
 
 /**
  * Utility methods related to {@link Technique}s

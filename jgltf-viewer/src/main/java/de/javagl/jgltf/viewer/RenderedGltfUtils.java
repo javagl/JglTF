@@ -33,10 +33,10 @@ import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.javagl.jgltf.impl.GlTF;
-import de.javagl.jgltf.impl.Program;
-import de.javagl.jgltf.impl.Shader;
-import de.javagl.jgltf.impl.Technique;
+import de.javagl.jgltf.impl.v1.GlTF;
+import de.javagl.jgltf.impl.v1.Program;
+import de.javagl.jgltf.impl.v1.Shader;
+import de.javagl.jgltf.impl.v1.Technique;
 import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.io.IO;
 

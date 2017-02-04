@@ -26,14 +26,14 @@
  */
 package de.javagl.jgltf.viewer;
 
-import de.javagl.jgltf.impl.Material;
-import de.javagl.jgltf.impl.Program;
-import de.javagl.jgltf.impl.Technique;
+import de.javagl.jgltf.impl.v1.Material;
+import de.javagl.jgltf.impl.v1.Program;
+import de.javagl.jgltf.impl.v1.Shader;
+import de.javagl.jgltf.impl.v1.Technique;
 import de.javagl.jgltf.model.Materials;
 import de.javagl.jgltf.model.Programs;
 import de.javagl.jgltf.model.Shaders;
 import de.javagl.jgltf.model.Techniques;
-import de.javagl.jgltf.impl.Shader;
 
 /**
  * A class containing the default {@link Shader}, {@link Program}, 

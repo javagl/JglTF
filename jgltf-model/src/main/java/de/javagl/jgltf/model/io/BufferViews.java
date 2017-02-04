@@ -30,8 +30,8 @@ import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import de.javagl.jgltf.impl.Buffer;
-import de.javagl.jgltf.impl.BufferView;
+import de.javagl.jgltf.impl.v1.Buffer;
+import de.javagl.jgltf.impl.v1.BufferView;
 import de.javagl.jgltf.model.GltfData;
 import de.javagl.jgltf.model.Maps;
 

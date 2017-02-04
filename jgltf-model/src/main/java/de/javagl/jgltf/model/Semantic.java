@@ -26,7 +26,7 @@
  */
 package de.javagl.jgltf.model;
 
-import de.javagl.jgltf.impl.TechniqueParameters;
+import de.javagl.jgltf.impl.v1.TechniqueParameters;
 
 /**
  * Enumeration of the {@link TechniqueParameters#getSemantic() technique 

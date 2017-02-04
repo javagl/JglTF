@@ -9,7 +9,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
-import de.javagl.jgltf.impl.GlTF;
+import de.javagl.jgltf.impl.v1.GlTF;
 import de.javagl.jgltf.model.GltfData;
 import de.javagl.jgltf.model.io.GltfDataReader;
 import de.javagl.jgltf.model.io.GltfWriter;

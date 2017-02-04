@@ -33,8 +33,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.javagl.jgltf.impl.Material;
-import de.javagl.jgltf.impl.Technique;
+import de.javagl.jgltf.impl.v1.Material;
+import de.javagl.jgltf.impl.v1.Technique;
 import de.javagl.obj.FloatTuple;
 import de.javagl.obj.Mtl;
 

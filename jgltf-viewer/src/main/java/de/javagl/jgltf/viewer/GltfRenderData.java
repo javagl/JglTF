@@ -38,11 +38,11 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Logger;
 
-import de.javagl.jgltf.impl.BufferView;
-import de.javagl.jgltf.impl.GlTF;
-import de.javagl.jgltf.impl.Program;
-import de.javagl.jgltf.impl.Sampler;
-import de.javagl.jgltf.impl.Texture;
+import de.javagl.jgltf.impl.v1.BufferView;
+import de.javagl.jgltf.impl.v1.GlTF;
+import de.javagl.jgltf.impl.v1.Program;
+import de.javagl.jgltf.impl.v1.Sampler;
+import de.javagl.jgltf.impl.v1.Texture;
 import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.GltfData;
 import de.javagl.jgltf.model.Shaders;

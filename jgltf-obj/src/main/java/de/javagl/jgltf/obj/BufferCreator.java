@@ -35,11 +35,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.javagl.jgltf.impl.Accessor;
-import de.javagl.jgltf.impl.Buffer;
-import de.javagl.jgltf.impl.BufferView;
-import de.javagl.jgltf.impl.GlTF;
-import de.javagl.jgltf.impl.MeshPrimitive;
+import de.javagl.jgltf.impl.v1.Accessor;
+import de.javagl.jgltf.impl.v1.Buffer;
+import de.javagl.jgltf.impl.v1.BufferView;
+import de.javagl.jgltf.impl.v1.GlTF;
+import de.javagl.jgltf.impl.v1.MeshPrimitive;
 
 /**
  * A class for creating {@link Buffer}s for a {@link GlTF}. The 

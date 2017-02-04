@@ -48,8 +48,8 @@ import javax.swing.JToggleButton;
 import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
 
-import de.javagl.jgltf.impl.Camera;
-import de.javagl.jgltf.impl.GlTF;
+import de.javagl.jgltf.impl.v1.Camera;
+import de.javagl.jgltf.impl.v1.GlTF;
 import de.javagl.jgltf.model.BoundingBoxes;
 import de.javagl.jgltf.model.GltfData;
 import de.javagl.jgltf.validator.Validator;

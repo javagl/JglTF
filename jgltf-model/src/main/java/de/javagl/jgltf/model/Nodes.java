@@ -26,7 +26,7 @@
  */
 package de.javagl.jgltf.model;
 
-import de.javagl.jgltf.impl.Node;
+import de.javagl.jgltf.impl.v1.Node;
 
 /**
  * Utility methods related to {@link Node}s.

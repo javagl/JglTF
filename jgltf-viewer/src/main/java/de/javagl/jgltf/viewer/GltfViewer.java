@@ -28,8 +28,8 @@ package de.javagl.jgltf.viewer;
 
 import java.awt.Component;
 
-import de.javagl.jgltf.impl.Camera;
-import de.javagl.jgltf.impl.GlTF;
+import de.javagl.jgltf.impl.v1.Camera;
+import de.javagl.jgltf.impl.v1.GlTF;
 import de.javagl.jgltf.model.GltfData;
 
 /**

@@ -35,8 +35,8 @@ import java.nio.ByteOrder;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
 
-import de.javagl.jgltf.impl.Buffer;
-import de.javagl.jgltf.impl.GlTF;
+import de.javagl.jgltf.impl.v1.Buffer;
+import de.javagl.jgltf.impl.v1.GlTF;
 import de.javagl.jgltf.model.BinaryGltf;
 import de.javagl.jgltf.model.GltfData;
 

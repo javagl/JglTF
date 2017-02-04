@@ -31,9 +31,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 
-import de.javagl.jgltf.impl.Buffer;
-import de.javagl.jgltf.impl.Image;
-import de.javagl.jgltf.impl.Shader;
+import de.javagl.jgltf.impl.v1.Buffer;
+import de.javagl.jgltf.impl.v1.Image;
+import de.javagl.jgltf.impl.v1.Shader;
 import de.javagl.jgltf.model.GltfData;
 
 /**

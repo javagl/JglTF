@@ -30,9 +30,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import de.javagl.jgltf.impl.Material;
-import de.javagl.jgltf.impl.Technique;
-import de.javagl.jgltf.impl.TechniqueParameters;
+import de.javagl.jgltf.impl.v1.Material;
+import de.javagl.jgltf.impl.v1.Technique;
+import de.javagl.jgltf.impl.v1.TechniqueParameters;
 
 /**
  * Utility methods related to the glTF data model. 

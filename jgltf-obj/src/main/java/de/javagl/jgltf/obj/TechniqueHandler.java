@@ -31,12 +31,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.javagl.jgltf.impl.GlTF;
-import de.javagl.jgltf.impl.Program;
-import de.javagl.jgltf.impl.Shader;
-import de.javagl.jgltf.impl.Technique;
-import de.javagl.jgltf.impl.TechniqueParameters;
-import de.javagl.jgltf.impl.TechniqueStates;
+import de.javagl.jgltf.impl.v1.GlTF;
+import de.javagl.jgltf.impl.v1.Program;
+import de.javagl.jgltf.impl.v1.Shader;
+import de.javagl.jgltf.impl.v1.Technique;
+import de.javagl.jgltf.impl.v1.TechniqueParameters;
+import de.javagl.jgltf.impl.v1.TechniqueStates;
 import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.Semantic;
 

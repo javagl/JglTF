@@ -44,10 +44,10 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 
-import de.javagl.jgltf.impl.GlTF;
-import de.javagl.jgltf.impl.Material;
-import de.javagl.jgltf.impl.Technique;
-import de.javagl.jgltf.impl.TechniqueParameters;
+import de.javagl.jgltf.impl.v1.GlTF;
+import de.javagl.jgltf.impl.v1.Material;
+import de.javagl.jgltf.impl.v1.Technique;
+import de.javagl.jgltf.impl.v1.TechniqueParameters;
 import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.Techniques;
 

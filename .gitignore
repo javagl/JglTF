@@ -7,10 +7,10 @@
 /jgltf-browser/.project
 /jgltf-browser/target
 /jgltf-browser/.classpath
-/jgltf-impl/.project
-/jgltf-impl/.settings
-/jgltf-impl/target
-/jgltf-impl/.classpath
+/jgltf-impl-v1/.project
+/jgltf-impl-v1/.settings
+/jgltf-impl-v1/target
+/jgltf-impl-v1/.classpath
 /jgltf-model/.project
 /jgltf-model/.settings
 /jgltf-model/target
@@ -39,7 +39,7 @@
 /jgltf-viewer/target
 /jgltf-viewer-jogl/target
 /jgltf-viewer-lwjgl/target
-/jgltf2-impl/.settings
-/jgltf2-impl/.project
-/jgltf2-impl/target
-/jgltf2-impl/.classpath
+/jgltf-impl-v2/.settings
+/jgltf-impl-v2/.project
+/jgltf-impl-v2/target
+/jgltf-impl-v2/.classpath

@@ -37,8 +37,8 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
-import de.javagl.jgltf.impl.Camera;
-import de.javagl.jgltf.impl.TechniqueParameters;
+import de.javagl.jgltf.impl.v1.Camera;
+import de.javagl.jgltf.impl.v1.TechniqueParameters;
 import de.javagl.jgltf.model.GltfAnimations;
 import de.javagl.jgltf.model.GltfData;
 import de.javagl.jgltf.model.GltfModel;

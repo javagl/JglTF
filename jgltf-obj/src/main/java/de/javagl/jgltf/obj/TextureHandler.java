@@ -29,10 +29,10 @@ package de.javagl.jgltf.obj;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.javagl.jgltf.impl.GlTF;
-import de.javagl.jgltf.impl.Image;
-import de.javagl.jgltf.impl.Sampler;
-import de.javagl.jgltf.impl.Texture;
+import de.javagl.jgltf.impl.v1.GlTF;
+import de.javagl.jgltf.impl.v1.Image;
+import de.javagl.jgltf.impl.v1.Sampler;
+import de.javagl.jgltf.impl.v1.Texture;
 import de.javagl.jgltf.model.GltfConstants;
 
 /**

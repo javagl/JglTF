@@ -28,8 +28,8 @@ package de.javagl.jgltf.model;
 
 import java.util.Base64;
 
-import de.javagl.jgltf.impl.Material;
-import de.javagl.jgltf.impl.Shader;
+import de.javagl.jgltf.impl.v1.Material;
+import de.javagl.jgltf.impl.v1.Shader;
 
 /**
  * Utility methods for {@link Shader}s.

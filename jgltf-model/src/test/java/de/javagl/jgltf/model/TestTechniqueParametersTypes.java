@@ -11,9 +11,9 @@ import java.util.function.Supplier;
 
 import org.junit.Test;
 
-import de.javagl.jgltf.impl.GlTF;
-import de.javagl.jgltf.impl.Material;
-import de.javagl.jgltf.impl.Technique;
+import de.javagl.jgltf.impl.v1.GlTF;
+import de.javagl.jgltf.impl.v1.Material;
+import de.javagl.jgltf.impl.v1.Technique;
 import de.javagl.jgltf.model.io.GltfReader;
 
 @SuppressWarnings("javadoc")

@@ -31,8 +31,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.javagl.jgltf.impl.GlTF;
-import de.javagl.jgltf.impl.GlTFProperty;
+import de.javagl.jgltf.impl.v1.GlTF;
+import de.javagl.jgltf.impl.v1.GlTFProperty;
 
 /**
  * Utility methods related to glTF extensions
