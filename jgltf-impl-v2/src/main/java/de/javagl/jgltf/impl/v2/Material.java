@@ -6,7 +6,7 @@
  * Copyright (c) 2016 Marco Hutter - http://www.javagl.de
  */
 
-package de.javagl.jgltf2.impl;
+package de.javagl.jgltf.impl.v2;
 
 import java.util.LinkedHashMap;
 import java.util.List;
