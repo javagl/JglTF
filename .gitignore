@@ -43,3 +43,8 @@
 /jgltf-impl-v2/.project
 /jgltf-impl-v2/target
 /jgltf-impl-v2/.classpath
+/jgltf-impl-v2-technique-webgl/.project
+/jgltf-impl-v2-technique-webgl/.settings
+/jgltf-impl-v2-technique-webgl/target
+/jgltf-impl-v2-technique-webgl/.classpath
+/jgltf-impl-v2-technique-webgl/.gitignore
