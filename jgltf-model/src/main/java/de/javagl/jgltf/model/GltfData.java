@@ -27,7 +27,6 @@
 package de.javagl.jgltf.model;
 
 import java.nio.ByteBuffer;
-import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -123,16 +122,6 @@ public final class GltfData
     }
     
     /**
-     * Remove the data that is stored under the given {@link Shader} ID
-     * 
-     * @param id The {@link Shader} ID
-     */
-    void removeShaderData(String id)
-    {
-        shaderDatas.remove(id);
-    }
-
-    /**
      * Returns the byte buffer containing the data of the {@link Shader}
      * with the given ID, or <code>null</code> if no such data is found.
      * 
@@ -145,17 +134,6 @@ public final class GltfData
     }
     
     /**
-     * Returns an unmodifiable view on the map that maps {@link Shader} IDs
-     * to the byte buffers storing the raw data.
-     * 
-     * @return The map
-     */
-    public Map<String, ByteBuffer> getShaderDatas()
-    {
-        return Collections.unmodifiableMap(shaderDatas);
-    }
-    
-    /**
      * Store the given byte buffer under the given {@link Image} ID
      * 
      * @param id The {@link Image} ID
@@ -164,16 +142,6 @@ public final class GltfData
     public void putImageData(String id, ByteBuffer byteBuffer)
     {
         imageDatas.put(id, byteBuffer);
-    }
-    
-    /**
-     * Remove data that is stored under the given {@link Image} ID
-     * 
-     * @param id The {@link Image} ID
-     */
-    void removeImageData(String id)
-    {
-        imageDatas.remove(id);
     }
     
     /**
@@ -189,17 +157,6 @@ public final class GltfData
     }
     
     /**
-     * Returns an unmodifiable view on the map that maps {@link Image} IDs
-     * to the byte buffers storing the raw data.
-     * 
-     * @return The map
-     */
-    public Map<String, ByteBuffer> getImageDatas()
-    {
-        return Collections.unmodifiableMap(imageDatas);
-    }
-    
-    /**
      * Store the given byte buffer under the given {@link Buffer} ID
      * 
      * @param id The {@link Buffer} ID
@@ -208,16 +165,6 @@ public final class GltfData
     public void putBufferData(String id, ByteBuffer byteBuffer)
     {
         bufferDatas.put(id, byteBuffer);
-    }
-    
-    /**
-     * Remove the data that is stored under the given {@link Buffer} ID
-     * 
-     * @param id The {@link Buffer} ID
-     */
-    void removeBufferData(String id)
-    {
-        bufferDatas.remove(id);
     }
     
     /**
@@ -233,17 +180,6 @@ public final class GltfData
     }
     
     /**
-     * Returns an unmodifiable view on the map that maps {@link Buffer} IDs
-     * to the byte buffers storing the raw data.
-     * 
-     * @return The map
-     */
-    public Map<String, ByteBuffer> getBufferDatas()
-    {
-        return Collections.unmodifiableMap(bufferDatas);
-    }
-
-    /**
      * Store the given byte buffer under the given {@link BufferView} ID
      * 
      * @param id The {@link BufferView} ID
@@ -252,16 +188,6 @@ public final class GltfData
     public void putBufferViewData(String id, ByteBuffer byteBuffer)
     {
         bufferViewDatas.put(id, byteBuffer);
-    }
-    
-    /**
-     * Remove the data that is stored under the given {@link BufferView} ID
-     * 
-     * @param id The {@link BufferView} ID
-     */
-    void removeBufferViewData(String id)
-    {
-        bufferViewDatas.remove(id);
     }
     
     /**
@@ -274,17 +200,6 @@ public final class GltfData
     public ByteBuffer getBufferViewData(String id)
     {
         return bufferViewDatas.get(id);
-    }
-    
-    /**
-     * Returns an unmodifiable view on the map that maps {@link BufferView} IDs
-     * to the byte buffers storing the raw data.
-     * 
-     * @return The map
-     */
-    public Map<String, ByteBuffer> getBufferViewDatas()
-    {
-        return Collections.unmodifiableMap(bufferViewDatas);
     }
     
 }
