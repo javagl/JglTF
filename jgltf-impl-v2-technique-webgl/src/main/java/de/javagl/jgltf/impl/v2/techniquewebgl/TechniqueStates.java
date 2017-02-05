@@ -14,7 +14,6 @@ import java.util.List;
 import de.javagl.jgltf.impl.v2.GlTFProperty;
 
 
-
 /**
  * Fixed-function rendering states. 
  * 

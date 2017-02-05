@@ -14,7 +14,6 @@ import java.util.List;
 import de.javagl.jgltf.impl.v2.GlTFProperty;
 
 
-
 /**
  * An attribute or uniform input to a technique, and an optional semantic 
  * and value. 

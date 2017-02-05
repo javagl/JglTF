@@ -14,8 +14,6 @@ import java.util.List;
 import de.javagl.jgltf.impl.v2.GlTFChildOfRootProperty;
 
 
-
-
 /**
  * A shader program, including its vertex and fragment shader, and names 
  * of vertex shader attributes. 
