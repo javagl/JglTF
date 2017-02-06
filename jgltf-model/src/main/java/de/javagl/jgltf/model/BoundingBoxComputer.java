@@ -235,11 +235,11 @@ class BoundingBoxComputer
         String accessorType = accessor.getType();
         int numComponents = 
             Accessors.getNumComponentsForAccessorType(accessorType);
-        if (numComponents != 3)
+        if (numComponents < 3)
         {
             logger.warning("Mesh primitive " + positionsAttributeName + 
                 " attribute refers to an accessor with type " + accessorType + 
-                " - expected \"VEC3\"");
+                " - expected \"VEC3\" or \"VEC4\"");
             return null;
         }
         if (!AccessorDatas.hasFloatComponents(accessor))
@@ -268,7 +268,7 @@ class BoundingBoxComputer
         BoundingBox boundingBox = new BoundingBox();
         for (int e = 0; e < accessorData.getNumElements(); e++)
         {
-            for (int c = 0; c < accessorData.getNumComponentsPerElement(); c++)
+            for (int c = 0; c < 3; c++)
             {
                 point[c] = accessorData.get(e, c);
             }
