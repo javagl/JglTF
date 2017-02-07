@@ -24,12 +24,13 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.model;
+package de.javagl.jgltf.model.gl;
 
 import java.util.Base64;
 
 import de.javagl.jgltf.impl.v1.Material;
 import de.javagl.jgltf.impl.v1.Shader;
+import de.javagl.jgltf.model.GltfConstants;
 
 /**
  * Utility methods for {@link Shader}s.

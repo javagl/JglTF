@@ -45,7 +45,7 @@ import de.javagl.jgltf.impl.v1.Sampler;
 import de.javagl.jgltf.impl.v1.Texture;
 import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.GltfData;
-import de.javagl.jgltf.model.Shaders;
+import de.javagl.jgltf.model.gl.Shaders;
 import de.javagl.jgltf.model.io.Buffers;
 
 /**

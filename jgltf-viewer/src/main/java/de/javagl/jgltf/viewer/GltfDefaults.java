@@ -30,10 +30,10 @@ import de.javagl.jgltf.impl.v1.Material;
 import de.javagl.jgltf.impl.v1.Program;
 import de.javagl.jgltf.impl.v1.Shader;
 import de.javagl.jgltf.impl.v1.Technique;
-import de.javagl.jgltf.model.Materials;
-import de.javagl.jgltf.model.Programs;
-import de.javagl.jgltf.model.Shaders;
-import de.javagl.jgltf.model.Techniques;
+import de.javagl.jgltf.model.gl.Materials;
+import de.javagl.jgltf.model.gl.Programs;
+import de.javagl.jgltf.model.gl.Shaders;
+import de.javagl.jgltf.model.gl.Techniques;
 
 /**
  * A class containing the default {@link Shader}, {@link Program}, 

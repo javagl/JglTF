@@ -49,7 +49,7 @@ import de.javagl.jgltf.impl.v1.Material;
 import de.javagl.jgltf.impl.v1.Technique;
 import de.javagl.jgltf.impl.v1.TechniqueParameters;
 import de.javagl.jgltf.model.GltfConstants;
-import de.javagl.jgltf.model.Techniques;
+import de.javagl.jgltf.model.gl.Techniques;
 
 /**
  * A panel that allows editing the {@link Material#getValues() values}

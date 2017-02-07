@@ -38,7 +38,7 @@ import de.javagl.jgltf.impl.v1.Technique;
 import de.javagl.jgltf.impl.v1.TechniqueParameters;
 import de.javagl.jgltf.impl.v1.TechniqueStates;
 import de.javagl.jgltf.model.GltfConstants;
-import de.javagl.jgltf.model.Semantic;
+import de.javagl.jgltf.model.gl.Semantic;
 
 /**
  * A class for managing the {@link Technique}s that may be required for

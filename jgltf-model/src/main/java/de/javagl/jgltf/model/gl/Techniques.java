@@ -24,7 +24,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.model;
+package de.javagl.jgltf.model.gl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,6 +38,8 @@ import de.javagl.jgltf.impl.v1.Technique;
 import de.javagl.jgltf.impl.v1.TechniqueParameters;
 import de.javagl.jgltf.impl.v1.TechniqueStates;
 import de.javagl.jgltf.impl.v1.TechniqueStatesFunctions;
+import de.javagl.jgltf.model.GltfConstants;
+import de.javagl.jgltf.model.GltfException;
 
 /**
  * Utility methods related to {@link Technique}s

@@ -24,7 +24,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.model;
+package de.javagl.jgltf.model.gl;
 
 import de.javagl.jgltf.impl.v1.Material;
 import de.javagl.jgltf.impl.v1.Program;

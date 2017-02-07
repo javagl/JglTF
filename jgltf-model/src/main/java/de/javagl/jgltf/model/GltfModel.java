@@ -46,6 +46,8 @@ import de.javagl.jgltf.impl.v1.Node;
 import de.javagl.jgltf.impl.v1.Skin;
 import de.javagl.jgltf.impl.v1.Technique;
 import de.javagl.jgltf.impl.v1.TechniqueParameters;
+import de.javagl.jgltf.model.gl.Semantic;
+import de.javagl.jgltf.model.gl.Techniques;
 
 /**
  * A class that serves as a data model for a {@link GlTF} and allows obtaining
