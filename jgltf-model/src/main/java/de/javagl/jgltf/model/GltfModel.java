@@ -561,7 +561,7 @@ public final class GltfModel
                 MathUtils.setIdentity4x4(result);  
                 return result;
             }
-            computeProjectionMatrix(camera, result);
+            computeProjectionMatrix(camera, aspectRatioSupplier, result);
             return result;
         };
     }
@@ -576,9 +576,13 @@ public final class GltfModel
      * message and set the given matrix to identity.
      * 
      * @param camera The {@link Camera}
+     * @param aspectRatioSupplier An optional supplier for the aspect ratio
+     * to use. If this is <code>null</code>, then the aspect ratio of the
+     * camera will be used.
      * @param result The array storing the result
      */
-    private void computeProjectionMatrix(Camera camera, float result[])
+    private static void computeProjectionMatrix(
+        Camera camera, DoubleSupplier aspectRatioSupplier, float result[])
     {
         String cameraType = camera.getType();
         if ("perspective".equals(cameraType))
@@ -844,10 +848,32 @@ public final class GltfModel
      */
     private Supplier<float[]> createNodeLocalTransformSupplier(String nodeId)
     {
-        float localTransform[] = new float[16];
-        MathUtils.setIdentity4x4(localTransform);
         Node node = getExpected(gltf.getNodes(), nodeId, 
             "node for the local transform");
+        return createNodeLocalTransformSupplier(node);
+    }
+    
+    /**
+     * Creates a supplier for the local transform matrix of the 
+     * given {@link Node}.<br>
+     * <br> 
+     * The matrix will be provided as a float array with 16 elements, 
+     * storing the matrix entries in column-major order.<br>
+     * <br>
+     * If the glTF does not contain the specified {@link Node}, then
+     * a warning will be printed and the resulting supplier will 
+     * return the identity matrix.<br>
+     * <br>
+     * Note: The supplier MAY always return the same array instance.
+     * Callers MUST NOT store or modify the returned array. 
+     * 
+     * @param node The {@link Node}
+     * @return The supplier
+     */
+    private static Supplier<float[]> createNodeLocalTransformSupplier(Node node)
+    {
+        float localTransform[] = new float[16];
+        MathUtils.setIdentity4x4(localTransform);
         if (node == null)
         {
             return () -> localTransform;
@@ -858,6 +884,7 @@ public final class GltfModel
             return localTransform;
         };
     }
+    
 
     
     /**
