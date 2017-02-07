@@ -53,7 +53,7 @@ public class GltfModels
      * @param material The {@link Material}
      * @return The uniform value
      */
-    static Object getUniformValueObject(
+    private static Object getUniformValueObject(
         String uniformName, Technique technique, Material material)
     {
         Map<String, String> uniforms = technique.getUniforms();

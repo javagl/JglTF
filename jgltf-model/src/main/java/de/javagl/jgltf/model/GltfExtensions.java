@@ -26,10 +26,12 @@
  */
 package de.javagl.jgltf.model;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.javagl.jgltf.impl.v1.GlTF;
 import de.javagl.jgltf.impl.v1.GlTFProperty;
@@ -54,13 +56,7 @@ public class GltfExtensions
         if (oldExtensionsUsed == null || 
             !oldExtensionsUsed.contains(extensionName))
         {
-            List<String> newExtensionsUsed = new ArrayList<String>();
-            if (oldExtensionsUsed != null)
-            {
-                newExtensionsUsed.addAll(oldExtensionsUsed);
-            }
-            newExtensionsUsed.add(extensionName);
-            gltf.setExtensionsUsed(newExtensionsUsed);
+            gltf.addExtensionsUsed(extensionName);
         }
     }
     
@@ -96,32 +92,6 @@ public class GltfExtensions
             return result; 
         }
         return null;
-    }
-    
-    /**
-     * Create a key-value mapping, and store it under the given name in the
-     * {@link GlTFProperty#getExtensions() extensions} of the given 
-     * {@link GlTFProperty}. If the extensions already contained a value 
-     * with the given name, then this value will be overwritten. 
-     * 
-     * @param gltfProperty The {@link GlTFProperty}
-     * @param extensionName The extension name
-     * @return The newly created extension mapping
-     */
-    static Map<String, Object> createExtensionMap(
-        GlTFProperty gltfProperty, String extensionName)
-    {
-        Map<String, Object> newExtensions = new LinkedHashMap<String, Object>();
-        Map<String, Object> oldExtensions = gltfProperty.getExtensions();
-        if (oldExtensions != null)
-        {
-            newExtensions.putAll(oldExtensions);
-        }
-        gltfProperty.setExtensions(newExtensions);
-        LinkedHashMap<String, Object> extensionMap = 
-            new LinkedHashMap<String, Object>();
-        newExtensions.put(extensionName, extensionMap);
-        return extensionMap;
     }
     
     
@@ -190,9 +160,44 @@ public class GltfExtensions
             getExtensionMap(gltfProperty, extensionName);
         if (extensionMap == null)
         {
-            extensionMap = createExtensionMap(gltfProperty, extensionName);
+            extensionMap = new LinkedHashMap<String, Object>();
+            gltfProperty.addExtensions(extensionName, extensionMap);
         }
         extensionMap.put(propertyName, propertyValue);
+    }
+    
+    
+    /**
+     * Fetch the value of the specified extension object from the given
+     * {@link GlTFProperty}, converted into the given target type. 
+     * Returns <code>null</code> if the given {@link GlTFProperty} does
+     * not have the specified extension.
+     * 
+     * @param gltfProperty The {@link GlTFProperty}
+     * @param extensionName The extension name
+     * @param type The type to convert the object to
+     * @return The object
+     * @throws IllegalArgumentException If the specified extension object
+     * cannot be converted to the desired target type
+     */
+    static <T> T fetchExtensionObject(
+        GlTFProperty gltfProperty, String extensionName, Class<T> type)
+    {
+        Map<String, Object> extensions = gltfProperty.getExtensions();
+        if (extensions == null)
+        {
+            return null;
+        }
+        Object extensionObject = extensions.get(extensionName);
+        if (extensionObject == null)
+        {
+            return null;
+        }
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(
+            DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
+        T extension = objectMapper.convertValue(extensionObject, type);
+        return extension;
     }
     
     

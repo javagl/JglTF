@@ -44,7 +44,7 @@ public class BufferViews
      * The logger used in this class
      */
     private static final Logger logger = 
-        Logger.getLogger(GltfUtils.class.getName());
+        Logger.getLogger(BufferViews.class.getName());
     
     /**
      * Create the {@link BufferView} byte buffers in the given {@link GltfData}.
@@ -111,7 +111,7 @@ public class BufferViews
      * @param bufferView The {@link BufferView}
      * @return The byte buffer
      */
-    private static ByteBuffer createBufferViewData(
+    public static ByteBuffer createBufferViewData(
         ByteBuffer bufferData, BufferView bufferView)  
     {
         Integer byteOffset = bufferView.getByteOffset();

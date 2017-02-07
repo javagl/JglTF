@@ -160,7 +160,6 @@ class JacksonUtils
      * @param objectMapper The object mapper
      * @param jsonErrorConsumer The consumer for {@link JsonError}s. If this 
      * is <code>null</code>, then the errors will not be handled.
-     * <code>null</code>, then log outputs will be created for the errors
      */
     static void configure(
         ObjectMapper objectMapper, Consumer<? super JsonError> jsonErrorConsumer)
