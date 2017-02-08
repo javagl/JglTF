@@ -27,7 +27,6 @@
 package de.javagl.jgltf.viewer;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -49,7 +48,6 @@ import de.javagl.jgltf.impl.v1.Program;
 import de.javagl.jgltf.impl.v1.Scene;
 import de.javagl.jgltf.impl.v1.Technique;
 import de.javagl.jgltf.impl.v1.TechniqueParameters;
-import de.javagl.jgltf.impl.v1.TechniqueStates;
 import de.javagl.jgltf.impl.v1.TechniqueStatesFunctions;
 import de.javagl.jgltf.impl.v1.Texture;
 import de.javagl.jgltf.model.Accessors;
@@ -58,6 +56,7 @@ import de.javagl.jgltf.model.GltfData;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.GltfModels;
 import de.javagl.jgltf.model.Maps;
+import de.javagl.jgltf.model.Optionals;
 
 /**
  * A representation of a rendered {@link GlTF}. This class uses a 
@@ -81,15 +80,14 @@ public class RenderedGltf
     private final GltfModel gltfModel;
     
     /**
-     * The {@link GltfData} that was contained in the {@link GltfModel},
-     * and stores the {@link GlTF} and the associated (binary) data
-     */
-    private final GltfData gltfData;
-    
-    /**
      * The {@link GlTF} that was contained in the {@link GltfData}
      */
     private final GlTF gltf;
+    
+    /**
+     * The {@link GltfTechniqueModel} that describes the rendering techniques
+     */
+    private final GltfTechniqueModel gltfTechniqueModel;
     
     /**
      * The OpenGL context that is used for rendering
@@ -170,8 +168,9 @@ public class RenderedGltf
         this.glContext = Objects.requireNonNull(glContext,
             "The glContext may not be null");
 
-        this.gltfData = gltfModel.getGltfData();
+        GltfData gltfData = gltfModel.getGltfData();
         this.gltf = gltfData.getGltf();
+        this.gltfTechniqueModel = new GltfTechniqueModel(gltf);
         this.gltfRenderData = new GltfRenderData(gltfData, glContext);
         
         this.opaqueRenderCommands = new ArrayList<Runnable>();
@@ -412,7 +411,7 @@ public class RenderedGltf
     {
         logger.info("Processing scene " + sceneId);
         
-        List<String> sceneNodes = optional(scene.getNodes());
+        List<String> sceneNodes = Optionals.of(scene.getNodes());
         for (String sceneNodeId : sceneNodes)
         {
             processNode(sceneNodeId);
@@ -436,12 +435,12 @@ public class RenderedGltf
 
         Node node = gltf.getNodes().get(nodeId);
         
-        List<String> meshes = optional(node.getMeshes());
+        List<String> meshes = Optionals.of(node.getMeshes());
         for (String meshId : meshes)
         {
             Mesh mesh = gltf.getMeshes().get(meshId);
             
-            List<MeshPrimitive> primitives = optional(mesh.getPrimitives());
+            List<MeshPrimitive> primitives = Optionals.of(mesh.getPrimitives());
             for (int i = 0; i < primitives.size(); i++)
             {
                 MeshPrimitive meshPrimitive = primitives.get(i);
@@ -456,7 +455,7 @@ public class RenderedGltf
             cameraIdToNodeId.put(cameraId, nodeId);
         }
         
-        List<String> children = optional(node.getChildren());
+        List<String> children = Optionals.of(node.getChildren());
         for (String childNodeId : children)
         {
             processNode(childNodeId);
@@ -483,9 +482,9 @@ public class RenderedGltf
         logger.fine("Processing meshPrimitive...");
         
         String materialId = meshPrimitive.getMaterial();
-        Material material = obtainMaterial(materialId);
+        Material material = gltfTechniqueModel.obtainMaterial(materialId);
         String techniqueId = material.getTechnique();
-        Technique technique = obtainTechnique(techniqueId);
+        Technique technique = gltfTechniqueModel.obtainTechnique(techniqueId);
         String programId = technique.getProgram();
 
         // Obtain the GL program for the Program of the Technique
@@ -517,8 +516,10 @@ public class RenderedGltf
 
         // Create the commands to set the technique.states and 
         // the technique.states.functions values 
-        commands.add(() -> glContext.disable(getAllStates()));
-        List<Integer> enabledStates = getEnabledStates(technique);
+        commands.add(() -> glContext.disable(
+            GltfTechniqueModel.getAllStates()));
+        List<Integer> enabledStates = 
+            GltfTechniqueModel.getEnabledStates(technique);
         commands.add(() -> {
             glContext.enable(enabledStates);
         });
@@ -566,42 +567,6 @@ public class RenderedGltf
     
     
 
-    /**
-     * Returns a list containing all possible states that may be contained
-     * in a <code>technique.states.enable</code> list.
-     * 
-     * @return All possible states
-     */
-    private static List<Integer> getAllStates()
-    {
-        List<Integer> allStates = Arrays.asList(
-            GltfConstants.GL_BLEND,
-            GltfConstants.GL_CULL_FACE,
-            GltfConstants.GL_DEPTH_TEST,
-            GltfConstants.GL_POLYGON_OFFSET_FILL,
-            GltfConstants.GL_SAMPLE_ALPHA_TO_COVERAGE,
-            GltfConstants.GL_SCISSOR_TEST
-        );
-        return allStates;
-    }
-    
-    /**
-     * Returns the set of states that should be enabled for the given 
-     * {@link Technique}
-     * 
-     * @param technique The {@link Technique}
-     * @return The enabled states
-     */
-    static List<Integer> getEnabledStates(Technique technique)
-    {
-        TechniqueStates states = obtainTechniqueStates(technique);
-        List<Integer> enable = states.getEnable();
-        if (enable == null)
-        {
-            return states.defaultEnable();
-        }
-        return enable;
-    }
     
     /**
      * Create the functions that, when executed, call the functions
@@ -616,10 +581,10 @@ public class RenderedGltf
         Technique technique)
     {
         TechniqueStatesFunctions functions = 
-            obtainTechniqueStatesFunctions(technique);
+            GltfTechniqueModel.obtainTechniqueStatesFunctions(technique);
         List<Runnable> commands = new ArrayList<Runnable>();
         
-        float[] blendColor = optional(
+        float[] blendColor = Optionals.of(
             functions.getBlendColor(), 
             functions.defaultBlendColor());
         commands.add(() ->
@@ -629,7 +594,7 @@ public class RenderedGltf
                 blendColor[2], blendColor[3]);
         });
         
-        int[] blendEquationSeparate = optional(
+        int[] blendEquationSeparate = Optionals.of(
             functions.getBlendEquationSeparate(),
             functions.defaultBlendEquationSeparate());
         commands.add(() ->
@@ -638,7 +603,7 @@ public class RenderedGltf
                 blendEquationSeparate[0], blendEquationSeparate[1]);
         });
         
-        int[] blendFuncSeparate = optional(
+        int[] blendFuncSeparate = Optionals.of(
             functions.getBlendFuncSeparate(),
             functions.defaultBlendFuncSeparate());
         commands.add(() ->
@@ -648,7 +613,7 @@ public class RenderedGltf
                 blendFuncSeparate[2], blendFuncSeparate[3]);
         });
         
-        boolean[] colorMask = optional(
+        boolean[] colorMask = Optionals.of(
             functions.getColorMask(),
             functions.defaultColorMask());
         commands.add(() ->
@@ -658,7 +623,7 @@ public class RenderedGltf
                 colorMask[2], colorMask[3]);
         });
         
-        int[] cullFace = optional(
+        int[] cullFace = Optionals.of(
             functions.getCullFace(),
             functions.defaultCullFace());
         commands.add(() ->
@@ -666,7 +631,7 @@ public class RenderedGltf
             glContext.setCullFace(cullFace[0]);
         });
         
-        int[] depthFunc = optional(
+        int[] depthFunc = Optionals.of(
             functions.getDepthFunc(),
             functions.defaultDepthFunc());
         commands.add(() ->
@@ -674,7 +639,7 @@ public class RenderedGltf
             glContext.setDepthFunc(depthFunc[0]);
         });
         
-        boolean[] depthMask = optional(
+        boolean[] depthMask = Optionals.of(
             functions.getDepthMask(),
             functions.defaultDepthMask());
         commands.add(() ->
@@ -682,7 +647,7 @@ public class RenderedGltf
             glContext.setDepthMask(depthMask[0]);
         });
         
-        float[] depthRange = optional(
+        float[] depthRange = Optionals.of(
             functions.getDepthRange(),
             functions.defaultDepthRange());
         commands.add(() ->
@@ -690,7 +655,7 @@ public class RenderedGltf
             glContext.setDepthRange(depthRange[0], depthRange[1]);
         });
         
-        int[] frontFace = optional(
+        int[] frontFace = Optionals.of(
             functions.getFrontFace(),
             functions.defaultFrontFace());
         commands.add(() ->
@@ -698,7 +663,7 @@ public class RenderedGltf
             glContext.setFrontFace(frontFace[0]);
         });
         
-        float[] lineWidth = optional(
+        float[] lineWidth = Optionals.of(
             functions.getLineWidth(),
             functions.defaultLineWidth());
         commands.add(() ->
@@ -706,7 +671,7 @@ public class RenderedGltf
             glContext.setLineWidth(lineWidth[0]);
         });
         
-        float[] polygonOffset = optional( 
+        float[] polygonOffset = Optionals.of( 
             functions.getPolygonOffset(),
             functions.defaultPolygonOffset());
         commands.add(() ->
@@ -767,7 +732,7 @@ public class RenderedGltf
             new UniformSetterFactory(glContext);
         
         Map<String, String> uniforms = 
-            optional(technique.getUniforms());
+            Optionals.of(technique.getUniforms());
         int textureCounter = 0;
         for (String uniformName : uniforms.keySet())
         {
@@ -838,7 +803,7 @@ public class RenderedGltf
             }
             else
             {
-                Integer count = optional(techniqueParameters.getCount(), 1);
+                Integer count = Optionals.of(techniqueParameters.getCount(), 1);
                 Runnable uniformSettingCommand = 
                     uniformSetterFactory.createUniformSettingCommand(
                         location, type, count, uniformValueSupplier);
@@ -894,9 +859,9 @@ public class RenderedGltf
         MeshPrimitive meshPrimitive)
     {
         String materialId = meshPrimitive.getMaterial();
-        Material material = obtainMaterial(materialId);
+        Material material = gltfTechniqueModel.obtainMaterial(materialId);
         String techniqueId = material.getTechnique();
-        Technique technique = obtainTechnique(techniqueId);
+        Technique technique = gltfTechniqueModel.obtainTechnique(techniqueId);
 
         // Obtain the GL program for the Program of the Technique
         String programId = technique.getProgram();
@@ -910,9 +875,9 @@ public class RenderedGltf
         
         // Don't mix these up! (See notes below) 
         Map<String, String> techniqueAttributes = 
-            optional(technique.getAttributes());
+            Optionals.of(technique.getAttributes());
         Map<String, String> meshPrimitiveAttributes = 
-            optional(meshPrimitive.getAttributes());
+            Optionals.of(meshPrimitive.getAttributes());
         
         for (String attributeName : techniqueAttributes.keySet())
         {
@@ -953,7 +918,7 @@ public class RenderedGltf
                     "The attribute name in the shader must match the " +
                     "key of the 'attributes' dictionary.");
             }
-            int target = optional(
+            int target = Optionals.of(
                 bufferView.getTarget(), GltfConstants.GL_ARRAY_BUFFER);
             int size = Accessors.getNumComponentsForAccessorType(
                 accessor.getType());
@@ -961,7 +926,7 @@ public class RenderedGltf
             int numBytesForComponentType = 
                 Accessors.getNumBytesForAccessorComponentType(type);
             int defaultStride = size * numBytesForComponentType;
-            int stride = optional(accessor.getByteStride(), defaultStride);
+            int stride = Optionals.of(accessor.getByteStride(), defaultStride);
             int offset = accessor.getByteOffset();
             
             glContext.createVertexAttribute(glVertexArray, 
@@ -982,7 +947,7 @@ public class RenderedGltf
     private Runnable createRenderCommand(
         MeshPrimitive meshPrimitive, int glVertexArray)
     {
-        int mode = optional(
+        int mode = Optionals.of(
             meshPrimitive.getMode(), meshPrimitive.defaultMode());
 
         String indicesAccessorId = meshPrimitive.getIndices();
@@ -1011,7 +976,7 @@ public class RenderedGltf
         // arbitrary attribute of the meshPrimitive, and create a command
         // for non-indexed rendering
         Map<String, String> attributes = 
-            optional(meshPrimitive.getAttributes());
+            Optionals.of(meshPrimitive.getAttributes());
         if (attributes.isEmpty())
         {
             logger.warning(
@@ -1036,127 +1001,6 @@ public class RenderedGltf
             // Empty
         };
     }
-
-    /**
-     * Obtain the {@link Material} with the given ID from the {@link GlTF},
-     * or return the {@link GltfDefaults#getDefaultMaterial() default
-     * material} if the given ID is <code>null</code> or the 
-     * {@link GltfDefaults#isDefaultMaterialId(String) default material ID}.
-     * 
-     * @param materialId The {@link Material} ID
-     * @return The {@link Material}
-     */
-    private Material obtainMaterial(String materialId)
-    {
-        if (materialId == null ||
-            GltfDefaults.isDefaultMaterialId(materialId))
-        {
-            return GltfDefaults.getDefaultMaterial();
-        }
-        return gltf.getMaterials().get(materialId);
-    }
-
-    /**
-     * Obtain the {@link Technique} with the given ID from the {@link GlTF},
-     * or return the {@link GltfDefaults#getDefaultTechnique() default
-     * technique} if the given ID is <code>null</code> or the 
-     * {@link GltfDefaults#isDefaultTechniqueId(String) default technique ID}.
-     * 
-     * @param techniqueId The {@link Technique} ID
-     * @return The {@link Technique}
-     */
-    private Technique obtainTechnique(String techniqueId)
-    {
-        if (techniqueId == null ||
-            GltfDefaults.isDefaultTechniqueId(techniqueId))
-        {
-            return GltfDefaults.getDefaultTechnique();
-        }
-        return gltf.getTechniques().get(techniqueId);
-    }
-    
-    /**
-     * Return the {@link TechniqueStates} from the given {@link Technique},
-     * or the {@link TechniqueStates} from the 
-     * {@link GltfDefaults#getDefaultTechnique() default technique} if
-     * the given {@link Technique} does not contain any {@link TechniqueStates}
-     *  
-     * @param technique The {@link Technique}
-     * @return The {@link TechniqueStates}
-     */
-    private static TechniqueStates obtainTechniqueStates(Technique technique)
-    {
-        TechniqueStates states = technique.getStates();
-        if (states == null)
-        {
-            return GltfDefaults.getDefaultTechnique().getStates();
-        }
-        return states;
-    }
-    
-    /**
-     * Return the {@link TechniqueStatesFunctions} from the 
-     * {@link TechniqueStates} of the given {@link Technique},
-     * or the {@link TechniqueStatesFunctions} from the 
-     * {@link GltfDefaults#getDefaultTechnique() default technique} if
-     * the given {@link Technique} does not contain any 
-     * {@link TechniqueStates} or {@link TechniqueStatesFunctions}
-     *  
-     * @param technique The {@link Technique}
-     * @return The {@link TechniqueStatesFunctions}
-     */
-    TechniqueStatesFunctions obtainTechniqueStatesFunctions(Technique technique)
-    {
-        TechniqueStates states = obtainTechniqueStates(technique);
-        TechniqueStatesFunctions functions = states.getFunctions();
-        if (functions == null)
-        {
-            TechniqueStates defaultStates = 
-                GltfDefaults.getDefaultTechnique().getStates();
-            return defaultStates.getFunctions();
-        }
-        return functions;
-    }
-    
-    /**
-     * Returns the given list, or an empty list if the given list 
-     * is <code>null</code>
-     * 
-     * @param list The list
-     * @return The result
-     */
-    private static <T> List<T> optional(List<T> list)
-    {
-        return list != null ? list : Collections.emptyList();
-    }
-    
-    /**
-     * Returns the given map, or an empty map if the given map 
-     * is <code>null</code>
-     * 
-     * @param map The map
-     * @return The result
-     */
-    private static <K, V> Map<K, V> optional(Map<K, V> map)
-    {
-        return map != null ? map : Collections.emptyMap();
-    }
-    
-    /**
-     * Returns the given value, or the given default value if the
-     * given value is <code>null</code>
-     * 
-     * @param t The value
-     * @param defaultValue The default value
-     * @return The value or the default value
-     */
-    private static <T> T optional(T t, T defaultValue)
-    {
-        return t != null ? t : defaultValue;
-    }
-    
-    
-    
 
     
     

@@ -220,7 +220,8 @@ class RenderedGltfUtils
         sb.append("    program: " + programId + 
             " (" + shaderNames + ")\n");
         
-        List<Integer> enabledStates = RenderedGltf.getEnabledStates(technique);
+        List<Integer> enabledStates = 
+            GltfTechniqueModel.getEnabledStates(technique);
         sb.append("    enabledStates: ");
         for (Integer enabledState : enabledStates)
         {
