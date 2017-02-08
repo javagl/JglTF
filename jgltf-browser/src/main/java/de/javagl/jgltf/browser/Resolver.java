@@ -36,6 +36,7 @@ import de.javagl.jgltf.impl.v1.GlTF;
 import de.javagl.jgltf.impl.v1.Technique;
 import de.javagl.jgltf.impl.v1.TechniqueParameters;
 import de.javagl.jgltf.impl.v1.Texture;
+import de.javagl.jgltf.model.Optionals;
 
 /**
  * Utility class for resolving entities inside a {@link GlTF} based on
@@ -220,7 +221,7 @@ class Resolver
         {
             String animationId = extractId(pathString, "glTF.animations.");
             Animation animation = 
-                getOptional(animationId, gltf.getAnimations());
+                Optionals.get(animationId, gltf.getAnimations());
             if (animation != null)
             {  
                 Map<String, AnimationSampler> samplers = 
@@ -237,7 +238,7 @@ class Resolver
         {
             String animationId = extractId(pathString, "glTF.animations.");
             Animation animation = 
-                getOptional(animationId, gltf.getAnimations());
+                Optionals.get(animationId, gltf.getAnimations());
             if (animation != null)
             {
                 Map<String, String> parameters = 
@@ -272,7 +273,7 @@ class Resolver
         {
             String techniqueId = extractId(pathString, "glTF.techniques.");
             Technique technique = 
-                getOptional(techniqueId, gltf.getTechniques());
+                Optionals.get(techniqueId, gltf.getTechniques());
             if (technique != null)
             {
                 Map<String, TechniqueParameters> parameters = 
@@ -283,30 +284,6 @@ class Resolver
             }
         }
         return null;
-    }
-    
-    /**
-     * Returns the value that is associated with the given key in the
-     * given map, or <code>null</code> if either the key or the map
-     * is <code>null</code>.
-     *  
-     * @param <T> The value type
-     * 
-     * @param key The key
-     * @param map The map
-     * @return The value
-     */
-    private static <T> T getOptional(String key, Map<String, T> map)
-    {
-        if (key == null)
-        {
-            return null;
-        }
-        if (map == null)
-        {
-            return null;
-        }
-        return map.get(key);
     }
     
     /**

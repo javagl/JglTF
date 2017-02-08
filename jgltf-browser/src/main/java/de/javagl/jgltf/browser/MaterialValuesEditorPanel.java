@@ -49,6 +49,7 @@ import de.javagl.jgltf.impl.v1.Material;
 import de.javagl.jgltf.impl.v1.Technique;
 import de.javagl.jgltf.impl.v1.TechniqueParameters;
 import de.javagl.jgltf.model.GltfConstants;
+import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.gl.Techniques;
 
 /**
@@ -82,14 +83,14 @@ class MaterialValuesEditorPanel extends JPanel
         
         Map<String, Material> materials = gltf.getMaterials();
         Material material = materials.get(materialId);
-        Map<String, Object> values = optional(material.getValues());
+        Map<String, Object> values = Optionals.of(material.getValues());
         
         String techniqueId = material.getTechnique();
         Technique technique = gltf.getTechniques().get(techniqueId);
         
         JPanel panel = new JPanel(new GridLayout(0,2));
         Map<String, TechniqueParameters> parameters = 
-            optional(technique.getParameters());
+            Optionals.of(technique.getParameters());
         for (Entry<String, TechniqueParameters> entry : parameters.entrySet())
         {
             String parameterName = entry.getKey();
@@ -292,16 +293,5 @@ class MaterialValuesEditorPanel extends JPanel
         return list;
     }
     
-    /**
-     * Returns the given map, or an empty map if the given map 
-     * is <code>null</code>
-     * 
-     * @param map The map
-     * @return The result
-     */
-    private static <K, V> Map<K, V> optional(Map<K, V> map)
-    {
-        return map != null ? map : Collections.emptyMap();
-    }
     
 }

@@ -78,7 +78,7 @@ class BoundingBoxComputer
     BoundingBox compute()
     {
         BoundingBox boundingBox = new BoundingBox();
-        Map<String, Scene> scenes = optional(gltf.getScenes());
+        Map<String, Scene> scenes = Optionals.of(gltf.getScenes());
         for (String sceneId : scenes.keySet())
         {
             float rootTransform[] = MathUtils.createIdentity4x4();
@@ -108,7 +108,7 @@ class BoundingBoxComputer
             localResult = new BoundingBox();
         }
         Scene scene = gltf.getScenes().get(sceneId);
-        List<String> sceneNodes = optional(scene.getNodes());
+        List<String> sceneNodes = Optionals.of(scene.getNodes());
         for (String sceneNodeId : sceneNodes)
         {
             computeNodeBoundingBox(sceneNodeId, transform, localResult);
@@ -156,7 +156,7 @@ class BoundingBoxComputer
             }
         }
         
-        List<String> children = optional(node.getChildren());
+        List<String> children = Optionals.of(node.getChildren());
         for (String childNodeId : children)
         {
             computeNodeBoundingBox(childNodeId, transform, result);
@@ -186,7 +186,7 @@ class BoundingBoxComputer
         }
         
         Mesh mesh = gltf.getMeshes().get(meshId);
-        List<MeshPrimitive> primitives = optional(mesh.getPrimitives());
+        List<MeshPrimitive> primitives = Optionals.of(mesh.getPrimitives());
         for (MeshPrimitive meshPrimitive : primitives)
         {
             BoundingBox meshPrimitiveBoundingBox =
@@ -217,7 +217,7 @@ class BoundingBoxComputer
         MeshPrimitive meshPrimitive, float transform[])
     {
         Map<String, String> attributes = 
-            optional(meshPrimitive.getAttributes());
+            Optionals.of(meshPrimitive.getAttributes());
         
         String positionsAttributeName = "POSITION";
         String positionAccessorId = attributes.get(positionsAttributeName);
@@ -282,31 +282,6 @@ class BoundingBoxComputer
                 transformedPoint[2]);
         }
         return boundingBox;
-    }
-    
-    
-    /**
-     * Returns the given list, or an empty list if the given list 
-     * is <code>null</code>
-     * 
-     * @param list The list
-     * @return The result
-     */
-    private static <T> List<T> optional(List<T> list)
-    {
-        return list != null ? list : Collections.emptyList();
-    }
-    
-    /**
-     * Returns the given map, or an empty list if the given map 
-     * is <code>null</code>
-     * 
-     * @param map The map
-     * @return The result
-     */
-    private static <K, V> Map<K, V> optional(Map<K, V> map)
-    {
-        return map != null ? map : Collections.emptyMap();
     }
     
 }
