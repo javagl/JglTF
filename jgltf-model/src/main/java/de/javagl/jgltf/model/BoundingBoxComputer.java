@@ -26,7 +26,6 @@
  */
 package de.javagl.jgltf.model;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
