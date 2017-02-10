@@ -26,13 +26,10 @@
  */
 package de.javagl.jgltf.model.io;
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-
-import javax.imageio.ImageIO;
 
 /**
  * Utility methods related to buffers
@@ -56,33 +53,6 @@ public class Buffers
         byte array[] = new byte[byteBuffer.capacity()];
         byteBuffer.slice().get(array);
         return new String(array);
-    }
-    
-    /**
-     * Returns the contents of the given buffer as a <code>BufferedImage</code>,
-     * or <code>null</code> if the given buffer is <code>null</code>, or
-     * the data can not be converted into a buffered image.
-     * 
-     * TODO TODO_ANDROID This may be moved to a different class
-     * 
-     * @param byteBuffer The byte buffer
-     * @return The buffered image
-     */
-    public static BufferedImage readAsBufferedImage(ByteBuffer byteBuffer)
-    {
-        if (byteBuffer == null)
-        {
-            return null;
-        }
-        try (InputStream inputStream = 
-            createByteBufferInputStream(byteBuffer.slice()))
-        {
-            return ImageIO.read(inputStream);
-        }
-        catch (IOException e)
-        {
-            return null;
-        }
     }
     
     /**
@@ -155,7 +125,6 @@ public class Buffers
         byteBuffer.order(ByteOrder.nativeOrder());
         return byteBuffer;
     }
-    
     
     /**
      * Create an input stream from the given byte buffer, starting at its

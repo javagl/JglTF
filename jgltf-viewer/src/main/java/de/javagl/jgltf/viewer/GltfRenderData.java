@@ -26,7 +26,6 @@
  */
 package de.javagl.jgltf.viewer;
 
-import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -308,37 +307,36 @@ class GltfRenderData
         logger.fine("Creating GL texture for texture " + textureId);
         
         Texture texture = gltf.getTextures().get(textureId);
-        String textureImageId = texture.getSource();
-        ByteBuffer imageData = gltfData.getImageData(textureImageId);
-        BufferedImage textureImage = Buffers.readAsBufferedImage(imageData);
-        if (textureImage == null)
-        {
-            logger.warning(
-                "Texture image data " + textureImageId + 
-                " for texture " + textureId + " not found");
-            return null;
-        }
         String samplerId = texture.getSampler();
         Sampler sampler = gltf.getSamplers().get(samplerId);
-            
-        ByteBuffer pixelDataARGB = 
-            ImageUtils.getImagePixelsARGB(textureImage, false);
-        int width = textureImage.getWidth();
-        int height = textureImage.getHeight();
+
+        String textureImageId = texture.getSource();
+        ByteBuffer imageData = gltfData.getImageData(textureImageId);
         
-        int format = Optional
-            .ofNullable(texture.getFormat())
-            .orElse(texture.defaultFormat());
         int internalFormat = Optional
             .ofNullable(texture.getInternalFormat())
             .orElse(texture.defaultInternalFormat());
-        int type = Optional
-            .ofNullable(texture.getType())
-            .orElse(texture.defaultType());
+
+        // The image data is read with the built-in routines, and
+        // always returned as RBGA pixels. So the format and type
+        // from the texture are ignored here.
+        //int format = Optional
+        //    .ofNullable(texture.getFormat())
+        //    .orElse(texture.defaultFormat());
+        //int type = Optional
+        //    .ofNullable(texture.getType())
+        //    .orElse(texture.defaultType());
+
+        // Use the fixed format and type for the RGBA pixels
+        int format = GltfConstants.GL_RGBA;
+        int type = GltfConstants.GL_UNSIGNED_BYTE;
         
-        int glTexture = 
-            glContext.createGlTexture(
-                pixelDataARGB, internalFormat, width, height, format, type);
+        PixelData pixelData = PixelDatas.create(imageData);
+        int width = pixelData.getWidth();
+        int height = pixelData.getHeight();
+        ByteBuffer pixelsRGBA = pixelData.getPixelsRGBA();
+        int glTexture = glContext.createGlTexture(
+            pixelsRGBA, internalFormat, width, height, format, type);
 
         int minFilter = Optional
             .ofNullable(sampler.getMinFilter())

@@ -26,9 +26,7 @@
  */
 package de.javagl.jgltf.viewer.jogl;
 
-import static com.jogamp.opengl.GL.GL_BGRA;
 import static com.jogamp.opengl.GL.GL_ELEMENT_ARRAY_BUFFER;
-import static com.jogamp.opengl.GL.GL_RGBA;
 import static com.jogamp.opengl.GL.GL_STATIC_DRAW;
 import static com.jogamp.opengl.GL.GL_TEXTURE0;
 import static com.jogamp.opengl.GL.GL_TEXTURE_2D;
@@ -37,7 +35,6 @@ import static com.jogamp.opengl.GL.GL_TEXTURE_MIN_FILTER;
 import static com.jogamp.opengl.GL.GL_TEXTURE_WRAP_S;
 import static com.jogamp.opengl.GL.GL_TEXTURE_WRAP_T;
 import static com.jogamp.opengl.GL.GL_TRUE;
-import static com.jogamp.opengl.GL.GL_UNSIGNED_BYTE;
 import static com.jogamp.opengl.GL2ES2.GL_COMPILE_STATUS;
 import static com.jogamp.opengl.GL2ES2.GL_FRAGMENT_SHADER;
 import static com.jogamp.opengl.GL2ES2.GL_INFO_LOG_LENGTH;
@@ -409,7 +406,7 @@ class GlContextJogl implements GlContext
 
     @Override
     public int createGlTexture(
-        ByteBuffer pixelDataARGB, int internalFormat, 
+        ByteBuffer pixelData, int internalFormat, 
         int width, int height, int format, int type)
     {
         int textureArray[] = {0};
@@ -418,8 +415,8 @@ class GlContextJogl implements GlContext
 
         gl.glBindTexture(GL_TEXTURE_2D, glTexture);
         gl.glTexImage2D(
-            GL_TEXTURE_2D, 0, GL_RGBA, width, height, 
-            0, GL_BGRA, GL_UNSIGNED_BYTE, pixelDataARGB);
+            GL_TEXTURE_2D, 0, internalFormat, width, height, 
+            0, format, type, pixelData);
         
         return glTexture;
     }
@@ -547,7 +544,8 @@ class GlContextJogl implements GlContext
     {
         IntBuffer infoLogLength = ByteBuffer
             .allocateDirect(4)
-            .order(ByteOrder.nativeOrder()).asIntBuffer();
+            .order(ByteOrder.nativeOrder())
+            .asIntBuffer();
         gl.glGetShaderiv(id, GL_INFO_LOG_LENGTH, infoLogLength);
         if (infoLogLength.get(0) > 0) 
         {
@@ -576,7 +574,8 @@ class GlContextJogl implements GlContext
     {
         IntBuffer infoLogLength = ByteBuffer
             .allocateDirect(4)
-            .order(ByteOrder.nativeOrder()).asIntBuffer();
+            .order(ByteOrder.nativeOrder())
+            .asIntBuffer();
         gl.glGetProgramiv(id, GL_INFO_LOG_LENGTH, infoLogLength);
         if (infoLogLength.get(0) > 0) 
         {

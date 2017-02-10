@@ -188,8 +188,7 @@ public interface GlContext
     /**
      * Create an OpenGL texture from the given texture parameters
      * 
-     * @param pixelDataARGB The pixel data, as an array containing the
-     * pixels as integers in the ARGB format (as obtained from a BufferedImage)
+     * @param pixelData The pixel data,
      * @param internalFormat The internal format
      * @param width The width
      * @param height The height
@@ -197,7 +196,7 @@ public interface GlContext
      * @param type The type
      * @return The GL texture
      */
-    int createGlTexture(ByteBuffer pixelDataARGB, 
+    int createGlTexture(ByteBuffer pixelData, 
         int internalFormat, int width, int height, int format, int type);
 
     /**

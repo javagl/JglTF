@@ -36,6 +36,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.ByteBuffer;
@@ -569,7 +570,7 @@ class InfoComponentFactory
             return createMessageInfoPanel("Could not find image in glTF");
         }
         ByteBuffer imageData = gltfData.getImageData(key);
-        BufferedImage bufferedImage = Buffers.readAsBufferedImage(imageData);
+        BufferedImage bufferedImage = readAsBufferedImage(imageData);
         if (bufferedImage == null)
         {
             return createMessageInfoPanel(
@@ -579,6 +580,31 @@ class InfoComponentFactory
         return createImageInfoPanel(bufferedImage);
     }
 
+    /**
+     * Returns the contents of the given buffer as a <code>BufferedImage</code>,
+     * or <code>null</code> if the given buffer is <code>null</code>, or
+     * the data can not be converted into a buffered image.
+     * 
+     * @param byteBuffer The byte buffer
+     * @return The buffered image
+     */
+    private static BufferedImage readAsBufferedImage(ByteBuffer byteBuffer)
+    {
+        if (byteBuffer == null)
+        {
+            return null;
+        }
+        try (InputStream inputStream = 
+            Buffers.createByteBufferInputStream(byteBuffer.slice()))
+        {
+            return ImageIO.read(inputStream);
+        }
+        catch (IOException e)
+        {
+            return null;
+        }
+    }
+    
     /**
      * Create an info component with the given message
      * 

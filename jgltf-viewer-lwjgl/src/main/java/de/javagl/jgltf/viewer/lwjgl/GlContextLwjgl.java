@@ -26,14 +26,12 @@
  */
 package de.javagl.jgltf.viewer.lwjgl;
 
-import static org.lwjgl.opengl.GL11.GL_RGBA;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_MAG_FILTER;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_MIN_FILTER;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_S;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_T;
 import static org.lwjgl.opengl.GL11.GL_TRUE;
-import static org.lwjgl.opengl.GL11.GL_UNSIGNED_BYTE;
 import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL11.glColorMask;
 import static org.lwjgl.opengl.GL11.glCullFace;
@@ -52,7 +50,6 @@ import static org.lwjgl.opengl.GL11.glPolygonOffset;
 import static org.lwjgl.opengl.GL11.glScissor;
 import static org.lwjgl.opengl.GL11.glTexImage2D;
 import static org.lwjgl.opengl.GL11.glTexParameteri;
-import static org.lwjgl.opengl.GL12.GL_BGRA;
 import static org.lwjgl.opengl.GL12.GL_TEXTURE_BASE_LEVEL;
 import static org.lwjgl.opengl.GL12.GL_TEXTURE_MAX_LEVEL;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
@@ -482,15 +479,15 @@ class GlContextLwjgl implements GlContext
     
     @Override
     public int createGlTexture(
-        ByteBuffer pixelDataARGB, int internalFormat, 
+        ByteBuffer pixelData, int internalFormat, 
         int width, int height, int format, int type)
     {
         int glTexture = glGenTextures();
 
         glBindTexture(GL_TEXTURE_2D, glTexture);
         glTexImage2D(
-            GL_TEXTURE_2D, 0, GL_RGBA, width, height, 
-            0, GL_BGRA, GL_UNSIGNED_BYTE, pixelDataARGB);
+            GL_TEXTURE_2D, 0, internalFormat, width, height, 
+            0, format, type, pixelData);
         
         return glTexture;
     }
@@ -612,7 +609,8 @@ class GlContextLwjgl implements GlContext
     private void printShaderLogInfo(int id) 
     {
         IntBuffer infoLogLength = ByteBuffer.allocateDirect(4)
-            .order(ByteOrder.nativeOrder()).asIntBuffer();
+            .order(ByteOrder.nativeOrder())
+            .asIntBuffer();
         glGetShader(id, GL_INFO_LOG_LENGTH, infoLogLength);
         if (infoLogLength.get(0) > 0) 
         {
@@ -639,7 +637,8 @@ class GlContextLwjgl implements GlContext
     private void printProgramLogInfo(int id) 
     {
         IntBuffer infoLogLength = ByteBuffer.allocateDirect(4)
-            .order(ByteOrder.nativeOrder()).asIntBuffer();
+            .order(ByteOrder.nativeOrder())
+            .asIntBuffer();
         glGetProgram(id, GL_INFO_LOG_LENGTH, infoLogLength);
         if (infoLogLength.get(0) > 0) 
         {
