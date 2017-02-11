@@ -33,7 +33,7 @@ import de.javagl.jgltf.impl.v1.Shader;
 /**
  * Utility methods for {@link Program}s
  */
-public class Programs
+class Programs
 {
     /**
      * Creates a default {@link Program} with the given vertex- and 
@@ -50,7 +50,7 @@ public class Programs
      * @param fragmentShaderId The fragment {@link Shader} ID
      * @return The default {@link Program}
      */
-    public static Program createDefaultProgram(
+    static Program createDefaultProgram(
         String vertexShaderId, String fragmentShaderId)
     {
         Program program = new Program();

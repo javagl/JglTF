@@ -160,30 +160,25 @@ public final class GltfModel
     private Map<String, String> computeNodeIdToParentNodeIdMap()
     {
         Map<String, String> map = new LinkedHashMap<String, String>();
-        Map<String, Node> nodes = gltf.getNodes();
-        if (nodes != null)
+        Map<String, Node> nodes = Optionals.of(gltf.getNodes());
+        for (String nodeId : nodes.keySet())
         {
-            for (String nodeId : nodes.keySet())
+            Node node = nodes.get(nodeId);
+            if (node == null)
             {
-                Node node = nodes.get(nodeId);
-                if (node == null)
+                logger.severe("No node found for ID "+nodeId);
+            }
+            else
+            {
+                List<String> children = Optionals.of(node.getChildren());
+                for (String childNodeId : children)
                 {
-                    logger.severe("No node found for ID "+nodeId);
-                }
-                else
-                {
-                    if (node.getChildren() != null)
+                    String oldParent = map.put(childNodeId, nodeId);
+                    if (oldParent != null)
                     {
-                        for (String childNodeId : node.getChildren())
-                        {
-                            String oldParent = map.put(childNodeId, nodeId);
-                            if (oldParent != null)
-                            {
-                                logger.severe("Node with ID " + childNodeId + 
-                                    " has two parents: " + oldParent + 
-                                    " and " + nodeId);
-                            }
-                        }
+                        logger.severe("Node with ID " + childNodeId + 
+                            " has two parents: " + oldParent + 
+                            " and " + nodeId);
                     }
                 }
             }
@@ -200,17 +195,14 @@ public final class GltfModel
     private Map<String, String> computeJointNameToNodeIdMap()
     {
         Map<String, String> map = new LinkedHashMap<String, String>();
-        Map<String, Node> nodes = gltf.getNodes();
-        if (nodes != null)
+        Map<String, Node> nodes = Optionals.of(gltf.getNodes());
+        for (Entry<String, Node> entry : nodes.entrySet())
         {
-            for (Entry<String, Node> entry : nodes.entrySet())
+            String nodeId = entry.getKey();
+            Node node = entry.getValue();
+            if (node.getJointName() != null)
             {
-                String nodeId = entry.getKey();
-                Node node = entry.getValue();
-                if (node.getJointName() != null)
-                {
-                    map.put(node.getJointName(), nodeId);
-                }
+                map.put(node.getJointName(), nodeId);
             }
         }
         return map;

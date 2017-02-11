@@ -57,6 +57,7 @@ import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.GltfModels;
 import de.javagl.jgltf.model.Maps;
 import de.javagl.jgltf.model.Optionals;
+import de.javagl.jgltf.model.gl.GltfTechniqueModel;
 
 /**
  * A representation of a rendered {@link GlTF}. This class uses a 
@@ -170,8 +171,9 @@ public class RenderedGltf
 
         GltfData gltfData = gltfModel.getGltfData();
         this.gltf = gltfData.getGltf();
-        this.gltfTechniqueModel = new GltfTechniqueModel(gltf);
-        this.gltfRenderData = new GltfRenderData(gltfData, glContext);
+        this.gltfTechniqueModel = new GltfTechniqueModel(gltfData);
+        this.gltfRenderData = new GltfRenderData(
+            gltfData, gltfTechniqueModel, glContext);
         
         this.opaqueRenderCommands = new ArrayList<Runnable>();
         this.transparentRenderCommands = new ArrayList<Runnable>();
@@ -482,6 +484,7 @@ public class RenderedGltf
         logger.fine("Processing meshPrimitive...");
         
         String materialId = meshPrimitive.getMaterial();
+        
         Material material = gltfTechniqueModel.obtainMaterial(materialId);
         String techniqueId = material.getTechnique();
         Technique technique = gltfTechniqueModel.obtainTechnique(techniqueId);

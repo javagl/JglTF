@@ -35,7 +35,7 @@ import de.javagl.jgltf.model.GltfConstants;
 /**
  * Utility methods for {@link Shader}s.
  */
-public class Shaders
+class Shaders
 {
     /**
      * The source code of the default vertex shader
@@ -79,7 +79,7 @@ public class Shaders
      * 
      * @return The default {@link Shader}
      */
-    public static Shader createDefaultVertexShader()
+    static Shader createDefaultVertexShader()
     {
         Shader shader = new Shader();
         shader.setType(GltfConstants.GL_VERTEX_SHADER);
@@ -101,7 +101,7 @@ public class Shaders
      * 
      * @return The default {@link Shader}
      */
-    public static Shader createDefaultFragmentShader()
+    static Shader createDefaultFragmentShader()
     {
         Shader shader = new Shader();
         shader.setType(GltfConstants.GL_FRAGMENT_SHADER);
@@ -118,7 +118,7 @@ public class Shaders
      * 
      * @return The default vertex shader source code
      */
-    public static String getDefaultVertexShaderCode()
+    static String getDefaultVertexShaderCode()
     {
         return DEFAULT_VERTEX_SHADER_CODE;
     }
@@ -128,7 +128,7 @@ public class Shaders
      * 
      * @return The default fragment shader source code
      */
-    public static String getDefaultFragmentShaderCode()
+    static String getDefaultFragmentShaderCode()
     {
         return DEFAULT_FRAGMENT_SHADER_CODE;
     }

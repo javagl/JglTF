@@ -24,22 +24,17 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.viewer;
+package de.javagl.jgltf.model.gl;
 
 import de.javagl.jgltf.impl.v1.Material;
 import de.javagl.jgltf.impl.v1.Program;
 import de.javagl.jgltf.impl.v1.Shader;
 import de.javagl.jgltf.impl.v1.Technique;
-import de.javagl.jgltf.model.gl.Materials;
-import de.javagl.jgltf.model.gl.Programs;
-import de.javagl.jgltf.model.gl.Shaders;
-import de.javagl.jgltf.model.gl.Techniques;
 
 /**
  * A class containing the default {@link Shader}, {@link Program}, 
  * {@link Technique} and {@link Material} objects according to 
- * https://github.com/KhronosGroup/glTF/blob/master/specification/README.md#appendix-a
- *
+ * "Appendix A" of the specification.
  */
 class GltfDefaults
 {

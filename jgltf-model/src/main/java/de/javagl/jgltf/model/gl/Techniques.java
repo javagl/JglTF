@@ -28,9 +28,7 @@ package de.javagl.jgltf.model.gl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Map;
-import java.util.Optional;
 
 import de.javagl.jgltf.impl.v1.Material;
 import de.javagl.jgltf.impl.v1.Program;
@@ -40,6 +38,7 @@ import de.javagl.jgltf.impl.v1.TechniqueStates;
 import de.javagl.jgltf.impl.v1.TechniqueStatesFunctions;
 import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.GltfException;
+import de.javagl.jgltf.model.Optionals;
 
 /**
  * Utility methods related to {@link Technique}s
@@ -58,7 +57,7 @@ public class Techniques
      * @param programId The {@link Program} ID
      * @return The default {@link Technique}
      */
-    public static Technique createDefaultTechnique(String programId)
+    static Technique createDefaultTechnique(String programId)
     {
         Technique technique = new Technique();
         technique.addAttributes("a_position", "position");
@@ -173,21 +172,10 @@ public class Techniques
         // The technique.uniforms map the uniform names to the
         // technique parameter IDs. The technique.parameters map
         // the technique parameter IDs to the TechniqueParameters.
-        Map<String, String> uniforms = technique.getUniforms();
-        if (uniforms == null)
-        {
-            return null;
-        }
+        Map<String, String> uniforms = Optionals.of(technique.getUniforms());
+        Map<String, TechniqueParameters> parameters = 
+            Optionals.of(technique.getParameters());
         String techniqueParameterId = uniforms.get(uniformName);
-        if (techniqueParameterId == null)
-        {
-            return null;
-        }
-        Map<String, TechniqueParameters> parameters = technique.getParameters();
-        if (parameters == null)
-        {
-            return null;
-        }
         return parameters.get(techniqueParameterId);
     }
     
@@ -208,21 +196,11 @@ public class Techniques
         // The technique.attributes map GLSL program attribute names 
         // to technique parameter IDs. The technique.parameters
         // map technique parameter IDs to TechniqueParameters.
-        Map<String, String> attributes = technique.getAttributes();
-        if (attributes == null)
-        {
-            return null;
-        }
+        Map<String, String> attributes = 
+            Optionals.of(technique.getAttributes());
+        Map<String, TechniqueParameters> parameters =
+            Optionals.of(technique.getParameters());
         String techniqueParameterId = attributes.get(attributeName);
-        if (techniqueParameterId == null)
-        {
-            return null;
-        }
-        Map<String, TechniqueParameters> parameters = technique.getParameters();
-        if (parameters == null)
-        {
-            return null;
-        }
         return parameters.get(techniqueParameterId);
     }
     
@@ -244,9 +222,7 @@ public class Techniques
         // The technique.uniforms map the uniform names to the
         // technique parameter IDs. The technique.parameters map
         // the technique parameter IDs to the TechniqueParameters.
-        Map<String, String> uniforms = Optional
-            .ofNullable(technique.getUniforms())
-            .orElse(Collections.emptyMap());
+        Map<String, String> uniforms = Optionals.of(technique.getUniforms());
         String techniqueParameterId = uniforms.get(uniformName);
         if (techniqueParameterId == null)
         {
@@ -254,9 +230,8 @@ public class Techniques
                 "No technique parameter ID for uniform with name " + 
                 uniformName + " found in technique");
         }
-        Map<String, TechniqueParameters> parameters = Optional
-            .ofNullable(technique.getParameters())
-            .orElse(Collections.emptyMap());
+        Map<String, TechniqueParameters> parameters = 
+            Optionals.of(technique.getParameters());
         TechniqueParameters techniqueParameters = 
             parameters.get(techniqueParameterId);
         if (techniqueParameters == null)
@@ -286,9 +261,8 @@ public class Techniques
         // The technique.attributes map GLSL program attribute names 
         // to technique parameter IDs. The technique.parameters
         // map technique parameter IDs to TechniqueParameters.
-        Map<String, String> attributes = Optional
-            .ofNullable(technique.getAttributes())
-            .orElse(Collections.emptyMap());
+        Map<String, String> attributes = 
+            Optionals.of(technique.getAttributes());
         String techniqueParameterId = attributes.get(attributeName);
         if (techniqueParameterId == null)
         {
@@ -296,9 +270,8 @@ public class Techniques
                 "No technique parameter ID for attribue with name " + 
                  attributeName + " found in technique");
         }
-        Map<String, TechniqueParameters> parameters = Optional
-            .ofNullable(technique.getParameters())
-            .orElse(Collections.emptyMap());
+        Map<String, TechniqueParameters> parameters = 
+            Optionals.of(technique.getParameters());
         TechniqueParameters techniqueParameters = 
             parameters.get(techniqueParameterId);
         if (techniqueParameters == null)
@@ -549,60 +522,6 @@ public class Techniques
         throw new IllegalArgumentException(
             "Invalid technique parameters semantic: " + semantic);
     }
-
-//    // TODO Really using "Optional" here does not make things better ...
-//    /**
-//     * Return the {@link TechniqueParameters} for the uniform with the
-//     * given name from the given {@link Technique}. If there are no
-//     * uniforms or parameters in the given {@link Technique}, or the
-//     * matching parameter is not found, then the optional will be empty.
-//     * 
-//     * @param technique The {@link Technique}
-//     * @param uniformName The uniform name
-//     * @return The optional {@link TechniqueParameters}
-//     */
-//    private static Optional<TechniqueParameters> 
-//    getOptionalUniformTechniqueParameters(
-//        Technique technique, String uniformName)
-//    {
-//        // The technique.uniforms map the uniform names to the
-//        // technique parameter IDs. The technique.parameters map
-//        // the technique parameter IDs to the TechniqueParameters.
-//        Optional<String> techniqueParameterId = 
-//            Optional.ofNullable(technique.getUniforms())
-//            .map(u -> u.get(uniformName));
-//        Optional<TechniqueParameters> techniqueParameters = 
-//            Optional.ofNullable(technique.getParameters())
-//            .flatMap(p -> techniqueParameterId.map(t -> p.get(t)));
-//        return techniqueParameters;
-//    }
-//
-//    /**
-//     * Return the {@link TechniqueParameters} for the program attribute with 
-//     * the given name from the given {@link Technique}. If there are no
-//     * attributes or parameters in the given {@link Technique}, or the
-//     * matching parameter is not found, then the optional will be empty.
-//     *  
-//     * @param technique The {@link Technique}
-//     * @param attributeName The program attribute name
-//     * @return The {@link TechniqueParameters}
-//     */
-//    private static Optional<TechniqueParameters> 
-//    getOptionalAttributeTechniqueParameters(
-//        Technique technique, String attributeName)
-//    {
-//        // The technique.attributes map GLSL program attribute names 
-//        // to technique parameter IDs. The technique.parameters
-//        // map technique parameter IDs to TechniqueParameters.
-//        Optional<String> techniqueParameterId = 
-//            Optional.ofNullable(technique.getAttributes())
-//            .map(u -> u.get(attributeName));
-//        Optional<TechniqueParameters> techniqueParameters = 
-//            Optional.ofNullable(technique.getParameters())
-//            .flatMap(p -> techniqueParameterId.map(t -> p.get(t)));
-//        return techniqueParameters;
-//    }
-    
     
     /**
      * Private constructor to prevent instantiation

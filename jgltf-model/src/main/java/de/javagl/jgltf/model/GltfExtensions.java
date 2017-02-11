@@ -196,6 +196,8 @@ public class GltfExtensions
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(
             DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
+        objectMapper.configure(
+            DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         T extension = objectMapper.convertValue(extensionObject, type);
         return extension;
     }

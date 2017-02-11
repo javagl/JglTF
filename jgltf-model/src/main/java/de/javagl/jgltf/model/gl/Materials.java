@@ -34,7 +34,7 @@ import de.javagl.jgltf.impl.v1.Technique;
 /**
  * Utility methods for {@link Material}s
  */
-public class Materials
+class Materials
 {
     /**
      * Create a default {@link Material} with the given {@link Technique} ID,
@@ -47,7 +47,7 @@ public class Materials
      * @param techniqueId The {@link Technique} ID
      * @return The default {@link Material}
      */
-    public static Material createDefaultMaterial(String techniqueId)
+    static Material createDefaultMaterial(String techniqueId)
     {
         Material material = new Material();
         material.addValues("emission", Arrays.asList(0.5, 0.5, 0.5, 1.0));

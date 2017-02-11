@@ -38,6 +38,7 @@ import de.javagl.jgltf.impl.v1.Program;
 import de.javagl.jgltf.impl.v1.Shader;
 import de.javagl.jgltf.impl.v1.Technique;
 import de.javagl.jgltf.model.GltfConstants;
+import de.javagl.jgltf.model.gl.GltfTechniqueModel;
 import de.javagl.jgltf.model.io.IO;
 
 /**

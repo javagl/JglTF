@@ -34,7 +34,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.logging.Logger;
 
 import de.javagl.jgltf.impl.v1.BufferView;
@@ -44,8 +43,8 @@ import de.javagl.jgltf.impl.v1.Sampler;
 import de.javagl.jgltf.impl.v1.Texture;
 import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.GltfData;
-import de.javagl.jgltf.model.gl.Shaders;
-import de.javagl.jgltf.model.io.Buffers;
+import de.javagl.jgltf.model.Optionals;
+import de.javagl.jgltf.model.gl.GltfTechniqueModel;
 
 /**
  * A class maintaining the data for rendering a glTF with OpenGL.<br>
@@ -97,6 +96,12 @@ class GltfRenderData
     private final GltfData gltfData;
     
     /**
+     * The {@link GltfTechniqueModel} that contains the elements for 
+     * rendering a glTF asset with GL
+     */
+    private final GltfTechniqueModel gltfTechniqueModel;
+    
+    /**
      * The {@link GlContext} that will create the GL objects
      */
     private final GlContext glContext;
@@ -111,12 +116,16 @@ class GltfRenderData
      * will be created using the given {@link GlContext}
      * 
      * @param gltfData The {@link GltfData}
+     * @param gltfTechniqueModel The {@link GltfTechniqueModel}
      * @param glContext The {@link GlContext}
      */
-    GltfRenderData(GltfData gltfData, GlContext glContext)
+    GltfRenderData(GltfData gltfData, GltfTechniqueModel gltfTechniqueModel, 
+        GlContext glContext)
     {
         this.gltfData = Objects.requireNonNull(gltfData, 
             "The gltfData may not be null");
+        this.gltfTechniqueModel = Objects.requireNonNull(gltfTechniqueModel,
+            "The gltfTechniqueModel may not be null");
         this.glContext = Objects.requireNonNull(glContext,
             "The glContext may not be null");
         
@@ -191,27 +200,16 @@ class GltfRenderData
     {
         logger.fine("Creating GL program for program " + programId);
         
-        Program program = null;
-        if (GltfDefaults.isDefaultProgramId(programId))
+        Program program = gltfTechniqueModel.obtainProgram(programId);
+        if (program == null)
         {
-            program = GltfDefaults.getDefaultProgram();
-        }
-        else
-        {
-            program = gltf.getPrograms().get(programId);
+            logger.warning("Program for " + programId + " not found");
+            return null;
         }
         
         String vertexShaderId = program.getVertexShader();
-        String vertexShaderSource = null;
-        if (GltfDefaults.isDefaultVertexShaderId(vertexShaderId))
-        {
-            vertexShaderSource = Shaders.getDefaultVertexShaderCode();
-        }
-        else
-        {
-            ByteBuffer shaderData = gltfData.getShaderData(vertexShaderId);
-            vertexShaderSource = Buffers.readAsString(shaderData);
-        }
+        String vertexShaderSource = 
+            gltfTechniqueModel.obtainVertexShaderSource(vertexShaderId);
         if (vertexShaderSource == null)
         {
             logger.warning("Source of vertex shader " + 
@@ -220,16 +218,8 @@ class GltfRenderData
         }
         
         String fragmentShaderId = program.getFragmentShader();
-        String fragmentShaderSource = null;
-        if (GltfDefaults.isDefaultFragmentShaderId(fragmentShaderId))
-        {
-            fragmentShaderSource = Shaders.getDefaultFragmentShaderCode();
-        }
-        else
-        {
-            ByteBuffer shaderData = gltfData.getShaderData(fragmentShaderId);
-            fragmentShaderSource = Buffers.readAsString(shaderData);
-        }
+        String fragmentShaderSource = 
+            gltfTechniqueModel.obtainFragmentShaderSource(fragmentShaderId);
         if (fragmentShaderSource == null)
         {
             logger.warning("Source of fragment shader " + 
@@ -313,9 +303,8 @@ class GltfRenderData
         String textureImageId = texture.getSource();
         ByteBuffer imageData = gltfData.getImageData(textureImageId);
         
-        int internalFormat = Optional
-            .ofNullable(texture.getInternalFormat())
-            .orElse(texture.defaultInternalFormat());
+        int internalFormat = Optionals.of(
+            texture.getInternalFormat(), texture.defaultInternalFormat());
 
         // The image data is read with the built-in routines, and
         // always returned as RBGA pixels. So the format and type
@@ -338,18 +327,14 @@ class GltfRenderData
         int glTexture = glContext.createGlTexture(
             pixelsRGBA, internalFormat, width, height, format, type);
 
-        int minFilter = Optional
-            .ofNullable(sampler.getMinFilter())
-            .orElse(sampler.defaultMinFilter());
-        int magFilter = Optional
-            .ofNullable(sampler.getMagFilter())
-            .orElse(sampler.defaultMagFilter());
-        int wrapS = Optional
-            .ofNullable(sampler.getWrapS())
-            .orElse(sampler.defaultWrapS());
-        int wrapT = Optional
-            .ofNullable(sampler.getWrapT())
-            .orElse(sampler.defaultWrapT());
+        int minFilter = Optionals.of(
+            sampler.getMinFilter(), sampler.defaultMinFilter());
+        int magFilter = Optionals.of(
+            sampler.getMagFilter(), sampler.defaultMagFilter());
+        int wrapS = Optionals.of(
+            sampler.getWrapS(), sampler.defaultWrapS());
+        int wrapT = Optionals.of(
+            sampler.getWrapT(), sampler.defaultWrapT());
         
         glContext.setGlTextureParameters(
             glTexture, minFilter, magFilter, wrapS, wrapT);
@@ -430,9 +415,8 @@ class GltfRenderData
             return null;
         }
         
-        int target = Optional
-            .ofNullable(bufferView.getTarget())
-            .orElse(GltfConstants.GL_ARRAY_BUFFER);
+        int target = Optionals.of(
+            bufferView.getTarget(), GltfConstants.GL_ARRAY_BUFFER);
         
         int glBufferView = 
             glContext.createGlBufferView(

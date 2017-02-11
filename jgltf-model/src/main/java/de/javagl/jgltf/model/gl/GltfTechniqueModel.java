@@ -24,39 +24,46 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.viewer;
+package de.javagl.jgltf.model.gl;
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 import de.javagl.jgltf.impl.v1.GlTF;
 import de.javagl.jgltf.impl.v1.Material;
+import de.javagl.jgltf.impl.v1.Program;
+import de.javagl.jgltf.impl.v1.Shader;
 import de.javagl.jgltf.impl.v1.Technique;
 import de.javagl.jgltf.impl.v1.TechniqueStates;
 import de.javagl.jgltf.impl.v1.TechniqueStatesFunctions;
 import de.javagl.jgltf.model.GltfConstants;
+import de.javagl.jgltf.model.GltfData;
+import de.javagl.jgltf.model.io.Buffers;
 
 /**
  * A class representing the techniques that are used for rendering a glTF.
  * This is based on the material- and technique concept of glTF 1.0, and
  * will be implemented with custom techniques for glTF 2.0.
  */
-class GltfTechniqueModel
+public class GltfTechniqueModel
 {
     /**
-     * The glTF which contains the techniques and materials
+     * The {@link GltfData} which contains the techniques, materials,
+     * programs and shaders
      */
-    private final GlTF gltf;
+    private final GltfData gltfData;
     
     /**
-     * Create a new technique model for the given {@link GlTF}
+     * Create a new technique model for the given {@link GltfData}
      * 
-     * @param gltf The {@link GlTF}. May not be <code>null</code>.
+     * @param gltfData The {@link GltfData}. May not be <code>null</code>.
      */
-    GltfTechniqueModel(GlTF gltf)
+    public GltfTechniqueModel(GltfData gltfData)
     {
-        this.gltf = Objects.requireNonNull(gltf, "The gltf may not be null");
+        this.gltfData = 
+            Objects.requireNonNull(gltfData, "The gltfData may not be null");
     }
     
     /**
@@ -68,13 +75,14 @@ class GltfTechniqueModel
      * @param materialId The {@link Material} ID
      * @return The {@link Material}
      */
-    Material obtainMaterial(String materialId)
+    public Material obtainMaterial(String materialId)
     {
         if (materialId == null ||
             GltfDefaults.isDefaultMaterialId(materialId))
         {
             return GltfDefaults.getDefaultMaterial();
         }
+        GlTF gltf = gltfData.getGltf();
         return gltf.getMaterials().get(materialId);
     }
 
@@ -87,14 +95,80 @@ class GltfTechniqueModel
      * @param techniqueId The {@link Technique} ID
      * @return The {@link Technique}
      */
-    Technique obtainTechnique(String techniqueId)
+    public Technique obtainTechnique(String techniqueId)
     {
         if (techniqueId == null ||
             GltfDefaults.isDefaultTechniqueId(techniqueId))
         {
             return GltfDefaults.getDefaultTechnique();
         }
+        GlTF gltf = gltfData.getGltf();
         return gltf.getTechniques().get(techniqueId);
+    }
+    
+    
+    /**
+     * Obtain the {@link Program} with the given ID from the {@link GlTF},
+     * or return the {@link GltfDefaults#getDefaultProgram() default
+     * program} if the given ID is <code>null</code> or the 
+     * {@link GltfDefaults#isDefaultProgramId(String) default program ID}.
+     * 
+     * @param programId The {@link Program} ID
+     * @return The {@link Program}
+     */
+    public Program obtainProgram(String programId)
+    {
+        if (programId == null || 
+            GltfDefaults.isDefaultProgramId(programId))
+        {
+            return GltfDefaults.getDefaultProgram();
+        }
+        GlTF gltf = gltfData.getGltf();
+        return gltf.getPrograms().get(programId);
+    }
+
+    /**
+     * Obtain the source code of the {@link Shader} with the given ID from 
+     * the {@link GltfData}, or return the 
+     * {@link Shaders#getDefaultVertexShaderCode() default vertex shader 
+     * code} if the given ID is <code>null</code> or the 
+     * {@link GltfDefaults#isDefaultVertexShaderId(String) default vertex
+     * shader ID}.
+     * 
+     * @param vertexShaderId The vertex {@link Shader} ID
+     * @return The shader source code
+     */
+    public String obtainVertexShaderSource(String vertexShaderId)
+    {
+        if (vertexShaderId == null ||
+            GltfDefaults.isDefaultVertexShaderId(vertexShaderId))
+        {
+            return Shaders.getDefaultVertexShaderCode();
+        }
+        ByteBuffer shaderData = gltfData.getShaderData(vertexShaderId);
+        return Buffers.readAsString(shaderData);
+    }
+    
+    /**
+     * Obtain the source code of the {@link Shader} with the given ID from 
+     * the {@link GltfData}, or return the 
+     * {@link Shaders#getDefaultFragmentShaderCode() default fragment shader 
+     * code} if the given ID is <code>null</code> or the 
+     * {@link GltfDefaults#isDefaultFragmentShaderId(String) default fragment
+     * shader ID}.
+     * 
+     * @param fragmentShaderId The fragment {@link Shader} ID
+     * @return The shader source code
+     */
+    public String obtainFragmentShaderSource(String fragmentShaderId)
+    {
+        if (fragmentShaderId == null ||
+            GltfDefaults.isDefaultFragmentShaderId(fragmentShaderId))
+        {
+            return Shaders.getDefaultFragmentShaderCode();
+        }
+        ByteBuffer shaderData = gltfData.getShaderData(fragmentShaderId);
+        return Buffers.readAsString(shaderData);
     }
     
     /**
@@ -104,7 +178,7 @@ class GltfTechniqueModel
      * @param technique The {@link Technique}
      * @return The enabled states
      */
-    static List<Integer> getEnabledStates(Technique technique)
+    public static List<Integer> getEnabledStates(Technique technique)
     {
         TechniqueStates states = obtainTechniqueStates(technique);
         List<Integer> enable = states.getEnable();
@@ -145,7 +219,7 @@ class GltfTechniqueModel
      * @param technique The {@link Technique}
      * @return The {@link TechniqueStatesFunctions}
      */
-    static TechniqueStatesFunctions obtainTechniqueStatesFunctions(
+    public static TechniqueStatesFunctions obtainTechniqueStatesFunctions(
         Technique technique)
     {
         TechniqueStates states = obtainTechniqueStates(technique);
@@ -165,7 +239,7 @@ class GltfTechniqueModel
      * 
      * @return All possible states
      */
-    static List<Integer> getAllStates()
+    public static List<Integer> getAllStates()
     {
         List<Integer> allStates = Arrays.asList(
             GltfConstants.GL_BLEND,
@@ -177,6 +251,7 @@ class GltfTechniqueModel
         );
         return allStates;
     }
+
     
     
 
