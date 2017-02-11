@@ -231,12 +231,13 @@ public abstract class AbstractGltfViewer implements GltfViewer
         }
             
         GltfModel gltfModel = new GltfModel(
-            gltfData, null, viewportSupplier, aspectRatioSupplier);
+            gltfData, null, aspectRatioSupplier);
         
         logger.info("Creating rendered glTF");
         
         RenderedGltf renderedGltf = new RenderedGltf(
             gltfModel, getGlContext(), 
+            viewportSupplier,
             viewMatrixSupplier, 
             projectionMatrixSupplier);
         renderedGltfs.put(gltfData, renderedGltf);

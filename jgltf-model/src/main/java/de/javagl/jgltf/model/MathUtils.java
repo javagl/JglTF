@@ -41,8 +41,10 @@ import java.util.Arrays;
  * Unless otherwise noted, each 4x4 matrix is assumed to have a length of 
  * at least 16, and each 3x3 matrix is assumed to have a length of 
  * at least 9. Points in 3D are assumed to have a length of at least 3.
+ * 
+ * TODO This class should not be considered as part of the public API!
  */
-class MathUtils
+public class MathUtils
 {
     /**
      * Epsilon for floating point computations
@@ -54,7 +56,7 @@ class MathUtils
      * 
      * @return The matrix
      */
-    static float[] createIdentity4x4()
+    public static float[] createIdentity4x4()
     {
         float m[] = new float[16];
         setIdentity4x4(m);
@@ -66,7 +68,7 @@ class MathUtils
      * 
      * @param m The matrix
      */
-    static void setIdentity4x4(float m[])
+    public static void setIdentity4x4(float m[])
     {
         Arrays.fill(m, 0.0f);
         m[0] = 1.0f;
@@ -110,7 +112,7 @@ class MathUtils
      * @param sourceMatrix4x4 The source matrix
      * @param targetMatrix3x3 The target matrix
      */
-    static void getRotationScale(
+    public static void getRotationScale(
         float sourceMatrix4x4[], float targetMatrix3x3[])
     {
         targetMatrix3x3[0] = sourceMatrix4x4[ 0];
@@ -161,7 +163,7 @@ class MathUtils
      * @param m The input matrix
      * @param t The target matrix
      */
-    static void transpose4x4(float m[], float t[])
+    public static void transpose4x4(float m[], float t[])
     {
         float m0 = m[ 0];
         float m1 = m[ 1];
@@ -204,7 +206,7 @@ class MathUtils
      * @param b The second matrix
      * @param m The result matrix
      */
-    static void mul4x4(float a[], float b[], float m[])
+    public static void mul4x4(float a[], float b[], float m[])
     {
         float a00 = a[ 0];
         float a10 = a[ 1];
@@ -322,7 +324,7 @@ class MathUtils
      * @param m The input matrix
      * @param inv The inverse matrix
      */
-    static void invert4x4(float m[], float inv[])
+    public static void invert4x4(float m[], float inv[])
     {
         // Adapted from The Mesa 3-D graphics library. 
         // Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
@@ -399,7 +401,7 @@ class MathUtils
      * @param m The input matrix
      * @param inv The inverse matrix
      */
-    static void invert3x3(float m[], float inv[])
+    public static void invert3x3(float m[], float inv[])
     {
         // Adapted from http://stackoverflow.com/a/18504573
         float m0 = m[0];
@@ -521,7 +523,7 @@ class MathUtils
      * @param array The array
      * @return The string representation
      */
-    static String createMatrixString(float array[])
+    public static String createMatrixString(float array[])
     {
         if (array == null)
         {

@@ -54,9 +54,10 @@ import de.javagl.jgltf.model.Accessors;
 import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.GltfData;
 import de.javagl.jgltf.model.GltfModel;
-import de.javagl.jgltf.model.GltfModels;
 import de.javagl.jgltf.model.Maps;
 import de.javagl.jgltf.model.Optionals;
+import de.javagl.jgltf.model.gl.GltfRenderModel;
+import de.javagl.jgltf.model.gl.GltfRenderModels;
 import de.javagl.jgltf.model.gl.GltfTechniqueModel;
 
 /**
@@ -79,6 +80,11 @@ public class RenderedGltf
      * properties of the glTF. 
      */
     private final GltfModel gltfModel;
+    
+    /**
+     * The {@link GltfRenderModel}
+     */
+    private final GltfRenderModel gltfRenderModel;
     
     /**
      * The {@link GlTF} that was contained in the {@link GltfData}
@@ -154,13 +160,16 @@ public class RenderedGltf
      * 
      * @param gltfModel The {@link GltfModel}
      * @param glContext The {@link GlContext}
+     * @param viewportSupplier A supplier that supplies the viewport, 
+     * as 4 float elements, [x, y, width, height]
      * @param externalViewMatrixSupplier The optional external supplier of
      * a view matrix.
      * @param externalProjectionMatrixSupplier The optional external supplier
      * of a projection matrix.
      */
     public RenderedGltf(
-        GltfModel gltfModel, GlContext glContext, 
+        GltfModel gltfModel, GlContext glContext,
+        Supplier<float[]> viewportSupplier,
         Supplier<float[]> externalViewMatrixSupplier, 
         Supplier<float[]> externalProjectionMatrixSupplier)
     {
@@ -168,6 +177,8 @@ public class RenderedGltf
             "The gltfModel may not be null");
         this.glContext = Objects.requireNonNull(glContext,
             "The glContext may not be null");
+        
+        this.gltfRenderModel = new GltfRenderModel(gltfModel, viewportSupplier);
 
         GltfData gltfData = gltfModel.getGltfData();
         this.gltf = gltfData.getGltf();
@@ -842,10 +853,10 @@ public class RenderedGltf
         String semantic = techniqueParameters.getSemantic();
         if (semantic == null)
         {
-            return GltfModels.createGenericSupplier(
+            return GltfRenderModels.createGenericSupplier(
                 uniformName, technique, material);
         }
-        return gltfModel.createSemanticBasedSupplier(
+        return gltfRenderModel.createSemanticBasedSupplier(
             uniformName, technique, nodeId, 
             viewMatrixSupplier, projectionMatrixSupplier);
     }

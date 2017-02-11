@@ -1,4 +1,4 @@
-package de.javagl.jgltf.model;
+package de.javagl.jgltf.model.gl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -29,68 +29,70 @@ public class TestTechniqueParametersTypes
     @Test
     public void testTechniqueParametersTypes() throws IOException 
     {
-        InputStream inputStream = 
+        GlTF gltf = null;
+        try (InputStream inputStream = 
             TestTechniqueParametersTypes.class.getResourceAsStream(
                 "/testModels/testTechniqueParametersTypes/" + 
-                "techniqueParametersTypes.gltf");
-        GltfReader gltfReader = new GltfReader();
-        GlTF gltf = gltfReader.readGltf(inputStream);
+                "techniqueParametersTypes.gltf"))
+        {
+            GltfReader gltfReader = new GltfReader();
+            gltf = gltfReader.readGltf(inputStream);
+        }
         
         Technique technique = gltf.getTechniques().get("technique0");
         Material material = new Material();
         
-        assertReturnTypeIs(GltfModels.createGenericSupplier(
+        assertReturnTypeIs(GltfRenderModels.createGenericSupplier(
             "singleInt", technique, material), 
             Integer.class, -1);
             
-        assertReturnTypeIs(GltfModels.createGenericSupplier(
+        assertReturnTypeIs(GltfRenderModels.createGenericSupplier(
             "singleUnsignedInt", technique, material), 
             Integer.class, -1);
             
-        assertReturnTypeIs(GltfModels.createGenericSupplier(
+        assertReturnTypeIs(GltfRenderModels.createGenericSupplier(
             "singleFloat", technique, material), 
             Float.class, -1);
             
-        assertReturnTypeIs(GltfModels.createGenericSupplier(
+        assertReturnTypeIs(GltfRenderModels.createGenericSupplier(
             "singleIntVec3", technique, material), 
             int[].class, 3);
             
-        assertReturnTypeIs(GltfModels.createGenericSupplier(
+        assertReturnTypeIs(GltfRenderModels.createGenericSupplier(
             "singleFloatVec3", technique, material), 
             float[].class, 3);
             
-        assertReturnTypeIs(GltfModels.createGenericSupplier(
+        assertReturnTypeIs(GltfRenderModels.createGenericSupplier(
             "singleElementIntArray", technique, material), 
             int[].class, 1);
             
-        assertReturnTypeIs(GltfModels.createGenericSupplier(
+        assertReturnTypeIs(GltfRenderModels.createGenericSupplier(
             "singleElementUnsignedIntArray", technique, material), 
             int[].class, 1);
             
-        assertReturnTypeIs(GltfModels.createGenericSupplier(
+        assertReturnTypeIs(GltfRenderModels.createGenericSupplier(
             "singleElementFloatArray", technique, material), 
             float[].class, 1);
             
-        assertReturnTypeIs(GltfModels.createGenericSupplier(
+        assertReturnTypeIs(GltfRenderModels.createGenericSupplier(
             "singleElementIntVec3Array", technique, material), 
             int[].class, 3);
             
-        assertReturnTypeIs(GltfModels.createGenericSupplier(
+        assertReturnTypeIs(GltfRenderModels.createGenericSupplier(
             "singleElementFloatVec3Array", technique, material), 
             float[].class, 3);
             
-        assertReturnTypeIs(GltfModels.createGenericSupplier(
+        assertReturnTypeIs(GltfRenderModels.createGenericSupplier(
             "intVec3Array", technique, material), 
             int[].class, 2 * 3);
             
-        assertReturnTypeIs(GltfModels.createGenericSupplier(
+        assertReturnTypeIs(GltfRenderModels.createGenericSupplier(
             "floatVec3Array", technique, material), 
             float[].class, 2 * 3);
         
-        assertReturnTypeIs(GltfModels.createGenericSupplier(
+        assertReturnTypeIs(GltfRenderModels.createGenericSupplier(
             "sampler2D", technique, material), 
             String.class, -1);
-        
    }
     
     private static void assertReturnTypeIs(

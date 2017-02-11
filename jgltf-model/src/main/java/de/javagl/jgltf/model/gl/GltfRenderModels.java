@@ -24,7 +24,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.model;
+package de.javagl.jgltf.model.gl;
 
 import java.util.List;
 import java.util.Map;
@@ -33,12 +33,12 @@ import java.util.function.Supplier;
 import de.javagl.jgltf.impl.v1.Material;
 import de.javagl.jgltf.impl.v1.Technique;
 import de.javagl.jgltf.impl.v1.TechniqueParameters;
-import de.javagl.jgltf.model.gl.Techniques;
+import de.javagl.jgltf.model.GltfConstants;
 
 /**
  * Utility methods related to the glTF data model. 
  */
-public class GltfModels
+public class GltfRenderModels
 {
     /**
      * Obtain the value for the uniform with the given name from the given
@@ -425,7 +425,7 @@ public class GltfModels
     /**
      * Private constructor to prevent instantiation
      */
-    private GltfModels()
+    private GltfRenderModels()
     {
         // Private constructor to prevent instantiation
     }

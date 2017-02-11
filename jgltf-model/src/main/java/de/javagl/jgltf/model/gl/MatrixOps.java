@@ -24,7 +24,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.model;
+package de.javagl.jgltf.model.gl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +32,8 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import de.javagl.jgltf.model.MathUtils;
 
 /**
  * A class for building suppliers of float arrays that represent matrices.
