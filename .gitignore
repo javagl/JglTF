@@ -48,3 +48,7 @@
 /jgltf-impl-v2-technique-webgl/target
 /jgltf-impl-v2-technique-webgl/.classpath
 /jgltf-impl-v2-technique-webgl/.gitignore
+/AccessorVis
+/jgltf-viewer-demo
+/jgltf-viewer-lwjgl3
+/jgltf2-experiments
