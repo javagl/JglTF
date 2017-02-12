@@ -26,16 +26,16 @@
  */
 package de.javagl.jgltf.viewer;
 
-import java.awt.Component;
-
 import de.javagl.jgltf.impl.v1.Camera;
 import de.javagl.jgltf.impl.v1.GlTF;
 import de.javagl.jgltf.model.GltfData;
 
 /**
  * Interface describing a simple glTF viewer
+ * 
+ * @param <C> The type of the rendering component of this viewer
  */
-public interface GltfViewer
+public interface GltfViewer<C>
 {
     /**
      * Set an optional {@link ExternalCamera}. <br>
@@ -65,7 +65,21 @@ public interface GltfViewer
      * 
      * @return The rendering component of this viewer
      */
-    Component getRenderComponent();
+    C getRenderComponent();
+    
+    /**
+     * Returns the width of the render component
+     * 
+     * @return The width of the render component
+     */
+    int getWidth();
+    
+    /**
+     * Returns the height of the render component
+     * 
+     * @return The height of the render component
+     */
+    int getHeight();
 
     /**
      * Trigger a rendering pass

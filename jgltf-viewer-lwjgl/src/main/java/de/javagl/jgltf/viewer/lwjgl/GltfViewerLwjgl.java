@@ -49,7 +49,7 @@ import de.javagl.jgltf.viewer.GlContext;
 /**
  * Implementation of a glTF viewer based on LWJGL
  */
-public class GltfViewerLwjgl extends AbstractGltfViewer
+public class GltfViewerLwjgl extends AbstractGltfViewer<Component>
 {
     /**
      * The logger used in this class
@@ -139,6 +139,27 @@ public class GltfViewerLwjgl extends AbstractGltfViewer
     public Component getRenderComponent()
     {
         return glComponent;
+    }
+    
+    @Override
+    public int getWidth()
+    {
+        return glComponent.getWidth();
+    }
+    
+    @Override
+    public int getHeight()
+    {
+        return glComponent.getHeight();
+    }
+    
+    @Override
+    public void triggerRendering()
+    {
+        if (getRenderComponent() != null)
+        {
+            getRenderComponent().repaint();
+        }
     }
     
     @Override

@@ -26,7 +26,6 @@
  */
 package de.javagl.jgltf.viewer;
 
-import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -50,8 +49,10 @@ import de.javagl.jgltf.validator.Validator;
 
 /**
  * Abstract base implementation of a {@link GltfViewer}
+ * 
+ * @param <C> The type of the render component of this viewer
  */
-public abstract class AbstractGltfViewer implements GltfViewer
+public abstract class AbstractGltfViewer<C> implements GltfViewer<C>
 {
     /**
      * The logger used in this class
@@ -72,11 +73,10 @@ public abstract class AbstractGltfViewer implements GltfViewer
         @Override
         public float[] get()
         {
-            Component c = getRenderComponent();
             viewport[0] = 0;
             viewport[1] = 0;
-            viewport[2] = c.getWidth();
-            viewport[3] = c.getHeight();
+            viewport[2] = getWidth();
+            viewport[3] = getHeight();
             return viewport;
         }
     };
@@ -90,8 +90,7 @@ public abstract class AbstractGltfViewer implements GltfViewer
      */
     private final DoubleSupplier aspectRatioSupplier = () -> 
     {
-        Component c = getRenderComponent();
-        return (double)c.getWidth() / c.getHeight();
+        return (double)getWidth() / getHeight();
     };
     
     /**
@@ -176,7 +175,7 @@ public abstract class AbstractGltfViewer implements GltfViewer
     }
     
     @Override
-    public abstract Component getRenderComponent();
+    public abstract C getRenderComponent();
     
     /**
      * Returns the {@link GlContext} of this viewer
@@ -184,15 +183,6 @@ public abstract class AbstractGltfViewer implements GltfViewer
      * @return The {@link GlContext} of this viewer
      */
     protected abstract GlContext getGlContext();
-    
-    @Override
-    public final void triggerRendering()
-    {
-        if (getRenderComponent() != null)
-        {
-            getRenderComponent().repaint();
-        }
-    }
     
     @Override
     public final void addGltfData(GltfData gltfData)

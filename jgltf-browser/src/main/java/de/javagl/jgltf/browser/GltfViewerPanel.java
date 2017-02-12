@@ -89,7 +89,7 @@ class GltfViewerPanel extends JPanel
     /**
      * The {@link GltfViewer} that may display the {@link GltfData}
      */
-    private GltfViewer gltfViewer;
+    private GltfViewer<? extends Component> gltfViewer;
     
     /**
      * The container for the {@link GltfViewer#getRenderComponent()}
@@ -356,7 +356,8 @@ class GltfViewerPanel extends JPanel
      * 
      * @param constructor The constructor.
      */
-    private void createViewer(Supplier<? extends GltfViewer> constructor)
+    private void createViewer(
+        Supplier<? extends GltfViewer<? extends Component>> constructor)
     {
         disposeGltfViewer();
         animationsRunningButton.setSelected(false);
