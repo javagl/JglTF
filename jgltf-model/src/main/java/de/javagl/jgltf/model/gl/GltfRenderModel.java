@@ -27,9 +27,11 @@
 package de.javagl.jgltf.model.gl;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Map.Entry;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -46,6 +48,8 @@ import de.javagl.jgltf.model.GltfData;
 import de.javagl.jgltf.model.GltfException;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.MathUtils;
+import de.javagl.jgltf.model.Optionals;
+import de.javagl.jgltf.model.Utils;
 
 /**
  * A class that serves as a data model for a glTF asset that will be
@@ -81,20 +85,52 @@ public class GltfRenderModel
     private final Supplier<float[]> viewportSupplier;
     
     /**
+     * The mapping from joint names to the ID of the {@link Node} with the 
+     * respective {@link Node#getJointName() joint name}
+     */
+    private final Map<String, String> jointNameToNodeId;
+    
+    /**
      * Creates a new render model
      * 
      * @param gltfModel The {@link GltfModel}
+     * @param gltfData The {@link GltfData}
      * @param viewportSupplier A supplier that supplies the viewport, 
      * as 4 float elements, [x, y, width, height]
      */
     public GltfRenderModel(
-        GltfModel gltfModel, Supplier<float[]> viewportSupplier)
+        GltfModel gltfModel, GltfData gltfData, 
+        Supplier<float[]> viewportSupplier)
     {
         this.gltfModel = gltfModel;
-        this.gltfData = gltfModel.getGltfData();
+        this.gltfData = gltfData;
         this.gltf = gltfData.getGltf();
         this.viewportSupplier = Objects.requireNonNull(viewportSupplier, 
             "The viewportSupplier may not be null");
+        
+        this.jointNameToNodeId = computeJointNameToNodeIdMap();
+    }
+    
+    /**
+     * Compute the mapping from joint names to the ID of the {@link Node} with
+     * the respective {@link Node#getJointName() joint name}
+     * 
+     * @return The mapping
+     */
+    private Map<String, String> computeJointNameToNodeIdMap()
+    {
+        Map<String, String> map = new LinkedHashMap<String, String>();
+        Map<String, Node> nodes = Optionals.of(gltf.getNodes());
+        for (Entry<String, Node> entry : nodes.entrySet())
+        {
+            String nodeId = entry.getKey();
+            Node node = entry.getValue();
+            if (node.getJointName() != null)
+            {
+                map.put(node.getJointName(), nodeId);
+            }
+        }
+        return map;
     }
     
     /**
@@ -207,13 +243,13 @@ public class GltfRenderModel
         String parameterNodeId = techniqueParameters.getNode();
         if (parameterNodeId != null)
         {
-            getChecked(gltf.getNodes(), parameterNodeId, 
+            Utils.getChecked(gltf.getNodes(), parameterNodeId, 
                 "technique parameter node");
             accessedNodeId = parameterNodeId;
         }
         else
         {
-            getChecked(gltf.getNodes(), currentNodeId, "current node");
+            Utils.getChecked(gltf.getNodes(), currentNodeId, "current node");
         }
         
         
@@ -221,7 +257,7 @@ public class GltfRenderModel
         {
             case LOCAL:
             {
-                Node node = getExpected(gltf.getNodes(), accessedNodeId, 
+                Node node = Utils.getExpected(gltf.getNodes(), accessedNodeId, 
                     "node for the local transform");
                 return GltfModel.createNodeLocalTransformSupplier(node);
             }
@@ -383,9 +419,11 @@ public class GltfRenderModel
      */
     private Supplier<float[]> createJointMatrixSupplier(String nodeId)
     {
-        Node node = getChecked(gltf.getNodes(), nodeId, "joint node");
+        Node node = Utils.getChecked(
+            gltf.getNodes(), nodeId, "joint node");
         String skinId = node.getSkin();
-        Skin skin = getChecked(gltf.getSkins(), skinId, "joint node skin");
+        Skin skin = Utils.getChecked(
+            gltf.getSkins(), skinId, "joint node skin");
         List<String> jointNames = skin.getJointNames();
 
         // Create the supplier for the bind shape matrix (or a supplier
@@ -399,7 +437,7 @@ public class GltfRenderModel
 
         // Obtain the accessor data for the inverse bind matrices
         String inverseBindMatricesAccessorId = skin.getInverseBindMatrices();
-        Accessor accessor = getChecked(gltf.getAccessors(), 
+        Accessor accessor = Utils.getChecked(gltf.getAccessors(), 
             inverseBindMatricesAccessorId, "inverse bind matrices accessor");
         AccessorFloatData inverseBindMatricesData = 
             AccessorDatas.createFloat(accessor, gltfData);
@@ -451,7 +489,7 @@ public class GltfRenderModel
         for (int j=0; j<jointNames.size(); j++)
         {
             String jointName = jointNames.get(j);            
-            String jointNodeId = gltfModel.getNodeIdForJointName(jointName);
+            String jointNodeId = jointNameToNodeId.get(jointName);
             
             Supplier<float[]> inverseBindMatrixSupplier = 
                 inverseBindMatrixSuppliers.get(j);
@@ -485,69 +523,6 @@ public class GltfRenderModel
         };
     }
     
-    /**
-     * Obtains the value for the given ID from the given map, and throws
-     * a <code>GltfException</code> with an appropriate error message
-     * if the given map is <code>null</code>, or there is no 
-     * non-<code>null</code> value found for the given ID.
-     * 
-     * @param map The map
-     * @param id The ID
-     * @param description A description of what was looked up in the map.
-     * This will be part of the possible exception message
-     * @return The value that was found in the map
-     * @throws GltfException If there was no value found in the map
-     */
-    static <T> T getChecked(
-        Map<String, T> map, String id, String description)
-    {
-        if (map == null)
-        {
-            throw new GltfException(
-                "No map for looking up " + description + " with ID " + id);
-        }
-        T result = map.get(id);
-        if (result == null)
-        {
-            throw new GltfException(
-                "The " + description + " with ID " + id + " does not exist");
-        }
-        return result;
-    }
-
-    /**
-     * Obtains the value for the given ID from the given map. If the given 
-     * ID is <code>null</code>, or the map is <code>null</code>, or there 
-     * is no non-<code>null</code> value found for the given ID, then a 
-     * warning will be printed, and <code>null</code> will be returned.
-     * 
-     * @param map The map
-     * @param id The ID
-     * @param description A description of what was looked up in the map.
-     * This will be part of the possible log message
-     * @return The value that was found in the map
-     */
-    static <T> T getExpected(Map<String, T> map, String id, String description)
-    {
-        if (id == null)
-        {
-            logger.warning("The ID of " + description + " is null");
-            return null;
-        }
-        if (map == null)
-        {
-            logger.warning( 
-                "No map for looking up " + description + " with ID " + id);
-            return null;
-        }
-        T result = map.get(id);
-        if (result == null)
-        {
-            logger.warning( 
-                "The " + description + " with ID " + id + " does not exist");
-        }
-        return result;
-    }
     
 }
 

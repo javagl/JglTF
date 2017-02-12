@@ -82,8 +82,7 @@ public abstract class AbstractGltfViewer implements GltfViewer
     };
     
     /**
-     * A supplier for the aspect ratio. This will be passed to the 
-     * {@link GltfModel} constructor, and provide the aspect ratio
+     * A supplier for the aspect ratio. This will provide the aspect ratio
      * of the rendering window. (If this was <code>null</code>,
      * then the aspect ratio of the glTF {@link Camera} would be
      * used, but this would hardly ever match the actual aspect
@@ -230,14 +229,14 @@ public abstract class AbstractGltfViewer implements GltfViewer
                 externalCamera.getProjectionMatrix();
         }
             
-        GltfModel gltfModel = new GltfModel(
-            gltfData, null, aspectRatioSupplier);
+        GltfModel gltfModel = new GltfModel(gltfData.getGltf());
         
         logger.info("Creating rendered glTF");
         
         RenderedGltf renderedGltf = new RenderedGltf(
-            gltfModel, getGlContext(), 
+            gltfModel, gltfData, getGlContext(), 
             viewportSupplier,
+            aspectRatioSupplier,
             viewMatrixSupplier, 
             projectionMatrixSupplier);
         renderedGltfs.put(gltfData, renderedGltf);

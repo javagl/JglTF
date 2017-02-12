@@ -46,47 +46,34 @@ class Nodes
      * the given array must at least have a length of 16.
      * 
      * @param node The node. May not be <code>null</code>.
-     * @param localTransform The optional array that will store the result
-     * @return The result
+     * @param result The result array
+     * @return The result array
      */
     static float[] computeLocalTransform(
-        Node node, float localTransform[])
+        Node node, float result[])
     {
-        float result[] = localTransform;
-        if (localTransform == null)
-        {
-            result = new float[16];
-        }
-        else
-        {
-            if (localTransform.length < 16)
-            {
-                throw new IllegalArgumentException(
-                    "Array length must at least be 16, but is " + 
-                    localTransform.length);
-            }
-        }
+        float localResult[] = Utils.validate(result, 16);
         if (node.getMatrix() != null)
         {
             float m[] = node.getMatrix();
-            System.arraycopy(m, 0, result, 0, m.length);
-            return result;
+            System.arraycopy(m, 0, localResult, 0, m.length);
+            return localResult;
         }
         
-        MathUtils.setIdentity4x4(result);
+        MathUtils.setIdentity4x4(localResult);
         if (node.getTranslation() != null)
         {
             float t[] = node.getTranslation();
-            result[12] = t[0]; 
-            result[13] = t[1]; 
-            result[14] = t[2]; 
+            localResult[12] = t[0]; 
+            localResult[13] = t[1]; 
+            localResult[14] = t[2]; 
         }
         if (node.getRotation() != null)
         {
             float q[] = node.getRotation();
             float m[] = new float[16];
             MathUtils.quaternionToMatrix4x4(q, m);
-            MathUtils.mul4x4(result, m, result);
+            MathUtils.mul4x4(localResult, m, localResult);
         }
         if (node.getScale() != null)
         {
@@ -96,9 +83,9 @@ class Nodes
             m[ 5] = s[1];
             m[10] = s[2];
             m[15] = 1.0f;
-            MathUtils.mul4x4(result, m, result);
+            MathUtils.mul4x4(localResult, m, localResult);
         }
-        return result;
+        return localResult;
     }
 
     /**

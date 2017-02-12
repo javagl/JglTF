@@ -33,6 +33,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
@@ -124,6 +125,12 @@ public class RenderedGltf
     private SettableSupplier<String> currentCameraNodeIdSupplier;
     
     /**
+     * An optional supplier for the aspect ratio. If this is <code>null</code>, 
+     * then the aspect ratio of the camera will be used     
+     */
+    private final DoubleSupplier aspectRatioSupplier;
+    
+    /**
      * A supplier for the view matrix. 
      * See {@link #createViewMatrixSupplier(Supplier)} for details.
      */
@@ -159,17 +166,22 @@ public class RenderedGltf
      * that are stored in the glTF.  
      * 
      * @param gltfModel The {@link GltfModel}
+     * @param gltfData The {@link GltfData}
      * @param glContext The {@link GlContext}
      * @param viewportSupplier A supplier that supplies the viewport, 
      * as 4 float elements, [x, y, width, height]
+     * @param aspectRatioSupplier An optional supplier for the aspect ratio. 
+     * If this is <code>null</code>, then the aspect ratio of the 
+     * camera will be used
      * @param externalViewMatrixSupplier The optional external supplier of
      * a view matrix.
      * @param externalProjectionMatrixSupplier The optional external supplier
      * of a projection matrix.
      */
     public RenderedGltf(
-        GltfModel gltfModel, GlContext glContext,
+        GltfModel gltfModel, GltfData gltfData, GlContext glContext,
         Supplier<float[]> viewportSupplier,
+        DoubleSupplier aspectRatioSupplier,
         Supplier<float[]> externalViewMatrixSupplier, 
         Supplier<float[]> externalProjectionMatrixSupplier)
     {
@@ -178,9 +190,10 @@ public class RenderedGltf
         this.glContext = Objects.requireNonNull(glContext,
             "The glContext may not be null");
         
-        this.gltfRenderModel = new GltfRenderModel(gltfModel, viewportSupplier);
+        this.gltfRenderModel = new GltfRenderModel(
+            gltfModel, gltfData, viewportSupplier);
+        this.aspectRatioSupplier = aspectRatioSupplier;
 
-        GltfData gltfData = gltfModel.getGltfData();
         this.gltf = gltfData.getGltf();
         this.gltfTechniqueModel = new GltfTechniqueModel(gltfData);
         this.gltfRenderData = new GltfRenderData(
@@ -342,7 +355,7 @@ public class RenderedGltf
     {
         Supplier<float[]> gltfProjectionMatrixSupplier = 
             gltfModel.createProjectionMatrixSupplier(
-                currentCameraNodeIdSupplier);
+                currentCameraNodeIdSupplier, aspectRatioSupplier);
         float identity[] = createIdentityMatrix4x4();
         return () ->
         {

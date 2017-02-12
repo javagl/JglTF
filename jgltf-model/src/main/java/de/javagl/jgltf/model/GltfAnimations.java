@@ -179,7 +179,7 @@ public class GltfAnimations
 
         String animationChannelSamplerId = animationChannel.getSampler();
         AnimationSampler animationSampler =
-            GltfModel.getExpected(animation.getSamplers(), 
+            Utils.getExpected(animation.getSamplers(), 
                 animationChannelSamplerId, "animation channel sampler");
         if (animationSampler == null)
         {
@@ -328,7 +328,7 @@ public class GltfAnimations
         
         String animationChannelSamplerId = animationChannel.getSampler();
         AnimationSampler animationSampler =
-            GltfModel.getExpected(animation.getSamplers(), 
+            Utils.getExpected(animation.getSamplers(), 
                 animationChannelSamplerId, "animation channel sampler");
         if (animationSampler == null)
         {
@@ -444,7 +444,7 @@ public class GltfAnimations
     private static AnimationListener createTranslationAnimationListener(
         GlTF gltf, String nodeId)
     {
-        Node node = GltfModel.getExpected(
+        Node node = Utils.getExpected(
             gltf.getNodes(), nodeId, "animated node");
         if (node == null)
         {
@@ -471,7 +471,7 @@ public class GltfAnimations
     private static AnimationListener createRotationAnimationListener(
         GlTF gltf, String nodeId)
     {
-        Node node = GltfModel.getExpected(
+        Node node = Utils.getExpected(
             gltf.getNodes(), nodeId, "animated node");
         if (node == null)
         {
@@ -498,7 +498,7 @@ public class GltfAnimations
     private static AnimationListener createScaleAnimationListener(
         GlTF gltf, String nodeId)
     {
-        Node node = GltfModel.getExpected(
+        Node node = Utils.getExpected(
             gltf.getNodes(), nodeId, "animated node");
         if (node == null)
         {

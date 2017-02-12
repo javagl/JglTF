@@ -29,14 +29,12 @@ package de.javagl.jgltf.model;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 import de.javagl.jgltf.impl.v1.Camera;
-import de.javagl.jgltf.impl.v1.CameraOrthographic;
 import de.javagl.jgltf.impl.v1.CameraPerspective;
 import de.javagl.jgltf.impl.v1.GlTF;
 import de.javagl.jgltf.impl.v1.Node;
@@ -61,105 +59,66 @@ public final class GltfModel
         Logger.getLogger(GltfModel.class.getName());
 
     /**
-     * The {@link GltfData} of this model
-     */
-    private final GltfData gltfData;
-
-    /**
      * The {@link GlTF} of this model
      */
     private final GlTF gltf;
 
     /**
-     * A mapping from {@link Node} IDs to their parent nodes
+     * The mapping from {@link Node} IDs to {@link NodeModel} instances
      */
-    private final Map<String, String> nodeIdToParentNodeId;
+    private final Map<String, NodeModel> nodeIdToNodeModel;
     
     /**
-     * The mapping from joint names to the ID of the {@link Node} with the 
-     * respective {@link Node#getJointName() joint name}
+     * The mapping from {@link Node} IDs (IMPORTANT: NOT from camera IDs!) to 
+     * {@link CameraModel} instances that have been created from
+     * the {@link Camera} reference of the respective {@link Node}
      */
-    private final Map<String, String> jointNameToNodeId;
+    private final Map<String, CameraModel> nodeIdToCameraModel;
     
     /**
-     * The root transform of the {@link GlTF}, as a column-major 4x4 matrix
-     */
-    private final float rootTransform[];
-    
-    /**
-     * A supplier for the aspect ratio. This may be used to override the
-     * aspect ratio that is provided by the camera, using an aspect ratio
-     * that depends, for example, on the rendering window size. If this is 
-     * <code>null</code>, then the aspect ratio of the camera will be used
-     */
-    private final DoubleSupplier aspectRatioSupplier;
-    
-    /**
-     * Creates a new model for the given {@link GltfData}
+     * Creates a new model for the given glTF
      * 
-     * @param gltfData The {@link GltfData}
-     * @param rootTransform The root transform of the {@link GlTF}, as a 
-     * column-major 4x4 matrix. If this is <code>null</code>, then the
-     * identity matrix will be used.
-     * @param aspectRatioSupplier An optional supplier for the aspect ratio. 
-     * If this is <code>null</code>, then the aspect ratio of the 
-     * camera will be used
+     * @param gltf The {@link GlTF}
      */
-    public GltfModel(GltfData gltfData, 
-        float rootTransform[],
-        DoubleSupplier aspectRatioSupplier)
+    public GltfModel(GlTF gltf)
     {
-        Objects.requireNonNull(gltfData, 
-            "The gltfData may not be null");
+        Objects.requireNonNull(gltf, 
+            "The gltf may not be null");
 
-        this.gltfData = gltfData;
-        this.gltf = gltfData.getGltf();
-        this.rootTransform = rootTransform != null ? 
-            rootTransform : MathUtils.createIdentity4x4();
-        this.aspectRatioSupplier = aspectRatioSupplier;
-        
-        this.nodeIdToParentNodeId = computeNodeIdToParentNodeIdMap();
-        this.jointNameToNodeId = computeJointNameToNodeIdMap();
+        this.gltf = gltf;
+        this.nodeIdToNodeModel = createNodeIdToNodeModel();
+        this.nodeIdToCameraModel = createNodeIdToCameraModel();
     }
-    
+
     /**
-     * Returns the {@link GltfData} that this model was created from
-     * 
-     * @return The {@link GltfData}
-     */
-    public GltfData getGltfData()
-    {
-        return gltfData;
-    }
-    
-    /**
-     * Compute the mapping from {@link Node} IDs to their parent node IDs
+     * Compute the mapping from {@link Node} IDs to {@link NodeModel} instances
      * 
      * @return The mapping
      */
-    private Map<String, String> computeNodeIdToParentNodeIdMap()
+    private Map<String, NodeModel> createNodeIdToNodeModel()
     {
-        Map<String, String> map = new LinkedHashMap<String, String>();
+        Map<String, NodeModel> map = new LinkedHashMap<String, NodeModel>();
         Map<String, Node> nodes = Optionals.of(gltf.getNodes());
         for (String nodeId : nodes.keySet())
         {
             Node node = nodes.get(nodeId);
-            if (node == null)
+            NodeModel nodeModel = new NodeModel(node);
+            map.put(nodeId, nodeModel);
+        }
+        for (String nodeId : map.keySet())
+        {
+            NodeModel node = map.get(nodeId);
+            List<String> childIds = Optionals.of(node.getNode().getChildren());
+            for (String childId : childIds)
             {
-                logger.severe("No node found for ID "+nodeId);
-            }
-            else
-            {
-                List<String> children = Optionals.of(node.getChildren());
-                for (String childNodeId : children)
+                NodeModel child = map.get(childId);
+                if (child == null)
                 {
-                    String oldParent = map.put(childNodeId, nodeId);
-                    if (oldParent != null)
-                    {
-                        logger.severe("Node with ID " + childNodeId + 
-                            " has two parents: " + oldParent + 
-                            " and " + nodeId);
-                    }
+                    logger.severe("Node with ID " + childId + " not found");
+                }
+                else
+                {
+                    node.addChild(child);
                 }
             }
         }
@@ -167,42 +126,40 @@ public final class GltfModel
     }
     
     /**
-     * Compute the mapping from joint names to the ID of the {@link Node} with
-     * the respective {@link Node#getJointName() joint name}
+     * Create the mapping from {@link Node} IDs to {@link CameraModel} 
+     * instances, based on the {@link Node} objects of the glTF that 
+     * refer to a {@link Camera}.
      * 
-     * @return The mapping
+     * @return The {@link CameraModel} instances
      */
-    private Map<String, String> computeJointNameToNodeIdMap()
+    private Map<String, CameraModel> createNodeIdToCameraModel()
     {
-        Map<String, String> map = new LinkedHashMap<String, String>();
+        Map<String, CameraModel> map = new LinkedHashMap<String, CameraModel>();
         Map<String, Node> nodes = Optionals.of(gltf.getNodes());
-        for (Entry<String, Node> entry : nodes.entrySet())
+        Map<String, Camera> cameras = Optionals.of(gltf.getCameras());
+        for (String nodeId : nodes.keySet())
         {
-            String nodeId = entry.getKey();
-            Node node = entry.getValue();
-            if (node.getJointName() != null)
+            Node node = nodes.get(nodeId);
+            String cameraId = node.getCamera();
+            if (cameraId != null)
             {
-                map.put(node.getJointName(), nodeId);
+                Camera camera = cameras.get(cameraId);
+                if (camera == null)
+                {
+                    logger.severe("Camera with ID " + cameraId + " not found");
+                }
+                else
+                {
+                    NodeModel nodeModel = nodeIdToNodeModel.get(nodeId);
+                    CameraModel cameraModel = 
+                        new CameraModel(camera, nodeModel);
+                    map.put(nodeId, cameraModel);
+                }
             }
         }
         return map;
     }
     
-    /**
-     * Returns the ID of the node with the given joint name, or 
-     * <code>null</code> if no such node exists.
-     * 
-     * TODO: This will be refactored for glTF 2.0!
-     * 
-     * @param jointName The joint name
-     * @return The node ID
-     */
-    public String getNodeIdForJointName(String jointName)
-    {
-        return jointNameToNodeId.get(jointName);
-    }
-    
-
     /**
      * Create a supplier for the view matrix of the camera that is attached
      * to the {@link Node} whose ID is provided by the given supplier. This 
@@ -225,14 +182,18 @@ public final class GltfModel
     public Supplier<float[]> createViewMatrixSupplier(
         Supplier<String> cameraNodeIdSupplier)
     {
-        float cameraMatrix[] = new float[16];
         float viewMatrix[] = new float[16];
-        float temp[] = new float[16];
         return () ->
         {
             String nodeId = cameraNodeIdSupplier.get();
-            computeGlobalTransform(nodeId, temp, cameraMatrix);
-            MathUtils.invert4x4(cameraMatrix, viewMatrix);
+            CameraModel cameraModel = nodeIdToCameraModel.get(nodeId);
+            if (cameraModel == null)
+            {
+                logger.warning("No camera model found for node " + nodeId);
+                MathUtils.setIdentity4x4(viewMatrix);
+                return viewMatrix;
+            }
+            cameraModel.computeViewMatrix(viewMatrix);
             return viewMatrix;
         };
     }
@@ -260,94 +221,39 @@ public final class GltfModel
      * 
      * @param cameraNodeIdSupplier The supplier of the {@link Node} ID
      * of the node that contains the {@link Camera} ID
+     * @param aspectRatioSupplier The optional supplier for the aspect
+     * ratio of the camera. If this is <code>null</code>, then the
+     * {@link CameraPerspective#getAspectRatio() aspect ratio of the camera}
+     * will be used.
      * @return The supplier
      */
     public Supplier<float[]> createProjectionMatrixSupplier(
-        Supplier<String> cameraNodeIdSupplier)
+        Supplier<String> cameraNodeIdSupplier,
+        DoubleSupplier aspectRatioSupplier)
     {
-        float result[] = new float[16];
-        return () ->
+        float projectionMatrix[] = new float[16];
+        return () -> 
         {
-            String cameraNodeId = cameraNodeIdSupplier.get();
-            Node node = getExpected(
-                gltf.getNodes(), cameraNodeId, "camera node");
-            if (node == null)
+            String nodeId = cameraNodeIdSupplier.get();
+            CameraModel cameraModel = nodeIdToCameraModel.get(nodeId);
+            if (cameraModel == null)
             {
-                MathUtils.setIdentity4x4(result);  
-                return result;
+                logger.warning("No camera model found for node " + nodeId);
+                MathUtils.setIdentity4x4(projectionMatrix);
+                return projectionMatrix;
             }
-            String cameraId = node.getCamera();
-            Camera camera = getExpected(
-                gltf.getCameras(), cameraId, "camera");
-            if (camera == null)
+            Float aspectRatio = null;
+            if (aspectRatioSupplier != null)
             {
-                MathUtils.setIdentity4x4(result);  
-                return result;
+                double a = aspectRatioSupplier.getAsDouble();
+                aspectRatio = (float)a;
             }
-            computeProjectionMatrix(camera, aspectRatioSupplier, result);
-            return result;
+            cameraModel.computeProjectionMatrix(projectionMatrix, aspectRatio);
+            return projectionMatrix;
         };
     }
     
-    /**
-     * Compute the projection matrix for the given {@link Camera}, and write
-     * it into the given result array, which is a float array with 16 
-     * elements, storing the matrix entries in column-major order.<br>
-     * <br>
-     * If the {@link Camera#getType()} is neither <code>"perspective"</code> 
-     * nor <code>"orthographic"</code>, then this method will print an error 
-     * message and set the given matrix to identity.
-     * 
-     * @param camera The {@link Camera}
-     * @param aspectRatioSupplier An optional supplier for the aspect ratio
-     * to use. If this is <code>null</code>, then the aspect ratio of the
-     * camera will be used.
-     * @param result The array storing the result
-     */
-    private static void computeProjectionMatrix(
-        Camera camera, DoubleSupplier aspectRatioSupplier, float result[])
-    {
-        String cameraType = camera.getType();
-        if ("perspective".equals(cameraType))
-        {
-            CameraPerspective cameraPerspective = camera.getPerspective();
-            float fovRad = cameraPerspective.getYfov();
-            float fovDeg = (float)Math.toDegrees(fovRad);
-            Float aspect = 1.0f;
-            if (aspectRatioSupplier != null)
-            {
-                aspect = (float)aspectRatioSupplier.getAsDouble();
-            }
-            else if (cameraPerspective.getAspectRatio() != null)
-            {
-                aspect = cameraPerspective.getAspectRatio();
-            }
-            float zNear = cameraPerspective.getZnear();
-            float zFar = cameraPerspective.getZfar();
-            MathUtils.perspective4x4(fovDeg, aspect, zNear, zFar, result);
-        }
-        else if ("orthographic".equals(cameraType))
-        {
-            CameraOrthographic cameraOrthographic = 
-                camera.getOrthographic();
-            float xMag = cameraOrthographic.getXmag();
-            float yMag = cameraOrthographic.getYmag();
-            float zNear = cameraOrthographic.getZnear();
-            float zFar = cameraOrthographic.getZfar();
-            MathUtils.setIdentity4x4(result);
-            result[0] = xMag;
-            result[5] = yMag;
-            result[10] = -2.0f / (zFar - zNear);
-        }
-        else
-        {
-            logger.severe("Invalid camera type: "+cameraType);
-            MathUtils.setIdentity4x4(result);
-        }
-    }
-
     
-
     /**
      * Creates a supplier for the global transform matrix of the 
      * {@link Node} with the given ID.<br>
@@ -363,77 +269,17 @@ public final class GltfModel
      */
     public Supplier<float[]> createNodeGlobalTransformSupplier(String nodeId)
     {
+        NodeModel node = nodeIdToNodeModel.get(nodeId);
+        if (node == null)
+        {
+            return createIdentityTransformSupplier();
+        }
         float globalTransform[] = new float[16];
-        float tempLocalTransform[] = new float[16];
         return () ->
         {
-            computeGlobalTransform(nodeId, tempLocalTransform, globalTransform);
-            return globalTransform;
+            return node.computeGlobalTransform(globalTransform);
         };
     }
-    
-    /**
-     * Compute the global transform of the {@link Node} with the given ID,
-     * and store it in the given result array, as a 4x4 matrix in column-major
-     * order.<br>
-     * <br>
-     * If one of the required nodes can not be found in the glTF, then
-     * a warning will be printed, and the identity matrix will be 
-     * assumed for the respective node.
-     * <br>
-     * If the given array is <code>null</code> or does not have a length 
-     * of 16, then a new array will be created and returned
-     * 
-     * @param nodeId The {@link Node} ID
-     * @param result The array that will store the result
-     * @return The result array
-     */
-    public float[] computeGlobalTransform(String nodeId, float result[])
-    {
-        float localResult[] = result;
-        if (localResult == null || localResult.length != 16)
-        {
-            localResult = new float[16];
-        }
-        float tempLocalTransform[] = new float[16];
-        computeGlobalTransform(nodeId, tempLocalTransform, localResult);
-        return localResult;
-    }
-
-    /**
-     * Compute the global transform of the {@link Node} with the given ID,
-     * and store the result in the given <code>globalTransform</code> array,
-     * in column-major order.<br>
-     * <br>
-     * If one of the required nodes can not be found in the glTF, then
-     * a warning will be printed, and the identity matrix will be 
-     * assumed for the respective node.
-     * 
-     * @param nodeId The {@link Node} ID
-     * @param tempLocalTransform A 16-element array for temporary storage
-     * @param globalTransform The array that will store the result
-     */
-    private void computeGlobalTransform(
-        String nodeId, float tempLocalTransform[], float globalTransform[])
-    {
-        String currentNodeId = nodeId;
-        MathUtils.setIdentity4x4(globalTransform);
-        while (currentNodeId != null)
-        {
-            Node currentNode = getExpected(
-                gltf.getNodes(), currentNodeId, "node");
-            if (currentNode != null)
-            {
-                Nodes.computeLocalTransform(currentNode, tempLocalTransform);
-                MathUtils.mul4x4(
-                    tempLocalTransform, globalTransform, globalTransform);
-            }
-            currentNodeId = nodeIdToParentNodeId.get(currentNodeId);
-        }
-        MathUtils.mul4x4(rootTransform, globalTransform, globalTransform);
-    }
-    
-    
     
     /**
      * Creates a supplier for the local transform matrix of the 
@@ -454,55 +300,39 @@ public final class GltfModel
      */
     public static Supplier<float[]> createNodeLocalTransformSupplier(Node node)
     {
-        float localTransform[] = new float[16];
-        MathUtils.setIdentity4x4(localTransform);
         if (node == null)
         {
-            return () -> localTransform;
+            return createIdentityTransformSupplier();
         }
+        float localTransform[] = new float[16];
         return () ->
         {
             Nodes.computeLocalTransform(node, localTransform);
             return localTransform;
         };
     }
+
+    /**
+     * Creates a supplier that returns the 4x4 identity matrix.<br>
+     * <br>
+     * Note: The supplier MAY always return the same array instance.
+     * Callers MUST NOT store or modify the returned array. 
+     *  
+     * @return The supplier
+     */
+    private static Supplier<float[]> createIdentityTransformSupplier()
+    {
+        float matrix[] = new float[16];
+        return () -> 
+        {
+            MathUtils.setIdentity4x4(matrix);
+            return matrix;
+        };
+    }
     
 
     
     
-    /**
-     * Obtains the value for the given ID from the given map. If the given 
-     * ID is <code>null</code>, or the map is <code>null</code>, or there 
-     * is no non-<code>null</code> value found for the given ID, then a 
-     * warning will be printed, and <code>null</code> will be returned.
-     * 
-     * @param map The map
-     * @param id The ID
-     * @param description A description of what was looked up in the map.
-     * This will be part of the possible log message
-     * @return The value that was found in the map
-     */
-    static <T> T getExpected(Map<String, T> map, String id, String description)
-    {
-        if (id == null)
-        {
-            logger.warning("The ID of " + description + " is null");
-            return null;
-        }
-        if (map == null)
-        {
-            logger.warning( 
-                "No map for looking up " + description + " with ID " + id);
-            return null;
-        }
-        T result = map.get(id);
-        if (result == null)
-        {
-            logger.warning( 
-                "The " + description + " with ID " + id + " does not exist");
-        }
-        return result;
-    }
     
     
 }
