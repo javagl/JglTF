@@ -124,36 +124,12 @@ public class GltfDataWriter
         {
             return;
         }
-        try
-        {
-            String fileName = Paths.get(path, uriString).toString();
-            try (@SuppressWarnings("resource")
-                WritableByteChannel writableByteChannel = 
-                    Channels.newChannel(new FileOutputStream(fileName)))
-            {
-                logger.log(level, 
-                    "Writing buffer " + id + " to " + fileName);
-                
-                ByteBuffer data = gltfData.getBufferData(id);
-                if (data == null)
-                {
-                    logger.warning("Writing buffer " + id + " FAILED: " + 
-                        "No buffer data found");
-                }
-                else
-                {
-                    writableByteChannel.write(data.slice());
-                    logger.log(level, "Writing buffer " + id + " DONE");
-                }
-            }
-        }
-        catch (IOException e)
-        {
-            logger.warning("Writing buffer " + id + " FAILED: " + 
-                e.getMessage());
-        }
+        String name = "buffer " + id;
+        ByteBuffer data = gltfData.getBufferData(id);
+        String fileName = Paths.get(path, uriString).toString();
+        write(name, data, fileName);
     }
-    
+
     /**
      * Write the {@link Image} with the given ID from the given 
      * {@link GltfData} to a file that is created by appending
@@ -173,34 +149,10 @@ public class GltfDataWriter
         {
             return;
         }
-        try
-        {
-            String fileName = Paths.get(path, uriString).toString();
-            try (@SuppressWarnings("resource")
-                WritableByteChannel writableByteChannel = 
-                    Channels.newChannel(new FileOutputStream(fileName)))
-            {
-                logger.log(level, 
-                    "Writing image " + id + " to " + fileName);
-                
-                ByteBuffer data = gltfData.getImageData(id);
-                if (data == null)
-                {
-                    logger.warning("Writing image " + id + " FAILED: " + 
-                        "No image data found");
-                }
-                else
-                {
-                    writableByteChannel.write(data.slice());
-                    logger.log(level, "Writing image " + id + " DONE");
-                }
-            }
-        }
-        catch (IOException e)
-        {
-            logger.warning("Writing image " + id + " FAILED: " + 
-                e.getMessage());
-        }
+        String name = "image " + id;
+        ByteBuffer data = gltfData.getImageData(id);
+        String fileName = Paths.get(path, uriString).toString();
+        write(name, data, fileName);
     }
     
     /**
@@ -222,37 +174,42 @@ public class GltfDataWriter
         {
             return;
         }
-        try
-        {
-            String fileName = Paths.get(path, uriString).toString();
-            try (@SuppressWarnings("resource")
-                WritableByteChannel writableByteChannel = 
-                    Channels.newChannel(new FileOutputStream(fileName)))
-            {
-                logger.log(level, 
-                    "Writing shader " + id + " to " + fileName);
-                
-                ByteBuffer data = gltfData.getShaderData(id);
-                if (data == null)
-                {
-                    logger.warning("Writing shader " + id + " FAILED: " + 
-                        "No shader data found");
-                }
-                else
-                {
-                    writableByteChannel.write(data.slice());
-                    logger.log(level, "Writing shader " + id + " DONE");
-                }
-            }
-        }
-        catch (IOException e)
-        {
-            logger.warning("Writing shader " + id + " FAILED: " + 
-                e.getMessage());
-        }
+        String name = "shader " + id;
+        ByteBuffer data = gltfData.getShaderData(id);
+        String fileName = Paths.get(path, uriString).toString();
+        write(name, data, fileName);
     }
     
     
+    /**
+     * Write the given byte buffer to a file with the given name. If the
+     * given data is <code>null</code>, then a warning will be printed
+     * and nothing will be written.
+     * 
+     * @param name The name of the written data. Only used for logging.
+     * @param data The data to write
+     * @param fileName The file name
+     */
+    private static void write(String name, ByteBuffer data, String fileName)
+    {
+        if (data == null)
+        {
+            logger.warning("Writing " + name + " FAILED: No  data found");
+            return;
+        }
+        try (@SuppressWarnings("resource")
+            WritableByteChannel writableByteChannel = 
+            Channels.newChannel(new FileOutputStream(fileName)))
+        {
+            logger.log(level, "Writing " + name + " to " + fileName);
+            writableByteChannel.write(data.slice());
+            logger.log(level, "Writing " + name + " DONE");
+        }
+        catch (IOException e)
+        {
+            logger.warning("Writing " + name + " FAILED: " + e.getMessage());
+        }
+    }
     
     
 }
