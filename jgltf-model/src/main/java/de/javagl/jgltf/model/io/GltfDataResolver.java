@@ -32,6 +32,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -168,35 +169,10 @@ public class GltfDataResolver
         {
             return;
         }
-        InputStream inputStream = null;
-        try
-        {
-            logger.log(level, "Reading buffer " + id);
-            
-            inputStream = uriStringResolver.apply(buffer.getUri());
-            if (inputStream != null)
-            {
-                byte data[] = IO.readStream(inputStream);
-                ByteBuffer byteBuffer = Buffers.create(data);
-                gltfData.putBufferData(id, byteBuffer);
-                logger.log(level, "Reading buffer " + id + " DONE");
-            }
-            else
-            {
-                throw new IOException(
-                    "Could not resolve URI " + buffer.getUri());
-            }
-        }
-        catch (IOException e)
-        {
-            logger.warning("Reading buffer " + id + " FAILED: " + 
-                e.getMessage());
-        }
-        finally
-        {
-            tryClose(inputStream);
-        }
+        read("buffer " + id, buffer.getUri(), 
+            byteBuffer -> gltfData.putBufferData(id, byteBuffer));
     }
+    
 
     /**
      * Resolve all {@link Image#getUri() image URIs}, load the data from 
@@ -222,33 +198,8 @@ public class GltfDataResolver
         {
             return;
         }
-        InputStream inputStream = null;
-        try
-        {
-            logger.log(level, "Reading image " + id);
-            
-            inputStream = uriStringResolver.apply(image.getUri());
-            if (inputStream != null)
-            {
-                byte data[] = IO.readStream(inputStream);
-                gltfData.putImageData(id, Buffers.create(data));
-                logger.log(level, "Reading image " + id + " DONE");
-            }
-            else
-            {
-                throw new IOException(
-                    "Could not resolve URI " + image.getUri());
-            }
-        }
-        catch (IOException e)
-        {
-            logger.warning("Reading image " + id + " FAILED: " + 
-                e.getMessage());
-        }
-        finally
-        {
-            tryClose(inputStream);
-        }
+        read("image " + id, image.getUri(), 
+            byteBuffer -> gltfData.putImageData(id, byteBuffer));
     }
 
     /**
@@ -274,27 +225,43 @@ public class GltfDataResolver
         {
             return;
         }
+        read("shader " + id, shader.getUri(), 
+            byteBuffer -> gltfData.putShaderData(id, byteBuffer));
+    }
+    
+    /**
+     * Read the data from the given URI into a byte buffer, and pass
+     * this buffer to the given consumer.
+     * 
+     * @param name The name of the resource to read. Only used for logging.
+     * @param uri The URI to read from
+     * @param consumer The consumer for the resulting byte buffer
+     */
+    private void read(String name, 
+        String uri, Consumer<ByteBuffer> consumer)
+    {
         InputStream inputStream = null;
         try
         {
-            logger.log(level, "Reading shader " + id);
-
-            inputStream = uriStringResolver.apply(shader.getUri());
+            logger.log(level, "Reading " + name);
+            
+            inputStream = uriStringResolver.apply(uri);
             if (inputStream != null)
             {
                 byte data[] = IO.readStream(inputStream);
-                gltfData.putShaderData(id, Buffers.create(data));
-                logger.log(level, "Reading shader " + id + " DONE");
+                ByteBuffer byteBuffer = Buffers.create(data);
+                consumer.accept(byteBuffer);
+                logger.log(level, "Reading " + name + " DONE");
             }
             else
             {
                 throw new IOException(
-                    "Could not resolve URI " + shader.getUri());
+                    "Could not resolve URI of " + name + ": " + uri);
             }
         }
         catch (IOException e)
         {
-            logger.warning("Reading shader " + id + " FAILED: " + 
+            logger.warning("Reading " + name + " FAILED: " + 
                 e.getMessage());
         }
         finally
