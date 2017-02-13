@@ -72,13 +72,19 @@ public class Buffers
     {
         int oldPosition = byteBuffer.position();
         int oldLimit = byteBuffer.limit();
-        byteBuffer.limit(position + length);
-        byteBuffer.position(position);
-        ByteBuffer slice = byteBuffer.slice();
-        slice.order(byteBuffer.order());
-        byteBuffer.limit(oldLimit);
-        byteBuffer.position(oldPosition);
-        return slice;
+        try
+        {
+            byteBuffer.limit(position + length);
+            byteBuffer.position(position);
+            ByteBuffer slice = byteBuffer.slice();
+            slice.order(byteBuffer.order());
+            return slice;
+        }
+        finally
+        {
+            byteBuffer.limit(oldLimit);
+            byteBuffer.position(oldPosition);
+        }
     }
     
     /**
