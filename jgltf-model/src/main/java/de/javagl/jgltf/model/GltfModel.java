@@ -39,15 +39,7 @@ import de.javagl.jgltf.impl.v1.GlTF;
 import de.javagl.jgltf.impl.v1.Node;
 
 /**
- * A class that serves as a data model for a {@link GlTF} and allows obtaining
- * suppliers for the data elements that are described in the {@link GlTF}.<br>
- * <br>
- * Unless otherwise noted, none of the parameters for the methods of this
- * class may be <code>null</code>.<br>
- * <br>
- * Note: The suppliers that are provided by this class may throw a
- * {@link GltfException} when they encounter an invalid state (for
- * example, an ID that is not mapped to a valid object).
+ * A class that serves as a data model for a {@link GlTF}.<br>
  */
 public final class GltfModel
 {
