@@ -41,9 +41,9 @@ class Nodes
      * are not <code>null</code>, respectively.<br>
      * <br>
      * The result will be written to the given array, as a 4x4 matrix in 
-     * column major order. If the given array is <code>null</code>, then
-     * a new array with length 16 will be created and returned. Otherwise,
-     * the given array must at least have a length of 16.
+     * column major order. If the given array is <code>null</code> or does
+     * not have a length of 16, then a new array with length 16 will be 
+     * created and returned. 
      * 
      * @param node The node. May not be <code>null</code>.
      * @param result The result array

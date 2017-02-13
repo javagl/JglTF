@@ -26,7 +26,11 @@
  */
 package de.javagl.jgltf.model;
 
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
 import de.javagl.jgltf.impl.v1.Camera;
+import de.javagl.jgltf.impl.v1.CameraPerspective;
 import de.javagl.jgltf.impl.v1.Node;
 
 /**
@@ -34,6 +38,11 @@ import de.javagl.jgltf.impl.v1.Node;
  */
 public final class CameraModel
 {
+    /**
+     * The name of this camera model, suitable to be shown to a user 
+     */
+    private final String name;
+    
     /**
      * The {@link Camera} of this instance
      */
@@ -44,18 +53,31 @@ public final class CameraModel
      * is attached to 
      */
     private final NodeModel nodeModel;
+
     
     /**
      * Creates a new instance for the given {@link Camera}, attached to
      * the given {@link NodeModel}
      * 
+     * @param name The name of this camera model, suitable to be shown to a user
      * @param camera The {@link Camera}
      * @param nodeModel The {@link NodeModel} that the camera is attached to 
      */
-    CameraModel(Camera camera, NodeModel nodeModel)
+    CameraModel(String name, Camera camera, NodeModel nodeModel)
     {
+        this.name = name;
         this.camera = camera;
         this.nodeModel = nodeModel;
+    }
+    
+    /**
+     * Returns the name of this camera model, suitable to be shown to a user
+     * 
+     * @return The name of this camera model
+     */
+    public String getName()
+    {
+        return name;
     }
     
     /**
@@ -63,7 +85,7 @@ public final class CameraModel
      * 
      * @return The {@link Camera}
      */
-    public Camera getCamera()
+    Camera getCamera()
     {
         return camera;
     }
@@ -83,14 +105,14 @@ public final class CameraModel
      * global transform of the {@link Node} that the camera is attached to.<br>
      * <br>
      * The result will be written to the given array, as a 4x4 matrix in 
-     * column major order. If the given array is <code>null</code>, then
-     * a new array with length 16 will be created and returned. Otherwise,
-     * the given array must at least have a length of 16.
+     * column major order. If the given array is <code>null</code> or does
+     * not have a length of 16, then a new array with length 16 will be 
+     * created and returned. 
      * 
      * @param result The result array
      * @return The result array
      */
-    float[] computeViewMatrix(float result[])
+    public float[] computeViewMatrix(float result[])
     {
         float localResult[] = Utils.validate(result, 16);
         nodeModel.computeGlobalTransform(localResult);
@@ -102,9 +124,9 @@ public final class CameraModel
      * Compute the projection matrix for this camera.<br>
      * <br>
      * The result will be written to the given array, as a 4x4 matrix in 
-     * column major order. If the given array is <code>null</code>, then
-     * a new array with length 16 will be created and returned. Otherwise,
-     * the given array must at least have a length of 16.
+     * column major order. If the given array is <code>null</code> or does
+     * not have a length of 16, then a new array with length 16 will be 
+     * created and returned. 
      * 
      * @param result The result array
      * @param aspectRatio An optional aspect ratio that should be used. 
@@ -112,12 +134,68 @@ public final class CameraModel
      * camera will be used.
      * @return The result array
      */
-    float[] computeProjectionMatrix(float result[], Float aspectRatio)
+    public float[] computeProjectionMatrix(float result[], Float aspectRatio)
     {
         float localResult[] = Utils.validate(result, 16);
         Cameras.computeProjectionMatrix(
             camera, aspectRatio, localResult);
         return localResult;
     }
+    
+    /**
+     * Create the supplier of the view matrix for this camera model.<br>
+     * <br> 
+     * The matrix will be provided as a float array with 16 elements, 
+     * storing the matrix entries in column-major order.<br>
+     * <br>
+     * Note: The supplier MAY always return the same array instance.
+     * Callers MUST NOT store or modify the returned array. 
+     * 
+     * @return The supplier.
+     */
+    public Supplier<float[]> createViewMatrixSupplier()
+    {
+        float viewMatrix[] = new float[16];
+        return () ->
+        {
+            computeViewMatrix(viewMatrix);
+            return viewMatrix;
+        };
+    }
+    
+    /**
+     * Create the supplier of the projection matrix for this camera model.<br>
+     * <br>
+     * The matrix will be provided as a float array with 16 elements, 
+     * storing the matrix entries in column-major order.<br>
+     * <br>
+     * Note: If the {@link Camera#getType()} of the camera that this 
+     * {@link CameraModel} was created for is neither 
+     * <code>"perspective"</code> nor <code>"orthographic"</code>,
+     * then the supplier will print an error message and return
+     * the identity matrix.
+     * 
+     * @param aspectRatioSupplier The optional supplier for the aspect
+     * ratio of the camera. If this is <code>null</code>, then the
+     * {@link CameraPerspective#getAspectRatio() aspect ratio of the camera}
+     * will be used.
+     * @return The supplier
+     */
+    public Supplier<float[]> createProjectionMatrixSupplier(
+        DoubleSupplier aspectRatioSupplier)
+    {
+        float projectionMatrix[] = new float[16];
+        return () -> 
+        {
+            Float aspectRatio = null;
+            if (aspectRatioSupplier != null)
+            {
+                aspectRatio = (float)aspectRatioSupplier.getAsDouble();
+            }
+            computeProjectionMatrix(projectionMatrix, aspectRatio);
+            return projectionMatrix;
+        };
+    }
+    
     
 }

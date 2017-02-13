@@ -28,8 +28,6 @@ package de.javagl.jgltf.viewer;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -39,7 +37,6 @@ import java.util.logging.Logger;
 
 import de.javagl.jgltf.impl.v1.Accessor;
 import de.javagl.jgltf.impl.v1.BufferView;
-import de.javagl.jgltf.impl.v1.Camera;
 import de.javagl.jgltf.impl.v1.GlTF;
 import de.javagl.jgltf.impl.v1.Material;
 import de.javagl.jgltf.impl.v1.Mesh;
@@ -52,6 +49,7 @@ import de.javagl.jgltf.impl.v1.TechniqueParameters;
 import de.javagl.jgltf.impl.v1.TechniqueStatesFunctions;
 import de.javagl.jgltf.impl.v1.Texture;
 import de.javagl.jgltf.model.Accessors;
+import de.javagl.jgltf.model.CameraModel;
 import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.GltfData;
 import de.javagl.jgltf.model.GltfModel;
@@ -73,14 +71,6 @@ public class RenderedGltf
      */
     private static final Logger logger =
         Logger.getLogger(RenderedGltf.class.getName());
-    
-    /**
-     * The {@link GltfModel} that wraps the {@link GltfData} and the 
-     * {@link GlTF}, and provides methods to create suppliers for 
-     * the {@link TechniqueParameters#getSemantic() semantic}-based 
-     * properties of the glTF. 
-     */
-    private final GltfModel gltfModel;
     
     /**
      * The {@link GltfRenderModel}
@@ -110,19 +100,11 @@ public class RenderedGltf
     private final GltfRenderData gltfRenderData;
     
     /**
-     * The list of IDs of {@link Node}s that contain a non-null
-     * {@link Node#getCamera() camera ID} 
+     * A {@link SettableSupplier} that provides the {@link CameraModel}
+     * that should be used for rendering.  
+     * See {@link #setCurrentCameraModel(CameraModel)}
      */
-    private final Map<String, String> cameraIdToNodeId;
-    
-    /**
-     * A {@link SettableSupplier} that provides the ID of the current 
-     * camera node. That is, it provides the ID of the {@link Node} 
-     * that contains a {@link Node#getCamera() camera ID} that refers
-     * to the {@link Camera} that should be used for rendering. 
-     * See {@link #setCurrentCameraId(String)}
-     */
-    private SettableSupplier<String> currentCameraNodeIdSupplier;
+    private SettableSupplier<CameraModel> currentCameraModelSupplier;
     
     /**
      * An optional supplier for the aspect ratio. If this is <code>null</code>, 
@@ -185,8 +167,10 @@ public class RenderedGltf
         Supplier<float[]> externalViewMatrixSupplier, 
         Supplier<float[]> externalProjectionMatrixSupplier)
     {
-        this.gltfModel = Objects.requireNonNull(gltfModel,
+        Objects.requireNonNull(gltfModel,
             "The gltfModel may not be null");
+        Objects.requireNonNull(gltfData,
+            "The gltfData may not be null");
         this.glContext = Objects.requireNonNull(glContext,
             "The glContext may not be null");
         
@@ -202,8 +186,7 @@ public class RenderedGltf
         this.opaqueRenderCommands = new ArrayList<Runnable>();
         this.transparentRenderCommands = new ArrayList<Runnable>();
         
-        this.cameraIdToNodeId = new LinkedHashMap<String, String>();
-        this.currentCameraNodeIdSupplier = new SettableSupplier<String>();
+        this.currentCameraModelSupplier = new SettableSupplier<CameraModel>();
 
         this.viewMatrixSupplier = 
             createViewMatrixSupplier(externalViewMatrixSupplier);
@@ -216,10 +199,10 @@ public class RenderedGltf
         
         if (externalViewMatrixSupplier == null)
         {
-            if (!cameraIdToNodeId.isEmpty())
+            List<CameraModel> cameraModels = gltfModel.getCameraModels();
+            if (!cameraModels.isEmpty())
             {
-                String cameraId = cameraIdToNodeId.keySet().iterator().next();
-                setCurrentCameraId(cameraId);
+                setCurrentCameraModel(cameraModels.get(0));
             }
         }
     }
@@ -287,9 +270,9 @@ public class RenderedGltf
      * The resulting supplier will supply a view matrix as follows:
      * <ul>
      *   <li> 
-     *     If a non-<code>null</code> {@link #setCurrentCameraId(String)
-     *     current camera ID} has been set, then the view matrix from
-     *     the {@link GltfModel} will be returned
+     *     If a non-<code>null</code> {@link #setCurrentCameraModel
+     *     current camera model} has been set, then the view matrix from
+     *     this {@link CameraModel} will be returned
      *   </li>
      *   <li>
      *     Otherwise, if the external matrix supplier is non-<code>null</code>,
@@ -299,6 +282,8 @@ public class RenderedGltf
      *     Otherwise, an identity matrix will be returned
      *   </li>
      * </ul>
+     * Note: The supplier MAY always return the same array instance.
+     * Callers MUST NOT store or modify the returned array. 
      * 
      * @param externalViewMatrixSupplier The optional external view matrix
      * supplier that may have been given in the constructor
@@ -307,22 +292,21 @@ public class RenderedGltf
     private Supplier<float[]> createViewMatrixSupplier(
         Supplier<float[]> externalViewMatrixSupplier)
     {
-        Supplier<float[]> gltfViewMatrixSupplier = 
-            gltfModel.createViewMatrixSupplier(
-                currentCameraNodeIdSupplier);
-        float identity[] = createIdentityMatrix4x4();
+        float viewMatrix[] = createIdentityMatrix4x4();
         return () ->
         {
-            String cameraNodeId = currentCameraNodeIdSupplier.get();
-            if (cameraNodeId == null)
+            // TODO Review this after camera refactoring
+            CameraModel cameraModel = currentCameraModelSupplier.get();
+            if (cameraModel == null)
             {
                 if (externalViewMatrixSupplier == null)
                 {
-                    return identity;
+                    return viewMatrix;
                 }
                 return externalViewMatrixSupplier.get();
             }
-            return gltfViewMatrixSupplier.get();
+            cameraModel.computeViewMatrix(viewMatrix);
+            return viewMatrix;
         };
     }
     
@@ -333,9 +317,9 @@ public class RenderedGltf
      * The resulting supplier will supply a projection matrix as follows:
      * <ul>
      *   <li> 
-     *     If a non-<code>null</code> {@link #setCurrentCameraId(String)
-     *     current camera ID} has been set, then the projection matrix 
-     *     from the {@link GltfModel} will be returned
+     *     If a non-<code>null</code> {@link #setCurrentCameraModel
+     *     current camera model} has been set, then the projection matrix from
+     *     this {@link CameraModel} will be returned
      *   </li>
      *   <li>
      *     Otherwise, if the external matrix supplier is non-<code>null</code>,
@@ -345,6 +329,8 @@ public class RenderedGltf
      *     Otherwise, an identity matrix will be returned
      *   </li>
      * </ul>
+     * Note: The supplier MAY always return the same array instance.
+     * Callers MUST NOT store or modify the returned array. 
      * 
      * @param externalProjectionMatrixSupplier The optional external projection
      * matrix supplier that may have been given in the constructor
@@ -353,22 +339,27 @@ public class RenderedGltf
     private Supplier<float[]> createProjectionMatrixSupplier(
         Supplier<float[]> externalProjectionMatrixSupplier)
     {
-        Supplier<float[]> gltfProjectionMatrixSupplier = 
-            gltfModel.createProjectionMatrixSupplier(
-                currentCameraNodeIdSupplier, aspectRatioSupplier);
-        float identity[] = createIdentityMatrix4x4();
+        float projectionMatrix[] = createIdentityMatrix4x4();
         return () ->
         {
-            String cameraNodeId = currentCameraNodeIdSupplier.get();
-            if (cameraNodeId == null)
+            // TODO Review this after camera refactoring
+            CameraModel cameraModel = currentCameraModelSupplier.get();
+            if (cameraModel == null)
             {
                 if (externalProjectionMatrixSupplier == null)
                 {
-                    return identity;
+                    return projectionMatrix;
                 }
                 return externalProjectionMatrixSupplier.get();
             }
-            return gltfProjectionMatrixSupplier.get();
+            Float aspectRatio = null;
+            if (aspectRatioSupplier != null)
+            {
+                aspectRatio = (float)aspectRatioSupplier.getAsDouble();
+            }
+            cameraModel.computeProjectionMatrix(
+                projectionMatrix, aspectRatio);
+            return projectionMatrix;
         };
     }
     
@@ -389,41 +380,15 @@ public class RenderedGltf
     
     
     /**
-     * Returns an unmodifiable (possibly empty) view on the collection of IDs 
-     * of {@link Camera}s.
-     *  
-     * @return The {@link Camera} IDs
-     */
-    Collection<String> getCameraIds()
-    {
-        return Collections.unmodifiableCollection(cameraIdToNodeId.keySet());
-    }
-    
-    /**
-     * Set the ID of the {@link Camera} that should be used for rendering.<br>
+     * Set the index of the {@link CameraModel} that should be used for 
+     * rendering. If the given {@link CameraModel} is <code>null</code>,
+     * then the external camera will be used.<br>
      * <br>
-     * If the given ID is <code>null</code>, then the external camera
-     * will be used.
-     *  
-     * @param cameraId The ID of the {@link Camera}
-     * @throws IllegalArgumentException If the given ID is not <code>null</code>
-     * and not contained in the {@link #getCameraIds() camera IDs}
+     * @param cameraModel The {@link CameraModel} 
      */
-    void setCurrentCameraId(String cameraId)
+    void setCurrentCameraModel(CameraModel cameraModel)
     {
-        if (cameraId == null)
-        {
-            currentCameraNodeIdSupplier.set(null);
-            return;
-        }
-        if (!cameraIdToNodeId.containsKey(cameraId))
-        {
-            throw new IllegalArgumentException(
-                "The ID " + cameraId + " is not a valid ID for " + 
-                "a camera. Valid IDs are " + cameraIdToNodeId.keySet());
-        }
-        String cameraNodeId = cameraIdToNodeId.get(cameraId);
-        currentCameraNodeIdSupplier.set(cameraNodeId);
+        currentCameraModelSupplier.set(cameraModel);
     }
     
     /**
@@ -473,12 +438,6 @@ public class RenderedGltf
                 String meshPrimitiveName = meshId + ".primitives[" + i + "]";
                 processMeshPrimitive(meshPrimitive, meshPrimitiveName, nodeId);
             }
-        }
-        
-        String cameraId = node.getCamera();
-        if (cameraId != null)
-        {
-            cameraIdToNodeId.put(cameraId, nodeId);
         }
         
         List<String> children = Optionals.of(node.getChildren());

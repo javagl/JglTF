@@ -26,16 +26,15 @@
  */
 package de.javagl.jgltf.model;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 import de.javagl.jgltf.impl.v1.Camera;
-import de.javagl.jgltf.impl.v1.CameraPerspective;
 import de.javagl.jgltf.impl.v1.GlTF;
 import de.javagl.jgltf.impl.v1.Node;
 
@@ -69,11 +68,10 @@ public final class GltfModel
     private final Map<String, NodeModel> nodeIdToNodeModel;
     
     /**
-     * The mapping from {@link Node} IDs (IMPORTANT: NOT from camera IDs!) to 
-     * {@link CameraModel} instances that have been created from
-     * the {@link Camera} reference of the respective {@link Node}
+     * The {@link CameraModel} instances that have been created from
+     * the {@link Camera} references of {@link Node} instances
      */
-    private final Map<String, CameraModel> nodeIdToCameraModel;
+    private final List<CameraModel> cameraModels;
     
     /**
      * Creates a new model for the given glTF
@@ -87,7 +85,7 @@ public final class GltfModel
 
         this.gltf = gltf;
         this.nodeIdToNodeModel = createNodeIdToNodeModel();
-        this.nodeIdToCameraModel = createNodeIdToCameraModel();
+        this.cameraModels = createCameraModels();
     }
 
     /**
@@ -107,8 +105,9 @@ public final class GltfModel
         }
         for (String nodeId : map.keySet())
         {
-            NodeModel node = map.get(nodeId);
-            List<String> childIds = Optionals.of(node.getNode().getChildren());
+            NodeModel nodeModel = map.get(nodeId);
+            Node node = nodeModel.getNode();
+            List<String> childIds = Optionals.of(node.getChildren());
             for (String childId : childIds)
             {
                 NodeModel child = map.get(childId);
@@ -118,7 +117,7 @@ public final class GltfModel
                 }
                 else
                 {
-                    node.addChild(child);
+                    nodeModel.addChild(child);
                 }
             }
         }
@@ -126,15 +125,14 @@ public final class GltfModel
     }
     
     /**
-     * Create the mapping from {@link Node} IDs to {@link CameraModel} 
-     * instances, based on the {@link Node} objects of the glTF that 
-     * refer to a {@link Camera}.
+     * Create the {@link CameraModel} instances, based on the {@link Node} 
+     * objects of the glTF that refer to a {@link Camera}.
      * 
      * @return The {@link CameraModel} instances
      */
-    private Map<String, CameraModel> createNodeIdToCameraModel()
+    private List<CameraModel> createCameraModels()
     {
-        Map<String, CameraModel> map = new LinkedHashMap<String, CameraModel>();
+        List<CameraModel> list = new ArrayList<CameraModel>();
         Map<String, Node> nodes = Optionals.of(gltf.getNodes());
         Map<String, Camera> cameras = Optionals.of(gltf.getCameras());
         for (String nodeId : nodes.keySet())
@@ -151,186 +149,54 @@ public final class GltfModel
                 else
                 {
                     NodeModel nodeModel = nodeIdToNodeModel.get(nodeId);
+                    String name = nodeId + "." + cameraId;
                     CameraModel cameraModel = 
-                        new CameraModel(camera, nodeModel);
-                    map.put(nodeId, cameraModel);
+                        new CameraModel(name, camera, nodeModel);
+                    list.add(cameraModel);
                 }
             }
         }
-        return map;
-    }
-    
-    /**
-     * Create a supplier for the view matrix of the camera that is attached
-     * to the {@link Node} whose ID is provided by the given supplier. This 
-     * will be the inverse of the global transform of the node.<br>
-     * <br>
-     * If the given supplier provides an ID of a {@link Node} that is
-     * not contained in the glTF (or one of its parents is not contained
-     * in the glTF) then a warning will be printed and the supplier will 
-     * assume the identity matrix for the respective node.
-     * <br> 
-     * The matrix will be provided as a float array with 16 elements, 
-     * storing the matrix entries in column-major order.<br>
-     * <br>
-     * Note: The supplier MAY always return the same array instance.
-     * Callers MUST NOT store or modify the returned array. 
-     * 
-     * @param cameraNodeIdSupplier The supplier for the camera node ID
-     * @return The supplier.
-     */
-    public Supplier<float[]> createViewMatrixSupplier(
-        Supplier<String> cameraNodeIdSupplier)
-    {
-        float viewMatrix[] = new float[16];
-        return () ->
-        {
-            String nodeId = cameraNodeIdSupplier.get();
-            CameraModel cameraModel = nodeIdToCameraModel.get(nodeId);
-            if (cameraModel == null)
-            {
-                logger.warning("No camera model found for node " + nodeId);
-                MathUtils.setIdentity4x4(viewMatrix);
-                return viewMatrix;
-            }
-            cameraModel.computeViewMatrix(viewMatrix);
-            return viewMatrix;
-        };
-    }
-    
-    /**
-     * Create the supplier of the projection matrix for the {@link Camera}
-     * with the ID that is contained in the {@link Node} with the ID
-     * that is provided by the given {@link Supplier}.<br>
-     * <br>
-     * If the given supplier provides an ID of a {@link Node} that is
-     * not contained in the glTF, or of a node that does not have a
-     * {@link Node#getCamera() camera}, then a warning will be printed
-     * and the supplier will return the identity matrix.
-     * <br> 
-     * The matrix will be provided as a float array with 16 elements, 
-     * storing the matrix entries in column-major order.<br>
-     * <br>
-     * Note: The supplier MAY always return the same array instance.
-     * Callers MUST NOT store or modify the returned array.<br>
-     * <br>
-     * Note: If the {@link Camera#getType()} is neither 
-     * <code>"perspective"</code> nor <code>"orthographic"</code>,
-     * then the supplier will print an error message and return
-     * the identity matrix.
-     * 
-     * @param cameraNodeIdSupplier The supplier of the {@link Node} ID
-     * of the node that contains the {@link Camera} ID
-     * @param aspectRatioSupplier The optional supplier for the aspect
-     * ratio of the camera. If this is <code>null</code>, then the
-     * {@link CameraPerspective#getAspectRatio() aspect ratio of the camera}
-     * will be used.
-     * @return The supplier
-     */
-    public Supplier<float[]> createProjectionMatrixSupplier(
-        Supplier<String> cameraNodeIdSupplier,
-        DoubleSupplier aspectRatioSupplier)
-    {
-        float projectionMatrix[] = new float[16];
-        return () -> 
-        {
-            String nodeId = cameraNodeIdSupplier.get();
-            CameraModel cameraModel = nodeIdToCameraModel.get(nodeId);
-            if (cameraModel == null)
-            {
-                logger.warning("No camera model found for node " + nodeId);
-                MathUtils.setIdentity4x4(projectionMatrix);
-                return projectionMatrix;
-            }
-            Float aspectRatio = null;
-            if (aspectRatioSupplier != null)
-            {
-                double a = aspectRatioSupplier.getAsDouble();
-                aspectRatio = (float)a;
-            }
-            cameraModel.computeProjectionMatrix(projectionMatrix, aspectRatio);
-            return projectionMatrix;
-        };
-    }
-    
-    
-    /**
-     * Creates a supplier for the global transform matrix of the 
-     * {@link Node} with the given ID.<br>
-     * <br> 
-     * The matrix will be provided as a float array with 16 elements, 
-     * storing the matrix entries in column-major order.<br>
-     * <br>
-     * Note: The supplier MAY always return the same array instance.
-     * Callers MUST NOT store or modify the returned array. 
-     * 
-     * @param nodeId The {@link Node} ID 
-     * @return The supplier
-     */
-    public Supplier<float[]> createNodeGlobalTransformSupplier(String nodeId)
-    {
-        NodeModel node = nodeIdToNodeModel.get(nodeId);
-        if (node == null)
-        {
-            return createIdentityTransformSupplier();
-        }
-        float globalTransform[] = new float[16];
-        return () ->
-        {
-            return node.computeGlobalTransform(globalTransform);
-        };
-    }
-    
-    /**
-     * Creates a supplier for the local transform matrix of the 
-     * given {@link Node}.<br>
-     * <br> 
-     * The matrix will be provided as a float array with 16 elements, 
-     * storing the matrix entries in column-major order.<br>
-     * <br>
-     * If the glTF does not contain the specified {@link Node}, then
-     * a warning will be printed and the resulting supplier will 
-     * return the identity matrix.<br>
-     * <br>
-     * Note: The supplier MAY always return the same array instance.
-     * Callers MUST NOT store or modify the returned array. 
-     * 
-     * @param node The {@link Node}
-     * @return The supplier
-     */
-    public static Supplier<float[]> createNodeLocalTransformSupplier(Node node)
-    {
-        if (node == null)
-        {
-            return createIdentityTransformSupplier();
-        }
-        float localTransform[] = new float[16];
-        return () ->
-        {
-            Nodes.computeLocalTransform(node, localTransform);
-            return localTransform;
-        };
+        return list;
     }
 
+    
     /**
-     * Creates a supplier that returns the 4x4 identity matrix.<br>
-     * <br>
-     * Note: The supplier MAY always return the same array instance.
-     * Callers MUST NOT store or modify the returned array. 
-     *  
-     * @return The supplier
+     * Returns an unmodifiable view on the list of {@link CameraModel} 
+     * instances that have been created for the glTF.
+     * 
+     * @return The {@link CameraModel} instances
      */
-    private static Supplier<float[]> createIdentityTransformSupplier()
+    public List<CameraModel> getCameraModels()
     {
-        float matrix[] = new float[16];
-        return () -> 
-        {
-            MathUtils.setIdentity4x4(matrix);
-            return matrix;
-        };
+        return Collections.unmodifiableList(cameraModels);
     }
     
-
+    /**
+     * Returns an unmodifiable view on the list of {@link NodeModel} 
+     * instances that have been created for the glTF.
+     * 
+     * @return The {@link NodeModel} instances
+     */
+    public List<NodeModel> getNodeModels()
+    {
+        // TODO: This should return the internal list after
+        // the update to glTF 2.0 is completed
+        return Collections.unmodifiableList(
+            new ArrayList<NodeModel>(nodeIdToNodeModel.values()));
+    }
+    
+    /**
+     * Returns an unmodifiable view on the map from node IDs to 
+     * {@link NodeModel} instances that have been created for the glTF.
+     * 
+     * @return The mapping from IDs to {@link NodeModel} instances
+     * 
+     * @deprecated This will be a list in glTF 2.0
+     */
+    public Map<String, NodeModel> getNodeModelsMap()
+    {
+        return Collections.unmodifiableMap(nodeIdToNodeModel);
+    }
     
     
     

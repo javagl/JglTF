@@ -38,6 +38,7 @@ import java.util.logging.Logger;
 
 import de.javagl.jgltf.impl.v1.Camera;
 import de.javagl.jgltf.impl.v1.TechniqueParameters;
+import de.javagl.jgltf.model.CameraModel;
 import de.javagl.jgltf.model.GltfAnimations;
 import de.javagl.jgltf.model.GltfData;
 import de.javagl.jgltf.model.GltfModel;
@@ -112,10 +113,10 @@ public abstract class AbstractGltfViewer<C> implements GltfViewer<C>
     private final Map<GltfData, RenderedGltf> renderedGltfs;
     
     /**
-     * The map from {@link GltfData} instances to the ID of the {@link Camera}
-     * that should be used for rendering the {@link GltfData}
+     * The map from {@link GltfData} instances to their {@link GltfModel}
+     * counterparts
      */
-    private final Map<GltfData, String> currentCameraIds;
+    private final Map<GltfData, GltfModel> gltfModels;
     
     /**
      * The {@link AnimationManager}
@@ -142,7 +143,7 @@ public abstract class AbstractGltfViewer<C> implements GltfViewer<C>
         this.beforeRenderTasks = Collections.synchronizedList(
             new ArrayList<Runnable>());
         this.renderedGltfs = new LinkedHashMap<GltfData, RenderedGltf>();
-        this.currentCameraIds = new LinkedHashMap<GltfData, String>();
+        this.gltfModels = new LinkedHashMap<GltfData, GltfModel>();
         this.animationManager = 
             GltfAnimations.createAnimationManager(AnimationPolicy.LOOP);
         this.animationManager.addAnimationManagerListener(a ->
@@ -197,6 +198,9 @@ public abstract class AbstractGltfViewer<C> implements GltfViewer<C>
             return;
         }
         
+        GltfModel gltfModel = new GltfModel(gltfData.getGltf());
+        gltfModels.put(gltfData, gltfModel);
+        
         addBeforeRenderTask(() -> createRenderedGltf(gltfData));
         triggerRendering();
     }
@@ -218,11 +222,10 @@ public abstract class AbstractGltfViewer<C> implements GltfViewer<C>
             projectionMatrixSupplier = () ->
                 externalCamera.getProjectionMatrix();
         }
-            
-        GltfModel gltfModel = new GltfModel(gltfData.getGltf());
         
         logger.info("Creating rendered glTF");
         
+        GltfModel gltfModel = gltfModels.get(gltfData);
         RenderedGltf renderedGltf = new RenderedGltf(
             gltfModel, gltfData, getGlContext(), 
             viewportSupplier,
@@ -268,19 +271,55 @@ public abstract class AbstractGltfViewer<C> implements GltfViewer<C>
 
         logger.info("Deleting rendered glTF");
         
+        gltfModels.remove(gltfData);
         renderedGltf.delete();
         renderedGltfs.remove(gltfData);
-        currentCameraIds.remove(gltfData);
     }
     
     @Override
-    public void setCurrentCameraId(GltfData gltfData, String cameraId)
+    public List<CameraModel> getCameraModels(GltfData gltfData)
     {
-        currentCameraIds.put(gltfData, cameraId);
-        RenderedGltf renderedGltf = renderedGltfs.get(gltfData);
-        if (renderedGltf != null)
+        List<CameraModel> cameraModels = new ArrayList<CameraModel>();
+        if (gltfData == null)
         {
-            renderedGltf.setCurrentCameraId(cameraId);
+            for (GltfModel gltfModel : gltfModels.values())
+            {
+                cameraModels.addAll(gltfModel.getCameraModels());
+            }
+        }
+        else
+        {
+            GltfModel gltfModel = gltfModels.get(gltfData);
+            if (gltfModel == null)
+            {
+                throw new IllegalArgumentException(
+                    "The given gltfData is not contained in this viewer");
+            }
+            cameraModels.addAll(gltfModel.getCameraModels());
+        }
+        return Collections.unmodifiableList(cameraModels);
+    }
+    
+    @Override
+    public void setCurrentCameraModel(
+        GltfData gltfData, CameraModel cameraModel)
+    {
+        if (gltfData == null)
+        {
+            for (RenderedGltf renderedGltf : renderedGltfs.values())
+            {
+                renderedGltf.setCurrentCameraModel(cameraModel);
+            }
+        }
+        else
+        {
+            RenderedGltf renderedGltf = renderedGltfs.get(gltfData);
+            if (renderedGltf == null)
+            {
+                throw new IllegalArgumentException(
+                    "The given gltfData is not contained in this viewer");
+            }
+            renderedGltf.setCurrentCameraModel(cameraModel);
         }
         triggerRendering();
     }

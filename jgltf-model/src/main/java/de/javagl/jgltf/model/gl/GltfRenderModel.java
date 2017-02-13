@@ -30,8 +30,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -48,6 +48,7 @@ import de.javagl.jgltf.model.GltfData;
 import de.javagl.jgltf.model.GltfException;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.MathUtils;
+import de.javagl.jgltf.model.NodeModel;
 import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.Utils;
 
@@ -252,20 +253,19 @@ public class GltfRenderModel
             Utils.getChecked(gltf.getNodes(), currentNodeId, "current node");
         }
         
+        // TODO: This will be replaced by an index after the update to glTF 2.0
+        NodeModel nodeModel = gltfModel.getNodeModelsMap().get(accessedNodeId);
         
         switch (semantic)
         {
             case LOCAL:
             {
-                Node node = Utils.getExpected(gltf.getNodes(), accessedNodeId, 
-                    "node for the local transform");
-                return GltfModel.createNodeLocalTransformSupplier(node);
+                return nodeModel.createLocalTransformSupplier();
             }
             
             case MODEL:
             {
-                return gltfModel.createNodeGlobalTransformSupplier(
-                    accessedNodeId);
+                return nodeModel.createGlobalTransformSupplier();
             }
             
             case VIEW:
@@ -281,7 +281,7 @@ public class GltfRenderModel
             case MODELVIEW:
             {
                 Supplier<float[]> modelMatrixSupplier = 
-                    gltfModel.createNodeGlobalTransformSupplier(accessedNodeId);
+                    nodeModel.createGlobalTransformSupplier();
                 return MatrixOps
                     .create4x4(viewMatrixSupplier)
                     .multiply4x4(modelMatrixSupplier)
@@ -292,7 +292,7 @@ public class GltfRenderModel
             case MODELVIEWPROJECTION:
             {
                 Supplier<float[]> modelMatrixSupplier = 
-                    gltfModel.createNodeGlobalTransformSupplier(accessedNodeId);
+                    nodeModel.createGlobalTransformSupplier();
                 return MatrixOps
                     .create4x4(projectionMatrixSupplier)
                     .multiply4x4(viewMatrixSupplier)
@@ -303,10 +303,10 @@ public class GltfRenderModel
             
             case MODELINVERSE:
             {
-                Supplier<float[]> model = 
-                    gltfModel.createNodeGlobalTransformSupplier(accessedNodeId);
+                Supplier<float[]> modelMatrixSupplier = 
+                    nodeModel.createGlobalTransformSupplier();
                 return MatrixOps
-                    .create4x4(model)
+                    .create4x4(modelMatrixSupplier)
                     .invert4x4()
                     .log(semanticString, Level.FINE)
                     .build();
@@ -324,7 +324,7 @@ public class GltfRenderModel
             case MODELVIEWINVERSE:
             {
                 Supplier<float[]> modelMatrixSupplier = 
-                    gltfModel.createNodeGlobalTransformSupplier(accessedNodeId);
+                    nodeModel.createGlobalTransformSupplier();
                 return MatrixOps
                     .create4x4(viewMatrixSupplier)
                     .multiply4x4(modelMatrixSupplier)
@@ -345,7 +345,7 @@ public class GltfRenderModel
             case MODELVIEWPROJECTIONINVERSE:
             {
                 Supplier<float[]> modelMatrixSupplier = 
-                    gltfModel.createNodeGlobalTransformSupplier(accessedNodeId);
+                    nodeModel.createGlobalTransformSupplier();
                 return MatrixOps
                     .create4x4(projectionMatrixSupplier)
                     .multiply4x4(viewMatrixSupplier)
@@ -358,7 +358,7 @@ public class GltfRenderModel
             case MODELINVERSETRANSPOSE:
             {
                 Supplier<float[]> modelMatrixSupplier = 
-                    gltfModel.createNodeGlobalTransformSupplier(accessedNodeId);
+                    nodeModel.createGlobalTransformSupplier();
                 return MatrixOps
                     .create4x4(modelMatrixSupplier)
                     .invert4x4()
@@ -371,7 +371,7 @@ public class GltfRenderModel
             case MODELVIEWINVERSETRANSPOSE:
             {
                 Supplier<float[]> modelMatrixSupplier = 
-                    gltfModel.createNodeGlobalTransformSupplier(accessedNodeId);
+                    nodeModel.createGlobalTransformSupplier();
                 return MatrixOps
                     .create4x4(viewMatrixSupplier)
                     .multiply4x4(modelMatrixSupplier)
@@ -421,6 +421,10 @@ public class GltfRenderModel
     {
         Node node = Utils.getChecked(
             gltf.getNodes(), nodeId, "joint node");
+        
+        // TODO: This will be replaced by an index after the update to glTF 2.0
+        NodeModel nodeModel = gltfModel.getNodeModelsMap().get(nodeId);
+        
         String skinId = node.getSkin();
         Skin skin = Utils.getChecked(
             gltf.getSkins(), skinId, "joint node skin");
@@ -491,14 +495,17 @@ public class GltfRenderModel
             String jointName = jointNames.get(j);            
             String jointNodeId = jointNameToNodeId.get(jointName);
             
+            // TODO: This will be replaced by an index after the update to glTF 2.0
+            NodeModel jointNodeModel = 
+                gltfModel.getNodeModelsMap().get(jointNodeId);
+            
             Supplier<float[]> inverseBindMatrixSupplier = 
                 inverseBindMatrixSuppliers.get(j);
             
             Supplier<float[]> jointMatrixSupplier = MatrixOps
-                .create4x4(gltfModel.createNodeGlobalTransformSupplier(nodeId))
+                .create4x4(nodeModel.createGlobalTransformSupplier())
                 .invert4x4()
-                .multiply4x4(gltfModel.createNodeGlobalTransformSupplier(
-                    jointNodeId))
+                .multiply4x4(jointNodeModel.createGlobalTransformSupplier())
                 .multiply4x4(inverseBindMatrixSupplier)
                 .multiply4x4(bindShapeMatrixSupplier)
                 .log("jointMatrix "+jointName, Level.FINE)

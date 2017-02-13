@@ -50,9 +50,9 @@ class Cameras
      * printed, and the result will be the identity matrix.<br>
      * <br>
      * The result will be written to the given array, as a 4x4 matrix in 
-     * column major order. If the given array is <code>null</code>, then
-     * a new array with length 16 will be created and returned. Otherwise,
-     * the given array must at least have a length of 16.
+     * column major order. If the given array is <code>null</code> or does
+     * not have a length of 16, then a new array with length 16 will be 
+     * created and returned. 
      * 
      * @param camera The {@link Camera}
      * @param aspectRatio An optional aspect ratio to use. If this is 
@@ -99,7 +99,7 @@ class Cameras
         }
         else
         {
-            logger.severe("Invalid camera type: "+cameraType);
+            logger.severe("Invalid camera type: " + cameraType);
             MathUtils.setIdentity4x4(localResult);
         }
         return localResult;

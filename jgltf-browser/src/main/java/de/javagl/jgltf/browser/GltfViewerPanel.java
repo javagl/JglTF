@@ -34,13 +34,15 @@ import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Map;
+import java.util.List;
 import java.util.function.Supplier;
 
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -48,9 +50,9 @@ import javax.swing.JToggleButton;
 import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
 
-import de.javagl.jgltf.impl.v1.Camera;
 import de.javagl.jgltf.impl.v1.GlTF;
 import de.javagl.jgltf.model.BoundingBoxes;
+import de.javagl.jgltf.model.CameraModel;
 import de.javagl.jgltf.model.GltfData;
 import de.javagl.jgltf.validator.Validator;
 import de.javagl.jgltf.validator.ValidatorResult;
@@ -70,21 +72,15 @@ class GltfViewerPanel extends JPanel
     private static final long serialVersionUID = -6213789785308105683L;
 
     /**
-     * The ID that is shown in the camera ID combo box to denote the
-     * external camera
-     */
-    private static final String EXTERNAL_CAMERA_ID = "(External camera)";
-    
-    /**
      * The {@link GltfData} that is shown in the {@link GltfViewer}
      */
     private final GltfData gltfData;
     
     /**
-     * Whether the {@link GltfData} is "valid", as determined by the
+     * Whether the {@link GlTF} is "valid", as determined by the
      * {@link Validator}
      */
-    private final boolean gltfDataIsValid;
+    private final boolean gltfIsValid;
     
     /**
      * The {@link GltfViewer} that may display the {@link GltfData}
@@ -102,10 +98,10 @@ class GltfViewerPanel extends JPanel
     private JToggleButton animationsRunningButton;
     
     /**
-     * The combo box model containing the EXTERNAL_CAMERA_ID and the
-     * {@link Camera} IDs that have been found in the glTF
+     * The combo box model containing the {@link CameraModel} instances 
+     * that have been found in the {@link GltfData}
      */
-    private DefaultComboBoxModel<String> cameraIdsComboBoxModel;
+    private DefaultComboBoxModel<CameraModel> cameraModelsComboBoxModel;
     
     /**
      * The external camera 
@@ -131,12 +127,12 @@ class GltfViewerPanel extends JPanel
         ValidatorResult validatorResult = validator.validate();
         if (validatorResult.hasErrors())
         {
-            gltfDataIsValid = false;
+            gltfIsValid = false;
             createErrorMessage(validatorResult);
         }
         else
         {
-            gltfDataIsValid = true;
+            gltfIsValid = true;
         }
         add(createControlPanel(), BorderLayout.NORTH);
     }
@@ -169,7 +165,7 @@ class GltfViewerPanel extends JPanel
         
         // The button to show the current glTF
         JButton showButton = new JButton("Show current glTF");
-        showButton.setEnabled(gltfDataIsValid);
+        showButton.setEnabled(gltfIsValid);
         mainControlPanel.add(showButton);
 
         // The combo box for selecting the JOGL- or LWJGL viewer implementation
@@ -208,27 +204,43 @@ class GltfViewerPanel extends JPanel
         
         // The combo box for selecting the camera
         cameraControlPanel.add(new JLabel("Camera:"));
-        cameraIdsComboBoxModel = new DefaultComboBoxModel<String>();
-        JComboBox<String> cameraIdsComboBox = 
-            new JComboBox<String>(cameraIdsComboBoxModel);
-        cameraIdsComboBox.addActionListener(e ->
+        cameraModelsComboBoxModel = new DefaultComboBoxModel<CameraModel>();
+        JComboBox<CameraModel> cameraModelsComboBox = 
+            new JComboBox<CameraModel>(cameraModelsComboBoxModel);
+        cameraModelsComboBox.setRenderer(new DefaultListCellRenderer() 
         {
-            String cameraId = 
-                String.valueOf(cameraIdsComboBox.getSelectedItem());
-            if (gltfViewer != null)
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public Component getListCellRendererComponent(
+                JList<?> list, Object value, int index, 
+                boolean isSelected, boolean cellHasFocus)
             {
-                if (cameraId.equals(EXTERNAL_CAMERA_ID))
+                super.getListCellRendererComponent(
+                    list, value, index, isSelected, cellHasFocus);
+                if (value == null)
                 {
-                    gltfViewer.setCurrentCameraId(gltfData, null);
+                    setText("(External camera)");
                 }
                 else
                 {
-                    gltfViewer.setCurrentCameraId(gltfData, cameraId);
+                    CameraModel cameraModel = (CameraModel)value;
+                    setText(cameraModel.getName());
                 }
+                return this;
             }
         });
-        updateCameraIdsComboBox();
-        cameraControlPanel.add(cameraIdsComboBox);
+        cameraModelsComboBox.addActionListener(e ->
+        {
+            CameraModel cameraModel = 
+                (CameraModel)cameraModelsComboBox.getSelectedItem();
+            if (gltfViewer != null)
+            {
+                gltfViewer.setCurrentCameraModel(null, cameraModel);
+            }
+        });
+        updateCameraModelsComboBox();
+        cameraControlPanel.add(cameraModelsComboBox);
         
         JButton resetCameraButton = new JButton("Reset camera");
         resetCameraButton.addActionListener(e -> resetExternalCamera());
@@ -252,7 +264,7 @@ class GltfViewerPanel extends JPanel
      */
     private void createViewer(String implementation)
     {
-        if (gltfDataIsValid)
+        if (gltfIsValid)
         {
             if ("JOGL".equals(implementation))
             {
@@ -266,20 +278,19 @@ class GltfViewerPanel extends JPanel
     }
     
     /**
-     * Update the combo box containing the {@link Camera} IDs, based on
+     * Update the combo box containing the {@link CameraModel} names, based on
      * the current {@link GltfData}
      */
-    private void updateCameraIdsComboBox()
+    private void updateCameraModelsComboBox()
     {
-        cameraIdsComboBoxModel.removeAllElements();
-        cameraIdsComboBoxModel.addElement(EXTERNAL_CAMERA_ID);
-        GlTF gltf = gltfData.getGltf();
-        Map<String, Camera> cameras = gltf.getCameras();
-        if (cameras != null)
+        cameraModelsComboBoxModel.removeAllElements();
+        cameraModelsComboBoxModel.addElement(null);
+        if (gltfViewer != null)
         {
-            for (String cameraId : cameras.keySet())
+            List<CameraModel> cameraModels = gltfViewer.getCameraModels(null);
+            for (CameraModel cameraModel : cameraModels)
             {
-                cameraIdsComboBoxModel.addElement(cameraId);
+                cameraModelsComboBoxModel.addElement(cameraModel);
             }
         }
     }
@@ -375,6 +386,8 @@ class GltfViewerPanel extends JPanel
             gltfViewer.setExternalCamera(externalCamera);
             viewerComponentContainer.add(renderComponent);
             animationsRunningButton.setEnabled(true);
+            
+            updateCameraModelsComboBox();
         }
         catch (Throwable t)
         {

@@ -29,6 +29,8 @@ package de.javagl.jgltf.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
 import de.javagl.jgltf.impl.v1.Node;
 
@@ -85,7 +87,7 @@ public final class NodeModel
      * 
      * @return The actual glTF {@link Node}
      */
-    public Node getNode()
+    Node getNode()
     {
         return node;
     }
@@ -104,9 +106,9 @@ public final class NodeModel
      * Computes the local transform of this node.<br>
      * <br>
      * The result will be written to the given array, as a 4x4 matrix in 
-     * column major order. If the given array is <code>null</code>, then
-     * a new array with length 16 will be created and returned. Otherwise,
-     * the given array must at least have a length of 16.
+     * column major order. If the given array is <code>null</code> or does
+     * not have a length of 16, then a new array with length 16 will be 
+     * created and returned. 
      * 
      * @param result The result array
      * @return The result array
@@ -120,9 +122,9 @@ public final class NodeModel
      * Computes the global transform of this node.<br>
      * <br>
      * The result will be written to the given array, as a 4x4 matrix in 
-     * column major order. If the given array is <code>null</code>, then
-     * a new array with length 16 will be created and returned. Otherwise,
-     * the given array must at least have a length of 16.
+     * column major order. If the given array is <code>null</code> or does
+     * not have a length of 16, then a new array with length 16 will be 
+     * created and returned. 
      * 
      * @param result The result array
      * @return The result array
@@ -141,6 +143,74 @@ public final class NodeModel
             currentNode = currentNode.parent;
         }
         return localResult;
+    }
+    
+    /**
+     * Creates a supplier for the global transform matrix of this node 
+     * model.<br>
+     * <br> 
+     * The matrix will be provided as a float array with 16 elements, 
+     * storing the matrix entries in column-major order.<br>
+     * <br>
+     * Note: The supplier MAY always return the same array instance.
+     * Callers MUST NOT store or modify the returned array. 
+     * 
+     * @return The supplier
+     */
+    public Supplier<float[]> createGlobalTransformSupplier()
+    {
+        return createTransformSupplier(this, 
+            (n, t) -> n.computeGlobalTransform(t));
+    }
+    
+    /**
+     * Creates a supplier for the local transform matrix of this node model.<br>
+     * <br> 
+     * The matrix will be provided as a float array with 16 elements, 
+     * storing the matrix entries in column-major order.<br>
+     * <br>
+     * Note: The supplier MAY always return the same array instance.
+     * Callers MUST NOT store or modify the returned array. 
+     * 
+     * @return The supplier
+     */
+    public Supplier<float[]> createLocalTransformSupplier()
+    {
+        return createTransformSupplier(node, 
+            (n, t) -> Nodes.computeLocalTransform(n, t));
+    }
+
+    /**
+     * Create a supplier of a 4x4 matrix that is computed by applying 
+     * the given computer to the given object and a 16-element array.<br>
+     * <br>
+     * If the given object is <code>null</code>, then the identity 
+     * matrix will be supplied.<br>
+     * <br>
+     * Note: The supplier MAY always return the same array instance.
+     * Callers MUST NOT store or modify the returned array. 
+     * 
+     * @param object The object
+     * @param computer The computer function
+     * @return The supplier
+     */
+    private static <T> Supplier<float[]> createTransformSupplier(
+        T object, BiConsumer<T, float[]> computer)
+    {
+        float transform[] = new float[16];
+        if (object == null)
+        {
+            return () -> 
+            {
+                MathUtils.setIdentity4x4(transform);
+                return transform;
+            };
+        }
+        return () ->
+        {
+            computer.accept(object, transform);
+            return transform;
+        };
     }
     
 }

@@ -26,8 +26,10 @@
  */
 package de.javagl.jgltf.viewer;
 
-import de.javagl.jgltf.impl.v1.Camera;
+import java.util.List;
+
 import de.javagl.jgltf.impl.v1.GlTF;
+import de.javagl.jgltf.model.CameraModel;
 import de.javagl.jgltf.model.GltfData;
 
 /**
@@ -110,17 +112,30 @@ public interface GltfViewer<C>
     void removeGltfData(GltfData gltfData);
 
     /**
-     * Set the ID of the {@link Camera} that should be used for rendering
-     * the given {@link GltfData}. If the given ID is <code>null</code>,
-     * then the external camera will be used. See
-     * {@link #setExternalCamera(ExternalCamera)}.
-     *  
-     * @param gltfData The {@link GltfData}
-     * @param cameraId The {@link Camera} ID
+     * Returns an unmodifiable list containing all {@link CameraModel}
+     * instances that are created from the given {@link GltfData}. If
+     * the given {@link GltfData} is <code>null</code>, then all
+     * {@link CameraModel} instances will be returned.
+     * 
+     * @param gltfData The optional {@link GltfData}
+     * @return The {@link CameraModel} instances
      * @throws IllegalArgumentException If the given {@link GltfData} is
-     * not contained in this viewer
-     * @throws IllegalArgumentException If the given ID is not a valid
-     * camera ID for the given {@link GltfData}
+     * not <code>null</code> and not contained in this viewer
      */
-    void setCurrentCameraId(GltfData gltfData, String cameraId);
+    List<CameraModel> getCameraModels(GltfData gltfData);
+    
+    /**
+     * Set {@link CameraModel} that should be used for rendering the 
+     * given {@link GltfData}. If the given {@link GltfData} is 
+     * <code>null</code>, then the {@link CameraModel} will be used
+     * for rendering all {@link GltfData} instances.
+     * If the {@link CameraModel} is <code>null</code>, then the external 
+     * camera will be used. See {@link #setExternalCamera(ExternalCamera)}.
+     * 
+     * @param gltfData The optional {@link GltfData}
+     * @param cameraModel The {@link CameraModel}
+     * @throws IllegalArgumentException If the given {@link GltfData} is
+     * not <code>null</code> and not contained in this viewer
+     */
+    void setCurrentCameraModel(GltfData gltfData, CameraModel cameraModel);
 }
