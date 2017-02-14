@@ -161,6 +161,10 @@ public class GltfConstants
      */
     public static final int GL_SAMPLER_2D = 35678;    
     
+    /**
+     * The GL_SAMPLER_CUBE constant (35680)
+     */
+    public static final int GL_SAMPLER_CUBE = 35680;
     
     
     /**
