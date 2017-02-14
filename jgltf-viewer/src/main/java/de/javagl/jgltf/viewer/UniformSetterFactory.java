@@ -117,17 +117,6 @@ class UniformSetterFactory
             case GltfConstants.GL_FLOAT:
             case GltfConstants.GL_FLOAT_VEC2:   
             case GltfConstants.GL_FLOAT_VEC3:
-            case GltfConstants.GL_FLOAT_VEC4:
-            {
-                Supplier<float[]> supplier =
-                    cast(uniformValueSupplier, float[].class);
-                return () ->
-                {
-                    float value[] = supplier.get();
-                    glContext.setUniformfv(type, location, count, value);
-                };
-            }
-
             case GltfConstants.GL_FLOAT_MAT2:   
             case GltfConstants.GL_FLOAT_MAT3:   
             case GltfConstants.GL_FLOAT_MAT4:   
