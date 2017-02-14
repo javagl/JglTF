@@ -44,15 +44,15 @@ public class TestTechniqueParametersTypes
         
         assertReturnTypeIs(GltfRenderModels.createGenericSupplier(
             "singleInt", technique, material), 
-            Integer.class, -1);
+            int[].class, 1);
             
         assertReturnTypeIs(GltfRenderModels.createGenericSupplier(
             "singleUnsignedInt", technique, material), 
-            Integer.class, -1);
+            int[].class, 1);
             
         assertReturnTypeIs(GltfRenderModels.createGenericSupplier(
             "singleFloat", technique, material), 
-            Float.class, -1);
+            float[].class, 1);
             
         assertReturnTypeIs(GltfRenderModels.createGenericSupplier(
             "singleIntVec3", technique, material), 
@@ -92,7 +92,7 @@ public class TestTechniqueParametersTypes
         
         assertReturnTypeIs(GltfRenderModels.createGenericSupplier(
             "sampler2D", technique, material), 
-            String.class, -1);
+            String[].class, 1);
    }
     
     private static void assertReturnTypeIs(
