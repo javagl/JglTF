@@ -92,25 +92,23 @@ public class GltfRenderModels
      * {@link TechniqueParameters#getType()}:
      * <pre><code>
      * GL_INT
-     * GL_UNSIGNED_INT   : Integer if technique.parameters.count is null.
-     *                     An int[] array with the appropriate size if 
-     *                     technique.parameters.count is non-null    
-     * 
-     * GL_FLOAT          : Float if technique.parameters.count is null.
-     *                     A float[] array with the appropriate size if 
-     *                     technique.parameters.count is non-null    
-     * 
+     * GL_UNSIGNED_INT     
+     * GL_INT_VEC2
+     * GL_INT_VEC3
+     * GL_INT_VEC4       : An int[] array with the appropriate size. If
+     *                     technique.parameters.count is null, then this
+     *                     will be a single-element array.
+     *                     
+     * GL_FLOAT           
      * GL_FLOAT_MAT3
      * GL_FLOAT_MAT4
      * GL_FLOAT_VEC2
      * GL_FLOAT_VEC3
-     * GL_FLOAT_VEC4     : A float[] array of appropriate size
+     * GL_FLOAT_VEC4     : A float[] array with the appropriate size. If
+     *                     technique.parameters.count is null, then this
+     *                     will be a single-element array. 
      * 
-     * GL_INT_VEC2
-     * GL_INT_VEC3
-     * GL_INT_VEC4       : An int[] array of appropriate size
-     * 
-     * GL_SAMPLER_2D     : A String containing the texture ID
+     * GL_SAMPLER_2D     : A String[1] containing the texture ID
      * </code></pre> 
      * <br>
      * The returned suppliers MAY always return the same array instances.
@@ -142,27 +140,15 @@ public class GltfRenderModels
         {
             case GltfConstants.GL_INT:
             case GltfConstants.GL_UNSIGNED_INT:
+            case GltfConstants.GL_INT_VEC2:   
+            case GltfConstants.GL_INT_VEC3:   
+            case GltfConstants.GL_INT_VEC4:   
             {
-                if (techniqueParameters.getCount() == null)
-                {
-                    return createSingleIntSupplier(
-                        uniformName, technique, material);
-                }
                 return createIntArraySupplier(
                     uniformName, technique, material);
             }
 
             case GltfConstants.GL_FLOAT: 
-            {
-                if (techniqueParameters.getCount() == null)
-                {
-                    return createSingleFloatSupplier(
-                        uniformName, technique, material);
-                }
-                return createFloatArraySupplier(
-                    uniformName, technique, material);
-            }
-
             case GltfConstants.GL_FLOAT_MAT2:   
             case GltfConstants.GL_FLOAT_MAT3:   
             case GltfConstants.GL_FLOAT_MAT4:   
@@ -173,23 +159,11 @@ public class GltfRenderModels
                 return createFloatArraySupplier(
                     uniformName, technique, material);
             }
-
-            case GltfConstants.GL_INT_VEC2:   
-            case GltfConstants.GL_INT_VEC3:   
-            case GltfConstants.GL_INT_VEC4:   
-            {
-                return createIntArraySupplier(
-                    uniformName, technique, material);
-            }
             
             case GltfConstants.GL_SAMPLER_2D:
             {
-                return () ->
-                {
-                    Object object = getUniformValueObject(
-                        uniformName, technique, material);
-                    return object == null ? null : object;
-                };
+                return createStringArraySupplier(
+                    uniformName, technique, material);
             }
             
             // These types are not supported as uniform types in OpenGL
@@ -212,48 +186,33 @@ public class GltfRenderModels
     }
 
 
-
-
     /**
-     * Returns a supplier for the specified uniform value, which is assumed
-     * to be a single (signed or unsigned) integer, or a list containing 
-     * at least one integer value. (The latter is the case even for 
-     * single-value parameters, as of glTF 1.1) 
+     * Returns a supplier for the specified uniform value. This supplier
+     * will return a String[1] array, with the only element being the
+     * value of the uniform. This value may be <code>null</code>, or
+     * the string representation of the actual value object.
      * 
      * @param uniformName The uniform name
      * @param technique The {@link Technique}
      * @param material The {@link Material}
      * @return The supplier
      */
-    private static Supplier<?> createSingleIntSupplier(
+    private static Supplier<?> createStringArraySupplier(
         String uniformName, Technique technique, Material material)
     {
+        String value[] = new String[1];
         return () ->
         {
             Object object = getUniformValueObject(
                 uniformName, technique, material);
-            if (object == null)
-            {
-                return null;
-            }
-            Number number = null;
-            if (object instanceof Number)
-            {
-                number = (Number)object;
-            }
-            else
-            {
-                List<? extends Number> list = asNumberList(object);
-                number = list.get(0);
-            }
-            Integer value = number.intValue();
+            value[0] = object == null ? null : String.valueOf(object); 
             return value;
         };
     }
 
     /**
      * Returns a supplier for the specified uniform value, which is assumed
-     * to be a an integer array. 
+     * to be a an integer array or a single number.  
      * 
      * @param uniformName The uniform name
      * @param technique The {@link Technique}
@@ -276,8 +235,20 @@ public class GltfRenderModels
                 {
                     return null;
                 }
-                List<? extends Number> list = asNumberList(object);
-                value = toIntArray(list, value);
+                if (object instanceof Number)
+                {
+                    if (value == null)
+                    {
+                        value = new int[1];
+                    }
+                    Number number = (Number)object;
+                    value[0] = number.intValue();
+                }
+                else
+                {
+                    List<? extends Number> list = asNumberList(object);
+                    value = toIntArray(list, value);
+                }
                 return value;
             }
         };
@@ -286,44 +257,7 @@ public class GltfRenderModels
     
     /**
      * Returns a supplier for the specified uniform value, which is assumed
-     * to be a single float value, or a list containing 
-     * at least one float value. (The latter is the case even for 
-     * single-value parameters, as of glTF 1.1)
-     * 
-     * @param uniformName The uniform name
-     * @param technique The {@link Technique}
-     * @param material The {@link Material}
-     * @return The supplier
-     */
-    private static Supplier<?> createSingleFloatSupplier(String uniformName,
-        Technique technique, Material material)
-    {
-        return () ->
-        {
-            Object object = getUniformValueObject(
-                uniformName, technique, material);
-            if (object == null)
-            {
-                return null;
-            }
-            Number number = null;
-            if (object instanceof Number)
-            {
-                number = (Number)object;
-            }
-            else
-            {
-                List<? extends Number> list = asNumberList(object);
-                number = list.get(0);
-            }
-            Float value = number.floatValue();
-            return value;
-        };
-    }
-    
-    /**
-     * Returns a supplier for the specified uniform value, which is assumed
-     * to be a float array 
+     * to be a float array or a single number. 
      * 
      * @param uniformName The uniform name
      * @param technique The {@link Technique}
@@ -346,8 +280,20 @@ public class GltfRenderModels
                 {
                     return null;
                 }
-                List<? extends Number> list = asNumberList(object);
-                value = toFloatArray(list, value);
+                if (object instanceof Number)
+                {
+                    if (value == null)
+                    {
+                        value = new float[1];
+                    }
+                    Number number = (Number)object;
+                    value[0] = number.floatValue();
+                }
+                else
+                {
+                    List<? extends Number> list = asNumberList(object);
+                    value = toFloatArray(list, value);
+                }
                 return value;
             }
         };

@@ -751,22 +751,8 @@ public class RenderedGltf
                 int textureIndex = textureCounter;
                 Runnable uniformSettingCommand = () ->
                 {
-                    Object value = uniformValueSupplier.get();
-                    
-                    String textureId;
-                    
-                    // This is the case of glTF 1.1, where single values 
-                    // are also contained in an array
-                    if (value instanceof Collection<?>)
-                    {
-                        Collection<?> collection = (Collection<?>)value;
-                        Object element = collection.iterator().next();
-                        textureId = String.valueOf(element);
-                    }
-                    else
-                    {
-                        textureId = String.valueOf(value);
-                    }
+                    String value[] = (String[])uniformValueSupplier.get();
+                    String textureId = value[0];
                     Integer glTexture = 
                         gltfRenderData.obtainGlTexture(textureId);
                     if (glTexture == null)
