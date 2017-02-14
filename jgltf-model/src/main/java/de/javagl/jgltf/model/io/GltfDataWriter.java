@@ -41,7 +41,7 @@ import de.javagl.jgltf.impl.v1.GlTF;
 import de.javagl.jgltf.impl.v1.Image;
 import de.javagl.jgltf.impl.v1.Shader;
 import de.javagl.jgltf.model.GltfData;
-import de.javagl.jgltf.model.Maps;
+import de.javagl.jgltf.model.Optionals;
 
 /**
  * A class for writing {@link GltfData}. <br>
@@ -97,11 +97,11 @@ public class GltfDataWriter
             gltfWriter.writeGltf(gltf, outputStream);
         }
         String path = Paths.get(fileName).getParent().toString();
-        Maps.forEachEntry(gltf.getBuffers(), (id, buffer) -> 
+        Optionals.of(gltf.getBuffers()).forEach((id, buffer) -> 
             writeBuffer(gltfData, id, buffer, path));
-        Maps.forEachEntry(gltf.getImages(), (id, image) -> 
+        Optionals.of(gltf.getImages()).forEach((id, image) -> 
             writeImage(gltfData, id, image, path));
-        Maps.forEachEntry(gltf.getShaders(), (id, shader) -> 
+        Optionals.of(gltf.getShaders()).forEach((id, shader) -> 
             writeShader(gltfData, id, shader, path));
     }
 

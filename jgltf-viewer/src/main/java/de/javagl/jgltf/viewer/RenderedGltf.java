@@ -53,7 +53,6 @@ import de.javagl.jgltf.model.CameraModel;
 import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.GltfData;
 import de.javagl.jgltf.model.GltfModel;
-import de.javagl.jgltf.model.Maps;
 import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.gl.GltfRenderModel;
 import de.javagl.jgltf.model.gl.GltfRenderModels;
@@ -194,7 +193,7 @@ public class RenderedGltf
             createProjectionMatrixSupplier(externalProjectionMatrixSupplier);
         
         logger.fine("Processing scenes...");
-        Maps.forEachEntry(gltf.getScenes(), this::processScene);
+        Optionals.of(gltf.getScenes()).forEach(this::processScene);
         logger.fine("Processing scenes DONE...");
         
         if (externalViewMatrixSupplier == null)

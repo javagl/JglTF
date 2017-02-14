@@ -43,7 +43,7 @@ import de.javagl.jgltf.impl.v1.Image;
 import de.javagl.jgltf.impl.v1.Shader;
 import de.javagl.jgltf.model.BinaryGltf;
 import de.javagl.jgltf.model.GltfData;
-import de.javagl.jgltf.model.Maps;
+import de.javagl.jgltf.model.Optionals;
 
 /**
  * A class for resolving the references of a {@link GlTF}. This class 
@@ -152,7 +152,7 @@ public class GltfDataResolver
     public void resolveBuffers()
     {
         GlTF gltf = gltfData.getGltf();
-        Maps.forEachEntry(gltf.getBuffers(), this::readBuffer);
+        Optionals.of(gltf.getBuffers()).forEach(this::readBuffer);
     }
     
     /**
@@ -181,7 +181,7 @@ public class GltfDataResolver
     public void resolveImages()
     {
         GlTF gltf = gltfData.getGltf();
-        Maps.forEachEntry(gltf.getImages(), this::readImage);
+        Optionals.of(gltf.getImages()).forEach(this::readImage);
     }
     
     /**
@@ -209,7 +209,7 @@ public class GltfDataResolver
     public void resolveShaders()
     {
         GlTF gltf = gltfData.getGltf();
-        Maps.forEachEntry(gltf.getShaders(), this::readShader);
+        Optionals.of(gltf.getShaders()).forEach(this::readShader);
     }
     
     /**

@@ -33,7 +33,7 @@ import java.util.logging.Logger;
 import de.javagl.jgltf.impl.v1.Buffer;
 import de.javagl.jgltf.impl.v1.BufferView;
 import de.javagl.jgltf.model.GltfData;
-import de.javagl.jgltf.model.Maps;
+import de.javagl.jgltf.model.Optionals;
 
 /**
  * Utility methods related to {@link BufferView} buffers in {@link GltfData}
@@ -65,7 +65,7 @@ public class BufferViews
     {
         Map<String, BufferView> bufferViews = 
             gltfData.getGltf().getBufferViews();
-        Maps.forEachEntry(bufferViews, (bufferViewId, bufferView) ->
+        Optionals.of(bufferViews).forEach((bufferViewId, bufferView) ->
             createBufferViewByteBuffer(gltfData, bufferViewId, bufferView));
     }
     

@@ -38,7 +38,7 @@ import de.javagl.jgltf.impl.v1.Image;
 import de.javagl.jgltf.impl.v1.Shader;
 import de.javagl.jgltf.model.BinaryGltf;
 import de.javagl.jgltf.model.GltfData;
-import de.javagl.jgltf.model.Maps;
+import de.javagl.jgltf.model.Optionals;
 
 /**
  * Methods related to binary {@link GltfData} instances
@@ -163,7 +163,7 @@ public class BinaryGltfDatas
     public static void createBinaryImageDatas(GltfData gltfData) 
     {
         GlTF gltf = gltfData.getGltf();
-        Maps.forEachEntry(gltf.getImages(), 
+        Optionals.of(gltf.getImages()).forEach(
             (id, image) -> createBinaryImageData(gltfData, id, image));
     }
     
@@ -200,7 +200,7 @@ public class BinaryGltfDatas
     public static void createBinaryShaderDatas(GltfData gltfData) 
     {
         GlTF gltf = gltfData.getGltf();
-        Maps.forEachEntry(gltf.getShaders(), 
+        Optionals.of(gltf.getShaders()).forEach(
             (id, shader) -> createBinaryShaderData(gltfData, id, shader));
     }
     

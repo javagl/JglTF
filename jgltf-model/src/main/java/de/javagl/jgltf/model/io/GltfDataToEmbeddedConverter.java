@@ -35,7 +35,7 @@ import de.javagl.jgltf.impl.v1.Image;
 import de.javagl.jgltf.impl.v1.Shader;
 import de.javagl.jgltf.model.GltfData;
 import de.javagl.jgltf.model.GltfException;
-import de.javagl.jgltf.model.Maps;
+import de.javagl.jgltf.model.Optionals;
 
 /**
  * A class for converting {@link GltfData} to a {@link GltfData} with
@@ -76,11 +76,11 @@ public class GltfDataToEmbeddedConverter
         
         GlTF gltf = convertedGltfData.getGltf();
         
-        Maps.forEachEntry(gltf.getBuffers(), (id, value) -> 
+        Optionals.of(gltf.getBuffers()).forEach((id, value) -> 
             convertBufferToEmbedded(convertedGltfData, id, value));
-        Maps.forEachEntry(gltf.getImages(), (id, value) -> 
+        Optionals.of(gltf.getImages()).forEach((id, value) -> 
             convertImageToEmbedded(convertedGltfData, id, value));
-        Maps.forEachEntry(gltf.getShaders(), (id, value) -> 
+        Optionals.of(gltf.getShaders()).forEach((id, value) -> 
             convertShaderToEmbedded(convertedGltfData, id, value));
         
         return convertedGltfData;

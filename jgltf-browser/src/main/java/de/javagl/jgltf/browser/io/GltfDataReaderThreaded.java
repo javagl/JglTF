@@ -47,7 +47,7 @@ import de.javagl.jgltf.impl.v1.Image;
 import de.javagl.jgltf.impl.v1.Shader;
 import de.javagl.jgltf.model.BinaryGltf;
 import de.javagl.jgltf.model.GltfData;
-import de.javagl.jgltf.model.Maps;
+import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.io.BinaryGltfDatas;
 import de.javagl.jgltf.model.io.BufferViews;
 import de.javagl.jgltf.model.io.Buffers;
@@ -324,11 +324,11 @@ public class GltfDataReaderThreaded
         
         // Process the buffers, images and shaders, creating tasks for
         // loading them, that are placed in the task lists
-        Maps.forEachEntry(gltf.getBuffers(), 
+        Optionals.of(gltf.getBuffers()).forEach( 
             this::createBufferLoadingTask);
-        Maps.forEachEntry(gltf.getImages(), 
+        Optionals.of(gltf.getImages()).forEach( 
             this::createImageLoadingTask);
-        Maps.forEachEntry(gltf.getShaders(), 
+        Optionals.of(gltf.getShaders()).forEach( 
             this::createShaderLoadingTask);
 
         // Schedule the loading tasks 
