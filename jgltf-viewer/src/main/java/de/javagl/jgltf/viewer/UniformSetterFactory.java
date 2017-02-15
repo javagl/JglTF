@@ -117,6 +117,7 @@ class UniformSetterFactory
             case GltfConstants.GL_FLOAT:
             case GltfConstants.GL_FLOAT_VEC2:   
             case GltfConstants.GL_FLOAT_VEC3:
+            case GltfConstants.GL_FLOAT_VEC4:
             case GltfConstants.GL_FLOAT_MAT2:   
             case GltfConstants.GL_FLOAT_MAT3:   
             case GltfConstants.GL_FLOAT_MAT4:   
