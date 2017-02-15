@@ -55,7 +55,6 @@ import de.javagl.jgltf.model.GltfData;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.gl.GltfRenderModel;
-import de.javagl.jgltf.model.gl.GltfRenderModels;
 import de.javagl.jgltf.model.gl.GltfTechniqueModel;
 
 /**
@@ -111,17 +110,6 @@ public class RenderedGltf
      */
     private final DoubleSupplier aspectRatioSupplier;
     
-    /**
-     * A supplier for the view matrix. 
-     * See {@link #createViewMatrixSupplier(Supplier)} for details.
-     */
-    private final Supplier<float[]> viewMatrixSupplier;
-    
-    /**
-     * A supplier for the projection matrix.
-     * See {@link #createProjectionMatrixSupplier(Supplier)} for details.
-     */
-    private final Supplier<float[]> projectionMatrixSupplier;
 
     /**
      * The list of commands that have to be executed for rendering the
@@ -172,9 +160,6 @@ public class RenderedGltf
             "The gltfData may not be null");
         this.glContext = Objects.requireNonNull(glContext,
             "The glContext may not be null");
-        
-        this.gltfRenderModel = new GltfRenderModel(
-            gltfModel, gltfData, viewportSupplier);
         this.aspectRatioSupplier = aspectRatioSupplier;
 
         this.gltf = gltfData.getGltf();
@@ -187,10 +172,13 @@ public class RenderedGltf
         
         this.currentCameraModelSupplier = new SettableSupplier<CameraModel>();
 
-        this.viewMatrixSupplier = 
+        Supplier<float[]> viewMatrixSupplier = 
             createViewMatrixSupplier(externalViewMatrixSupplier);
-        this.projectionMatrixSupplier = 
+        Supplier<float[]> projectionMatrixSupplier = 
             createProjectionMatrixSupplier(externalProjectionMatrixSupplier);
+        this.gltfRenderModel = new GltfRenderModel(
+            gltfModel, gltfData, viewportSupplier,
+            viewMatrixSupplier, projectionMatrixSupplier);
         
         logger.fine("Processing scenes...");
         Optionals.of(gltf.getScenes()).forEach(this::processScene);
@@ -729,9 +717,8 @@ public class RenderedGltf
             // Create the supplier for the value that corresponds
             // the the uniform
             Supplier<?> uniformValueSupplier = 
-                createUniformValueSupplier(
-                    uniformName, technique, material, 
-                    nodeId, techniqueParameters);
+                gltfRenderModel.createUniformValueSupplier(
+                    uniformName, technique, material, nodeId);
             
             // Create the command for setting the uniform value
             // in the GL context
@@ -788,36 +775,6 @@ public class RenderedGltf
     }
     
     
-    /**
-     * Create a supplier that supplies the value for the specified uniform.
-     * If there is no {@link TechniqueParameters#getSemantic() semantic}, 
-     * then this value will be obtained from the {@link Technique} or the 
-     * {@link Material}. Otherwise, the value will be derived from the 
-     * context of the currently rendered {@link Node}, which is given by 
-     * the local and global transform of the {@link Node} with the given ID 
-     * 
-     * @param uniformName The name of the uniform
-     * @param technique The {@link Technique}
-     * @param material The {@link Material}
-     * @param nodeId The {@link Node} ID
-     * @param techniqueParameters The {@link TechniqueParameters}
-     * @return The supplier for the uniform value
-     */
-    private Supplier<?> createUniformValueSupplier(
-        String uniformName, Technique technique, Material material,
-        String nodeId, TechniqueParameters techniqueParameters)
-    {
-        String semantic = techniqueParameters.getSemantic();
-        if (semantic == null)
-        {
-            return GltfRenderModels.createGenericSupplier(
-                uniformName, technique, material);
-        }
-        return gltfRenderModel.createSemanticBasedSupplier(
-            uniformName, technique, nodeId, 
-            viewMatrixSupplier, projectionMatrixSupplier);
-    }
-
     /**
      * Walk through the {@link MeshPrimitive#getAttributes() attributes} of
      * the given {@link MeshPrimitive} and create the corresponding OpenGL 

@@ -38,6 +38,7 @@ import java.util.logging.Logger;
 
 import de.javagl.jgltf.impl.v1.Accessor;
 import de.javagl.jgltf.impl.v1.GlTF;
+import de.javagl.jgltf.impl.v1.Material;
 import de.javagl.jgltf.impl.v1.Node;
 import de.javagl.jgltf.impl.v1.Skin;
 import de.javagl.jgltf.impl.v1.Technique;
@@ -55,6 +56,9 @@ import de.javagl.jgltf.model.Utils;
 /**
  * A class that serves as a data model for a glTF asset that will be
  * rendered with GL, using the technique-based concepts of glTF 1.0.
+ * Its only public method is that for obtaining a supplier that 
+ * provides the value for a uniform variable, based on a {@link Technique}
+ * and a {@link Material}.
  */
 public class GltfRenderModel
 {
@@ -80,6 +84,16 @@ public class GltfRenderModel
     private final GlTF gltf;
     
     /**
+     * A supplier for the view matrix.  
+     */
+    private final Supplier<float[]> viewMatrixSupplier;
+    
+    /**
+     * A supplier for the projection matrix.
+     */
+    private final Supplier<float[]> projectionMatrixSupplier;
+    
+    /**
      * A supplier that supplies the viewport, as 4 float elements, 
      * [x, y, width, height]
      */
@@ -95,20 +109,35 @@ public class GltfRenderModel
      * Creates a new render model
      * 
      * @param gltfModel The {@link GltfModel}
-     * @param gltfData The {@link GltfData}
+     * @param gltfData The {@link GltfData}. Only used for obtaining the
+     * inverse bind matrices for skinning computations.
      * @param viewportSupplier A supplier that supplies the viewport, 
      * as 4 float elements, [x, y, width, height]
+     * @param viewMatrixSupplier A supplier that supplies the view matrix,
+     * which is a 4x4 matrix, given as a float array, in column-major order
+     * @param projectionMatrixSupplier A supplier that supplies the projection
+     * matrix, which is a 4x4 matrix, given as a float array, in 
+     * column-major order
      */
     public GltfRenderModel(
         GltfModel gltfModel, GltfData gltfData, 
-        Supplier<float[]> viewportSupplier)
+        Supplier<float[]> viewportSupplier,
+        Supplier<float[]> viewMatrixSupplier,
+        Supplier<float[]> projectionMatrixSupplier)
     {
-        this.gltfModel = gltfModel;
-        this.gltfData = gltfData;
-        this.gltf = gltfData.getGltf();
+        this.gltfModel = Objects.requireNonNull(gltfModel,
+            "The gltfModel may not be null");
+        this.gltfData = Objects.requireNonNull(gltfData,
+            "The gltfData  may not be null");
         this.viewportSupplier = Objects.requireNonNull(viewportSupplier, 
             "The viewportSupplier may not be null");
+        this.viewMatrixSupplier = Objects.requireNonNull(viewMatrixSupplier, 
+            "The viewMatrixSupplier may not be null");
+        this.projectionMatrixSupplier = 
+            Objects.requireNonNull(projectionMatrixSupplier, 
+                "The projectionMatrixSupplier may not be null");
         
+        this.gltf = gltfData.getGltf();
         this.jointNameToNodeId = computeJointNameToNodeIdMap();
     }
     
@@ -133,6 +162,41 @@ public class GltfRenderModel
         }
         return map;
     }
+    
+    /**
+     * Create a supplier that supplies the value for the specified uniform.
+     * If there is no {@link TechniqueParameters#getSemantic() semantic}, 
+     * then this value will be obtained from the {@link Technique} or the 
+     * {@link Material}. Otherwise, the value will be derived from the 
+     * context of the currently rendered {@link Node}, which is given by 
+     * the local and global transform of the {@link Node} with the given ID 
+     * 
+     * @param uniformName The name of the uniform
+     * @param technique The {@link Technique}
+     * @param material The {@link Material}
+     * @param nodeId The {@link Node} ID
+     * @return The supplier for the uniform value
+     */
+    public Supplier<?> createUniformValueSupplier(
+        String uniformName, Technique technique, 
+        Material material, String nodeId)
+    {
+        Map<String, String> uniforms = 
+            Optionals.of(technique.getUniforms());
+        String techniqueParameterId = uniforms.get(uniformName);
+        TechniqueParameters techniqueParameters = 
+            technique.getParameters().get(techniqueParameterId);
+        
+        String semantic = techniqueParameters.getSemantic();
+        if (semantic == null)
+        {
+            return GltfRenderModels.createGenericSupplier(
+                uniformName, technique, material);
+        }
+        return createSemanticBasedSupplier(
+            uniformName, technique, nodeId);
+    }
+    
     
     /**
      * Creates a supplier for the value of the uniform with the given name,
@@ -168,12 +232,12 @@ public class GltfRenderModel
      *  VIEWPORT                    float[4]    
      *  JOINTMATRIX                 float[16*numJoints] (see notes below)    
      * </code></pre>
-     * All matrices will be in column-major order. If the semantic does 
-     * not have any of these values, then a warning will be printed 
-     * and <code>null</code> will be returned.<br>
+     * If the semantic does not have any of these values, then an
+     * <code>IllegalArgumentException</code> will be thrown.<br>
      * <br>
-     * The returned suppliers MAY always return the same array instance.
-     * So callers MUST NOT store or modify the returned arrays.<br>
+     * All matrices will be in column-major order. The returned suppliers 
+     * MAY always return the same array instance. So callers MUST NOT 
+     * store or modify the returned arrays.<br>
      * <br>
      * About the <code>numJoints</code> factor in the <code>JOINTMATRIX</code>
      * case: The supplier will provide <code>numJoints</code> 4x4 matrices
@@ -202,8 +266,6 @@ public class GltfRenderModel
      * @param uniformName The uniform name
      * @param technique The {@link Technique}
      * @param currentNodeId The current {@link Node} ID
-     * @param viewMatrixSupplier The supplier for view matrix 
-     * @param projectionMatrixSupplier The supplier for projection matrix 
      * @return The supplier, or <code>null</code> if the semantic did
      * not have any of the valid values mentioned above.
      * @throws IllegalArgumentException If the semantic of the
@@ -213,10 +275,8 @@ public class GltfRenderModel
      * @throws GltfException May be thrown if the computations involve an ID 
      * of an element that is not found in the {@link GlTF}.
      */
-    public Supplier<?> createSemanticBasedSupplier(
-        String uniformName, Technique technique, String currentNodeId, 
-        Supplier<float[]> viewMatrixSupplier,
-        Supplier<float[]> projectionMatrixSupplier)
+    private Supplier<?> createSemanticBasedSupplier(
+        String uniformName, Technique technique, String currentNodeId)
     {
         Objects.requireNonNull(uniformName, 
             "The uniformName may not be null");

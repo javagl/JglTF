@@ -38,7 +38,7 @@ import de.javagl.jgltf.model.GltfConstants;
 /**
  * Utility methods related to the glTF data model. 
  */
-public class GltfRenderModels
+class GltfRenderModels
 {
     /**
      * Obtain the value for the uniform with the given name from the given
@@ -126,7 +126,7 @@ public class GltfRenderModels
      * {@link TechniqueParameters#getType()} is not one of the supported
      * types for OpenGL uniforms
      */
-    public static Supplier<?> createGenericSupplier(
+    static Supplier<?> createGenericSupplier(
         String uniformName, Technique technique, Material material)
     {
         TechniqueParameters techniqueParameters = 
