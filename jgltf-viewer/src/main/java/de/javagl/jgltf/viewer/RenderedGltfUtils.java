@@ -131,6 +131,11 @@ class RenderedGltfUtils
             }
             return Arrays.toString(array);
         }
+        if (value instanceof String[])
+        {
+            String array[] = (String[])value;
+            return Arrays.toString(array);
+        }
         return String.valueOf(value);
     }
     
