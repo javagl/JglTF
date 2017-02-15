@@ -740,17 +740,25 @@ public class RenderedGltf
                 {
                     String value[] = (String[])uniformValueSupplier.get();
                     String textureId = value[0];
-                    Integer glTexture = 
-                        gltfRenderData.obtainGlTexture(textureId);
-                    if (glTexture == null)
+                    if (textureId == null)
                     {
-                        logger.warning("Could not obtain GL texture for " + 
-                            "texture " + textureId );
+                        logger.warning("No texture ID found for uniform " + 
+                            uniformName);
                     }
                     else
                     {
-                        glContext.setUniformSampler(
-                            location, textureIndex, glTexture);
+                        Integer glTexture = 
+                            gltfRenderData.obtainGlTexture(textureId);
+                        if (glTexture == null)
+                        {
+                            logger.warning("Could not obtain GL texture for " + 
+                                "texture " + textureId );
+                        }
+                        else
+                        {
+                            glContext.setUniformSampler(
+                                location, textureIndex, glTexture);
+                        }
                     }
                 };
                 textureCounter++;
