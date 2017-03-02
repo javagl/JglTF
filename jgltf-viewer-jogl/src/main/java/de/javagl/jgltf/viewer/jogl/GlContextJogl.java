@@ -112,7 +112,7 @@ class GlContextJogl implements GlContext
         gl.glDeleteShader(glVertexShader);
 
         gl.glAttachShader(glProgram, glFragmentShader);
-        gl.glDeleteShader(glVertexShader);
+        gl.glDeleteShader(glFragmentShader);
         
         gl.glLinkProgram(glProgram);
         gl.glValidateProgram(glProgram);

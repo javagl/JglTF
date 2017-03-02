@@ -215,7 +215,7 @@ class GlContextLwjgl implements GlContext
         glDeleteShader(glVertexShader);
 
         glAttachShader(glProgram, glFragmentShader);
-        glDeleteShader(glVertexShader);
+        glDeleteShader(glFragmentShader);
         
         glLinkProgram(glProgram);
         glValidateProgram(glProgram);
