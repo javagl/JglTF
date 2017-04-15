@@ -29,6 +29,7 @@ package de.javagl.jgltf.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
@@ -67,7 +68,7 @@ public final class NodeModel
      */
     NodeModel(Node node)
     {
-        this.node = node;
+        this.node = Objects.requireNonNull(node, "The node may not be null");
         this.children = new ArrayList<NodeModel>();
     }
     
@@ -78,6 +79,7 @@ public final class NodeModel
      */
     void addChild(NodeModel child)
     {
+        Objects.requireNonNull(child, "The child may not be null");
         children.add(child);
         child.parent = this;
     }
