@@ -449,7 +449,7 @@ public class MathUtils
         float fovyRad = (float)Math.toRadians(fovyDeg);
         float t = (float)Math.tan(0.5 * fovyRad);
         m[0] = 1.0f / (aspect * t);
-        m[1] = 1.0f / t;
+        m[5] = 1.0f / t;
         m[10] = -1.0f;
         m[11] = -1.0f;
         m[14] = 2.0f * zNear;
@@ -473,7 +473,7 @@ public class MathUtils
         float fovyRad = (float)Math.toRadians(fovyDeg);
         float t = (float)Math.tan(0.5 * fovyRad);
         m[0] = 1.0f / (aspect * t);
-        m[1] = 1.0f / t;
+        m[5] = 1.0f / t;
         m[10] = (zFar + zNear) / (zNear - zFar);
         m[11] = -1.0f;
         m[14] = 2.0f * zFar * zNear / (zNear - zFar);
