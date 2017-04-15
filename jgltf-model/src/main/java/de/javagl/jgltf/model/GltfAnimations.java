@@ -59,26 +59,6 @@ public class GltfAnimations
         Logger.getLogger(GltfAnimations.class.getName());
     
     /**
-     * Create a new {@link AnimationManager} for the given {@link GltfData},
-     * using the given {@link AnimationPolicy}, that contains all 
-     * {@link Animation} instances created from the {@link GltfData}.
-     * 
-     * @param gltfData The {@link GltfData}
-     * @param animationPolicy The {@link AnimationPolicy}
-     * @return The {@link AnimationManager}
-     */
-    public static AnimationManager createAnimationManager(
-        GltfData gltfData, AnimationPolicy animationPolicy)
-    {
-        AnimationManager animationManager = 
-            new AnimationManager(animationPolicy);
-        List<de.javagl.jgltf.model.animation.Animation> modelAnimations =
-            createModelAnimations(gltfData);
-        animationManager.addAnimations(modelAnimations);
-        return animationManager;
-    }
-    
-    /**
      * Create a new {@link AnimationManager} using the given 
      * {@link AnimationPolicy}
      * 
