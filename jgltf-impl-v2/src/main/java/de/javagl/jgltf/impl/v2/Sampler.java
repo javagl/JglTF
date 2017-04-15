@@ -21,38 +21,30 @@ public class Sampler
 {
 
     /**
-     * Magnification filter. (optional)<br> 
-     * Default: 9729<br> 
-     * Valid values: [9728, 9729] 
+     * Magnification filter. (optional) 
      * 
      */
     private Integer magFilter;
     /**
-     * Minification filter. (optional)<br> 
-     * Default: 9986<br> 
-     * Valid values: [9728, 9729, 9984, 9985, 9986, 9987] 
+     * Minification filter. (optional) 
      * 
      */
     private Integer minFilter;
     /**
      * s wrapping mode. (optional)<br> 
-     * Default: 10497<br> 
-     * Valid values: [33071, 33648, 10497] 
+     * Default: 10497 
      * 
      */
     private Integer wrapS;
     /**
      * t wrapping mode. (optional)<br> 
-     * Default: 10497<br> 
-     * Valid values: [33071, 33648, 10497] 
+     * Default: 10497 
      * 
      */
     private Integer wrapT;
 
     /**
-     * Magnification filter. (optional)<br> 
-     * Default: 9729<br> 
-     * Valid values: [9728, 9729] 
+     * Magnification filter. (optional) 
      * 
      * @param magFilter The magFilter to set
      * @throws IllegalArgumentException If the given value does not meet
@@ -71,9 +63,7 @@ public class Sampler
     }
 
     /**
-     * Magnification filter. (optional)<br> 
-     * Default: 9729<br> 
-     * Valid values: [9728, 9729] 
+     * Magnification filter. (optional) 
      * 
      * @return The magFilter
      * 
@@ -83,20 +73,7 @@ public class Sampler
     }
 
     /**
-     * Returns the default value of the magFilter<br> 
-     * @see #getMagFilter 
-     * 
-     * @return The default magFilter
-     * 
-     */
-    public Integer defaultMagFilter() {
-        return  9729;
-    }
-
-    /**
-     * Minification filter. (optional)<br> 
-     * Default: 9986<br> 
-     * Valid values: [9728, 9729, 9984, 9985, 9986, 9987] 
+     * Minification filter. (optional) 
      * 
      * @param minFilter The minFilter to set
      * @throws IllegalArgumentException If the given value does not meet
@@ -115,9 +92,7 @@ public class Sampler
     }
 
     /**
-     * Minification filter. (optional)<br> 
-     * Default: 9986<br> 
-     * Valid values: [9728, 9729, 9984, 9985, 9986, 9987] 
+     * Minification filter. (optional) 
      * 
      * @return The minFilter
      * 
@@ -127,20 +102,8 @@ public class Sampler
     }
 
     /**
-     * Returns the default value of the minFilter<br> 
-     * @see #getMinFilter 
-     * 
-     * @return The default minFilter
-     * 
-     */
-    public Integer defaultMinFilter() {
-        return  9986;
-    }
-
-    /**
      * s wrapping mode. (optional)<br> 
-     * Default: 10497<br> 
-     * Valid values: [33071, 33648, 10497] 
+     * Default: 10497 
      * 
      * @param wrapS The wrapS to set
      * @throws IllegalArgumentException If the given value does not meet
@@ -160,8 +123,7 @@ public class Sampler
 
     /**
      * s wrapping mode. (optional)<br> 
-     * Default: 10497<br> 
-     * Valid values: [33071, 33648, 10497] 
+     * Default: 10497 
      * 
      * @return The wrapS
      * 
@@ -183,8 +145,7 @@ public class Sampler
 
     /**
      * t wrapping mode. (optional)<br> 
-     * Default: 10497<br> 
-     * Valid values: [33071, 33648, 10497] 
+     * Default: 10497 
      * 
      * @param wrapT The wrapT to set
      * @throws IllegalArgumentException If the given value does not meet
@@ -204,8 +165,7 @@ public class Sampler
 
     /**
      * t wrapping mode. (optional)<br> 
-     * Default: 10497<br> 
-     * Valid values: [33071, 33648, 10497] 
+     * Default: 10497 
      * 
      * @return The wrapT
      * 

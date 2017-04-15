@@ -35,8 +35,7 @@ public class Camera
     private CameraPerspective perspective;
     /**
      * Specifies if the camera uses a perspective or orthographic projection. 
-     * (required)<br> 
-     * Valid values: ["perspective", "orthographic"] 
+     * (required) 
      * 
      */
     private String type;
@@ -95,8 +94,7 @@ public class Camera
 
     /**
      * Specifies if the camera uses a perspective or orthographic projection. 
-     * (required)<br> 
-     * Valid values: ["perspective", "orthographic"] 
+     * (required) 
      * 
      * @param type The type to set
      * @throws NullPointerException If the given value is <code>null</code>
@@ -116,8 +114,7 @@ public class Camera
 
     /**
      * Specifies if the camera uses a perspective or orthographic projection. 
-     * (required)<br> 
-     * Valid values: ["perspective", "orthographic"] 
+     * (required) 
      * 
      * @return The type
      * 

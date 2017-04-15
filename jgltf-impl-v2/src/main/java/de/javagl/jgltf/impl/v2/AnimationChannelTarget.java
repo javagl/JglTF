@@ -25,10 +25,10 @@ public class AnimationChannelTarget
      * The index of the node to target. (required) 
      * 
      */
-    private Integer id;
+    private Integer node;
     /**
-     * The name of the node's TRS property to modify. (required)<br> 
-     * Valid values: ["translation", "rotation", "scale"] 
+     * The name of the node's TRS property to modify, or the "weights" of the 
+     * Morph Targets it instantiates. (required) 
      * 
      */
     private String path;
@@ -36,30 +36,30 @@ public class AnimationChannelTarget
     /**
      * The index of the node to target. (required) 
      * 
-     * @param id The id to set
+     * @param node The node to set
      * @throws NullPointerException If the given value is <code>null</code>
      * 
      */
-    public void setId(Integer id) {
-        if (id == null) {
-            throw new NullPointerException((("Invalid value for id: "+ id)+", may not be null"));
+    public void setNode(Integer node) {
+        if (node == null) {
+            throw new NullPointerException((("Invalid value for node: "+ node)+", may not be null"));
         }
-        this.id = id;
+        this.node = node;
     }
 
     /**
      * The index of the node to target. (required) 
      * 
-     * @return The id
+     * @return The node
      * 
      */
-    public Integer getId() {
-        return this.id;
+    public Integer getNode() {
+        return this.node;
     }
 
     /**
-     * The name of the node's TRS property to modify. (required)<br> 
-     * Valid values: ["translation", "rotation", "scale"] 
+     * The name of the node's TRS property to modify, or the "weights" of the 
+     * Morph Targets it instantiates. (required) 
      * 
      * @param path The path to set
      * @throws NullPointerException If the given value is <code>null</code>
@@ -71,15 +71,15 @@ public class AnimationChannelTarget
         if (path == null) {
             throw new NullPointerException((("Invalid value for path: "+ path)+", may not be null"));
         }
-        if (((!"translation".equals(path))&&(!"rotation".equals(path)))&&(!"scale".equals(path))) {
-            throw new IllegalArgumentException((("Invalid value for path: "+ path)+", valid: [\"translation\", \"rotation\", \"scale\"]"));
+        if ((((!"translation".equals(path))&&(!"rotation".equals(path)))&&(!"scale".equals(path)))&&(!"weights".equals(path))) {
+            throw new IllegalArgumentException((("Invalid value for path: "+ path)+", valid: [\"translation\", \"rotation\", \"scale\", \"weights\"]"));
         }
         this.path = path;
     }
 
     /**
-     * The name of the node's TRS property to modify. (required)<br> 
-     * Valid values: ["translation", "rotation", "scale"] 
+     * The name of the node's TRS property to modify, or the "weights" of the 
+     * Morph Targets it instantiates. (required) 
      * 
      * @return The path
      * 

@@ -38,8 +38,15 @@ public class BufferView
      */
     private Integer byteLength;
     /**
-     * The target that the WebGL buffer should be bound to. (optional)<br> 
-     * Valid values: [34962, 34963] 
+     * The stride, in bytes. (optional)<br> 
+     * Default: 0<br> 
+     * Minimum: 0 (inclusive)<br> 
+     * Maximum: 255 (inclusive) 
+     * 
+     */
+    private Integer byteStride;
+    /**
+     * The target that the GPU buffer should be bound to. (optional) 
      * 
      */
     private Integer target;
@@ -131,8 +138,56 @@ public class BufferView
     }
 
     /**
-     * The target that the WebGL buffer should be bound to. (optional)<br> 
-     * Valid values: [34962, 34963] 
+     * The stride, in bytes. (optional)<br> 
+     * Default: 0<br> 
+     * Minimum: 0 (inclusive)<br> 
+     * Maximum: 255 (inclusive) 
+     * 
+     * @param byteStride The byteStride to set
+     * @throws IllegalArgumentException If the given value does not meet
+     * the given constraints
+     * 
+     */
+    public void setByteStride(Integer byteStride) {
+        if (byteStride == null) {
+            this.byteStride = byteStride;
+            return ;
+        }
+        if (byteStride > 255) {
+            throw new IllegalArgumentException("byteStride > 255");
+        }
+        if (byteStride< 0) {
+            throw new IllegalArgumentException("byteStride < 0");
+        }
+        this.byteStride = byteStride;
+    }
+
+    /**
+     * The stride, in bytes. (optional)<br> 
+     * Default: 0<br> 
+     * Minimum: 0 (inclusive)<br> 
+     * Maximum: 255 (inclusive) 
+     * 
+     * @return The byteStride
+     * 
+     */
+    public Integer getByteStride() {
+        return this.byteStride;
+    }
+
+    /**
+     * Returns the default value of the byteStride<br> 
+     * @see #getByteStride 
+     * 
+     * @return The default byteStride
+     * 
+     */
+    public Integer defaultByteStride() {
+        return  0;
+    }
+
+    /**
+     * The target that the GPU buffer should be bound to. (optional) 
      * 
      * @param target The target to set
      * @throws IllegalArgumentException If the given value does not meet
@@ -151,8 +206,7 @@ public class BufferView
     }
 
     /**
-     * The target that the WebGL buffer should be bound to. (optional)<br> 
-     * Valid values: [34962, 34963] 
+     * The target that the GPU buffer should be bound to. (optional) 
      * 
      * @return The target
      * 

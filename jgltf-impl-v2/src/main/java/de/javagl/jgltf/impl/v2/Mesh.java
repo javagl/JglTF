@@ -33,6 +33,14 @@ public class Mesh
      * 
      */
     private List<MeshPrimitive> primitives;
+    /**
+     * Array of weights to be applied to the Morph Targets. (optional)<br> 
+     * Minimum number of items: 0<br> 
+     * Array elements:<br> 
+     * &nbsp;&nbsp;The elements of this array (optional) 
+     * 
+     */
+    private List<Float> weights;
 
     /**
      * An array of primitives, each defining geometry to be rendered with a 
@@ -115,6 +123,91 @@ public class Mesh
         }
         newList.remove(element);
         this.primitives = newList;
+    }
+
+    /**
+     * Array of weights to be applied to the Morph Targets. (optional)<br> 
+     * Minimum number of items: 0<br> 
+     * Array elements:<br> 
+     * &nbsp;&nbsp;The elements of this array (optional) 
+     * 
+     * @param weights The weights to set
+     * @throws IllegalArgumentException If the given value does not meet
+     * the given constraints
+     * 
+     */
+    public void setWeights(List<Float> weights) {
+        if (weights == null) {
+            this.weights = weights;
+            return ;
+        }
+        if (weights.size()< 0) {
+            throw new IllegalArgumentException("Number of weights elements is < 0");
+        }
+        this.weights = weights;
+    }
+
+    /**
+     * Array of weights to be applied to the Morph Targets. (optional)<br> 
+     * Minimum number of items: 0<br> 
+     * Array elements:<br> 
+     * &nbsp;&nbsp;The elements of this array (optional) 
+     * 
+     * @return The weights
+     * 
+     */
+    public List<Float> getWeights() {
+        return this.weights;
+    }
+
+    /**
+     * Add the given weights. The weights of this instance will be replaced 
+     * with a list that contains all previous elements, and additionally the 
+     * new element. 
+     * 
+     * @param element The element
+     * @throws NullPointerException If the given element is <code>null</code>
+     * 
+     */
+    public void addWeights(Float element) {
+        if (element == null) {
+            throw new NullPointerException("The element may not be null");
+        }
+        List<Float> oldList = this.weights;
+        List<Float> newList = new ArrayList<Float>();
+        if (oldList!= null) {
+            newList.addAll(oldList);
+        }
+        newList.add(element);
+        this.weights = newList;
+    }
+
+    /**
+     * Remove the given weights. The weights of this instance will be 
+     * replaced with a list that contains all previous elements, except for 
+     * the removed one.<br> 
+     * If this new list would be empty, then it will be set to 
+     * <code>null</code>. 
+     * 
+     * @param element The element
+     * @throws NullPointerException If the given element is <code>null</code>
+     * 
+     */
+    public void removeWeights(Float element) {
+        if (element == null) {
+            throw new NullPointerException("The element may not be null");
+        }
+        List<Float> oldList = this.weights;
+        List<Float> newList = new ArrayList<Float>();
+        if (oldList!= null) {
+            newList.addAll(oldList);
+        }
+        newList.remove(element);
+        if (newList.isEmpty()) {
+            this.weights = null;
+        } else {
+            this.weights = newList;
+        }
     }
 
 }

@@ -13,20 +13,16 @@ import java.util.List;
 
 
 /**
- * A node in the node hierarchy. A node can have either the `camera`, 
- * `meshes`, or `skeletons`/`skin`/`meshes` properties defined. In the 
- * later case, all `primitives` in the referenced `meshes` contain 
- * `JOINT` and `WEIGHT` attributes and the referenced 
- * `material`/`technique` from each `primitive` has parameters with 
- * `JOINT` and `WEIGHT` semantics. A node can have either a `matrix` or 
- * any combination of `translation`/`rotation`/`scale` (TRS) properties. 
- * TRS properties are converted to matrices and postmultiplied in the `T 
- * * R * S` order to compose the transformation matrix; first the scale 
- * is applied to the vertices, then the rotation, and then the 
- * translation. If none are provided, the transform is the identity. When 
- * a node is targeted for animation (referenced by an 
- * animation.channel.target), only TRS properties may be present; 
- * `matrix` will not be present. 
+ * A node in the node hierarchy. When the node contains `skin`, all 
+ * `mesh.primitives` must contain `JOINTS_0` and `WEIGHTS_0` attributes. 
+ * A node can have either a `matrix` or any combination of 
+ * `translation`/`rotation`/`scale` (TRS) properties. TRS properties are 
+ * converted to matrices and postmultiplied in the `T * R * S` order to 
+ * compose the transformation matrix; first the scale is applied to the 
+ * vertices, then the rotation, and then the translation. If none are 
+ * provided, the transform is the identity. When a node is targeted for 
+ * animation (referenced by an animation.channel.target), only TRS 
+ * properties may be present; `matrix` will not be present. 
  * 
  * Auto-generated for node.schema.json 
  * 
@@ -50,23 +46,10 @@ public class Node
      */
     private List<Integer> children;
     /**
-     * The indices of skeleton nodes. (optional)<br> 
-     * Array elements:<br> 
-     * &nbsp;&nbsp;The elements of this array (optional)<br> 
-     * &nbsp;&nbsp;Minimum: 0 (inclusive) 
-     * 
-     */
-    private List<Integer> skeletons;
-    /**
      * The index of the skin referenced by this node. (optional) 
      * 
      */
     private Integer skin;
-    /**
-     * Name used when this node is a joint in a skin. (optional) 
-     * 
-     */
-    private Integer jointName;
     /**
      * A floating-point 4x4 transformation matrix stored in column-major 
      * order. (optional)<br> 
@@ -111,6 +94,16 @@ public class Node
      * 
      */
     private float[] translation;
+    /**
+     * The weights of the instantiated Morph Target. Number of elements must 
+     * match number of Morph Targets of used mesh. (optional)<br> 
+     * Minimum number of items: 1<br> 
+     * Array elements:<br> 
+     * &nbsp;&nbsp;The elements of this array (optional)<br> 
+     * &nbsp;&nbsp;Minimum: 0 (inclusive) 
+     * 
+     */
+    private List<Float> weights;
 
     /**
      * The index of the camera referenced by this node. (optional) 
@@ -237,93 +230,6 @@ public class Node
     }
 
     /**
-     * The indices of skeleton nodes. (optional)<br> 
-     * Array elements:<br> 
-     * &nbsp;&nbsp;The elements of this array (optional)<br> 
-     * &nbsp;&nbsp;Minimum: 0 (inclusive) 
-     * 
-     * @param skeletons The skeletons to set
-     * @throws IllegalArgumentException If the given value does not meet
-     * the given constraints
-     * 
-     */
-    public void setSkeletons(List<Integer> skeletons) {
-        if (skeletons == null) {
-            this.skeletons = skeletons;
-            return ;
-        }
-        for (Integer skeletonsElement: skeletons) {
-            if (skeletonsElement< 0) {
-                throw new IllegalArgumentException("skeletonsElement < 0");
-            }
-        }
-        this.skeletons = skeletons;
-    }
-
-    /**
-     * The indices of skeleton nodes. (optional)<br> 
-     * Array elements:<br> 
-     * &nbsp;&nbsp;The elements of this array (optional)<br> 
-     * &nbsp;&nbsp;Minimum: 0 (inclusive) 
-     * 
-     * @return The skeletons
-     * 
-     */
-    public List<Integer> getSkeletons() {
-        return this.skeletons;
-    }
-
-    /**
-     * Add the given skeletons. The skeletons of this instance will be 
-     * replaced with a list that contains all previous elements, and 
-     * additionally the new element. 
-     * 
-     * @param element The element
-     * @throws NullPointerException If the given element is <code>null</code>
-     * 
-     */
-    public void addSkeletons(Integer element) {
-        if (element == null) {
-            throw new NullPointerException("The element may not be null");
-        }
-        List<Integer> oldList = this.skeletons;
-        List<Integer> newList = new ArrayList<Integer>();
-        if (oldList!= null) {
-            newList.addAll(oldList);
-        }
-        newList.add(element);
-        this.skeletons = newList;
-    }
-
-    /**
-     * Remove the given skeletons. The skeletons of this instance will be 
-     * replaced with a list that contains all previous elements, except for 
-     * the removed one.<br> 
-     * If this new list would be empty, then it will be set to 
-     * <code>null</code>. 
-     * 
-     * @param element The element
-     * @throws NullPointerException If the given element is <code>null</code>
-     * 
-     */
-    public void removeSkeletons(Integer element) {
-        if (element == null) {
-            throw new NullPointerException("The element may not be null");
-        }
-        List<Integer> oldList = this.skeletons;
-        List<Integer> newList = new ArrayList<Integer>();
-        if (oldList!= null) {
-            newList.addAll(oldList);
-        }
-        newList.remove(element);
-        if (newList.isEmpty()) {
-            this.skeletons = null;
-        } else {
-            this.skeletons = newList;
-        }
-    }
-
-    /**
      * The index of the skin referenced by this node. (optional) 
      * 
      * @param skin The skin to set
@@ -345,30 +251,6 @@ public class Node
      */
     public Integer getSkin() {
         return this.skin;
-    }
-
-    /**
-     * Name used when this node is a joint in a skin. (optional) 
-     * 
-     * @param jointName The jointName to set
-     * 
-     */
-    public void setJointName(Integer jointName) {
-        if (jointName == null) {
-            this.jointName = jointName;
-            return ;
-        }
-        this.jointName = jointName;
-    }
-
-    /**
-     * Name used when this node is a joint in a skin. (optional) 
-     * 
-     * @return The jointName
-     * 
-     */
-    public Integer getJointName() {
-        return this.jointName;
     }
 
     /**
@@ -603,6 +485,100 @@ public class Node
      */
     public float[] defaultTranslation() {
         return new float[] { 0.0F, 0.0F, 0.0F };
+    }
+
+    /**
+     * The weights of the instantiated Morph Target. Number of elements must 
+     * match number of Morph Targets of used mesh. (optional)<br> 
+     * Minimum number of items: 1<br> 
+     * Array elements:<br> 
+     * &nbsp;&nbsp;The elements of this array (optional)<br> 
+     * &nbsp;&nbsp;Minimum: 0 (inclusive) 
+     * 
+     * @param weights The weights to set
+     * @throws IllegalArgumentException If the given value does not meet
+     * the given constraints
+     * 
+     */
+    public void setWeights(List<Float> weights) {
+        if (weights == null) {
+            this.weights = weights;
+            return ;
+        }
+        if (weights.size()< 1) {
+            throw new IllegalArgumentException("Number of weights elements is < 1");
+        }
+        for (Float weightsElement: weights) {
+            if (weightsElement< 0.0D) {
+                throw new IllegalArgumentException("weightsElement < 0.0");
+            }
+        }
+        this.weights = weights;
+    }
+
+    /**
+     * The weights of the instantiated Morph Target. Number of elements must 
+     * match number of Morph Targets of used mesh. (optional)<br> 
+     * Minimum number of items: 1<br> 
+     * Array elements:<br> 
+     * &nbsp;&nbsp;The elements of this array (optional)<br> 
+     * &nbsp;&nbsp;Minimum: 0 (inclusive) 
+     * 
+     * @return The weights
+     * 
+     */
+    public List<Float> getWeights() {
+        return this.weights;
+    }
+
+    /**
+     * Add the given weights. The weights of this instance will be replaced 
+     * with a list that contains all previous elements, and additionally the 
+     * new element. 
+     * 
+     * @param element The element
+     * @throws NullPointerException If the given element is <code>null</code>
+     * 
+     */
+    public void addWeights(Float element) {
+        if (element == null) {
+            throw new NullPointerException("The element may not be null");
+        }
+        List<Float> oldList = this.weights;
+        List<Float> newList = new ArrayList<Float>();
+        if (oldList!= null) {
+            newList.addAll(oldList);
+        }
+        newList.add(element);
+        this.weights = newList;
+    }
+
+    /**
+     * Remove the given weights. The weights of this instance will be 
+     * replaced with a list that contains all previous elements, except for 
+     * the removed one.<br> 
+     * If this new list would be empty, then it will be set to 
+     * <code>null</code>. 
+     * 
+     * @param element The element
+     * @throws NullPointerException If the given element is <code>null</code>
+     * 
+     */
+    public void removeWeights(Float element) {
+        if (element == null) {
+            throw new NullPointerException("The element may not be null");
+        }
+        List<Float> oldList = this.weights;
+        List<Float> newList = new ArrayList<Float>();
+        if (oldList!= null) {
+            newList.addAll(oldList);
+        }
+        newList.remove(element);
+        if (newList.isEmpty()) {
+            this.weights = null;
+        } else {
+            this.weights = newList;
+        }
     }
 
 }

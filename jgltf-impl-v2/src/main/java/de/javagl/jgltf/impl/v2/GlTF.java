@@ -24,7 +24,7 @@ public class GlTF
 
     /**
      * Names of glTF extensions used somewhere in this asset. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;The elements of this array (optional) 
      * 
@@ -33,7 +33,7 @@ public class GlTF
     /**
      * Names of glTF extensions required to properly load this asset. 
      * (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;The elements of this array (optional) 
      * 
@@ -41,7 +41,7 @@ public class GlTF
     private List<String> extensionsRequired;
     /**
      * An array of accessors. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;A typed view into a bufferView. A bufferView contains raw 
      * binary data. An accessor provides a typed view into a bufferView or a 
@@ -52,7 +52,7 @@ public class GlTF
     private List<Accessor> accessors;
     /**
      * An array of keyframe animations. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;A keyframe animation. (optional) 
      * 
@@ -65,7 +65,7 @@ public class GlTF
     private Asset asset;
     /**
      * An array of buffers. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;A buffer points to binary geometry, animation, or skins. 
      * (optional) 
@@ -74,7 +74,7 @@ public class GlTF
     private List<Buffer> buffers;
     /**
      * An array of bufferViews. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;A view into a buffer generally representing a subset of 
      * the buffer. (optional) 
@@ -83,7 +83,7 @@ public class GlTF
     private List<BufferView> bufferViews;
     /**
      * An array of cameras. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;A camera's projection. A node can reference a camera to 
      * apply a transform to place the camera in the scene. (optional) 
@@ -92,7 +92,7 @@ public class GlTF
     private List<Camera> cameras;
     /**
      * An array of images. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;Image data used to create a texture. Image can be 
      * referenced by URI or `bufferView` index. `mimeType` is required in the 
@@ -102,7 +102,7 @@ public class GlTF
     private List<Image> images;
     /**
      * An array of materials. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;The material appearance of a primitive. (optional) 
      * 
@@ -110,7 +110,7 @@ public class GlTF
     private List<Material> materials;
     /**
      * An array of meshes. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;A set of primitives to be rendered. A node can contain one 
      * or more meshes. A node's transform places the mesh in the scene. 
@@ -120,28 +120,24 @@ public class GlTF
     private List<Mesh> meshes;
     /**
      * An array of nodes. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
-     * &nbsp;&nbsp;A node in the node hierarchy. A node can have either the 
-     * `camera`, `meshes`, or `skeletons`/`skin`/`meshes` properties defined. 
-     * In the later case, all `primitives` in the referenced `meshes` contain 
-     * `JOINT` and `WEIGHT` attributes and the referenced 
-     * `material`/`technique` from each `primitive` has parameters with 
-     * `JOINT` and `WEIGHT` semantics. A node can have either a `matrix` or 
-     * any combination of `translation`/`rotation`/`scale` (TRS) properties. 
-     * TRS properties are converted to matrices and postmultiplied in the `T 
-     * * R * S` order to compose the transformation matrix; first the scale 
-     * is applied to the vertices, then the rotation, and then the 
-     * translation. If none are provided, the transform is the identity. When 
-     * a node is targeted for animation (referenced by an 
-     * animation.channel.target), only TRS properties may be present; 
-     * `matrix` will not be present. (optional) 
+     * &nbsp;&nbsp;A node in the node hierarchy. When the node contains 
+     * `skin`, all `mesh.primitives` must contain `JOINTS_0` and `WEIGHTS_0` 
+     * attributes. A node can have either a `matrix` or any combination of 
+     * `translation`/`rotation`/`scale` (TRS) properties. TRS properties are 
+     * converted to matrices and postmultiplied in the `T * R * S` order to 
+     * compose the transformation matrix; first the scale is applied to the 
+     * vertices, then the rotation, and then the translation. If none are 
+     * provided, the transform is the identity. When a node is targeted for 
+     * animation (referenced by an animation.channel.target), only TRS 
+     * properties may be present; `matrix` will not be present. (optional) 
      * 
      */
     private List<Node> nodes;
     /**
      * An array of samplers. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;Texture sampler properties for filtering and wrapping 
      * modes. (optional) 
@@ -155,7 +151,7 @@ public class GlTF
     private Integer scene;
     /**
      * An array of scenes. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;The root nodes of a scene. (optional) 
      * 
@@ -163,7 +159,7 @@ public class GlTF
     private List<Scene> scenes;
     /**
      * An array of skins. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;Joints and matrices defining a skin. (optional) 
      * 
@@ -171,30 +167,22 @@ public class GlTF
     private List<Skin> skins;
     /**
      * An array of textures. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;A texture and its sampler. (optional) 
      * 
      */
     private List<Texture> textures;
-    /**
-     * Names of WebGL extensions required to render this asset. 
-     * (optional)<br> 
-     * Default: []<br> 
-     * Array elements:<br> 
-     * &nbsp;&nbsp;The elements of this array (optional)<br> 
-     * &nbsp;&nbsp;Valid values: ["OES_element_index_uint"] 
-     * 
-     */
-    private List<String> glExtensionsUsed;
 
     /**
      * Names of glTF extensions used somewhere in this asset. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;The elements of this array (optional) 
      * 
      * @param extensionsUsed The extensionsUsed to set
+     * @throws IllegalArgumentException If the given value does not meet
+     * the given constraints
      * 
      */
     public void setExtensionsUsed(List<String> extensionsUsed) {
@@ -202,12 +190,15 @@ public class GlTF
             this.extensionsUsed = extensionsUsed;
             return ;
         }
+        if (extensionsUsed.size()< 1) {
+            throw new IllegalArgumentException("Number of extensionsUsed elements is < 1");
+        }
         this.extensionsUsed = extensionsUsed;
     }
 
     /**
      * Names of glTF extensions used somewhere in this asset. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;The elements of this array (optional) 
      * 
@@ -269,24 +260,15 @@ public class GlTF
     }
 
     /**
-     * Returns the default value of the extensionsUsed<br> 
-     * @see #getExtensionsUsed 
-     * 
-     * @return The default extensionsUsed
-     * 
-     */
-    public List<String> defaultExtensionsUsed() {
-        return new ArrayList<String>();
-    }
-
-    /**
      * Names of glTF extensions required to properly load this asset. 
      * (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;The elements of this array (optional) 
      * 
      * @param extensionsRequired The extensionsRequired to set
+     * @throws IllegalArgumentException If the given value does not meet
+     * the given constraints
      * 
      */
     public void setExtensionsRequired(List<String> extensionsRequired) {
@@ -294,13 +276,16 @@ public class GlTF
             this.extensionsRequired = extensionsRequired;
             return ;
         }
+        if (extensionsRequired.size()< 1) {
+            throw new IllegalArgumentException("Number of extensionsRequired elements is < 1");
+        }
         this.extensionsRequired = extensionsRequired;
     }
 
     /**
      * Names of glTF extensions required to properly load this asset. 
      * (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;The elements of this array (optional) 
      * 
@@ -362,19 +347,8 @@ public class GlTF
     }
 
     /**
-     * Returns the default value of the extensionsRequired<br> 
-     * @see #getExtensionsRequired 
-     * 
-     * @return The default extensionsRequired
-     * 
-     */
-    public List<String> defaultExtensionsRequired() {
-        return new ArrayList<String>();
-    }
-
-    /**
      * An array of accessors. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;A typed view into a bufferView. A bufferView contains raw 
      * binary data. An accessor provides a typed view into a bufferView or a 
@@ -382,6 +356,8 @@ public class GlTF
      * defines an attribute in a buffer. (optional) 
      * 
      * @param accessors The accessors to set
+     * @throws IllegalArgumentException If the given value does not meet
+     * the given constraints
      * 
      */
     public void setAccessors(List<Accessor> accessors) {
@@ -389,12 +365,15 @@ public class GlTF
             this.accessors = accessors;
             return ;
         }
+        if (accessors.size()< 1) {
+            throw new IllegalArgumentException("Number of accessors elements is < 1");
+        }
         this.accessors = accessors;
     }
 
     /**
      * An array of accessors. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;A typed view into a bufferView. A bufferView contains raw 
      * binary data. An accessor provides a typed view into a bufferView or a 
@@ -459,23 +438,14 @@ public class GlTF
     }
 
     /**
-     * Returns the default value of the accessors<br> 
-     * @see #getAccessors 
-     * 
-     * @return The default accessors
-     * 
-     */
-    public List<Accessor> defaultAccessors() {
-        return new ArrayList<Accessor>();
-    }
-
-    /**
      * An array of keyframe animations. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;A keyframe animation. (optional) 
      * 
      * @param animations The animations to set
+     * @throws IllegalArgumentException If the given value does not meet
+     * the given constraints
      * 
      */
     public void setAnimations(List<Animation> animations) {
@@ -483,12 +453,15 @@ public class GlTF
             this.animations = animations;
             return ;
         }
+        if (animations.size()< 1) {
+            throw new IllegalArgumentException("Number of animations elements is < 1");
+        }
         this.animations = animations;
     }
 
     /**
      * An array of keyframe animations. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;A keyframe animation. (optional) 
      * 
@@ -550,17 +523,6 @@ public class GlTF
     }
 
     /**
-     * Returns the default value of the animations<br> 
-     * @see #getAnimations 
-     * 
-     * @return The default animations
-     * 
-     */
-    public List<Animation> defaultAnimations() {
-        return new ArrayList<Animation>();
-    }
-
-    /**
      * Metadata about the glTF asset. (required) 
      * 
      * @param asset The asset to set
@@ -586,12 +548,14 @@ public class GlTF
 
     /**
      * An array of buffers. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;A buffer points to binary geometry, animation, or skins. 
      * (optional) 
      * 
      * @param buffers The buffers to set
+     * @throws IllegalArgumentException If the given value does not meet
+     * the given constraints
      * 
      */
     public void setBuffers(List<Buffer> buffers) {
@@ -599,12 +563,15 @@ public class GlTF
             this.buffers = buffers;
             return ;
         }
+        if (buffers.size()< 1) {
+            throw new IllegalArgumentException("Number of buffers elements is < 1");
+        }
         this.buffers = buffers;
     }
 
     /**
      * An array of buffers. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;A buffer points to binary geometry, animation, or skins. 
      * (optional) 
@@ -667,24 +634,15 @@ public class GlTF
     }
 
     /**
-     * Returns the default value of the buffers<br> 
-     * @see #getBuffers 
-     * 
-     * @return The default buffers
-     * 
-     */
-    public List<Buffer> defaultBuffers() {
-        return new ArrayList<Buffer>();
-    }
-
-    /**
      * An array of bufferViews. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;A view into a buffer generally representing a subset of 
      * the buffer. (optional) 
      * 
      * @param bufferViews The bufferViews to set
+     * @throws IllegalArgumentException If the given value does not meet
+     * the given constraints
      * 
      */
     public void setBufferViews(List<BufferView> bufferViews) {
@@ -692,12 +650,15 @@ public class GlTF
             this.bufferViews = bufferViews;
             return ;
         }
+        if (bufferViews.size()< 1) {
+            throw new IllegalArgumentException("Number of bufferViews elements is < 1");
+        }
         this.bufferViews = bufferViews;
     }
 
     /**
      * An array of bufferViews. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;A view into a buffer generally representing a subset of 
      * the buffer. (optional) 
@@ -760,24 +721,15 @@ public class GlTF
     }
 
     /**
-     * Returns the default value of the bufferViews<br> 
-     * @see #getBufferViews 
-     * 
-     * @return The default bufferViews
-     * 
-     */
-    public List<BufferView> defaultBufferViews() {
-        return new ArrayList<BufferView>();
-    }
-
-    /**
      * An array of cameras. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;A camera's projection. A node can reference a camera to 
      * apply a transform to place the camera in the scene. (optional) 
      * 
      * @param cameras The cameras to set
+     * @throws IllegalArgumentException If the given value does not meet
+     * the given constraints
      * 
      */
     public void setCameras(List<Camera> cameras) {
@@ -785,12 +737,15 @@ public class GlTF
             this.cameras = cameras;
             return ;
         }
+        if (cameras.size()< 1) {
+            throw new IllegalArgumentException("Number of cameras elements is < 1");
+        }
         this.cameras = cameras;
     }
 
     /**
      * An array of cameras. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;A camera's projection. A node can reference a camera to 
      * apply a transform to place the camera in the scene. (optional) 
@@ -853,25 +808,16 @@ public class GlTF
     }
 
     /**
-     * Returns the default value of the cameras<br> 
-     * @see #getCameras 
-     * 
-     * @return The default cameras
-     * 
-     */
-    public List<Camera> defaultCameras() {
-        return new ArrayList<Camera>();
-    }
-
-    /**
      * An array of images. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;Image data used to create a texture. Image can be 
      * referenced by URI or `bufferView` index. `mimeType` is required in the 
      * latter case. (optional) 
      * 
      * @param images The images to set
+     * @throws IllegalArgumentException If the given value does not meet
+     * the given constraints
      * 
      */
     public void setImages(List<Image> images) {
@@ -879,12 +825,15 @@ public class GlTF
             this.images = images;
             return ;
         }
+        if (images.size()< 1) {
+            throw new IllegalArgumentException("Number of images elements is < 1");
+        }
         this.images = images;
     }
 
     /**
      * An array of images. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;Image data used to create a texture. Image can be 
      * referenced by URI or `bufferView` index. `mimeType` is required in the 
@@ -948,23 +897,14 @@ public class GlTF
     }
 
     /**
-     * Returns the default value of the images<br> 
-     * @see #getImages 
-     * 
-     * @return The default images
-     * 
-     */
-    public List<Image> defaultImages() {
-        return new ArrayList<Image>();
-    }
-
-    /**
      * An array of materials. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;The material appearance of a primitive. (optional) 
      * 
      * @param materials The materials to set
+     * @throws IllegalArgumentException If the given value does not meet
+     * the given constraints
      * 
      */
     public void setMaterials(List<Material> materials) {
@@ -972,12 +912,15 @@ public class GlTF
             this.materials = materials;
             return ;
         }
+        if (materials.size()< 1) {
+            throw new IllegalArgumentException("Number of materials elements is < 1");
+        }
         this.materials = materials;
     }
 
     /**
      * An array of materials. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;The material appearance of a primitive. (optional) 
      * 
@@ -1039,25 +982,16 @@ public class GlTF
     }
 
     /**
-     * Returns the default value of the materials<br> 
-     * @see #getMaterials 
-     * 
-     * @return The default materials
-     * 
-     */
-    public List<Material> defaultMaterials() {
-        return new ArrayList<Material>();
-    }
-
-    /**
      * An array of meshes. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;A set of primitives to be rendered. A node can contain one 
      * or more meshes. A node's transform places the mesh in the scene. 
      * (optional) 
      * 
      * @param meshes The meshes to set
+     * @throws IllegalArgumentException If the given value does not meet
+     * the given constraints
      * 
      */
     public void setMeshes(List<Mesh> meshes) {
@@ -1065,12 +999,15 @@ public class GlTF
             this.meshes = meshes;
             return ;
         }
+        if (meshes.size()< 1) {
+            throw new IllegalArgumentException("Number of meshes elements is < 1");
+        }
         this.meshes = meshes;
     }
 
     /**
      * An array of meshes. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;A set of primitives to be rendered. A node can contain one 
      * or more meshes. A node's transform places the mesh in the scene. 
@@ -1134,36 +1071,23 @@ public class GlTF
     }
 
     /**
-     * Returns the default value of the meshes<br> 
-     * @see #getMeshes 
-     * 
-     * @return The default meshes
-     * 
-     */
-    public List<Mesh> defaultMeshes() {
-        return new ArrayList<Mesh>();
-    }
-
-    /**
      * An array of nodes. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
-     * &nbsp;&nbsp;A node in the node hierarchy. A node can have either the 
-     * `camera`, `meshes`, or `skeletons`/`skin`/`meshes` properties defined. 
-     * In the later case, all `primitives` in the referenced `meshes` contain 
-     * `JOINT` and `WEIGHT` attributes and the referenced 
-     * `material`/`technique` from each `primitive` has parameters with 
-     * `JOINT` and `WEIGHT` semantics. A node can have either a `matrix` or 
-     * any combination of `translation`/`rotation`/`scale` (TRS) properties. 
-     * TRS properties are converted to matrices and postmultiplied in the `T 
-     * * R * S` order to compose the transformation matrix; first the scale 
-     * is applied to the vertices, then the rotation, and then the 
-     * translation. If none are provided, the transform is the identity. When 
-     * a node is targeted for animation (referenced by an 
-     * animation.channel.target), only TRS properties may be present; 
-     * `matrix` will not be present. (optional) 
+     * &nbsp;&nbsp;A node in the node hierarchy. When the node contains 
+     * `skin`, all `mesh.primitives` must contain `JOINTS_0` and `WEIGHTS_0` 
+     * attributes. A node can have either a `matrix` or any combination of 
+     * `translation`/`rotation`/`scale` (TRS) properties. TRS properties are 
+     * converted to matrices and postmultiplied in the `T * R * S` order to 
+     * compose the transformation matrix; first the scale is applied to the 
+     * vertices, then the rotation, and then the translation. If none are 
+     * provided, the transform is the identity. When a node is targeted for 
+     * animation (referenced by an animation.channel.target), only TRS 
+     * properties may be present; `matrix` will not be present. (optional) 
      * 
      * @param nodes The nodes to set
+     * @throws IllegalArgumentException If the given value does not meet
+     * the given constraints
      * 
      */
     public void setNodes(List<Node> nodes) {
@@ -1171,27 +1095,26 @@ public class GlTF
             this.nodes = nodes;
             return ;
         }
+        if (nodes.size()< 1) {
+            throw new IllegalArgumentException("Number of nodes elements is < 1");
+        }
         this.nodes = nodes;
     }
 
     /**
      * An array of nodes. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
-     * &nbsp;&nbsp;A node in the node hierarchy. A node can have either the 
-     * `camera`, `meshes`, or `skeletons`/`skin`/`meshes` properties defined. 
-     * In the later case, all `primitives` in the referenced `meshes` contain 
-     * `JOINT` and `WEIGHT` attributes and the referenced 
-     * `material`/`technique` from each `primitive` has parameters with 
-     * `JOINT` and `WEIGHT` semantics. A node can have either a `matrix` or 
-     * any combination of `translation`/`rotation`/`scale` (TRS) properties. 
-     * TRS properties are converted to matrices and postmultiplied in the `T 
-     * * R * S` order to compose the transformation matrix; first the scale 
-     * is applied to the vertices, then the rotation, and then the 
-     * translation. If none are provided, the transform is the identity. When 
-     * a node is targeted for animation (referenced by an 
-     * animation.channel.target), only TRS properties may be present; 
-     * `matrix` will not be present. (optional) 
+     * &nbsp;&nbsp;A node in the node hierarchy. When the node contains 
+     * `skin`, all `mesh.primitives` must contain `JOINTS_0` and `WEIGHTS_0` 
+     * attributes. A node can have either a `matrix` or any combination of 
+     * `translation`/`rotation`/`scale` (TRS) properties. TRS properties are 
+     * converted to matrices and postmultiplied in the `T * R * S` order to 
+     * compose the transformation matrix; first the scale is applied to the 
+     * vertices, then the rotation, and then the translation. If none are 
+     * provided, the transform is the identity. When a node is targeted for 
+     * animation (referenced by an animation.channel.target), only TRS 
+     * properties may be present; `matrix` will not be present. (optional) 
      * 
      * @return The nodes
      * 
@@ -1251,24 +1174,15 @@ public class GlTF
     }
 
     /**
-     * Returns the default value of the nodes<br> 
-     * @see #getNodes 
-     * 
-     * @return The default nodes
-     * 
-     */
-    public List<Node> defaultNodes() {
-        return new ArrayList<Node>();
-    }
-
-    /**
      * An array of samplers. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;Texture sampler properties for filtering and wrapping 
      * modes. (optional) 
      * 
      * @param samplers The samplers to set
+     * @throws IllegalArgumentException If the given value does not meet
+     * the given constraints
      * 
      */
     public void setSamplers(List<Sampler> samplers) {
@@ -1276,12 +1190,15 @@ public class GlTF
             this.samplers = samplers;
             return ;
         }
+        if (samplers.size()< 1) {
+            throw new IllegalArgumentException("Number of samplers elements is < 1");
+        }
         this.samplers = samplers;
     }
 
     /**
      * An array of samplers. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;Texture sampler properties for filtering and wrapping 
      * modes. (optional) 
@@ -1344,17 +1261,6 @@ public class GlTF
     }
 
     /**
-     * Returns the default value of the samplers<br> 
-     * @see #getSamplers 
-     * 
-     * @return The default samplers
-     * 
-     */
-    public List<Sampler> defaultSamplers() {
-        return new ArrayList<Sampler>();
-    }
-
-    /**
      * The index of the default scene. (optional) 
      * 
      * @param scene The scene to set
@@ -1380,11 +1286,13 @@ public class GlTF
 
     /**
      * An array of scenes. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;The root nodes of a scene. (optional) 
      * 
      * @param scenes The scenes to set
+     * @throws IllegalArgumentException If the given value does not meet
+     * the given constraints
      * 
      */
     public void setScenes(List<Scene> scenes) {
@@ -1392,12 +1300,15 @@ public class GlTF
             this.scenes = scenes;
             return ;
         }
+        if (scenes.size()< 1) {
+            throw new IllegalArgumentException("Number of scenes elements is < 1");
+        }
         this.scenes = scenes;
     }
 
     /**
      * An array of scenes. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;The root nodes of a scene. (optional) 
      * 
@@ -1459,23 +1370,14 @@ public class GlTF
     }
 
     /**
-     * Returns the default value of the scenes<br> 
-     * @see #getScenes 
-     * 
-     * @return The default scenes
-     * 
-     */
-    public List<Scene> defaultScenes() {
-        return new ArrayList<Scene>();
-    }
-
-    /**
      * An array of skins. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;Joints and matrices defining a skin. (optional) 
      * 
      * @param skins The skins to set
+     * @throws IllegalArgumentException If the given value does not meet
+     * the given constraints
      * 
      */
     public void setSkins(List<Skin> skins) {
@@ -1483,12 +1385,15 @@ public class GlTF
             this.skins = skins;
             return ;
         }
+        if (skins.size()< 1) {
+            throw new IllegalArgumentException("Number of skins elements is < 1");
+        }
         this.skins = skins;
     }
 
     /**
      * An array of skins. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;Joints and matrices defining a skin. (optional) 
      * 
@@ -1550,23 +1455,14 @@ public class GlTF
     }
 
     /**
-     * Returns the default value of the skins<br> 
-     * @see #getSkins 
-     * 
-     * @return The default skins
-     * 
-     */
-    public List<Skin> defaultSkins() {
-        return new ArrayList<Skin>();
-    }
-
-    /**
      * An array of textures. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;A texture and its sampler. (optional) 
      * 
      * @param textures The textures to set
+     * @throws IllegalArgumentException If the given value does not meet
+     * the given constraints
      * 
      */
     public void setTextures(List<Texture> textures) {
@@ -1574,12 +1470,15 @@ public class GlTF
             this.textures = textures;
             return ;
         }
+        if (textures.size()< 1) {
+            throw new IllegalArgumentException("Number of textures elements is < 1");
+        }
         this.textures = textures;
     }
 
     /**
      * An array of textures. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;A texture and its sampler. (optional) 
      * 
@@ -1638,119 +1537,6 @@ public class GlTF
         } else {
             this.textures = newList;
         }
-    }
-
-    /**
-     * Returns the default value of the textures<br> 
-     * @see #getTextures 
-     * 
-     * @return The default textures
-     * 
-     */
-    public List<Texture> defaultTextures() {
-        return new ArrayList<Texture>();
-    }
-
-    /**
-     * Names of WebGL extensions required to render this asset. 
-     * (optional)<br> 
-     * Default: []<br> 
-     * Array elements:<br> 
-     * &nbsp;&nbsp;The elements of this array (optional)<br> 
-     * &nbsp;&nbsp;Valid values: ["OES_element_index_uint"] 
-     * 
-     * @param glExtensionsUsed The glExtensionsUsed to set
-     * @throws IllegalArgumentException If the given value does not meet
-     * the given constraints
-     * 
-     */
-    public void setGlExtensionsUsed(List<String> glExtensionsUsed) {
-        if (glExtensionsUsed == null) {
-            this.glExtensionsUsed = glExtensionsUsed;
-            return ;
-        }
-        for (String glExtensionsUsedElement: glExtensionsUsed) {
-            if (!"OES_element_index_uint".equals(glExtensionsUsedElement)) {
-                throw new IllegalArgumentException((("Invalid value for glExtensionsUsedElement: "+ glExtensionsUsedElement)+", valid: [\"OES_element_index_uint\"]"));
-            }
-        }
-        this.glExtensionsUsed = glExtensionsUsed;
-    }
-
-    /**
-     * Names of WebGL extensions required to render this asset. 
-     * (optional)<br> 
-     * Default: []<br> 
-     * Array elements:<br> 
-     * &nbsp;&nbsp;The elements of this array (optional)<br> 
-     * &nbsp;&nbsp;Valid values: ["OES_element_index_uint"] 
-     * 
-     * @return The glExtensionsUsed
-     * 
-     */
-    public List<String> getGlExtensionsUsed() {
-        return this.glExtensionsUsed;
-    }
-
-    /**
-     * Add the given glExtensionsUsed. The glExtensionsUsed of this instance 
-     * will be replaced with a list that contains all previous elements, and 
-     * additionally the new element. 
-     * 
-     * @param element The element
-     * @throws NullPointerException If the given element is <code>null</code>
-     * 
-     */
-    public void addGlExtensionsUsed(String element) {
-        if (element == null) {
-            throw new NullPointerException("The element may not be null");
-        }
-        List<String> oldList = this.glExtensionsUsed;
-        List<String> newList = new ArrayList<String>();
-        if (oldList!= null) {
-            newList.addAll(oldList);
-        }
-        newList.add(element);
-        this.glExtensionsUsed = newList;
-    }
-
-    /**
-     * Remove the given glExtensionsUsed. The glExtensionsUsed of this 
-     * instance will be replaced with a list that contains all previous 
-     * elements, except for the removed one.<br> 
-     * If this new list would be empty, then it will be set to 
-     * <code>null</code>. 
-     * 
-     * @param element The element
-     * @throws NullPointerException If the given element is <code>null</code>
-     * 
-     */
-    public void removeGlExtensionsUsed(String element) {
-        if (element == null) {
-            throw new NullPointerException("The element may not be null");
-        }
-        List<String> oldList = this.glExtensionsUsed;
-        List<String> newList = new ArrayList<String>();
-        if (oldList!= null) {
-            newList.addAll(oldList);
-        }
-        newList.remove(element);
-        if (newList.isEmpty()) {
-            this.glExtensionsUsed = null;
-        } else {
-            this.glExtensionsUsed = newList;
-        }
-    }
-
-    /**
-     * Returns the default value of the glExtensionsUsed<br> 
-     * @see #getGlExtensionsUsed 
-     * 
-     * @return The default glExtensionsUsed
-     * 
-     */
-    public List<String> defaultGlExtensionsUsed() {
-        return new ArrayList<String>();
     }
 
 }

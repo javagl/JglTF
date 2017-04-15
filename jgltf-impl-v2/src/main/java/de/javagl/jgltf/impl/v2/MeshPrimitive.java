@@ -8,7 +8,9 @@
 
 package de.javagl.jgltf.impl.v2;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -42,11 +44,24 @@ public class MeshPrimitive
     private Integer material;
     /**
      * The type of primitives to render. (optional)<br> 
-     * Default: 4<br> 
-     * Valid values: [0, 1, 2, 3, 4, 5, 6] 
+     * Default: 4 
      * 
      */
     private Integer mode;
+    /**
+     * An array of Morph Targets, each Morph Target is a dictionary mapping 
+     * attributes (only `POSITION`, `NORMAL`, and `TANGENT` supported) to 
+     * their deviations in the Morph Target. (optional)<br> 
+     * Minimum number of items: 0<br> 
+     * Array elements:<br> 
+     * &nbsp;&nbsp;A dictionary object specifying attributes displacements in 
+     * a Morph Target, where each key corresponds to one of the three 
+     * supported attribute semantic (`POSITION`, `NORMAL`, or `TANGENT`) and 
+     * each value is the index of the accessor containing the attribute 
+     * displacements' data. (optional) 
+     * 
+     */
+    private List<Integer> targets;
 
     /**
      * A dictionary object, where each key corresponds to mesh attribute 
@@ -176,8 +191,7 @@ public class MeshPrimitive
 
     /**
      * The type of primitives to render. (optional)<br> 
-     * Default: 4<br> 
-     * Valid values: [0, 1, 2, 3, 4, 5, 6] 
+     * Default: 4 
      * 
      * @param mode The mode to set
      * @throws IllegalArgumentException If the given value does not meet
@@ -197,8 +211,7 @@ public class MeshPrimitive
 
     /**
      * The type of primitives to render. (optional)<br> 
-     * Default: 4<br> 
-     * Valid values: [0, 1, 2, 3, 4, 5, 6] 
+     * Default: 4 
      * 
      * @return The mode
      * 
@@ -216,6 +229,103 @@ public class MeshPrimitive
      */
     public Integer defaultMode() {
         return  4;
+    }
+
+    /**
+     * An array of Morph Targets, each Morph Target is a dictionary mapping 
+     * attributes (only `POSITION`, `NORMAL`, and `TANGENT` supported) to 
+     * their deviations in the Morph Target. (optional)<br> 
+     * Minimum number of items: 0<br> 
+     * Array elements:<br> 
+     * &nbsp;&nbsp;A dictionary object specifying attributes displacements in 
+     * a Morph Target, where each key corresponds to one of the three 
+     * supported attribute semantic (`POSITION`, `NORMAL`, or `TANGENT`) and 
+     * each value is the index of the accessor containing the attribute 
+     * displacements' data. (optional) 
+     * 
+     * @param targets The targets to set
+     * @throws IllegalArgumentException If the given value does not meet
+     * the given constraints
+     * 
+     */
+    public void setTargets(List<Integer> targets) {
+        if (targets == null) {
+            this.targets = targets;
+            return ;
+        }
+        if (targets.size()< 0) {
+            throw new IllegalArgumentException("Number of targets elements is < 0");
+        }
+        this.targets = targets;
+    }
+
+    /**
+     * An array of Morph Targets, each Morph Target is a dictionary mapping 
+     * attributes (only `POSITION`, `NORMAL`, and `TANGENT` supported) to 
+     * their deviations in the Morph Target. (optional)<br> 
+     * Minimum number of items: 0<br> 
+     * Array elements:<br> 
+     * &nbsp;&nbsp;A dictionary object specifying attributes displacements in 
+     * a Morph Target, where each key corresponds to one of the three 
+     * supported attribute semantic (`POSITION`, `NORMAL`, or `TANGENT`) and 
+     * each value is the index of the accessor containing the attribute 
+     * displacements' data. (optional) 
+     * 
+     * @return The targets
+     * 
+     */
+    public List<Integer> getTargets() {
+        return this.targets;
+    }
+
+    /**
+     * Add the given targets. The targets of this instance will be replaced 
+     * with a list that contains all previous elements, and additionally the 
+     * new element. 
+     * 
+     * @param element The element
+     * @throws NullPointerException If the given element is <code>null</code>
+     * 
+     */
+    public void addTargets(Integer element) {
+        if (element == null) {
+            throw new NullPointerException("The element may not be null");
+        }
+        List<Integer> oldList = this.targets;
+        List<Integer> newList = new ArrayList<Integer>();
+        if (oldList!= null) {
+            newList.addAll(oldList);
+        }
+        newList.add(element);
+        this.targets = newList;
+    }
+
+    /**
+     * Remove the given targets. The targets of this instance will be 
+     * replaced with a list that contains all previous elements, except for 
+     * the removed one.<br> 
+     * If this new list would be empty, then it will be set to 
+     * <code>null</code>. 
+     * 
+     * @param element The element
+     * @throws NullPointerException If the given element is <code>null</code>
+     * 
+     */
+    public void removeTargets(Integer element) {
+        if (element == null) {
+            throw new NullPointerException("The element may not be null");
+        }
+        List<Integer> oldList = this.targets;
+        List<Integer> newList = new ArrayList<Integer>();
+        if (oldList!= null) {
+            newList.addAll(oldList);
+        }
+        newList.remove(element);
+        if (newList.isEmpty()) {
+            this.targets = null;
+        } else {
+            this.targets = newList;
+        }
     }
 
 }

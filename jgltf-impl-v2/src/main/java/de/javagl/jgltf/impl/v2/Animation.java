@@ -25,7 +25,7 @@ public class Animation
     /**
      * An array of channels, each of which targets an animation's sampler at 
      * a node's property. Different channels of the same animation can't have 
-     * equal targets. (optional)<br> 
+     * equal targets. (required)<br> 
      * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;Targets an animation's sampler at a node's property. 
@@ -36,7 +36,7 @@ public class Animation
     /**
      * An array of samplers that combines input and output accessors with an 
      * interpolation algorithm to define a keyframe graph (but not its 
-     * target). (optional)<br> 
+     * target). (required)<br> 
      * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;Combines input and output accessors with an interpolation 
@@ -48,21 +48,21 @@ public class Animation
     /**
      * An array of channels, each of which targets an animation's sampler at 
      * a node's property. Different channels of the same animation can't have 
-     * equal targets. (optional)<br> 
+     * equal targets. (required)<br> 
      * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;Targets an animation's sampler at a node's property. 
      * (optional) 
      * 
      * @param channels The channels to set
+     * @throws NullPointerException If the given value is <code>null</code>
      * @throws IllegalArgumentException If the given value does not meet
      * the given constraints
      * 
      */
     public void setChannels(List<AnimationChannel> channels) {
         if (channels == null) {
-            this.channels = channels;
-            return ;
+            throw new NullPointerException((("Invalid value for channels: "+ channels)+", may not be null"));
         }
         if (channels.size()< 1) {
             throw new IllegalArgumentException("Number of channels elements is < 1");
@@ -73,7 +73,7 @@ public class Animation
     /**
      * An array of channels, each of which targets an animation's sampler at 
      * a node's property. Different channels of the same animation can't have 
-     * equal targets. (optional)<br> 
+     * equal targets. (required)<br> 
      * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;Targets an animation's sampler at a node's property. 
@@ -111,9 +111,7 @@ public class Animation
     /**
      * Remove the given channels. The channels of this instance will be 
      * replaced with a list that contains all previous elements, except for 
-     * the removed one.<br> 
-     * If this new list would be empty, then it will be set to 
-     * <code>null</code>. 
+     * the removed one. 
      * 
      * @param element The element
      * @throws NullPointerException If the given element is <code>null</code>
@@ -129,31 +127,27 @@ public class Animation
             newList.addAll(oldList);
         }
         newList.remove(element);
-        if (newList.isEmpty()) {
-            this.channels = null;
-        } else {
-            this.channels = newList;
-        }
+        this.channels = newList;
     }
 
     /**
      * An array of samplers that combines input and output accessors with an 
      * interpolation algorithm to define a keyframe graph (but not its 
-     * target). (optional)<br> 
+     * target). (required)<br> 
      * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;Combines input and output accessors with an interpolation 
      * algorithm to define a keyframe graph (but not its target). (optional) 
      * 
      * @param samplers The samplers to set
+     * @throws NullPointerException If the given value is <code>null</code>
      * @throws IllegalArgumentException If the given value does not meet
      * the given constraints
      * 
      */
     public void setSamplers(List<AnimationSampler> samplers) {
         if (samplers == null) {
-            this.samplers = samplers;
-            return ;
+            throw new NullPointerException((("Invalid value for samplers: "+ samplers)+", may not be null"));
         }
         if (samplers.size()< 1) {
             throw new IllegalArgumentException("Number of samplers elements is < 1");
@@ -164,7 +158,7 @@ public class Animation
     /**
      * An array of samplers that combines input and output accessors with an 
      * interpolation algorithm to define a keyframe graph (but not its 
-     * target). (optional)<br> 
+     * target). (required)<br> 
      * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;Combines input and output accessors with an interpolation 
@@ -202,9 +196,7 @@ public class Animation
     /**
      * Remove the given samplers. The samplers of this instance will be 
      * replaced with a list that contains all previous elements, except for 
-     * the removed one.<br> 
-     * If this new list would be empty, then it will be set to 
-     * <code>null</code>. 
+     * the removed one. 
      * 
      * @param element The element
      * @throws NullPointerException If the given element is <code>null</code>
@@ -220,11 +212,7 @@ public class Animation
             newList.addAll(oldList);
         }
         newList.remove(element);
-        if (newList.isEmpty()) {
-            this.samplers = null;
-        } else {
-            this.samplers = newList;
-        }
+        this.samplers = newList;
     }
 
 }

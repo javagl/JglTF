@@ -21,7 +21,7 @@ public class Buffer
 {
 
     /**
-     * The uri of the buffer. (required) 
+     * The uri of the buffer. (optional) 
      * 
      */
     private String uri;
@@ -34,21 +34,21 @@ public class Buffer
     private Integer byteLength = 0;
 
     /**
-     * The uri of the buffer. (required) 
+     * The uri of the buffer. (optional) 
      * 
      * @param uri The uri to set
-     * @throws NullPointerException If the given value is <code>null</code>
      * 
      */
     public void setUri(String uri) {
         if (uri == null) {
-            throw new NullPointerException((("Invalid value for uri: "+ uri)+", may not be null"));
+            this.uri = uri;
+            return ;
         }
         this.uri = uri;
     }
 
     /**
-     * The uri of the buffer. (required) 
+     * The uri of the buffer. (optional) 
      * 
      * @return The uri
      * 

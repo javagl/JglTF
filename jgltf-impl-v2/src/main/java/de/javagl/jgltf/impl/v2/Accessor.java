@@ -24,29 +24,20 @@ public class Accessor
 {
 
     /**
-     * The index of the bufferView. (required) 
+     * The index of the bufferView. (optional) 
      * 
      */
     private Integer bufferView;
     /**
      * The offset relative to the start of the bufferView in bytes. 
-     * (required)<br> 
+     * (optional)<br> 
+     * Default: 0<br> 
      * Minimum: 0 (inclusive) 
      * 
      */
     private Integer byteOffset;
     /**
-     * The stride, in bytes, between attributes referenced by this accessor. 
-     * (optional)<br> 
-     * Default: 0<br> 
-     * Minimum: 0 (inclusive)<br> 
-     * Maximum: 255 (inclusive) 
-     * 
-     */
-    private Integer byteStride;
-    /**
-     * The datatype of components in the attribute. (required)<br> 
-     * Valid values: [5120, 5121, 5122, 5123, 5125, 5126] 
+     * The datatype of components in the attribute. (required) 
      * 
      */
     private Integer componentType;
@@ -64,10 +55,7 @@ public class Accessor
      */
     private Integer count;
     /**
-     * Specifies if the attribute is a scalar, vector, or matrix. 
-     * (required)<br> 
-     * Valid values: ["SCALAR", "VEC2", "VEC3", "VEC4", "MAT2", "MAT3", 
-     * "MAT4"] 
+     * Specifies if the attribute is a scalar, vector, or matrix. (required) 
      * 
      */
     private String type;
@@ -89,23 +77,29 @@ public class Accessor
      * 
      */
     private Number[] min;
+    /**
+     * Sparse storage of attributes that deviate from their initialization 
+     * value. (optional) 
+     * 
+     */
+    private AccessorSparse sparse;
 
     /**
-     * The index of the bufferView. (required) 
+     * The index of the bufferView. (optional) 
      * 
      * @param bufferView The bufferView to set
-     * @throws NullPointerException If the given value is <code>null</code>
      * 
      */
     public void setBufferView(Integer bufferView) {
         if (bufferView == null) {
-            throw new NullPointerException((("Invalid value for bufferView: "+ bufferView)+", may not be null"));
+            this.bufferView = bufferView;
+            return ;
         }
         this.bufferView = bufferView;
     }
 
     /**
-     * The index of the bufferView. (required) 
+     * The index of the bufferView. (optional) 
      * 
      * @return The bufferView
      * 
@@ -116,18 +110,19 @@ public class Accessor
 
     /**
      * The offset relative to the start of the bufferView in bytes. 
-     * (required)<br> 
+     * (optional)<br> 
+     * Default: 0<br> 
      * Minimum: 0 (inclusive) 
      * 
      * @param byteOffset The byteOffset to set
-     * @throws NullPointerException If the given value is <code>null</code>
      * @throws IllegalArgumentException If the given value does not meet
      * the given constraints
      * 
      */
     public void setByteOffset(Integer byteOffset) {
         if (byteOffset == null) {
-            throw new NullPointerException((("Invalid value for byteOffset: "+ byteOffset)+", may not be null"));
+            this.byteOffset = byteOffset;
+            return ;
         }
         if (byteOffset< 0) {
             throw new IllegalArgumentException("byteOffset < 0");
@@ -137,7 +132,8 @@ public class Accessor
 
     /**
      * The offset relative to the start of the bufferView in bytes. 
-     * (required)<br> 
+     * (optional)<br> 
+     * Default: 0<br> 
      * Minimum: 0 (inclusive) 
      * 
      * @return The byteOffset
@@ -148,59 +144,18 @@ public class Accessor
     }
 
     /**
-     * The stride, in bytes, between attributes referenced by this accessor. 
-     * (optional)<br> 
-     * Default: 0<br> 
-     * Minimum: 0 (inclusive)<br> 
-     * Maximum: 255 (inclusive) 
+     * Returns the default value of the byteOffset<br> 
+     * @see #getByteOffset 
      * 
-     * @param byteStride The byteStride to set
-     * @throws IllegalArgumentException If the given value does not meet
-     * the given constraints
+     * @return The default byteOffset
      * 
      */
-    public void setByteStride(Integer byteStride) {
-        if (byteStride == null) {
-            this.byteStride = byteStride;
-            return ;
-        }
-        if (byteStride > 255) {
-            throw new IllegalArgumentException("byteStride > 255");
-        }
-        if (byteStride< 0) {
-            throw new IllegalArgumentException("byteStride < 0");
-        }
-        this.byteStride = byteStride;
-    }
-
-    /**
-     * The stride, in bytes, between attributes referenced by this accessor. 
-     * (optional)<br> 
-     * Default: 0<br> 
-     * Minimum: 0 (inclusive)<br> 
-     * Maximum: 255 (inclusive) 
-     * 
-     * @return The byteStride
-     * 
-     */
-    public Integer getByteStride() {
-        return this.byteStride;
-    }
-
-    /**
-     * Returns the default value of the byteStride<br> 
-     * @see #getByteStride 
-     * 
-     * @return The default byteStride
-     * 
-     */
-    public Integer defaultByteStride() {
+    public Integer defaultByteOffset() {
         return  0;
     }
 
     /**
-     * The datatype of components in the attribute. (required)<br> 
-     * Valid values: [5120, 5121, 5122, 5123, 5125, 5126] 
+     * The datatype of components in the attribute. (required) 
      * 
      * @param componentType The componentType to set
      * @throws NullPointerException If the given value is <code>null</code>
@@ -219,8 +174,7 @@ public class Accessor
     }
 
     /**
-     * The datatype of components in the attribute. (required)<br> 
-     * Valid values: [5120, 5121, 5122, 5123, 5125, 5126] 
+     * The datatype of components in the attribute. (required) 
      * 
      * @return The componentType
      * 
@@ -300,10 +254,7 @@ public class Accessor
     }
 
     /**
-     * Specifies if the attribute is a scalar, vector, or matrix. 
-     * (required)<br> 
-     * Valid values: ["SCALAR", "VEC2", "VEC3", "VEC4", "MAT2", "MAT3", 
-     * "MAT4"] 
+     * Specifies if the attribute is a scalar, vector, or matrix. (required) 
      * 
      * @param type The type to set
      * @throws NullPointerException If the given value is <code>null</code>
@@ -322,10 +273,7 @@ public class Accessor
     }
 
     /**
-     * Specifies if the attribute is a scalar, vector, or matrix. 
-     * (required)<br> 
-     * Valid values: ["SCALAR", "VEC2", "VEC3", "VEC4", "MAT2", "MAT3", 
-     * "MAT4"] 
+     * Specifies if the attribute is a scalar, vector, or matrix. (required) 
      * 
      * @return The type
      * 
@@ -412,6 +360,32 @@ public class Accessor
      */
     public Number[] getMin() {
         return this.min;
+    }
+
+    /**
+     * Sparse storage of attributes that deviate from their initialization 
+     * value. (optional) 
+     * 
+     * @param sparse The sparse to set
+     * 
+     */
+    public void setSparse(AccessorSparse sparse) {
+        if (sparse == null) {
+            this.sparse = sparse;
+            return ;
+        }
+        this.sparse = sparse;
+    }
+
+    /**
+     * Sparse storage of attributes that deviate from their initialization 
+     * value. (optional) 
+     * 
+     * @return The sparse
+     * 
+     */
+    public AccessorSparse getSparse() {
+        return this.sparse;
     }
 
 }

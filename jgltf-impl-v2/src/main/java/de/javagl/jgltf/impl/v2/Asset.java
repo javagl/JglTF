@@ -32,23 +32,15 @@ public class Asset
      */
     private String generator;
     /**
-     * Specifies if the shaders were generated with premultiplied alpha. 
-     * (optional)<br> 
-     * Default: false 
-     * 
-     */
-    private Boolean premultipliedAlpha;
-    /**
-     * The profile of this Asset (optional)<br> 
-     * Default: {} 
-     * 
-     */
-    private AssetProfile profile;
-    /**
-     * The glTF version. (required) 
+     * The glTF version that this asset targets. (required) 
      * 
      */
     private String version;
+    /**
+     * The minimum glTF version that this asset targets. (optional) 
+     * 
+     */
+    private String minVersion;
 
     /**
      * A copyright message suitable for display to credit the content 
@@ -101,83 +93,7 @@ public class Asset
     }
 
     /**
-     * Specifies if the shaders were generated with premultiplied alpha. 
-     * (optional)<br> 
-     * Default: false 
-     * 
-     * @param premultipliedAlpha The premultipliedAlpha to set
-     * 
-     */
-    public void setPremultipliedAlpha(Boolean premultipliedAlpha) {
-        if (premultipliedAlpha == null) {
-            this.premultipliedAlpha = premultipliedAlpha;
-            return ;
-        }
-        this.premultipliedAlpha = premultipliedAlpha;
-    }
-
-    /**
-     * Specifies if the shaders were generated with premultiplied alpha. 
-     * (optional)<br> 
-     * Default: false 
-     * 
-     * @return The premultipliedAlpha
-     * 
-     */
-    public Boolean isPremultipliedAlpha() {
-        return this.premultipliedAlpha;
-    }
-
-    /**
-     * Returns the default value of the premultipliedAlpha<br> 
-     * @see #isPremultipliedAlpha 
-     * 
-     * @return The default premultipliedAlpha
-     * 
-     */
-    public Boolean defaultPremultipliedAlpha() {
-        return false;
-    }
-
-    /**
-     * The profile of this Asset (optional)<br> 
-     * Default: {} 
-     * 
-     * @param profile The profile to set
-     * 
-     */
-    public void setProfile(AssetProfile profile) {
-        if (profile == null) {
-            this.profile = profile;
-            return ;
-        }
-        this.profile = profile;
-    }
-
-    /**
-     * The profile of this Asset (optional)<br> 
-     * Default: {} 
-     * 
-     * @return The profile
-     * 
-     */
-    public AssetProfile getProfile() {
-        return this.profile;
-    }
-
-    /**
-     * Returns the default value of the profile<br> 
-     * @see #getProfile 
-     * 
-     * @return The default profile
-     * 
-     */
-    public AssetProfile defaultProfile() {
-        return new AssetProfile();
-    }
-
-    /**
-     * The glTF version. (required) 
+     * The glTF version that this asset targets. (required) 
      * 
      * @param version The version to set
      * @throws NullPointerException If the given value is <code>null</code>
@@ -191,13 +107,37 @@ public class Asset
     }
 
     /**
-     * The glTF version. (required) 
+     * The glTF version that this asset targets. (required) 
      * 
      * @return The version
      * 
      */
     public String getVersion() {
         return this.version;
+    }
+
+    /**
+     * The minimum glTF version that this asset targets. (optional) 
+     * 
+     * @param minVersion The minVersion to set
+     * 
+     */
+    public void setMinVersion(String minVersion) {
+        if (minVersion == null) {
+            this.minVersion = minVersion;
+            return ;
+        }
+        this.minVersion = minVersion;
+    }
+
+    /**
+     * The minimum glTF version that this asset targets. (optional) 
+     * 
+     * @return The minVersion
+     * 
+     */
+    public String getMinVersion() {
+        return this.minVersion;
     }
 
 }
