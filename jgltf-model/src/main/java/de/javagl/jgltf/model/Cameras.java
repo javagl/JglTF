@@ -80,9 +80,17 @@ class Cameras
                 localAspectRatio = cameraPerspective.getAspectRatio();
             }
             float zNear = cameraPerspective.getZnear();
-            float zFar = cameraPerspective.getZfar();
-            MathUtils.perspective4x4(
-                fovDeg, localAspectRatio, zNear, zFar, localResult);
+            Float zFar = cameraPerspective.getZfar();
+            if (zFar == null)
+            {
+                MathUtils.infinitePerspective4x4(
+                    fovDeg, localAspectRatio, zNear, localResult);
+            }
+            else
+            {
+                MathUtils.perspective4x4(
+                    fovDeg, localAspectRatio, zNear, zFar, localResult);
+            }
         }
         else if ("orthographic".equals(cameraType))
         {
@@ -93,9 +101,10 @@ class Cameras
             float zNear = cameraOrthographic.getZnear();
             float zFar = cameraOrthographic.getZfar();
             MathUtils.setIdentity4x4(localResult);
-            localResult[0] = xMag;
-            localResult[5] = yMag;
-            localResult[10] = -2.0f / (zFar - zNear);
+            localResult[0] = 1.0f / xMag;
+            localResult[5] = 1.0f / yMag;
+            localResult[10] = 2.0f / (zNear - zFar);
+            localResult[14] = (zFar + zNear) / (zNear - zFar);
         }
         else
         {

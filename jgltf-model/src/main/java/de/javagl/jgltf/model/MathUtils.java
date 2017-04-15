@@ -434,6 +434,29 @@ public class MathUtils
     }
     
     /**
+     * Fill the given matrix to describe an infinite perspective projection 
+     * with the given parameters. 
+     * 
+     * @param fovyDeg The Field-Of-View, in y-direction, in degrees
+     * @param aspect The aspect ratio
+     * @param zNear The z-value of the near clipping plane
+     * @param m The matrix to fill
+     */
+    static void infinitePerspective4x4(
+        float fovyDeg, float aspect, float zNear, float m[])
+    {
+        setIdentity4x4(m);
+        float fovyRad = (float)Math.toRadians(fovyDeg);
+        float t = (float)Math.tan(0.5 * fovyRad);
+        m[0] = 1.0f / (aspect * t);
+        m[1] = 1.0f / t;
+        m[10] = -1.0f;
+        m[11] = -1.0f;
+        m[14] = 2.0f * zNear;
+        m[15] = 0.0f;
+    }
+    
+    /**
      * Fill the given matrix to describe a perspective projection with the
      * given parameters. 
      * 
@@ -446,24 +469,14 @@ public class MathUtils
     static void perspective4x4(
         float fovyDeg, float aspect, float zNear, float zFar, float m[])
     {
-        // Adapted from The Mesa 3-D graphics library. 
-        // Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
-        // Published under the MIT license (see the header of this file)
-        float radians = (float)Math.toRadians(fovyDeg / 2);
-        float deltaZ = zFar - zNear;
-        float sine = (float)Math.sin(radians);
-        if ((deltaZ == 0) || (sine == 0) || (aspect == 0)) 
-        {
-            return;
-        }
-        float cotangent = (float)Math.cos(radians) / sine;
-
         setIdentity4x4(m);
-        m[0] = cotangent / aspect;
-        m[5] = cotangent;
-        m[10] = -(zFar + zNear) / deltaZ;
-        m[11] = -1;
-        m[14] = -2 * zNear * zFar / deltaZ;
+        float fovyRad = (float)Math.toRadians(fovyDeg);
+        float t = (float)Math.tan(0.5 * fovyRad);
+        m[0] = 1.0f / (aspect * t);
+        m[1] = 1.0f / t;
+        m[10] = (zFar + zNear) / (zNear - zFar);
+        m[11] = -1.0f;
+        m[14] = 2.0f * zFar * zNear / (zNear - zFar);
         m[15] = 0.0f;
     }
     
