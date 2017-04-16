@@ -258,12 +258,12 @@ public class AccessorDatas
     public static AccessorByteData createByte(
         Accessor accessor, ByteBuffer bufferViewByteBuffer)
     {
-        return new AccessorByteData(bufferViewByteBuffer, 
+        return new AccessorByteData(accessor.getComponentType(), 
+            bufferViewByteBuffer,
             accessor.getByteOffset(),
-            accessor.getByteStride(),
-            accessor.getComponentType(),
+            accessor.getCount(),
             Accessors.getNumComponentsForAccessorType(accessor.getType()),
-            accessor.getCount());
+            accessor.getByteStride());
     }
     
     
@@ -340,12 +340,12 @@ public class AccessorDatas
     public static AccessorShortData createShort(
         Accessor accessor, ByteBuffer bufferViewByteBuffer)
     {
-        return new AccessorShortData(bufferViewByteBuffer, 
+        return new AccessorShortData(accessor.getComponentType(), 
+            bufferViewByteBuffer,
             accessor.getByteOffset(),
-            accessor.getByteStride(),
-            accessor.getComponentType(),
+            accessor.getCount(),
             Accessors.getNumComponentsForAccessorType(accessor.getType()),
-            accessor.getCount());
+            accessor.getByteStride());
     }
     
 
@@ -421,12 +421,12 @@ public class AccessorDatas
     public static AccessorIntData createInt(
         Accessor accessor, ByteBuffer bufferViewByteBuffer)
     {
-        return new AccessorIntData(bufferViewByteBuffer, 
+        return new AccessorIntData(accessor.getComponentType(), 
+            bufferViewByteBuffer,
             accessor.getByteOffset(),
-            accessor.getByteStride(),
-            accessor.getComponentType(),
+            accessor.getCount(),
             Accessors.getNumComponentsForAccessorType(accessor.getType()),
-            accessor.getCount());
+            accessor.getByteStride());
     }
     
     
@@ -499,12 +499,12 @@ public class AccessorDatas
     public static AccessorFloatData createFloat(
         Accessor accessor, ByteBuffer bufferViewByteBuffer)
     {
-        return new AccessorFloatData(bufferViewByteBuffer, 
+        return new AccessorFloatData(accessor.getComponentType(), 
+            bufferViewByteBuffer,
             accessor.getByteOffset(),
-            accessor.getByteStride(),
-            accessor.getComponentType(),
+            accessor.getCount(),
             Accessors.getNumComponentsForAccessorType(accessor.getType()),
-            accessor.getCount());
+            accessor.getByteStride());
     }
 
     /**

@@ -52,15 +52,15 @@ public final class AccessorIntData
      * Creates a new instance for accessing the data in the given 
      * byte buffer, according to the rules described by the given
      * accessor parameters.
-     * 
+     * @param componentType The component type
      * @param bufferViewByteBuffer The byte buffer of the buffer view
      * @param byteOffset The byte offset in the buffer view 
+     * @param numElements The number of elements
+     * @param numComponentsPerElement The number of components per element
      * @param byteStride The byte stride between two elements. If this
      * is <code>null</code> or <code>0</code>, then the stride will
      * be the size of one element.
-     * @param componentType The component type
-     * @param numComponentsPerElement The number of components per element
-     * @param count The count (number of elements)
+     * 
      * @throws NullPointerException If the bufferViewByteBuffer is 
      * <code>null</code>
      * @throws IllegalArgumentException If the component type is not 
@@ -68,11 +68,11 @@ public final class AccessorIntData
      * @throws IllegalArgumentException If the given byte buffer does not
      * have a sufficient capacity to provide the data for the accessor 
      */
-    AccessorIntData(ByteBuffer bufferViewByteBuffer,
-        int byteOffset, Integer byteStride, int componentType,
-        int numComponentsPerElement, int count)
+    AccessorIntData(int componentType,
+        ByteBuffer bufferViewByteBuffer, int byteOffset, int numElements,
+        int numComponentsPerElement, Integer byteStride)
     {
-        super(int.class, bufferViewByteBuffer, byteOffset, count, 
+        super(int.class, bufferViewByteBuffer, byteOffset, numElements, 
             numComponentsPerElement, Integer.BYTES, byteStride);
         AccessorDatas.validateIntType(componentType);
 
