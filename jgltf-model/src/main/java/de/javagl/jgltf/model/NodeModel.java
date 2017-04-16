@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 import de.javagl.jgltf.impl.v1.Node;
@@ -161,7 +160,7 @@ public final class NodeModel
      */
     public Supplier<float[]> createGlobalTransformSupplier()
     {
-        return createTransformSupplier(this, 
+        return Suppliers.createTransformSupplier(this, 
             (n, t) -> n.computeGlobalTransform(t));
     }
     
@@ -178,41 +177,9 @@ public final class NodeModel
      */
     public Supplier<float[]> createLocalTransformSupplier()
     {
-        return createTransformSupplier(node, 
+        return Suppliers.createTransformSupplier(node, 
             (n, t) -> Nodes.computeLocalTransform(n, t));
     }
 
-    /**
-     * Create a supplier of a 4x4 matrix that is computed by applying 
-     * the given computer to the given object and a 16-element array.<br>
-     * <br>
-     * If the given object is <code>null</code>, then the identity 
-     * matrix will be supplied.<br>
-     * <br>
-     * Note: The supplier MAY always return the same array instance.
-     * Callers MUST NOT store or modify the returned array. 
-     * 
-     * @param object The object
-     * @param computer The computer function
-     * @return The supplier
-     */
-    private static <T> Supplier<float[]> createTransformSupplier(
-        T object, BiConsumer<T, float[]> computer)
-    {
-        float transform[] = new float[16];
-        if (object == null)
-        {
-            return () -> 
-            {
-                MathUtils.setIdentity4x4(transform);
-                return transform;
-            };
-        }
-        return () ->
-        {
-            computer.accept(object, transform);
-            return transform;
-        };
-    }
     
 }

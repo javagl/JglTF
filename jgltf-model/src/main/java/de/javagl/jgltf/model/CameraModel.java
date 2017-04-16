@@ -155,12 +155,8 @@ public final class CameraModel
      */
     public Supplier<float[]> createViewMatrixSupplier()
     {
-        float viewMatrix[] = new float[16];
-        return () ->
-        {
-            computeViewMatrix(viewMatrix);
-            return viewMatrix;
-        };
+        return Suppliers.createTransformSupplier(this, 
+            (c, t) -> computeViewMatrix(t));
     }
     
     /**
@@ -184,17 +180,15 @@ public final class CameraModel
     public Supplier<float[]> createProjectionMatrixSupplier(
         DoubleSupplier aspectRatioSupplier)
     {
-        float projectionMatrix[] = new float[16];
-        return () -> 
+        return Suppliers.createTransformSupplier(this, (c, t) -> 
         {
             Float aspectRatio = null;
             if (aspectRatioSupplier != null)
             {
                 aspectRatio = (float)aspectRatioSupplier.getAsDouble();
             }
-            computeProjectionMatrix(projectionMatrix, aspectRatio);
-            return projectionMatrix;
-        };
+            computeProjectionMatrix(t, aspectRatio);
+        });
     }
     
     
