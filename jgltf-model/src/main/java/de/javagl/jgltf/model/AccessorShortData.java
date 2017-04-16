@@ -30,7 +30,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.Locale;
-import java.util.Objects;
 
 /**
  * A class for accessing the data that is described by an accessor.
@@ -40,40 +39,10 @@ import java.util.Objects;
  * This data consists of several elements (for example, 3D short vectors),
  * which consist of several components (for example, the 3 short values).  
  */
-public final class AccessorShortData
+public final class AccessorShortData 
+    extends AbstractAccessorData
+    implements AccessorData
 {
-    /**
-     * The number of bytes that each component of this data consists of
-     */
-    private static final int NUM_BYTES_PER_COMPONENT = Short.BYTES;
-    
-    /**
-     * The byte buffer of the buffer view that the accessor
-     * refers to
-     */
-    private final ByteBuffer bufferViewByteBuffer;
-
-    /**
-     * The number of elements
-     */
-    private final int numElements;
-    
-    /**
-     * The number of components per element
-     */
-    private final int numComponentsPerElement;
-    
-    /**
-     * The offset for the accessor inside the byte buffer of
-     * the buffer view
-     */
-    private final int byteOffset;
-    
-    /**
-     * The stride, in number of bytes, between two consecutive elements 
-     */
-    private final int byteStridePerElement;
-    
     /**
      * Whether the data should be interpreted as unsigned values
      */
@@ -103,26 +72,13 @@ public final class AccessorShortData
         int byteOffset, Integer byteStride, int componentType,
         int numComponentsPerElement, int count)
     {
-        Objects.requireNonNull(bufferViewByteBuffer, 
-            "The bufferViewByteBuffer is null");
+        super(short.class, bufferViewByteBuffer, byteOffset, count, 
+            numComponentsPerElement, Short.BYTES, byteStride);
         AccessorDatas.validateShortType(componentType);
 
-        this.bufferViewByteBuffer = bufferViewByteBuffer;
         this.unsigned = AccessorDatas.isUnsignedType(componentType);
-        this.numElements = count;
-        this.numComponentsPerElement = numComponentsPerElement;
-        this.byteOffset = byteOffset;
-        if (byteStride == null || byteStride == 0)
-        {
-            this.byteStridePerElement = 
-                numComponentsPerElement * NUM_BYTES_PER_COMPONENT;
-        }
-        else
-        {
-            this.byteStridePerElement = byteStride;
-        }
-        AccessorDatas.validateCapacity(byteOffset, numElements, 
-            byteStridePerElement, bufferViewByteBuffer.capacity());
+        AccessorDatas.validateCapacity(byteOffset, getNumElements(), 
+            getByteStridePerElement(), bufferViewByteBuffer.capacity());
     }
     
     /**
@@ -136,39 +92,6 @@ public final class AccessorShortData
     }
     
     /**
-     * Returns the number of elements in this data (for example, the number
-     * of 3D vectors)
-     * 
-     * @return The number of elements
-     */
-    public int getNumElements()
-    {
-        return numElements;
-    }
-    
-    /**
-     * Returns the number of components per element (for example, 3 if the
-     * elements are 3D vectors)
-     * 
-     * @return The number of components per element
-     */
-    public int getNumComponentsPerElement()
-    {
-        return numComponentsPerElement;
-    }
-    
-    /**
-     * Returns the total number of components (that is, the number of elements
-     * multiplied with the number of components per element)
-     * 
-     * @return The total number of components
-     */
-    public int getTotalNumComponents()
-    {
-        return numElements * numComponentsPerElement;
-    }
-    
-    /**
      * Returns the value of the specified component of the specified element
      * 
      * @param elementIndex The element index
@@ -179,10 +102,8 @@ public final class AccessorShortData
      */
     public short get(int elementIndex, int componentIndex)
     {
-        int byteIndex = byteOffset + 
-            elementIndex * byteStridePerElement + 
-            componentIndex * NUM_BYTES_PER_COMPONENT;
-        return bufferViewByteBuffer.getShort(byteIndex);
+        int byteIndex = getByteIndex(elementIndex, componentIndex);
+        return getBufferViewByteBuffer().getShort(byteIndex);
     }
     
     /**
@@ -195,8 +116,10 @@ public final class AccessorShortData
      */
     public short get(int globalComponentIndex)
     {
-        int elementIndex = globalComponentIndex / numComponentsPerElement;
-        int componentIndex = globalComponentIndex % numComponentsPerElement;
+        int elementIndex = 
+            globalComponentIndex / getNumComponentsPerElement();
+        int componentIndex = 
+            globalComponentIndex % getNumComponentsPerElement();
         return get(elementIndex, componentIndex);
     }
 
@@ -322,18 +245,11 @@ public final class AccessorShortData
         return result;
     }
     
-    /**
-     * Creates a new, direct byte buffer (with native byte order) that
-     * contains the data for the accessor, in a compact form,
-     * without any offset, and without any additional stride (that is,
-     * all elements will be tightly packed).  
-     * 
-     * @return The byte buffer
-     */
+    @Override
     public ByteBuffer createByteBuffer()
     {
         int totalNumComponents = getTotalNumComponents();
-        int totalBytes = totalNumComponents * NUM_BYTES_PER_COMPONENT;
+        int totalBytes = totalNumComponents * getNumBytesPerComponent();
         ByteBuffer result = ByteBuffer.allocateDirect(totalBytes)
             .order(ByteOrder.nativeOrder());
         for (int i=0; i<totalNumComponents; i++)

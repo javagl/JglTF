@@ -33,9 +33,8 @@ import de.javagl.jgltf.impl.v1.BufferView;
 
 /**
  * Methods to create instances of the {@link Accessor} data utility classes
- * that allow a <i>typed</i> access to the data that is provided by the
- * {@link GltfData#getBufferViewData(String) bufferViews} that
- * the {@link Accessor} refers to.<br>
+ * that allow a <i>typed</i> access to the data that is contained in the
+ * {@link BufferView} that the {@link Accessor} refers to.<br>
  * <br>
  * Unless otherwise noted, none of the arguments to these methods may 
  * be <code>null</code>.
@@ -234,11 +233,12 @@ public class AccessorDatas
         Accessor accessor, GltfData gltfData)
     {
         String bufferViewId = accessor.getBufferView();
-        ByteBuffer bufferViewData = gltfData.getBufferViewData(bufferViewId);
+        ByteBuffer bufferViewData = 
+            GltfDatas.getBufferViewData(gltfData, bufferViewId);
         if (bufferViewData == null)
         {
-            throw new GltfException("The accessor buffer view with ID " + 
-                bufferViewId + " does not exist");
+            throw new GltfException("The data  for the accessor buffer "
+                + "view with ID " + bufferViewId + " could not be obtained");
         }
         return createByte(accessor, bufferViewData);
     }
@@ -315,11 +315,12 @@ public class AccessorDatas
         Accessor accessor, GltfData gltfData)
     {
         String bufferViewId = accessor.getBufferView();
-        ByteBuffer bufferViewData = gltfData.getBufferViewData(bufferViewId);
+        ByteBuffer bufferViewData = 
+            GltfDatas.getBufferViewData(gltfData, bufferViewId);
         if (bufferViewData == null)
         {
-            throw new GltfException("The accessor buffer view with ID " + 
-                bufferViewId + " does not exist");
+            throw new GltfException("The data  for the accessor buffer "
+                + "view with ID " + bufferViewId + " could not be obtained");
         }
         return createShort(accessor, bufferViewData);
     }
@@ -395,11 +396,12 @@ public class AccessorDatas
         Accessor accessor, GltfData gltfData)
     {
         String bufferViewId = accessor.getBufferView();
-        ByteBuffer bufferViewData = gltfData.getBufferViewData(bufferViewId);
+        ByteBuffer bufferViewData = 
+            GltfDatas.getBufferViewData(gltfData, bufferViewId);
         if (bufferViewData == null)
         {
-            throw new GltfException("The accessor buffer view with ID " + 
-                bufferViewId + " does not exist");
+            throw new GltfException("The data  for the accessor buffer "
+                + "view with ID " + bufferViewId + " could not be obtained");
         }
         return createInt(accessor, bufferViewData);
     }
@@ -472,11 +474,12 @@ public class AccessorDatas
         Accessor accessor, GltfData gltfData)
     {
         String bufferViewId = accessor.getBufferView();
-        ByteBuffer bufferViewData = gltfData.getBufferViewData(bufferViewId);
+        ByteBuffer bufferViewData = 
+            GltfDatas.getBufferViewData(gltfData, bufferViewId);
         if (bufferViewData == null)
         {
-            throw new GltfException("The accessor buffer view with ID " + 
-                bufferViewId + " does not exist");
+            throw new GltfException("The data  for the accessor buffer "
+                + "view with ID " + bufferViewId + " could not be obtained");
         }
         return createFloat(accessor, bufferViewData);
     }
