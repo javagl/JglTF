@@ -36,8 +36,6 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
-import de.javagl.jgltf.impl.v1.Camera;
-import de.javagl.jgltf.impl.v1.TechniqueParameters;
 import de.javagl.jgltf.model.CameraModel;
 import de.javagl.jgltf.model.GltfAnimations;
 import de.javagl.jgltf.model.GltfData;
@@ -64,8 +62,7 @@ public abstract class AbstractGltfViewer<C> implements GltfViewer<C>
     /**
      * A supplier of the viewport size. This will be passed to the
      * {@link GltfModel} constructor, and eventually provide the data for the 
-     * uniforms that have {@link TechniqueParameters#getSemantic()
-     * semantic} <code>VIEWPORT</code>
+     * uniforms that have the <code>VIEWPORT</code> semantic.
      */
     private final Supplier<float[]> viewportSupplier = new Supplier<float[]>()
     {
@@ -85,7 +82,7 @@ public abstract class AbstractGltfViewer<C> implements GltfViewer<C>
     /**
      * A supplier for the aspect ratio. This will provide the aspect ratio
      * of the rendering window. (If this was <code>null</code>,
-     * then the aspect ratio of the glTF {@link Camera} would be
+     * then the aspect ratio of the glTF camera would be
      * used, but this would hardly ever match the actual aspect
      * ratio of the rendering component...)
      */
