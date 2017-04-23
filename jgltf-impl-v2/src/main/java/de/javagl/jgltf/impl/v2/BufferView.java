@@ -26,14 +26,15 @@ public class BufferView
      */
     private Integer buffer;
     /**
-     * The offset into the buffer in bytes. (required)<br> 
+     * The offset into the buffer in bytes. (optional)<br> 
+     * Default: 0<br> 
      * Minimum: 0 (inclusive) 
      * 
      */
     private Integer byteOffset;
     /**
      * The length of the bufferView in bytes. (required)<br> 
-     * Minimum: 0 (inclusive) 
+     * Minimum: 1 (inclusive) 
      * 
      */
     private Integer byteLength;
@@ -76,18 +77,19 @@ public class BufferView
     }
 
     /**
-     * The offset into the buffer in bytes. (required)<br> 
+     * The offset into the buffer in bytes. (optional)<br> 
+     * Default: 0<br> 
      * Minimum: 0 (inclusive) 
      * 
      * @param byteOffset The byteOffset to set
-     * @throws NullPointerException If the given value is <code>null</code>
      * @throws IllegalArgumentException If the given value does not meet
      * the given constraints
      * 
      */
     public void setByteOffset(Integer byteOffset) {
         if (byteOffset == null) {
-            throw new NullPointerException((("Invalid value for byteOffset: "+ byteOffset)+", may not be null"));
+            this.byteOffset = byteOffset;
+            return ;
         }
         if (byteOffset< 0) {
             throw new IllegalArgumentException("byteOffset < 0");
@@ -96,7 +98,8 @@ public class BufferView
     }
 
     /**
-     * The offset into the buffer in bytes. (required)<br> 
+     * The offset into the buffer in bytes. (optional)<br> 
+     * Default: 0<br> 
      * Minimum: 0 (inclusive) 
      * 
      * @return The byteOffset
@@ -107,8 +110,19 @@ public class BufferView
     }
 
     /**
+     * Returns the default value of the byteOffset<br> 
+     * @see #getByteOffset 
+     * 
+     * @return The default byteOffset
+     * 
+     */
+    public Integer defaultByteOffset() {
+        return  0;
+    }
+
+    /**
      * The length of the bufferView in bytes. (required)<br> 
-     * Minimum: 0 (inclusive) 
+     * Minimum: 1 (inclusive) 
      * 
      * @param byteLength The byteLength to set
      * @throws NullPointerException If the given value is <code>null</code>
@@ -120,15 +134,15 @@ public class BufferView
         if (byteLength == null) {
             throw new NullPointerException((("Invalid value for byteLength: "+ byteLength)+", may not be null"));
         }
-        if (byteLength< 0) {
-            throw new IllegalArgumentException("byteLength < 0");
+        if (byteLength< 1) {
+            throw new IllegalArgumentException("byteLength < 1");
         }
         this.byteLength = byteLength;
     }
 
     /**
      * The length of the bufferView in bytes. (required)<br> 
-     * Minimum: 0 (inclusive) 
+     * Minimum: 1 (inclusive) 
      * 
      * @return The byteLength
      * 

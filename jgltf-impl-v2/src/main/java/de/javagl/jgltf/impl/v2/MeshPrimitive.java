@@ -52,7 +52,7 @@ public class MeshPrimitive
      * An array of Morph Targets, each Morph Target is a dictionary mapping 
      * attributes (only `POSITION`, `NORMAL`, and `TANGENT` supported) to 
      * their deviations in the Morph Target. (optional)<br> 
-     * Minimum number of items: 0<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;A dictionary object specifying attributes displacements in 
      * a Morph Target, where each key corresponds to one of the three 
@@ -61,7 +61,7 @@ public class MeshPrimitive
      * displacements' data. (optional) 
      * 
      */
-    private List<Integer> targets;
+    private List<Map<String, Integer>> targets;
 
     /**
      * A dictionary object, where each key corresponds to mesh attribute 
@@ -235,7 +235,7 @@ public class MeshPrimitive
      * An array of Morph Targets, each Morph Target is a dictionary mapping 
      * attributes (only `POSITION`, `NORMAL`, and `TANGENT` supported) to 
      * their deviations in the Morph Target. (optional)<br> 
-     * Minimum number of items: 0<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;A dictionary object specifying attributes displacements in 
      * a Morph Target, where each key corresponds to one of the three 
@@ -248,13 +248,13 @@ public class MeshPrimitive
      * the given constraints
      * 
      */
-    public void setTargets(List<Integer> targets) {
+    public void setTargets(List<Map<String, Integer>> targets) {
         if (targets == null) {
             this.targets = targets;
             return ;
         }
-        if (targets.size()< 0) {
-            throw new IllegalArgumentException("Number of targets elements is < 0");
+        if (targets.size()< 1) {
+            throw new IllegalArgumentException("Number of targets elements is < 1");
         }
         this.targets = targets;
     }
@@ -263,7 +263,7 @@ public class MeshPrimitive
      * An array of Morph Targets, each Morph Target is a dictionary mapping 
      * attributes (only `POSITION`, `NORMAL`, and `TANGENT` supported) to 
      * their deviations in the Morph Target. (optional)<br> 
-     * Minimum number of items: 0<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;A dictionary object specifying attributes displacements in 
      * a Morph Target, where each key corresponds to one of the three 
@@ -274,7 +274,7 @@ public class MeshPrimitive
      * @return The targets
      * 
      */
-    public List<Integer> getTargets() {
+    public List<Map<String, Integer>> getTargets() {
         return this.targets;
     }
 
@@ -287,12 +287,12 @@ public class MeshPrimitive
      * @throws NullPointerException If the given element is <code>null</code>
      * 
      */
-    public void addTargets(Integer element) {
+    public void addTargets(Map<String, Integer> element) {
         if (element == null) {
             throw new NullPointerException("The element may not be null");
         }
-        List<Integer> oldList = this.targets;
-        List<Integer> newList = new ArrayList<Integer>();
+        List<Map<String, Integer>> oldList = this.targets;
+        List<Map<String, Integer>> newList = new ArrayList<Map<String, Integer>>();
         if (oldList!= null) {
             newList.addAll(oldList);
         }
@@ -311,12 +311,12 @@ public class MeshPrimitive
      * @throws NullPointerException If the given element is <code>null</code>
      * 
      */
-    public void removeTargets(Integer element) {
+    public void removeTargets(Map<String, Integer> element) {
         if (element == null) {
             throw new NullPointerException("The element may not be null");
         }
-        List<Integer> oldList = this.targets;
-        List<Integer> newList = new ArrayList<Integer>();
+        List<Map<String, Integer>> oldList = this.targets;
+        List<Map<String, Integer>> newList = new ArrayList<Map<String, Integer>>();
         if (oldList!= null) {
             newList.addAll(oldList);
         }

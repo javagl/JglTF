@@ -18,7 +18,9 @@ package de.javagl.jgltf.impl.v2;
  * Auto-generated for material.pbrMetallicRoughness.schema.json 
  * 
  */
-public class MaterialPbrMetallicRoughness {
+public class MaterialPbrMetallicRoughness
+    extends GlTFProperty
+{
 
     /**
      * The material's base color factor. (optional)<br> 

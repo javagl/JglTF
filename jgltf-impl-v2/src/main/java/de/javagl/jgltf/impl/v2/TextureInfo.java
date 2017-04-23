@@ -16,7 +16,9 @@ package de.javagl.jgltf.impl.v2;
  * Auto-generated for textureInfo.schema.json 
  * 
  */
-public class TextureInfo {
+public class TextureInfo
+    extends GlTFProperty
+{
 
     /**
      * The index of the texture. (required) 

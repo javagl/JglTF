@@ -27,11 +27,10 @@ public class Buffer
     private String uri;
     /**
      * The length of the buffer in bytes. (required)<br> 
-     * Default: 0<br> 
-     * Minimum: 0 (inclusive) 
+     * Minimum: 1 (inclusive) 
      * 
      */
-    private Integer byteLength = 0;
+    private Integer byteLength;
 
     /**
      * The uri of the buffer. (optional) 
@@ -59,8 +58,7 @@ public class Buffer
 
     /**
      * The length of the buffer in bytes. (required)<br> 
-     * Default: 0<br> 
-     * Minimum: 0 (inclusive) 
+     * Minimum: 1 (inclusive) 
      * 
      * @param byteLength The byteLength to set
      * @throws NullPointerException If the given value is <code>null</code>
@@ -72,16 +70,15 @@ public class Buffer
         if (byteLength == null) {
             throw new NullPointerException((("Invalid value for byteLength: "+ byteLength)+", may not be null"));
         }
-        if (byteLength< 0) {
-            throw new IllegalArgumentException("byteLength < 0");
+        if (byteLength< 1) {
+            throw new IllegalArgumentException("byteLength < 1");
         }
         this.byteLength = byteLength;
     }
 
     /**
      * The length of the buffer in bytes. (required)<br> 
-     * Default: 0<br> 
-     * Minimum: 0 (inclusive) 
+     * Minimum: 1 (inclusive) 
      * 
      * @return The byteLength
      * 
