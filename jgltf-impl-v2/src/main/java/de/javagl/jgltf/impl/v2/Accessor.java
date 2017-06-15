@@ -60,7 +60,7 @@ public class Accessor
      */
     private String type;
     /**
-     * Maximum value of each component in this attribute. (required)<br> 
+     * Maximum value of each component in this attribute. (optional)<br> 
      * Minimum number of items: 1<br> 
      * Maximum number of items: 16<br> 
      * Array elements:<br> 
@@ -69,7 +69,7 @@ public class Accessor
      */
     private Number[] max;
     /**
-     * Minimum value of each component in this attribute. (required)<br> 
+     * Minimum value of each component in this attribute. (optional)<br> 
      * Minimum number of items: 1<br> 
      * Maximum number of items: 16<br> 
      * Array elements:<br> 
@@ -283,21 +283,21 @@ public class Accessor
     }
 
     /**
-     * Maximum value of each component in this attribute. (required)<br> 
+     * Maximum value of each component in this attribute. (optional)<br> 
      * Minimum number of items: 1<br> 
      * Maximum number of items: 16<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;The elements of this array (optional) 
      * 
      * @param max The max to set
-     * @throws NullPointerException If the given value is <code>null</code>
      * @throws IllegalArgumentException If the given value does not meet
      * the given constraints
      * 
      */
     public void setMax(Number[] max) {
         if (max == null) {
-            throw new NullPointerException((("Invalid value for max: "+ max)+", may not be null"));
+            this.max = max;
+            return ;
         }
         if (max.length< 1) {
             throw new IllegalArgumentException("Number of max elements is < 1");
@@ -309,7 +309,7 @@ public class Accessor
     }
 
     /**
-     * Maximum value of each component in this attribute. (required)<br> 
+     * Maximum value of each component in this attribute. (optional)<br> 
      * Minimum number of items: 1<br> 
      * Maximum number of items: 16<br> 
      * Array elements:<br> 
@@ -323,21 +323,21 @@ public class Accessor
     }
 
     /**
-     * Minimum value of each component in this attribute. (required)<br> 
+     * Minimum value of each component in this attribute. (optional)<br> 
      * Minimum number of items: 1<br> 
      * Maximum number of items: 16<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;The elements of this array (optional) 
      * 
      * @param min The min to set
-     * @throws NullPointerException If the given value is <code>null</code>
      * @throws IllegalArgumentException If the given value does not meet
      * the given constraints
      * 
      */
     public void setMin(Number[] min) {
         if (min == null) {
-            throw new NullPointerException((("Invalid value for min: "+ min)+", may not be null"));
+            this.min = min;
+            return ;
         }
         if (min.length< 1) {
             throw new IllegalArgumentException("Number of min elements is < 1");
@@ -349,7 +349,7 @@ public class Accessor
     }
 
     /**
-     * Minimum value of each component in this attribute. (required)<br> 
+     * Minimum value of each component in this attribute. (optional)<br> 
      * Minimum number of items: 1<br> 
      * Maximum number of items: 16<br> 
      * Array elements:<br> 

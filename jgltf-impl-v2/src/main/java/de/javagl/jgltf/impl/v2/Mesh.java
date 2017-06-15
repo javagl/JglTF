@@ -13,8 +13,8 @@ import java.util.List;
 
 
 /**
- * A set of primitives to be rendered. A node can contain one or more 
- * meshes. A node's transform places the mesh in the scene. 
+ * A set of primitives to be rendered. A node can contain one mesh. A 
+ * node's transform places the mesh in the scene. 
  * 
  * Auto-generated for mesh.schema.json 
  * 
@@ -35,7 +35,7 @@ public class Mesh
     private List<MeshPrimitive> primitives;
     /**
      * Array of weights to be applied to the Morph Targets. (optional)<br> 
-     * Minimum number of items: 0<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;The elements of this array (optional) 
      * 
@@ -127,7 +127,7 @@ public class Mesh
 
     /**
      * Array of weights to be applied to the Morph Targets. (optional)<br> 
-     * Minimum number of items: 0<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;The elements of this array (optional) 
      * 
@@ -141,15 +141,15 @@ public class Mesh
             this.weights = weights;
             return ;
         }
-        if (weights.size()< 0) {
-            throw new IllegalArgumentException("Number of weights elements is < 0");
+        if (weights.size()< 1) {
+            throw new IllegalArgumentException("Number of weights elements is < 1");
         }
         this.weights = weights;
     }
 
     /**
      * Array of weights to be applied to the Morph Targets. (optional)<br> 
-     * Minimum number of items: 0<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;The elements of this array (optional) 
      * 

@@ -38,7 +38,7 @@ public class Node
     private Integer camera;
     /**
      * The indices of this node's children. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;The elements of this array (optional)<br> 
      * &nbsp;&nbsp;Minimum: 0 (inclusive) 
@@ -72,7 +72,9 @@ public class Node
      * Default: [0.0,0.0,0.0,1.0]<br> 
      * Number of items: 4<br> 
      * Array elements:<br> 
-     * &nbsp;&nbsp;The elements of this array (optional) 
+     * &nbsp;&nbsp;The elements of this array (optional)<br> 
+     * &nbsp;&nbsp;Minimum: -1.0 (inclusive)<br> 
+     * &nbsp;&nbsp;Maximum: 1.0 (inclusive) 
      * 
      */
     private float[] rotation;
@@ -99,8 +101,7 @@ public class Node
      * match number of Morph Targets of used mesh. (optional)<br> 
      * Minimum number of items: 1<br> 
      * Array elements:<br> 
-     * &nbsp;&nbsp;The elements of this array (optional)<br> 
-     * &nbsp;&nbsp;Minimum: 0 (inclusive) 
+     * &nbsp;&nbsp;The elements of this array (optional) 
      * 
      */
     private List<Float> weights;
@@ -131,7 +132,7 @@ public class Node
 
     /**
      * The indices of this node's children. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;The elements of this array (optional)<br> 
      * &nbsp;&nbsp;Minimum: 0 (inclusive) 
@@ -146,6 +147,9 @@ public class Node
             this.children = children;
             return ;
         }
+        if (children.size()< 1) {
+            throw new IllegalArgumentException("Number of children elements is < 1");
+        }
         for (Integer childrenElement: children) {
             if (childrenElement< 0) {
                 throw new IllegalArgumentException("childrenElement < 0");
@@ -156,7 +160,7 @@ public class Node
 
     /**
      * The indices of this node's children. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;The elements of this array (optional)<br> 
      * &nbsp;&nbsp;Minimum: 0 (inclusive) 
@@ -216,17 +220,6 @@ public class Node
         } else {
             this.children = newList;
         }
-    }
-
-    /**
-     * Returns the default value of the children<br> 
-     * @see #getChildren 
-     * 
-     * @return The default children
-     * 
-     */
-    public List<Integer> defaultChildren() {
-        return new ArrayList<Integer>();
     }
 
     /**
@@ -338,7 +331,9 @@ public class Node
      * Default: [0.0,0.0,0.0,1.0]<br> 
      * Number of items: 4<br> 
      * Array elements:<br> 
-     * &nbsp;&nbsp;The elements of this array (optional) 
+     * &nbsp;&nbsp;The elements of this array (optional)<br> 
+     * &nbsp;&nbsp;Minimum: -1.0 (inclusive)<br> 
+     * &nbsp;&nbsp;Maximum: 1.0 (inclusive) 
      * 
      * @param rotation The rotation to set
      * @throws IllegalArgumentException If the given value does not meet
@@ -356,6 +351,14 @@ public class Node
         if (rotation.length > 4) {
             throw new IllegalArgumentException("Number of rotation elements is > 4");
         }
+        for (float rotationElement: rotation) {
+            if (rotationElement > 1.0D) {
+                throw new IllegalArgumentException("rotationElement > 1.0");
+            }
+            if (rotationElement<-1.0D) {
+                throw new IllegalArgumentException("rotationElement < -1.0");
+            }
+        }
         this.rotation = rotation;
     }
 
@@ -365,7 +368,9 @@ public class Node
      * Default: [0.0,0.0,0.0,1.0]<br> 
      * Number of items: 4<br> 
      * Array elements:<br> 
-     * &nbsp;&nbsp;The elements of this array (optional) 
+     * &nbsp;&nbsp;The elements of this array (optional)<br> 
+     * &nbsp;&nbsp;Minimum: -1.0 (inclusive)<br> 
+     * &nbsp;&nbsp;Maximum: 1.0 (inclusive) 
      * 
      * @return The rotation
      * 
@@ -492,8 +497,7 @@ public class Node
      * match number of Morph Targets of used mesh. (optional)<br> 
      * Minimum number of items: 1<br> 
      * Array elements:<br> 
-     * &nbsp;&nbsp;The elements of this array (optional)<br> 
-     * &nbsp;&nbsp;Minimum: 0 (inclusive) 
+     * &nbsp;&nbsp;The elements of this array (optional) 
      * 
      * @param weights The weights to set
      * @throws IllegalArgumentException If the given value does not meet
@@ -508,11 +512,6 @@ public class Node
         if (weights.size()< 1) {
             throw new IllegalArgumentException("Number of weights elements is < 1");
         }
-        for (Float weightsElement: weights) {
-            if (weightsElement< 0.0D) {
-                throw new IllegalArgumentException("weightsElement < 0.0");
-            }
-        }
         this.weights = weights;
     }
 
@@ -521,8 +520,7 @@ public class Node
      * match number of Morph Targets of used mesh. (optional)<br> 
      * Minimum number of items: 1<br> 
      * Array elements:<br> 
-     * &nbsp;&nbsp;The elements of this array (optional)<br> 
-     * &nbsp;&nbsp;Minimum: 0 (inclusive) 
+     * &nbsp;&nbsp;The elements of this array (optional) 
      * 
      * @return The weights
      * 

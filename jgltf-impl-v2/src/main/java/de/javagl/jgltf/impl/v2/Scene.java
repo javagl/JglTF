@@ -24,7 +24,7 @@ public class Scene
 
     /**
      * The indices of each root node. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;The elements of this array (optional)<br> 
      * &nbsp;&nbsp;Minimum: 0 (inclusive) 
@@ -34,7 +34,7 @@ public class Scene
 
     /**
      * The indices of each root node. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;The elements of this array (optional)<br> 
      * &nbsp;&nbsp;Minimum: 0 (inclusive) 
@@ -49,6 +49,9 @@ public class Scene
             this.nodes = nodes;
             return ;
         }
+        if (nodes.size()< 1) {
+            throw new IllegalArgumentException("Number of nodes elements is < 1");
+        }
         for (Integer nodesElement: nodes) {
             if (nodesElement< 0) {
                 throw new IllegalArgumentException("nodesElement < 0");
@@ -59,7 +62,7 @@ public class Scene
 
     /**
      * The indices of each root node. (optional)<br> 
-     * Default: []<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;The elements of this array (optional)<br> 
      * &nbsp;&nbsp;Minimum: 0 (inclusive) 
@@ -119,17 +122,6 @@ public class Scene
         } else {
             this.nodes = newList;
         }
-    }
-
-    /**
-     * Returns the default value of the nodes<br> 
-     * @see #getNodes 
-     * 
-     * @return The default nodes
-     * 
-     */
-    public List<Integer> defaultNodes() {
-        return new ArrayList<Integer>();
     }
 
 }

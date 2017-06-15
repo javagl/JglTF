@@ -22,7 +22,7 @@ public class AnimationChannelTarget
 {
 
     /**
-     * The index of the node to target. (required) 
+     * The index of the node to target. (optional) 
      * 
      */
     private Integer node;
@@ -34,21 +34,21 @@ public class AnimationChannelTarget
     private String path;
 
     /**
-     * The index of the node to target. (required) 
+     * The index of the node to target. (optional) 
      * 
      * @param node The node to set
-     * @throws NullPointerException If the given value is <code>null</code>
      * 
      */
     public void setNode(Integer node) {
         if (node == null) {
-            throw new NullPointerException((("Invalid value for node: "+ node)+", may not be null"));
+            this.node = node;
+            return ;
         }
         this.node = node;
     }
 
     /**
-     * The index of the node to target. (required) 
+     * The index of the node to target. (optional) 
      * 
      * @return The node
      * 

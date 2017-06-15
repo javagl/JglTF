@@ -113,8 +113,7 @@ public class GlTF
      * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;A set of primitives to be rendered. A node can contain one 
-     * or more meshes. A node's transform places the mesh in the scene. 
-     * (optional) 
+     * mesh. A node's transform places the mesh in the scene. (optional) 
      * 
      */
     private List<Mesh> meshes;
@@ -986,8 +985,7 @@ public class GlTF
      * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;A set of primitives to be rendered. A node can contain one 
-     * or more meshes. A node's transform places the mesh in the scene. 
-     * (optional) 
+     * mesh. A node's transform places the mesh in the scene. (optional) 
      * 
      * @param meshes The meshes to set
      * @throws IllegalArgumentException If the given value does not meet
@@ -1010,8 +1008,7 @@ public class GlTF
      * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;A set of primitives to be rendered. A node can contain one 
-     * or more meshes. A node's transform places the mesh in the scene. 
-     * (optional) 
+     * mesh. A node's transform places the mesh in the scene. (optional) 
      * 
      * @return The meshes
      * 

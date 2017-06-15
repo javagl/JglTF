@@ -38,6 +38,7 @@ public class Skin
     private Integer skeleton;
     /**
      * Indices of skeleton nodes, used as joints in this skin. (required)<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;The elements of this array (optional)<br> 
      * &nbsp;&nbsp;Minimum: 0 (inclusive) 
@@ -103,6 +104,7 @@ public class Skin
 
     /**
      * Indices of skeleton nodes, used as joints in this skin. (required)<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;The elements of this array (optional)<br> 
      * &nbsp;&nbsp;Minimum: 0 (inclusive) 
@@ -117,6 +119,9 @@ public class Skin
         if (joints == null) {
             throw new NullPointerException((("Invalid value for joints: "+ joints)+", may not be null"));
         }
+        if (joints.size()< 1) {
+            throw new IllegalArgumentException("Number of joints elements is < 1");
+        }
         for (Integer jointsElement: joints) {
             if (jointsElement< 0) {
                 throw new IllegalArgumentException("jointsElement < 0");
@@ -127,6 +132,7 @@ public class Skin
 
     /**
      * Indices of skeleton nodes, used as joints in this skin. (required)<br> 
+     * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;The elements of this array (optional)<br> 
      * &nbsp;&nbsp;Minimum: 0 (inclusive) 

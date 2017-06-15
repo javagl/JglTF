@@ -32,8 +32,9 @@ public class CameraOrthographic
      */
     private Float ymag;
     /**
-     * The floating-point distance to the far clipping plane. (required)<br> 
-     * Minimum: 0.0 (inclusive) 
+     * The floating-point distance to the far clipping plane. `zfar` must be 
+     * greater than `znear`. (required)<br> 
+     * Minimum: 0.0 (exclusive) 
      * 
      */
     private Float zfar;
@@ -93,8 +94,9 @@ public class CameraOrthographic
     }
 
     /**
-     * The floating-point distance to the far clipping plane. (required)<br> 
-     * Minimum: 0.0 (inclusive) 
+     * The floating-point distance to the far clipping plane. `zfar` must be 
+     * greater than `znear`. (required)<br> 
+     * Minimum: 0.0 (exclusive) 
      * 
      * @param zfar The zfar to set
      * @throws NullPointerException If the given value is <code>null</code>
@@ -106,15 +108,16 @@ public class CameraOrthographic
         if (zfar == null) {
             throw new NullPointerException((("Invalid value for zfar: "+ zfar)+", may not be null"));
         }
-        if (zfar< 0.0D) {
-            throw new IllegalArgumentException("zfar < 0.0");
+        if (zfar<= 0.0D) {
+            throw new IllegalArgumentException("zfar <= 0.0");
         }
         this.zfar = zfar;
     }
 
     /**
-     * The floating-point distance to the far clipping plane. (required)<br> 
-     * Minimum: 0.0 (inclusive) 
+     * The floating-point distance to the far clipping plane. `zfar` must be 
+     * greater than `znear`. (required)<br> 
+     * Minimum: 0.0 (exclusive) 
      * 
      * @return The zfar
      * 

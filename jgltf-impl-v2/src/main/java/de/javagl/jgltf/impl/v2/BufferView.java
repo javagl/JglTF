@@ -40,9 +40,8 @@ public class BufferView
     private Integer byteLength;
     /**
      * The stride, in bytes. (optional)<br> 
-     * Default: 0<br> 
-     * Minimum: 0 (inclusive)<br> 
-     * Maximum: 255 (inclusive) 
+     * Minimum: 4 (inclusive)<br> 
+     * Maximum: 252 (inclusive) 
      * 
      */
     private Integer byteStride;
@@ -153,9 +152,8 @@ public class BufferView
 
     /**
      * The stride, in bytes. (optional)<br> 
-     * Default: 0<br> 
-     * Minimum: 0 (inclusive)<br> 
-     * Maximum: 255 (inclusive) 
+     * Minimum: 4 (inclusive)<br> 
+     * Maximum: 252 (inclusive) 
      * 
      * @param byteStride The byteStride to set
      * @throws IllegalArgumentException If the given value does not meet
@@ -167,37 +165,25 @@ public class BufferView
             this.byteStride = byteStride;
             return ;
         }
-        if (byteStride > 255) {
-            throw new IllegalArgumentException("byteStride > 255");
+        if (byteStride > 252) {
+            throw new IllegalArgumentException("byteStride > 252");
         }
-        if (byteStride< 0) {
-            throw new IllegalArgumentException("byteStride < 0");
+        if (byteStride< 4) {
+            throw new IllegalArgumentException("byteStride < 4");
         }
         this.byteStride = byteStride;
     }
 
     /**
      * The stride, in bytes. (optional)<br> 
-     * Default: 0<br> 
-     * Minimum: 0 (inclusive)<br> 
-     * Maximum: 255 (inclusive) 
+     * Minimum: 4 (inclusive)<br> 
+     * Maximum: 252 (inclusive) 
      * 
      * @return The byteStride
      * 
      */
     public Integer getByteStride() {
         return this.byteStride;
-    }
-
-    /**
-     * Returns the default value of the byteStride<br> 
-     * @see #getByteStride 
-     * 
-     * @return The default byteStride
-     * 
-     */
-    public Integer defaultByteStride() {
-        return  0;
     }
 
     /**
