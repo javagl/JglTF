@@ -27,7 +27,8 @@ public class Image
      */
     private String uri;
     /**
-     * The image's MIME type. (optional) 
+     * The image's MIME type. (optional)<br> 
+     * Valid values: ["image/jpeg", "image/png"] 
      * 
      */
     private String mimeType;
@@ -63,7 +64,8 @@ public class Image
     }
 
     /**
-     * The image's MIME type. (optional) 
+     * The image's MIME type. (optional)<br> 
+     * Valid values: ["image/jpeg", "image/png"] 
      * 
      * @param mimeType The mimeType to set
      * @throws IllegalArgumentException If the given value does not meet
@@ -82,7 +84,8 @@ public class Image
     }
 
     /**
-     * The image's MIME type. (optional) 
+     * The image's MIME type. (optional)<br> 
+     * Valid values: ["image/jpeg", "image/png"] 
      * 
      * @return The mimeType
      * 

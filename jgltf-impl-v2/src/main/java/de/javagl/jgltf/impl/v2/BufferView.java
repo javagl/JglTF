@@ -46,7 +46,8 @@ public class BufferView
      */
     private Integer byteStride;
     /**
-     * The target that the GPU buffer should be bound to. (optional) 
+     * The target that the GPU buffer should be bound to. (optional)<br> 
+     * Valid values: [34962, 34963] 
      * 
      */
     private Integer target;
@@ -187,7 +188,8 @@ public class BufferView
     }
 
     /**
-     * The target that the GPU buffer should be bound to. (optional) 
+     * The target that the GPU buffer should be bound to. (optional)<br> 
+     * Valid values: [34962, 34963] 
      * 
      * @param target The target to set
      * @throws IllegalArgumentException If the given value does not meet
@@ -206,7 +208,8 @@ public class BufferView
     }
 
     /**
-     * The target that the GPU buffer should be bound to. (optional) 
+     * The target that the GPU buffer should be bound to. (optional)<br> 
+     * Valid values: [34962, 34963] 
      * 
      * @return The target
      * 

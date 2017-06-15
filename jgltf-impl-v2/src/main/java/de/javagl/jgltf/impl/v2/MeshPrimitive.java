@@ -44,7 +44,8 @@ public class MeshPrimitive
     private Integer material;
     /**
      * The type of primitives to render. (optional)<br> 
-     * Default: 4 
+     * Default: 4<br> 
+     * Valid values: [0, 1, 2, 3, 4, 5, 6] 
      * 
      */
     private Integer mode;
@@ -191,7 +192,8 @@ public class MeshPrimitive
 
     /**
      * The type of primitives to render. (optional)<br> 
-     * Default: 4 
+     * Default: 4<br> 
+     * Valid values: [0, 1, 2, 3, 4, 5, 6] 
      * 
      * @param mode The mode to set
      * @throws IllegalArgumentException If the given value does not meet
@@ -211,7 +213,8 @@ public class MeshPrimitive
 
     /**
      * The type of primitives to render. (optional)<br> 
-     * Default: 4 
+     * Default: 4<br> 
+     * Valid values: [0, 1, 2, 3, 4, 5, 6] 
      * 
      * @return The mode
      * 

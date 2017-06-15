@@ -37,7 +37,8 @@ public class Accessor
      */
     private Integer byteOffset;
     /**
-     * The datatype of components in the attribute. (required) 
+     * The datatype of components in the attribute. (required)<br> 
+     * Valid values: [5120, 5121, 5122, 5123, 5125, 5126] 
      * 
      */
     private Integer componentType;
@@ -55,7 +56,10 @@ public class Accessor
      */
     private Integer count;
     /**
-     * Specifies if the attribute is a scalar, vector, or matrix. (required) 
+     * Specifies if the attribute is a scalar, vector, or matrix. 
+     * (required)<br> 
+     * Valid values: ["SCALAR", "VEC2", "VEC3", "VEC4", "MAT2", "MAT3", 
+     * "MAT4"] 
      * 
      */
     private String type;
@@ -155,7 +159,8 @@ public class Accessor
     }
 
     /**
-     * The datatype of components in the attribute. (required) 
+     * The datatype of components in the attribute. (required)<br> 
+     * Valid values: [5120, 5121, 5122, 5123, 5125, 5126] 
      * 
      * @param componentType The componentType to set
      * @throws NullPointerException If the given value is <code>null</code>
@@ -174,7 +179,8 @@ public class Accessor
     }
 
     /**
-     * The datatype of components in the attribute. (required) 
+     * The datatype of components in the attribute. (required)<br> 
+     * Valid values: [5120, 5121, 5122, 5123, 5125, 5126] 
      * 
      * @return The componentType
      * 
@@ -254,7 +260,10 @@ public class Accessor
     }
 
     /**
-     * Specifies if the attribute is a scalar, vector, or matrix. (required) 
+     * Specifies if the attribute is a scalar, vector, or matrix. 
+     * (required)<br> 
+     * Valid values: ["SCALAR", "VEC2", "VEC3", "VEC4", "MAT2", "MAT3", 
+     * "MAT4"] 
      * 
      * @param type The type to set
      * @throws NullPointerException If the given value is <code>null</code>
@@ -273,7 +282,10 @@ public class Accessor
     }
 
     /**
-     * Specifies if the attribute is a scalar, vector, or matrix. (required) 
+     * Specifies if the attribute is a scalar, vector, or matrix. 
+     * (required)<br> 
+     * Valid values: ["SCALAR", "VEC2", "VEC3", "VEC4", "MAT2", "MAT3", 
+     * "MAT4"] 
      * 
      * @return The type
      * 

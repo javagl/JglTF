@@ -28,7 +28,8 @@ public class AnimationChannelTarget
     private Integer node;
     /**
      * The name of the node's TRS property to modify, or the "weights" of the 
-     * Morph Targets it instantiates. (required) 
+     * Morph Targets it instantiates. (required)<br> 
+     * Valid values: ["translation", "rotation", "scale", "weights"] 
      * 
      */
     private String path;
@@ -59,7 +60,8 @@ public class AnimationChannelTarget
 
     /**
      * The name of the node's TRS property to modify, or the "weights" of the 
-     * Morph Targets it instantiates. (required) 
+     * Morph Targets it instantiates. (required)<br> 
+     * Valid values: ["translation", "rotation", "scale", "weights"] 
      * 
      * @param path The path to set
      * @throws NullPointerException If the given value is <code>null</code>
@@ -79,7 +81,8 @@ public class AnimationChannelTarget
 
     /**
      * The name of the node's TRS property to modify, or the "weights" of the 
-     * Morph Targets it instantiates. (required) 
+     * Morph Targets it instantiates. (required)<br> 
+     * Valid values: ["translation", "rotation", "scale", "weights"] 
      * 
      * @return The path
      * 

@@ -56,7 +56,8 @@ public class Material
     private float[] emissiveFactor;
     /**
      * The alpha rendering mode of the material. (optional)<br> 
-     * Default: "OPAQUE" 
+     * Default: "OPAQUE"<br> 
+     * Valid values: ["OPAQUE", "MASK", "BLEND"] 
      * 
      */
     private String alphaMode;
@@ -241,7 +242,8 @@ public class Material
 
     /**
      * The alpha rendering mode of the material. (optional)<br> 
-     * Default: "OPAQUE" 
+     * Default: "OPAQUE"<br> 
+     * Valid values: ["OPAQUE", "MASK", "BLEND"] 
      * 
      * @param alphaMode The alphaMode to set
      * @throws IllegalArgumentException If the given value does not meet
@@ -261,7 +263,8 @@ public class Material
 
     /**
      * The alpha rendering mode of the material. (optional)<br> 
-     * Default: "OPAQUE" 
+     * Default: "OPAQUE"<br> 
+     * Valid values: ["OPAQUE", "MASK", "BLEND"] 
      * 
      * @return The alphaMode
      * 

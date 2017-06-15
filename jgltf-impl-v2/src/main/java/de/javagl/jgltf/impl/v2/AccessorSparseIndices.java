@@ -36,7 +36,8 @@ public class AccessorSparseIndices
      */
     private Integer byteOffset;
     /**
-     * The indices data type. (required) 
+     * The indices data type. (required)<br> 
+     * Valid values: [5121, 5123, 5125] 
      * 
      */
     private Integer componentType;
@@ -114,7 +115,8 @@ public class AccessorSparseIndices
     }
 
     /**
-     * The indices data type. (required) 
+     * The indices data type. (required)<br> 
+     * Valid values: [5121, 5123, 5125] 
      * 
      * @param componentType The componentType to set
      * @throws NullPointerException If the given value is <code>null</code>
@@ -133,7 +135,8 @@ public class AccessorSparseIndices
     }
 
     /**
-     * The indices data type. (required) 
+     * The indices data type. (required)<br> 
+     * Valid values: [5121, 5123, 5125] 
      * 
      * @return The componentType
      * 

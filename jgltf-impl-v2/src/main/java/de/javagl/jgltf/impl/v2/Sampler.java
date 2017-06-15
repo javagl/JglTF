@@ -21,30 +21,35 @@ public class Sampler
 {
 
     /**
-     * Magnification filter. (optional) 
+     * Magnification filter. (optional)<br> 
+     * Valid values: [9728, 9729] 
      * 
      */
     private Integer magFilter;
     /**
-     * Minification filter. (optional) 
+     * Minification filter. (optional)<br> 
+     * Valid values: [9728, 9729, 9984, 9985, 9986, 9987] 
      * 
      */
     private Integer minFilter;
     /**
      * s wrapping mode. (optional)<br> 
-     * Default: 10497 
+     * Default: 10497<br> 
+     * Valid values: [33071, 33648, 10497] 
      * 
      */
     private Integer wrapS;
     /**
      * t wrapping mode. (optional)<br> 
-     * Default: 10497 
+     * Default: 10497<br> 
+     * Valid values: [33071, 33648, 10497] 
      * 
      */
     private Integer wrapT;
 
     /**
-     * Magnification filter. (optional) 
+     * Magnification filter. (optional)<br> 
+     * Valid values: [9728, 9729] 
      * 
      * @param magFilter The magFilter to set
      * @throws IllegalArgumentException If the given value does not meet
@@ -63,7 +68,8 @@ public class Sampler
     }
 
     /**
-     * Magnification filter. (optional) 
+     * Magnification filter. (optional)<br> 
+     * Valid values: [9728, 9729] 
      * 
      * @return The magFilter
      * 
@@ -73,7 +79,8 @@ public class Sampler
     }
 
     /**
-     * Minification filter. (optional) 
+     * Minification filter. (optional)<br> 
+     * Valid values: [9728, 9729, 9984, 9985, 9986, 9987] 
      * 
      * @param minFilter The minFilter to set
      * @throws IllegalArgumentException If the given value does not meet
@@ -92,7 +99,8 @@ public class Sampler
     }
 
     /**
-     * Minification filter. (optional) 
+     * Minification filter. (optional)<br> 
+     * Valid values: [9728, 9729, 9984, 9985, 9986, 9987] 
      * 
      * @return The minFilter
      * 
@@ -103,7 +111,8 @@ public class Sampler
 
     /**
      * s wrapping mode. (optional)<br> 
-     * Default: 10497 
+     * Default: 10497<br> 
+     * Valid values: [33071, 33648, 10497] 
      * 
      * @param wrapS The wrapS to set
      * @throws IllegalArgumentException If the given value does not meet
@@ -123,7 +132,8 @@ public class Sampler
 
     /**
      * s wrapping mode. (optional)<br> 
-     * Default: 10497 
+     * Default: 10497<br> 
+     * Valid values: [33071, 33648, 10497] 
      * 
      * @return The wrapS
      * 
@@ -145,7 +155,8 @@ public class Sampler
 
     /**
      * t wrapping mode. (optional)<br> 
-     * Default: 10497 
+     * Default: 10497<br> 
+     * Valid values: [33071, 33648, 10497] 
      * 
      * @param wrapT The wrapT to set
      * @throws IllegalArgumentException If the given value does not meet
@@ -165,7 +176,8 @@ public class Sampler
 
     /**
      * t wrapping mode. (optional)<br> 
-     * Default: 10497 
+     * Default: 10497<br> 
+     * Valid values: [33071, 33648, 10497] 
      * 
      * @return The wrapT
      * 
