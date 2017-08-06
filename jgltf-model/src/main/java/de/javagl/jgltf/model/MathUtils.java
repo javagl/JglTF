@@ -289,7 +289,7 @@ public class MathUtils
      * @param q The quaternion
      * @param m The matrix
      */
-    static void quaternionToMatrix4x4(float q[], float m[])
+    public static void quaternionToMatrix4x4(float q[], float m[])
     {
         float invLength = 1.0f / (float)Math.sqrt(dot(q, q));
 
@@ -442,7 +442,7 @@ public class MathUtils
      * @param zNear The z-value of the near clipping plane
      * @param m The matrix to fill
      */
-    static void infinitePerspective4x4(
+    public static void infinitePerspective4x4(
         float fovyDeg, float aspect, float zNear, float m[])
     {
         setIdentity4x4(m);
@@ -466,7 +466,7 @@ public class MathUtils
      * @param zFar The z-value of the far clipping plane
      * @param m The matrix to fill
      */
-    static void perspective4x4(
+    public static void perspective4x4(
         float fovyDeg, float aspect, float zNear, float zFar, float m[])
     {
         setIdentity4x4(m);

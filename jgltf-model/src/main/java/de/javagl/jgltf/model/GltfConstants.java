@@ -432,6 +432,39 @@ public class GltfConstants
     public static final int GL_CCW = 2305;    
     
     
+    // glTexParameter
+    
+    /**
+     * The GL_NEAREST constant (9728)
+     */
+    public static final int GL_NEAREST = 9728;
+
+    /**
+     * The GL_LINEAR constant (9729)
+     */
+    public static final int GL_LINEAR = 9729;
+
+    /**
+     * The GL_NEAREST_MIPMAP_NEAREST constant (9984)
+     */
+    public static final int GL_NEAREST_MIPMAP_NEAREST = 9984;
+
+    /**
+     * The GL_LINEAR_MIPMAP_NEAREST constant (9985)
+     */
+    public static final int GL_LINEAR_MIPMAP_NEAREST = 9985;
+
+    /**
+     * The GL_NEAREST_MIPMAP_LINEAR constant (9986)
+     */
+    public static final int GL_NEAREST_MIPMAP_LINEAR = 9986;
+
+    /**
+     * The GL_LINEAR_MIPMAP_LINEAR constant (9987)
+     */
+    public static final int GL_LINEAR_MIPMAP_LINEAR = 9987;
+
+    
     /**
      * Returns the String representation of the given constant
      * 
@@ -536,6 +569,14 @@ public class GltfConstants
             // glFrontFace
             case GL_CW: return "GL_CW";
             case GL_CCW: return "GL_CCW";
+            
+            // glTexParameter
+            case GL_NEAREST : return "GL_NEAREST";
+            case GL_LINEAR : return "GL_LINEAR";
+            case GL_NEAREST_MIPMAP_NEAREST : return "GL_NEAREST_MIPMAP_NEAREST";
+            case GL_LINEAR_MIPMAP_NEAREST : return "GL_LINEAR_MIPMAP_NEAREST";
+            case GL_NEAREST_MIPMAP_LINEAR : return "GL_NEAREST_MIPMAP_LINEAR";
+            case GL_LINEAR_MIPMAP_LINEAR : return "GL_LINEAR_MIPMAP_LINEAR";
             
             default:
                 return "UNKNOWN_GL_CONSTANT["+constant+"]";

@@ -33,12 +33,8 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.logging.Logger;
 
-import de.javagl.jgltf.model.GltfData;
-import de.javagl.jgltf.model.io.BinaryGltfDataWriter;
-import de.javagl.jgltf.model.io.GltfDataToBinaryConverter;
-import de.javagl.jgltf.model.io.GltfDataToEmbeddedConverter;
-import de.javagl.jgltf.model.io.GltfDataWriter;
-import de.javagl.jgltf.obj.ObjGltfDataCreator.BufferStrategy;
+import de.javagl.jgltf.model.v1.GltfModelV1;
+import de.javagl.jgltf.obj.ObjGltfModelCreatorV1.BufferStrategy;
 
 /**
  * A class for converting OBJ files to glTF
@@ -140,29 +136,30 @@ public class ObjToGltf
         long beforeNs = System.nanoTime();
         
         URI objUri = Paths.get(inputFileName).toUri();
-        GltfData gltfData = 
-            new ObjGltfDataCreator(bufferStrategy).create(objUri);
+        GltfModelV1 gltfModel = 
+            new ObjGltfModelCreatorV1(bufferStrategy).create(objUri);
 
-        if (binary)
-        {
-            logger.info("Converting to binary glTF");
-            gltfData = new GltfDataToBinaryConverter().convert(gltfData);
-            
-            logger.info("Writing binary glTF to " + outputFileName);
-            new BinaryGltfDataWriter().writeBinaryGltfData(
-                gltfData, outputFileName);
-        }
-        else
-        {
-            if (embedded)
-            {
-                logger.info("Converting to embedded glTF");
-                gltfData = new GltfDataToEmbeddedConverter().convert(gltfData);
-            }
-    
-            logger.info("Writing glTF to " + outputFileName);
-            new GltfDataWriter().writeGltfData(gltfData, outputFileName);
-        }
+//        if (binary)
+//        {
+//            logger.info("Converting to binary glTF");
+//            gltfData = new GltfDataToBinaryConverter().convert(gltfData);
+//            
+//            logger.info("Writing binary glTF to " + outputFileName);
+//            int XXX; // XXX Not implemented
+////            new BinaryGltfDataWriter().writeBinaryGltfData(
+////                gltfData, outputFileName);
+//        }
+//        else
+//        {
+//            if (embedded)
+//            {
+//                logger.info("Converting to embedded glTF");
+//                gltfData = new GltfDataToEmbeddedConverter().convert(gltfData);
+//            }
+//    
+//            logger.info("Writing glTF to " + outputFileName);
+//            new GltfDataWriter().writeGltfData(gltfData, outputFileName);
+//        }
         
         long afterNs = System.nanoTime();
         double durationS = (afterNs - beforeNs) * 1e-9;

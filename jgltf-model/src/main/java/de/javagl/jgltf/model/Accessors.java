@@ -26,10 +26,8 @@
  */
 package de.javagl.jgltf.model;
 
-import de.javagl.jgltf.impl.v1.Accessor;
-
 /**
- * Utility methods related to {@link Accessor}s.<br>
+ * Utility methods related to accessor properties.<br>
  * <br>
  * Unless otherwise noted, none of the arguments to these methods may 
  * be <code>null</code>.
@@ -38,7 +36,7 @@ public class Accessors
 {
     /**
      * Returns the number of components that one element has for the given 
-     * {@link Accessor#getType()}. Valid parameters are
+     * accessor type. Valid parameters are
      * <pre><code>
      * "SCALAR" :  1
      * "VEC2"   :  2 
@@ -49,7 +47,7 @@ public class Accessors
      * "MAT4"   : 16
      * </code></pre>
      * 
-     * @param accessorType The {@link Accessor#getType()}. 
+     * @param accessorType The accessor type. 
      * @return The number of components
      * @throws IllegalArgumentException If the given type is none of the
      * valid parameters
@@ -74,7 +72,7 @@ public class Accessors
 
     /**
      * Returns the number of bytes that one component with the given 
-     * {@link Accessor#getComponentType()} consists of.
+     * accessor component type consists of.
      * Valid parameters are
      * <pre><code>
      * GL_BYTE           : 1
@@ -102,6 +100,43 @@ public class Accessors
             case GltfConstants.GL_INT: return 4;
             case GltfConstants.GL_UNSIGNED_INT: return 4;
             case GltfConstants.GL_FLOAT: return 4;
+            default:
+                break;
+        }
+        throw new IllegalArgumentException(
+            "Invalid accessor component type: "+componentType);
+    }
+
+    /**
+     * Returns the data type for the given accessor component type.
+     * Valid parameters and their return values are
+     * <pre><code>
+     * GL_BYTE           : byte.class
+     * GL_UNSIGNED_BYTE  : byte.class
+     * GL_SHORT          : short.class 
+     * GL_UNSIGNED_SHORT : short.class
+     * GL_INT            : int.class 
+     * GL_UNSIGNED_INT   : int.class
+     * GL_FLOAT          : float.class
+     * </code></pre>
+     *  
+     * @param componentType The component type
+     * @return The data type
+     * @throws IllegalArgumentException If the given type is none of the
+     * valid parameters
+     */
+    public static Class<?> getDataTypeForAccessorComponentType(
+        int componentType)
+    {
+        switch (componentType)
+        {
+            case GltfConstants.GL_BYTE: return byte.class;
+            case GltfConstants.GL_UNSIGNED_BYTE: return byte.class;
+            case GltfConstants.GL_SHORT: return short.class;
+            case GltfConstants.GL_UNSIGNED_SHORT: return short.class;
+            case GltfConstants.GL_INT: return int.class;
+            case GltfConstants.GL_UNSIGNED_INT: return int.class;
+            case GltfConstants.GL_FLOAT: return float.class;
             default:
                 break;
         }

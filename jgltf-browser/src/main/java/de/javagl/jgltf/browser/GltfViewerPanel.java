@@ -50,12 +50,9 @@ import javax.swing.JToggleButton;
 import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
 
-import de.javagl.jgltf.impl.v1.GlTF;
 import de.javagl.jgltf.model.BoundingBoxes;
 import de.javagl.jgltf.model.CameraModel;
-import de.javagl.jgltf.model.GltfData;
-import de.javagl.jgltf.validator.Validator;
-import de.javagl.jgltf.validator.ValidatorResult;
+import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.viewer.GltfViewer;
 import de.javagl.jgltf.viewer.jogl.GltfViewerJogl;
 import de.javagl.jgltf.viewer.lwjgl.GltfViewerLwjgl;
@@ -72,18 +69,12 @@ class GltfViewerPanel extends JPanel
     private static final long serialVersionUID = -6213789785308105683L;
 
     /**
-     * The {@link GltfData} that is shown in the {@link GltfViewer}
+     * The {@link GltfModel} that is shown in the {@link GltfViewer}
      */
-    private final GltfData gltfData;
+    private final GltfModel gltfModel;
     
     /**
-     * Whether the {@link GlTF} is "valid", as determined by the
-     * {@link Validator}
-     */
-    private final boolean gltfIsValid;
-    
-    /**
-     * The {@link GltfViewer} that may display the {@link GltfData}
+     * The {@link GltfViewer} that may display the {@link GltfModel}
      */
     private GltfViewer<? extends Component> gltfViewer;
     
@@ -99,7 +90,7 @@ class GltfViewerPanel extends JPanel
     
     /**
      * The combo box model containing the {@link CameraModel} instances 
-     * that have been found in the {@link GltfData}
+     * that have been found in the {@link GltfModel}
      */
     private DefaultComboBoxModel<CameraModel> cameraModelsComboBoxModel;
     
@@ -109,38 +100,27 @@ class GltfViewerPanel extends JPanel
     private final ExternalCameraRendering externalCamera;
     
     /**
-     * Creates a new viewer panel for the given {@link GltfData}
+     * Creates a new viewer panel for the given {@link GltfModel}
      * 
-     * @param gltfData The {@link GltfData}
+     * @param gltfModel The {@link GltfModel}
      */
-    GltfViewerPanel(GltfData gltfData)
+    GltfViewerPanel(GltfModel gltfModel)
     {
         super(new BorderLayout());
-        this.gltfData = gltfData;
+        this.gltfModel = gltfModel;
 
         viewerComponentContainer = new JPanel(new GridLayout(1,1));
         add(viewerComponentContainer, BorderLayout.CENTER);
         
         this.externalCamera = new ExternalCameraRendering();
         
-        Validator validator = new Validator(gltfData.getGltf());
-        ValidatorResult validatorResult = validator.validate();
-        if (validatorResult.hasErrors())
-        {
-            gltfIsValid = false;
-            createErrorMessage(validatorResult);
-        }
-        else
-        {
-            gltfIsValid = true;
-        }
         add(createControlPanel(), BorderLayout.NORTH);
     }
     
     
     /**
      * Dispose the current {@link GltfViewer}. This will stop all animations,
-     * remove the {@link GltfData} from the viewer, and set the viewer 
+     * remove the {@link GltfModel} from the viewer, and set the viewer 
      * to <code>null</code>
      */
     void disposeGltfViewer()
@@ -148,7 +128,7 @@ class GltfViewerPanel extends JPanel
         if (gltfViewer != null)
         {
             gltfViewer.setAnimationsRunning(false);
-            gltfViewer.removeGltfData(gltfData);
+            gltfViewer.removeGltfModel(gltfModel);
         }
         gltfViewer = null;
     }
@@ -165,7 +145,6 @@ class GltfViewerPanel extends JPanel
         
         // The button to show the current glTF
         JButton showButton = new JButton("Show current glTF");
-        showButton.setEnabled(gltfIsValid);
         mainControlPanel.add(showButton);
 
         // The combo box for selecting the JOGL- or LWJGL viewer implementation
@@ -264,22 +243,19 @@ class GltfViewerPanel extends JPanel
      */
     private void createViewer(String implementation)
     {
-        if (gltfIsValid)
+        if ("JOGL".equals(implementation))
         {
-            if ("JOGL".equals(implementation))
-            {
-                createViewer(GltfViewerJogl::new);
-            }
-            else
-            {
-                createViewer(GltfViewerLwjgl::new);
-            }
+            createViewer(GltfViewerJogl::new);
+        }
+        else
+        {
+            createViewer(GltfViewerLwjgl::new);
         }
     }
     
     /**
      * Update the combo box containing the {@link CameraModel} names, based on
-     * the current {@link GltfData}
+     * the current {@link GltfModel}
      */
     private void updateCameraModelsComboBox()
     {
@@ -287,7 +263,7 @@ class GltfViewerPanel extends JPanel
         cameraModelsComboBoxModel.addElement(null);
         if (gltfViewer != null)
         {
-            List<CameraModel> cameraModels = gltfViewer.getCameraModels(null);
+            List<CameraModel> cameraModels = gltfViewer.getCameraModels();
             for (CameraModel cameraModel : cameraModels)
             {
                 cameraModelsComboBoxModel.addElement(cameraModel);
@@ -318,7 +294,7 @@ class GltfViewerPanel extends JPanel
         // generously moves the camera so that for usual scenes 
         // everything is visible, regardless of the aspect ratio
         
-        float minMax[] = BoundingBoxes.computeBoundingBoxMinMax(gltfData);
+        float minMax[] = BoundingBoxes.computeBoundingBoxMinMax(gltfModel);
         
         // Compute diagonal length and center of the bounding box
         Point3f min = new Point3f();
@@ -378,7 +354,7 @@ class GltfViewerPanel extends JPanel
         {
             gltfViewer = constructor.get();
             gltfViewer.setAnimationsRunning(false);
-            gltfViewer.addGltfData(gltfData);
+            gltfViewer.addGltfModel(gltfModel);
             
             Component renderComponent = gltfViewer.getRenderComponent();
             externalCamera.setComponent(renderComponent);
@@ -405,20 +381,6 @@ class GltfViewerPanel extends JPanel
         }
         revalidate();
         repaint();
-    }
-    
-    /**
-     * Put a component containing an error message based on the given
-     * {@link ValidatorResult} at the place of the viewer component
-     * 
-     * @param validatorResult The {@link ValidatorResult}
-     */
-    private void createErrorMessage(ValidatorResult validatorResult)
-    {
-        JTextArea textArea = new JTextArea();
-        textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        textArea.setText(validatorResult.createString());
-        viewerComponentContainer.add(new JScrollPane(textArea));
     }
     
     // For some reason, calling repaint() on this panel does

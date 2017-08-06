@@ -26,10 +26,8 @@
  */
 package de.javagl.jgltf.model.gl;
 
-import de.javagl.jgltf.impl.v1.TechniqueParameters;
-
 /**
- * Enumeration of the {@link TechniqueParameters#getSemantic() technique 
+ * Enumeration of the {@link TechniqueParametersModel#getSemantic() technique 
  * parameters semantics}
  */
 public enum Semantic
@@ -126,6 +124,27 @@ public enum Semantic
             }
         }
         return false;
+    }
+    
+    /**
+     * Returns the semantic for the given string. If the string is 
+     * <code>null</code> or does not describe a valid semantic,
+     * then <code>null</code> is returned
+     * 
+     * @param string The string
+     * @return The semantic
+     */
+    public static Semantic forString(String string)
+    {
+        if (string == null)
+        {
+            return null;
+        }
+        if (!contains(string))
+        {
+            return null;
+        }
+        return Semantic.valueOf(string);
     }
     
 }

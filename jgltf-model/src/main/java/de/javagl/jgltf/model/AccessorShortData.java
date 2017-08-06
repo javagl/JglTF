@@ -68,7 +68,7 @@ public final class AccessorShortData
      * @throws IllegalArgumentException If the given byte buffer does not
      * have a sufficient capacity to provide the data for the accessor 
      */
-    AccessorShortData(int componentType,
+    public AccessorShortData(int componentType,
         ByteBuffer bufferViewByteBuffer, int byteOffset, int numElements,
         int numComponentsPerElement, Integer byteStride)
     {
@@ -166,7 +166,7 @@ public final class AccessorShortData
      * 
      * @return The minimum values
      */
-    public short[] getMin()
+    public short[] computeMin()
     {
         short result[] = new short[getNumComponentsPerElement()];
         Arrays.fill(result, Short.MAX_VALUE);
@@ -187,7 +187,7 @@ public final class AccessorShortData
      * 
      * @return The minimum values
      */
-    public short[] getMax()
+    public short[] computeMax()
     {
         short result[] = new short[getNumComponentsPerElement()];
         Arrays.fill(result, Short.MIN_VALUE);
@@ -209,7 +209,7 @@ public final class AccessorShortData
      * 
      * @return The minimum values
      */
-    public int[] getMinInt()
+    public int[] computeMinInt()
     {
         int result[] = new int[getNumComponentsPerElement()];
         Arrays.fill(result, Integer.MAX_VALUE);
@@ -231,7 +231,7 @@ public final class AccessorShortData
      * 
      * @return The minimum values
      */
-    public int[] getMaxInt()
+    public int[] computeMaxInt()
     {
         int result[] = new int[getNumComponentsPerElement()];
         Arrays.fill(result, Integer.MIN_VALUE);

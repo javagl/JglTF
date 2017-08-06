@@ -1,0 +1,233 @@
+/*
+ * www.javagl.de - JglTF
+ *
+ * Copyright 2015-2016 Marco Hutter - http://www.javagl.de
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
+package de.javagl.jgltf.model.v1.gl;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import de.javagl.jgltf.impl.v1.Material;
+import de.javagl.jgltf.impl.v1.Shader;
+import de.javagl.jgltf.impl.v1.Technique;
+import de.javagl.jgltf.impl.v1.TechniqueParameters;
+import de.javagl.jgltf.impl.v1.TechniqueStates;
+import de.javagl.jgltf.impl.v1.TechniqueStatesFunctions;
+import de.javagl.jgltf.model.MaterialModel;
+import de.javagl.jgltf.model.NodeModel;
+import de.javagl.jgltf.model.Optionals;
+import de.javagl.jgltf.model.gl.ProgramModel;
+import de.javagl.jgltf.model.gl.ShaderModel;
+import de.javagl.jgltf.model.gl.TechniqueModel;
+import de.javagl.jgltf.model.gl.TechniqueParametersModel;
+import de.javagl.jgltf.model.gl.TechniqueStatesFunctionsModel;
+import de.javagl.jgltf.model.gl.TechniqueStatesModel;
+import de.javagl.jgltf.model.gl.impl.DefaultProgramModel;
+import de.javagl.jgltf.model.gl.impl.DefaultShaderModel;
+import de.javagl.jgltf.model.gl.impl.DefaultTechniqueModel;
+import de.javagl.jgltf.model.gl.impl.DefaultTechniqueParametersModel;
+import de.javagl.jgltf.model.gl.impl.DefaultTechniqueStatesModel;
+import de.javagl.jgltf.model.gl.impl.v1.DefaultTechniqueStatesFunctionsModelV1;
+import de.javagl.jgltf.model.impl.DefaultMaterialModel;
+
+/**
+ * A class containing the default {@link TechniqueModel} and 
+ * {@link MaterialModel} instances that correspond to the
+ * default {@link Technique} and {@link Material} of glTF 1.0.
+ */
+public class DefaultModels
+{
+    /**
+     * The default vertex {@link ShaderModel}
+     */
+    private static final ShaderModel DEFAULT_VERTEX_SHADER_MODEL;
+    
+    /**
+     * The default fragment {@link ShaderModel}
+     */
+    private static final ShaderModel DEFAULT_FRAGMENT_SHADER_MODEL;
+    
+    /**
+     * The default {@link ProgramModel}
+     */
+    private static final DefaultProgramModel DEFAULT_PROGRAM_MODEL;
+    
+    /**
+     * The default {@link TechniqueModel}
+     */
+    private static final DefaultTechniqueModel DEFAULT_TECHNIQUE_MODEL;
+    
+    /**
+     * The default {@link MaterialModel}
+     */
+    private static final DefaultMaterialModel DEFAULT_MATERIAL_MODEL;
+    
+    static
+    {
+        // Create models for the default vertex- and fragment shader
+        Shader vertexShader = GltfDefaults.getDefaultVertexShader();
+        DEFAULT_VERTEX_SHADER_MODEL = 
+            new DefaultShaderModel(vertexShader.getUri());
+        
+        Shader fragmentShader = GltfDefaults.getDefaultFragmentShader();
+        DEFAULT_FRAGMENT_SHADER_MODEL = 
+            new DefaultShaderModel(fragmentShader.getUri());
+        
+        // Create a model for the default program
+        DEFAULT_PROGRAM_MODEL = new DefaultProgramModel();
+        DEFAULT_PROGRAM_MODEL.setVertexShaderModel(
+            DEFAULT_VERTEX_SHADER_MODEL);
+        DEFAULT_PROGRAM_MODEL.setFragmentShaderModel(
+            DEFAULT_FRAGMENT_SHADER_MODEL);
+        
+        // Create a model for the default technique
+        Technique technique = GltfDefaults.getDefaultTechnique();
+        DEFAULT_TECHNIQUE_MODEL = new DefaultTechniqueModel();
+        DEFAULT_TECHNIQUE_MODEL.setProgramModel(DEFAULT_PROGRAM_MODEL);
+        
+        addParametersForDefaultTechnique(technique, DEFAULT_TECHNIQUE_MODEL);
+        addAttributes(technique, DEFAULT_TECHNIQUE_MODEL);
+        addUniforms(technique, DEFAULT_TECHNIQUE_MODEL);
+        
+        TechniqueStates states = technique.getStates();
+        List<Integer> enable = Optionals.of(
+            states.getEnable(), 
+            states.defaultEnable());
+        
+        TechniqueStatesFunctions functions = states.getFunctions();
+        TechniqueStatesFunctionsModel techniqueStatesFunctionsModel =
+            new DefaultTechniqueStatesFunctionsModelV1(functions);
+        TechniqueStatesModel techniqueStatesModel = 
+            new DefaultTechniqueStatesModel(
+                enable, techniqueStatesFunctionsModel);
+        DEFAULT_TECHNIQUE_MODEL.setTechniqueStatesModel(techniqueStatesModel);
+
+        // Create a model for the default material
+        Material material = GltfDefaults.getDefaultMaterial();
+        Map<String, Object> values = Optionals.of(material.getValues());
+        DEFAULT_MATERIAL_MODEL = new DefaultMaterialModel(values);
+        DEFAULT_MATERIAL_MODEL.setTechniqueModel(DEFAULT_TECHNIQUE_MODEL);
+        
+    }
+    
+    /**
+     * Return the default {@link MaterialModel}
+     * 
+     * @return The default {@link MaterialModel}
+     */
+    public static MaterialModel getDefaultMaterialModel()
+    {
+        return DEFAULT_MATERIAL_MODEL;
+    }
+    
+    /**
+     * Return the default {@link TechniqueModel}
+     * 
+     * @return The default {@link TechniqueModel}
+     */
+    public static TechniqueModel getDefaultTechniqueModel()
+    {
+        return DEFAULT_TECHNIQUE_MODEL;
+    }
+    
+    /**
+     * Add all {@link TechniqueParametersModel} instances for the 
+     * attributes of the given {@link Technique} to the given
+     * {@link TechniqueModel}
+     * 
+     * @param technique The {@link Technique}
+     * @param techniqueModel The {@link TechniqueModel}
+     */
+    private static void addParametersForDefaultTechnique(
+        Technique technique, DefaultTechniqueModel techniqueModel)
+    {
+        Map<String, TechniqueParameters> parameters = 
+            Optionals.of(technique.getParameters());
+        for (Entry<String, TechniqueParameters> entry : parameters.entrySet())
+        {
+            String parameterName = entry.getKey();
+            TechniqueParameters parameter = entry.getValue();
+            
+            int type = parameter.getType();
+            int count = Optionals.of(parameter.getCount(), 1);
+            String semantic = parameter.getSemantic();
+            Object value = parameter.getValue();
+            
+            // The NodeModel is always null in the default technique
+            NodeModel nodeModel = null;
+            
+            TechniqueParametersModel techniqueParametersModel =
+                new DefaultTechniqueParametersModel(
+                    type, count, semantic, value, nodeModel);
+            techniqueModel.addParameter(
+                parameterName, techniqueParametersModel);
+        }
+    }
+    
+    /**
+     * Add all attribute entries of the given {@link Technique} to the given
+     * {@link TechniqueModel}
+     * 
+     * @param technique The {@link Technique}
+     * @param techniqueModel The {@link TechniqueModel}
+     */
+    private static void addAttributes(Technique technique,
+        DefaultTechniqueModel techniqueModel)
+    {
+        Map<String, String> attributes = 
+            Optionals.of(technique.getAttributes());
+        for (Entry<String, String> entry : attributes.entrySet())
+        {
+            String attributeName = entry.getKey();
+            String parameterName = entry.getValue();
+            techniqueModel.addAttribute(attributeName, parameterName);
+        }
+    }
+
+    /**
+     * Add all uniform entries of the given {@link Technique} to the given
+     * {@link TechniqueModel}
+     * 
+     * @param technique The {@link Technique}
+     * @param techniqueModel The {@link TechniqueModel}
+     */
+    private static void addUniforms(Technique technique,
+        DefaultTechniqueModel techniqueModel)
+    {
+        Map<String, String> uniforms = 
+            Optionals.of(technique.getUniforms());
+        for (Entry<String, String> entry : uniforms.entrySet())
+        {
+            String uniformName = entry.getKey();
+            String parameterName = entry.getValue();
+            techniqueModel.addUniform(uniformName, parameterName);
+        }
+    }
+    
+    
+    
+    
+}

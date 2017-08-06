@@ -27,7 +27,6 @@
 package de.javagl.jgltf.browser;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -50,7 +49,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -72,13 +70,11 @@ import de.javagl.common.ui.tree.filtered.FilteredTree;
 import de.javagl.common.ui.tree.filtered.TreeModelFilter;
 import de.javagl.jgltf.browser.ObjectTrees.NodeEntry;
 import de.javagl.jgltf.browser.Resolver.ResolvedEntity;
-import de.javagl.jgltf.impl.v1.GlTF;
-import de.javagl.jgltf.impl.v1.Material;
-import de.javagl.jgltf.model.GltfData;
+import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.viewer.GltfViewer;
 
 /**
- * A panel for browsing through the {@link GlTF} of a {@link GltfData}
+ * A panel for browsing through the glTF of a {@link GltfModel}
  * and displaying information about the glTF entities. 
  */
 class GltfBrowserPanel extends JPanel
@@ -95,15 +91,9 @@ class GltfBrowserPanel extends JPanel
     private static final long serialVersionUID = 8959452050508861357L;
 
     /**
-     * Compile-time flag for the debug mode, where material values may
-     * be edited.
+     * The {@link GltfModel} that is displayed in this panel
      */
-    private static final boolean ALLOW_MATERIAL_EDITING = false;
-    
-    /**
-     * The {@link GltfData} that is displayed in this panel
-     */
-    private final GltfData gltfData;
+    private final GltfModel gltfModel;
     
     /**
      * The tree that displays the glTF structure
@@ -178,23 +168,22 @@ class GltfBrowserPanel extends JPanel
     private final JPanel infoPanelContainer;
     
     /**
-     * Creates a new browser panel for the given {@link GltfData}
+     * Creates a new browser panel for the given {@link GltfModel}
      * 
-     * @param gltfData The {@link GltfData}
-     * @param jsonString The JSON string that the glTF was read from.
-     * This may be <code>null</code> if the given {@link GltfData} was
-     * not read, but created programmatically.
+     * @param gltf The glTF
+     * @param gltfModel The {@link GltfModel}
      */
-    GltfBrowserPanel(GltfData gltfData, String jsonString)
+    GltfBrowserPanel(Object gltf, GltfModel gltfModel)
     {
         super(new BorderLayout());
-        Objects.requireNonNull(gltfData, "The gltfData may not be null");
         
-        this.gltfData = gltfData;
+        Objects.requireNonNull(
+            gltf, "The gltf may not be null");
+        this.gltfModel = Objects.requireNonNull(
+            gltfModel, "The gltfModel may not be null");
         this.selectionPathHistory = new LinkedList<TreePath>();
-        this.infoComponentFactory = 
-            new InfoComponentFactory(gltfData, jsonString);
-        this.resolver = new Resolver(gltfData.getGltf());
+        this.infoComponentFactory = new InfoComponentFactory(gltfModel);
+        this.resolver = new Resolver(gltf);
         
         add(createControlPanel(), BorderLayout.NORTH);
         
@@ -210,7 +199,7 @@ class GltfBrowserPanel extends JPanel
         });
         
         mainSplitPane.setLeftComponent(
-            createTreePanel(gltfData.getGltf()));
+            createTreePanel(gltf));
         
         mainTabbedPane = new JTabbedPane();
         mainSplitPane.setRightComponent(mainTabbedPane);
@@ -218,13 +207,13 @@ class GltfBrowserPanel extends JPanel
         infoPanelContainer = new JPanel(new GridLayout(1,1));
         mainTabbedPane.addTab("Info", infoPanelContainer);
         
-        gltfViewerPanel = new GltfViewerPanel(gltfData);
+        gltfViewerPanel = new GltfViewerPanel(gltfModel);
         mainTabbedPane.addTab("View", gltfViewerPanel);
     }
     
     /**
      * Dispose the current {@link GltfViewer}. This will stop all animations,
-     * remove the {@link GltfData} from the viewer, and set the viewer to
+     * remove the {@link GltfModel} from the viewer, and set the viewer to
      * <code>null</code>
      */
     void disposeGltfViewer()
@@ -233,23 +222,23 @@ class GltfBrowserPanel extends JPanel
     }
     
     /**
-     * Returns the {@link GltfData} that is displayed in this panel
+     * Returns the {@link GltfModel} that is displayed in this panel
      * 
-     * @return The {@link GltfData}
+     * @return The {@link GltfModel}
      */
-    GltfData getGltfData()
+    GltfModel getGltfModel()
     {
-        return gltfData;
+        return gltfModel;
     }
     
     /**
      * Create the panel containing the (filterable, browsable) tree 
-     * showing the structure of the given {@link GlTF}
+     * showing the structure of the given glTF
      *  
-     * @param gltf The {@link GlTF}
+     * @param gltf The glTF
      * @return The tree panel
      */
-    private JPanel createTreePanel(GlTF gltf)
+    private JPanel createTreePanel(Object gltf)
     {
         JPanel treePanel = new JPanel(new BorderLayout());
 
@@ -455,18 +444,6 @@ class GltfBrowserPanel extends JPanel
             return false;
         }
         
-        if (ALLOW_MATERIAL_EDITING)
-        {
-            if (nodeEntryValue instanceof Material)
-            {
-                String pathString = ObjectTrees.createPathString(treePath);
-                String materialId =
-                    pathString.substring(pathString.lastIndexOf('.') + 1);
-                popupMenu.add(createMaterialEditingMenuItem(materialId));
-                return true;
-            }
-        }
-        
         String pathString = ObjectTrees.createPathString(treePath);
         ResolvedEntity resolvedEntity = 
             resolver.resolve(pathString, nodeEntryValue);
@@ -486,38 +463,6 @@ class GltfBrowserPanel extends JPanel
         return true;
     }
     
-    /**
-     * Create a menu item for editing the specified {@link Material}
-     *
-     * @param materialId The {@link Material} ID
-     * @return The menu item
-     */
-    private JMenuItem createMaterialEditingMenuItem(
-        String materialId)
-    {
-        JMenuItem item = new JMenuItem("Edit " + materialId);
-        item.addActionListener(e -> showMaterialValuesEditor(materialId));
-        return item;
-    }
-
-    /**
-     * Show the editor for the specified {@link Material}
-     * 
-     * @param materialId The {@link Material} ID
-     */
-    private void showMaterialValuesEditor(String materialId)
-    {
-        GlTF gltf = gltfData.getGltf();
-        JDialog dialog = new JDialog();
-        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        Component materialValuesEditorPanel =
-            new MaterialValuesEditorPanel(gltf, materialId, 
-                () -> gltfViewerPanel.repaint());
-        dialog.getContentPane().add(materialValuesEditorPanel);
-        dialog.pack();
-        dialog.setLocationRelativeTo(this);
-        dialog.setVisible(true);
-    }
 
     /**
      * Create a disabled menu item with the given text

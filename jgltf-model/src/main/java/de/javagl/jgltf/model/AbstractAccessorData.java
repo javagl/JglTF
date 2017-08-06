@@ -145,9 +145,9 @@ abstract class AbstractAccessorData implements AccessorData
      */
     protected final int getByteIndex(int elementIndex, int componentIndex)
     {
-        int byteIndex = byteOffset + 
-            elementIndex * byteStridePerElement + 
-            componentIndex * numBytesPerComponent;
+        int byteIndex = byteOffset 
+            + elementIndex * byteStridePerElement
+            + componentIndex * numBytesPerComponent;
         return byteIndex;
     }
     

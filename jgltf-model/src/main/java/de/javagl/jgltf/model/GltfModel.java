@@ -1,7 +1,7 @@
 /*
  * www.javagl.de - JglTF
  *
- * Copyright 2015-2016 Marco Hutter - http://www.javagl.de
+ * Copyright 2015-2017 Marco Hutter - http://www.javagl.de
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -26,131 +26,52 @@
  */
 package de.javagl.jgltf.model;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.logging.Logger;
-
-import de.javagl.jgltf.impl.v1.Camera;
-import de.javagl.jgltf.impl.v1.GlTF;
-import de.javagl.jgltf.impl.v1.Node;
 
 /**
- * A class that serves as a data model for a {@link GlTF}.<br>
+ * Interface for a model that was created from a glTF asset
  */
-public final class GltfModel
+public interface GltfModel
 {
     /**
-     * The logger used in this class
+     * Return a list of all {@link GltfReference} objects that refer to
+     * external resources for this model
+     * 
+     * @return The {@link GltfReference} objects
      */
-    private static final Logger logger = 
-        Logger.getLogger(GltfModel.class.getName());
-
-    /**
-     * The {@link GlTF} of this model
-     */
-    private final GlTF gltf;
-
-    /**
-     * The mapping from {@link Node} IDs to {@link NodeModel} instances
-     */
-    private final Map<String, NodeModel> nodeIdToNodeModel;
+    List<GltfReference> getReferences();
     
     /**
-     * The {@link CameraModel} instances that have been created from
-     * the {@link Camera} references of {@link Node} instances
+     * Returns an unmodifiable view on the list of {@link AccessorModel} 
+     * instances that have been created for the glTF.
+     * 
+     * @return The {@link AccessorModel} instances
      */
-    private final List<CameraModel> cameraModels;
+    List<AccessorModel> getAccessorModels();
     
     /**
-     * Creates a new model for the given glTF
+     * Returns an unmodifiable view on the list of {@link AnimationModel} 
+     * instances that have been created for the glTF.
      * 
-     * @param gltf The {@link GlTF}
+     * @return The {@link AnimationModel} instances
      */
-    public GltfModel(GlTF gltf)
-    {
-        Objects.requireNonNull(gltf, 
-            "The gltf may not be null");
-
-        this.gltf = gltf;
-        this.nodeIdToNodeModel = createNodeIdToNodeModel();
-        this.cameraModels = createCameraModels();
-    }
+    List<AnimationModel> getAnimationModels();
 
     /**
-     * Compute the mapping from {@link Node} IDs to {@link NodeModel} instances
+     * Returns an unmodifiable view on the list of {@link BufferModel} 
+     * instances that have been created for the glTF.
      * 
-     * @return The mapping
+     * @return The {@link BufferModel} instances
      */
-    private Map<String, NodeModel> createNodeIdToNodeModel()
-    {
-        Map<String, NodeModel> map = new LinkedHashMap<String, NodeModel>();
-        Map<String, Node> nodes = Optionals.of(gltf.getNodes());
-        for (String nodeId : nodes.keySet())
-        {
-            Node node = nodes.get(nodeId);
-            NodeModel nodeModel = new NodeModel(node);
-            map.put(nodeId, nodeModel);
-        }
-        for (String nodeId : map.keySet())
-        {
-            NodeModel nodeModel = map.get(nodeId);
-            Node node = nodeModel.getNode();
-            List<String> childIds = Optionals.of(node.getChildren());
-            for (String childId : childIds)
-            {
-                NodeModel child = map.get(childId);
-                if (child == null)
-                {
-                    logger.severe("Node with ID " + childId + " not found");
-                }
-                else
-                {
-                    nodeModel.addChild(child);
-                }
-            }
-        }
-        return map;
-    }
-    
-    /**
-     * Create the {@link CameraModel} instances, based on the {@link Node} 
-     * objects of the glTF that refer to a {@link Camera}.
-     * 
-     * @return The {@link CameraModel} instances
-     */
-    private List<CameraModel> createCameraModels()
-    {
-        List<CameraModel> list = new ArrayList<CameraModel>();
-        Map<String, Node> nodes = Optionals.of(gltf.getNodes());
-        Map<String, Camera> cameras = Optionals.of(gltf.getCameras());
-        for (String nodeId : nodes.keySet())
-        {
-            Node node = nodes.get(nodeId);
-            String cameraId = node.getCamera();
-            if (cameraId != null)
-            {
-                Camera camera = cameras.get(cameraId);
-                if (camera == null)
-                {
-                    logger.severe("Camera with ID " + cameraId + " not found");
-                }
-                else
-                {
-                    NodeModel nodeModel = nodeIdToNodeModel.get(nodeId);
-                    String name = nodeId + "." + cameraId;
-                    CameraModel cameraModel = 
-                        new CameraModel(name, camera, nodeModel);
-                    list.add(cameraModel);
-                }
-            }
-        }
-        return list;
-    }
+    List<BufferModel> getBufferModels();
 
+    /**
+     * Returns an unmodifiable view on the list of {@link BufferViewModel} 
+     * instances that have been created for the glTF.
+     * 
+     * @return The {@link BufferViewModel} instances
+     */
+    List<BufferViewModel> getBufferViewModels();
     
     /**
      * Returns an unmodifiable view on the list of {@link CameraModel} 
@@ -158,39 +79,57 @@ public final class GltfModel
      * 
      * @return The {@link CameraModel} instances
      */
-    public List<CameraModel> getCameraModels()
-    {
-        return Collections.unmodifiableList(cameraModels);
-    }
+    List<CameraModel> getCameraModels();
+
+    /**
+     * Returns an unmodifiable view on the list of {@link ImageModel} 
+     * instances that have been created for the glTF.
+     * 
+     * @return The {@link ImageModel} instances
+     */
+    List<ImageModel> getImageModels();
     
+    /**
+     * Returns an unmodifiable view on the list of {@link MaterialModel} 
+     * instances that have been created for the glTF.
+     * 
+     * @return The {@link MaterialModel} instances
+     */
+    List<MaterialModel> getMaterialModels();
+
     /**
      * Returns an unmodifiable view on the list of {@link NodeModel} 
      * instances that have been created for the glTF.
      * 
      * @return The {@link NodeModel} instances
      */
-    public List<NodeModel> getNodeModels()
-    {
-        // TODO: This should return the internal list after
-        // the update to glTF 2.0 is completed
-        return Collections.unmodifiableList(
-            new ArrayList<NodeModel>(nodeIdToNodeModel.values()));
-    }
+    List<NodeModel> getNodeModels();
+
+    /**
+     * Returns an unmodifiable view on the list of {@link SceneModel} 
+     * instances that have been created for the glTF.
+     * 
+     * @return The {@link SceneModel} instances
+     */
+    List<SceneModel> getSceneModels();
+
+    /**
+     * Returns an unmodifiable view on the list of {@link TextureModel} 
+     * instances that have been created for the glTF.
+     * 
+     * @return The {@link TextureModel} instances
+     */
+    List<TextureModel> getTextureModels();
     
     /**
-     * Returns an unmodifiable view on the map from node IDs to 
-     * {@link NodeModel} instances that have been created for the glTF.
+     * Returns the raw glTF object. Depending on the version of the asset
+     * that this model was created from, this may be a 
+     * {@link de.javagl.jgltf.impl.v1.GlTF version 1.0 glTF} or a
+     * {@link de.javagl.jgltf.impl.v1.GlTF version 2.0 glTF}.<br>
+     * <br>
+     * This method should usually not be called by clients.
      * 
-     * @return The mapping from IDs to {@link NodeModel} instances
-     * 
-     * @deprecated This will be a list in glTF 2.0
+     * @return The glTF object
      */
-    public Map<String, NodeModel> getNodeModelsMap()
-    {
-        return Collections.unmodifiableMap(nodeIdToNodeModel);
-    }
-    
-    
-    
-    
+    Object getGltf();
 }

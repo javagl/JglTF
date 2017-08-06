@@ -52,7 +52,7 @@ class ObjSplitting
      * The logger used in this class
      */
     private static final Logger logger = 
-        Logger.getLogger(ObjGltfDataCreator.class.getName());
+        Logger.getLogger(ObjGltfModelCreatorV1.class.getName());
     
     /**
      * The log level

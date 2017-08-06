@@ -39,7 +39,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 
 import de.javagl.jgltf.model.GltfConstants;
-import de.javagl.jgltf.obj.ObjGltfDataCreator.BufferStrategy;
+import de.javagl.jgltf.obj.ObjGltfModelCreatorV1.BufferStrategy;
 
 /**
  * A panel that will be used as the accessory component for the file chooser

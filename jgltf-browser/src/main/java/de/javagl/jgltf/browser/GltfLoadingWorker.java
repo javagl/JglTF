@@ -42,8 +42,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import de.javagl.jgltf.browser.io.GltfDataReaderThreaded;
-import de.javagl.jgltf.model.GltfData;
+import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.io.IO;
 import de.javagl.swing.tasks.ProgressListener;
 import de.javagl.swing.tasks.SwingTask;
@@ -51,28 +50,28 @@ import de.javagl.swing.tasks.SwingTaskExecutors;
 import de.javagl.swing.tasks.SwingTaskViews;
 
 /**
- * The worker class for loading glTF data from a URI. This is a swing task
- * that performs the loading in a background thread, while showing a modal
- * dialog with progress information. 
+ * The worker class for loading a {@link GltfModel} from a URI. This is a 
+ * swing task that performs the loading in a background thread, while 
+ * showing a modal dialog with progress information. 
  */
-final class GltfLoadingWorker extends SwingTask<GltfData, Object>
+final class GltfLoadingWorker extends SwingTask<GltfModel, Object>
 {
     /**
      * The logger used in this class
      */
     private static final Logger logger = 
         Logger.getLogger(GltfBrowserApplication.class.getName());
-    
+
     /**
      * The application which created this worker
      */
     private final GltfBrowserApplication owner;
-    
+
     /**
      * The main frame of the application, used as parent for dialogs
      */
     private final JFrame frame;
-    
+
     /**
      * The URI that the data is loaded from
      */
@@ -81,7 +80,7 @@ final class GltfLoadingWorker extends SwingTask<GltfData, Object>
     /**
      * The reader that will execute the background tasks
      */
-    private final GltfDataReaderThreaded gltfDataReaderThreaded;
+    private final GltfModelReaderThreaded gltfModelReaderThreaded;
 
     /**
      * The {@link GltfLoaderPanel} that will be shown in the modal
@@ -102,12 +101,12 @@ final class GltfLoadingWorker extends SwingTask<GltfData, Object>
         this.owner = owner;
         this.frame = frame;
         this.uri = uri;
-        
-        this.gltfDataReaderThreaded = new GltfDataReaderThreaded(-1);
+
+        this.gltfModelReaderThreaded = new GltfModelReaderThreaded(-1);
         this.gltfLoaderPanel = new GltfLoaderPanel(
-            gltfDataReaderThreaded.getObservableExecutorService());
+            gltfModelReaderThreaded.getObservableExecutorService());
     }
-    
+
     /**
      * Load the data from the URI that was given in the constructor,
      * showing a modal dialog with progress information.
@@ -118,14 +117,14 @@ final class GltfLoadingWorker extends SwingTask<GltfData, Object>
             .setTitle("Loading")
             .setMillisToPopup(0)
             .setSwingTaskViewFactory(c -> 
-                SwingTaskViews.create(c, gltfLoaderPanel, false))
+        SwingTaskViews.create(c, gltfLoaderPanel, false))
             .setCancelable(true)
             .build()
             .execute();
     }
-        
+
     @Override
-    protected GltfData doInBackground() throws IOException
+    protected GltfModel doInBackground() throws IOException
     {
         String message = "Loading glTF from " + IO.extractFileName(uri);
         long contentLength = IO.getContentLength(uri);
@@ -136,7 +135,7 @@ final class GltfLoadingWorker extends SwingTask<GltfData, Object>
             message += " (" + contentLengthString + " bytes)";
         }
         setMessage(message);
-        
+
         ProgressListener progressListener = new ProgressListener()
         {
             @Override
@@ -150,15 +149,15 @@ final class GltfLoadingWorker extends SwingTask<GltfData, Object>
                 setProgress(progress);
             }
         }; 
-        gltfDataReaderThreaded.addProgressListener(progressListener);
-        gltfDataReaderThreaded.setJsonErrorConsumer(jsonError ->
+        gltfModelReaderThreaded.addProgressListener(progressListener);
+        gltfModelReaderThreaded.setJsonErrorConsumer(jsonError ->
         {
             String jsonErrorString = 
                 jsonError.getMessage() + ",\n at JSON path: " + 
-                jsonError.getJsonPathString() + "\n";
+                    jsonError.getJsonPathString() + "\n";
             gltfLoaderPanel.appendMessage(jsonErrorString);
         });
-        return gltfDataReaderThreaded.readGltfData(uri);
+        return gltfModelReaderThreaded.readGltfModel(uri);
     }
 
     @Override
@@ -166,16 +165,15 @@ final class GltfLoadingWorker extends SwingTask<GltfData, Object>
     {
         try
         {
-            GltfData gltfData = get();
+            GltfModel gltfModel = get();
             String fileName = IO.extractFileName(uri);
-            String jsonString = gltfDataReaderThreaded.getJsonString();
-            owner.createGltfBrowserPanel(fileName, gltfData, jsonString);
+            owner.createGltfBrowserPanel(fileName, gltfModel);
         } 
         catch (CancellationException e)
         {
             logger.info("Cancelled loading " + uri + 
                 " (" + e.getMessage() + ")");
-            gltfDataReaderThreaded.cancel();
+            gltfModelReaderThreaded.cancel();
             //e.printStackTrace();
             return;
         }
@@ -183,14 +181,14 @@ final class GltfLoadingWorker extends SwingTask<GltfData, Object>
         {
             logger.info("Interrupted while loading " + uri + 
                 " (" + e.getMessage() + ")");
-            gltfDataReaderThreaded.cancel();
+            gltfModelReaderThreaded.cancel();
             Thread.currentThread().interrupt();
         }
         catch (ExecutionException e)
         {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
-            
+
             JTextArea textArea = new JTextArea();
             textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
             textArea.setEditable(false);
@@ -198,12 +196,12 @@ final class GltfLoadingWorker extends SwingTask<GltfData, Object>
                 "\n" + sw.toString());
             JScrollPane scrollPane = new JScrollPane(textArea);
             scrollPane.setPreferredSize(new Dimension(800, 600));
-            
+
             JOptionPane.showMessageDialog(frame,
                 scrollPane, "Error",
                 JOptionPane.ERROR_MESSAGE);
             return;
         }
     }
-            
+
 }

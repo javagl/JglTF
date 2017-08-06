@@ -68,7 +68,7 @@ public final class AccessorIntData
      * @throws IllegalArgumentException If the given byte buffer does not
      * have a sufficient capacity to provide the data for the accessor 
      */
-    AccessorIntData(int componentType,
+    public AccessorIntData(int componentType,
         ByteBuffer bufferViewByteBuffer, int byteOffset, int numElements,
         int numComponentsPerElement, Integer byteStride)
     {
@@ -166,7 +166,7 @@ public final class AccessorIntData
      * 
      * @return The minimum values
      */
-    public int[] getMin()
+    public int[] computeMin()
     {
         int result[] = new int[getNumComponentsPerElement()];
         Arrays.fill(result, Integer.MAX_VALUE);
@@ -187,7 +187,7 @@ public final class AccessorIntData
      * 
      * @return The minimum values
      */
-    public int[] getMax()
+    public int[] computeMax()
     {
         int result[] = new int[getNumComponentsPerElement()];
         Arrays.fill(result, Integer.MIN_VALUE);
@@ -209,7 +209,7 @@ public final class AccessorIntData
      * 
      * @return The minimum values
      */
-    public long[] getMinLong()
+    public long[] computeMinLong()
     {
         long result[] = new long[getNumComponentsPerElement()];
         Arrays.fill(result, Long.MAX_VALUE);
@@ -231,7 +231,7 @@ public final class AccessorIntData
      * 
      * @return The minimum values
      */
-    public long[] getMaxLong()
+    public long[] computeMaxLong()
     {
         long result[] = new long[getNumComponentsPerElement()];
         Arrays.fill(result, Long.MIN_VALUE);

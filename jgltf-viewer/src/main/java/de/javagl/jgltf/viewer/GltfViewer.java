@@ -28,9 +28,8 @@ package de.javagl.jgltf.viewer;
 
 import java.util.List;
 
-import de.javagl.jgltf.impl.v1.GlTF;
 import de.javagl.jgltf.model.CameraModel;
-import de.javagl.jgltf.model.GltfData;
+import de.javagl.jgltf.model.GltfModel;
 
 /**
  * Interface describing a simple glTF viewer
@@ -45,10 +44,10 @@ public interface GltfViewer<C>
      * If the given {@link ExternalCamera} is not <code>null</code>, then it 
      * may supply a view- and projection matrix from an external camera that 
      * will be used as an alternative to the camera information that is 
-     * found in the {@link GlTF}.<br>
+     * found in the {@link GltfModel}.<br>
      * <br>
-     * Note: This has to be set <b>before</b> any {@link GltfData} is added
-     * with {@link #addGltfData(GltfData)}. Otherwise, the external camera
+     * Note: This has to be set <b>before</b> any {@link GltfModel} is added
+     * with {@link #addGltfModel(GltfModel)}. Otherwise, the external camera
      * will not affect the rendered glTF.
      * 
      * @param externalCamera The optional {@link ExternalCamera}
@@ -89,53 +88,46 @@ public interface GltfViewer<C>
     void triggerRendering();
 
     /**
-     * Add the given {@link GltfData} to this viewer. This will prepare
+     * Add the given {@link GltfModel} to this viewer. This will prepare
      * the internal data structures that are required for rendering, and 
      * trigger a new rendering pass. At the beginning of the rendering 
      * pass, the initialization of the rendering structures will be 
      * performed, on the rendering thread.<br>
-     * <br>
-     * If the {@link GlTF} in the given {@link GltfData} is not valid,
-     * then an error message will be printed instead.
      * 
-     * @param gltfData The {@link GltfData}
+     * @param gltfModel The {@link GltfModel}
      */
-    void addGltfData(GltfData gltfData);
+    void addGltfModel(GltfModel gltfModel);
 
     /**
-     * Remove the given {@link GltfData} from this viewer. This will trigger
+     * Remove the given {@link GltfModel} from this viewer. This will trigger
      * a new rendering pass, and at the beginning of the rendering pass, the
      * internal data structures will be deleted.
      * 
-     * @param gltfData The {@link GltfData} to remove
+     * @param gltfModel The {@link GltfModel} to remove
      */
-    void removeGltfData(GltfData gltfData);
+    void removeGltfModel(GltfModel gltfModel);
 
     /**
      * Returns an unmodifiable list containing all {@link CameraModel}
-     * instances that are created from the given {@link GltfData}. If
-     * the given {@link GltfData} is <code>null</code>, then all
-     * {@link CameraModel} instances will be returned.
+     * instances that are contained in the {@link GltfModel} instances
+     * that have been added to this viewer.
      * 
-     * @param gltfData The optional {@link GltfData}
      * @return The {@link CameraModel} instances
-     * @throws IllegalArgumentException If the given {@link GltfData} is
-     * not <code>null</code> and not contained in this viewer
      */
-    List<CameraModel> getCameraModels(GltfData gltfData);
+    List<CameraModel> getCameraModels();
     
     /**
      * Set {@link CameraModel} that should be used for rendering the 
-     * given {@link GltfData}. If the given {@link GltfData} is 
+     * given {@link GltfModel}. If the given {@link GltfModel} is 
      * <code>null</code>, then the {@link CameraModel} will be used
-     * for rendering all {@link GltfData} instances.
+     * for rendering all {@link GltfModel} instances.
      * If the {@link CameraModel} is <code>null</code>, then the external 
      * camera will be used. See {@link #setExternalCamera(ExternalCamera)}.
      * 
-     * @param gltfData The optional {@link GltfData}
+     * @param gltfModel The optional {@link GltfModel}
      * @param cameraModel The {@link CameraModel}
-     * @throws IllegalArgumentException If the given {@link GltfData} is
+     * @throws IllegalArgumentException If the given {@link GltfModel} is
      * not <code>null</code> and not contained in this viewer
      */
-    void setCurrentCameraModel(GltfData gltfData, CameraModel cameraModel);
+    void setCurrentCameraModel(GltfModel gltfModel, CameraModel cameraModel);
 }

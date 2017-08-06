@@ -37,18 +37,18 @@ import java.util.Objects;
 public class BoundingBoxes
 {
     /**
-     * Compute the bounding box of the given {@link GltfData}. The result
+     * Compute the bounding box of the given {@link GltfModel}. The result
      * will be an array <code>[minX, minY, minZ, maxX, maxY, maxZ]</code>.
      * 
-     * @param gltfData The {@link GltfData}
+     * @param gltfModel The {@link GltfModel}
      * @return The bounding box
      */
-    public static float[] computeBoundingBoxMinMax(GltfData gltfData)
+    public static float[] computeBoundingBoxMinMax(GltfModel gltfModel)
     {
-        Objects.requireNonNull(gltfData, "The gltfData may not be null");
+        Objects.requireNonNull(gltfModel, "The gltfModel may not be null");
         
         BoundingBoxComputer boundingBoxComputer =
-            new BoundingBoxComputer(gltfData);
+            new BoundingBoxComputer(gltfModel);
         BoundingBox boundingBox = boundingBoxComputer.compute();
         
         float result[] = {

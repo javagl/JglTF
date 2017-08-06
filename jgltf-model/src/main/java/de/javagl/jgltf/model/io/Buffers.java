@@ -26,7 +26,6 @@
  */
 package de.javagl.jgltf.model.io;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -39,7 +38,8 @@ public class Buffers
     /**
      * Returns the contents of the given byte buffer as a string, using
      * the platform's default charset, or <code>null</code> if the given 
-     * buffer is <code>null</code>.
+     * buffer is <code>null</code>. The position and limit of the given
+     * buffer will be unaffected by this call.
      * 
      * @param byteBuffer The byte buffer
      * @return The data as a string
@@ -54,11 +54,30 @@ public class Buffers
         byteBuffer.slice().get(array);
         return new String(array);
     }
+
+    /**
+     * Create a slice of the given byte buffer, using its current position
+     * and limit. The returned slice will have the same byte order as the
+     * given buffer. If the given buffer is <code>null</code>, then
+     * <code>null</code> will be returned.
+     * 
+     * @param byteBuffer The byte buffer
+     * @return The slice
+     */
+    public static ByteBuffer createSlice(ByteBuffer byteBuffer)
+    {
+        if (byteBuffer == null)
+        {
+            return null;
+        }
+        return byteBuffer.slice().order(byteBuffer.order());
+    }
     
     /**
      * Create a slice of the given byte buffer, in the specified range.
      * The returned buffer will have the same byte order as the given
-     * buffer.
+     * buffer. If the given buffer is <code>null</code>, then
+     * <code>null</code> will be returned.
      * 
      * @param byteBuffer The byte buffer
      * @param position The position where the slice should start
@@ -70,11 +89,22 @@ public class Buffers
     public static ByteBuffer createSlice(
         ByteBuffer byteBuffer, int position, int length)
     {
+        if (byteBuffer == null)
+        {
+            return null;
+        }
         int oldPosition = byteBuffer.position();
         int oldLimit = byteBuffer.limit();
         try
         {
-            byteBuffer.limit(position + length);
+            int newLimit = position + length;
+            if (newLimit > byteBuffer.capacity())
+            {
+                throw new IllegalArgumentException(
+                    "The new limit is " + newLimit + ", but the capacity is "
+                    + byteBuffer.capacity());
+            }
+            byteBuffer.limit(newLimit);
             byteBuffer.position(position);
             ByteBuffer slice = byteBuffer.slice();
             slice.order(byteBuffer.order());
@@ -118,8 +148,8 @@ public class Buffers
     }
     
     /**
-     * Create a new direct byte buffer with the given size, and native byte
-     * order.
+     * Create a new direct byte buffer with the given size, and little-endian
+     * byte order.
      * 
      * @param size The size of the buffer
      * @return The byte buffer
@@ -128,7 +158,7 @@ public class Buffers
     public static ByteBuffer create(int size)
     {
         ByteBuffer byteBuffer = ByteBuffer.allocateDirect(size);
-        byteBuffer.order(ByteOrder.nativeOrder());
+        byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
         return byteBuffer;
     }
     
@@ -141,33 +171,9 @@ public class Buffers
      * @param byteBuffer The buffer
      * @return The input stream
      */
-    public static InputStream createByteBufferInputStream(
-        ByteBuffer byteBuffer)
+    public static InputStream createByteBufferInputStream(ByteBuffer byteBuffer)
     {
-        return new InputStream()
-        {
-            @Override
-            public int read() throws IOException
-            {
-                if (!byteBuffer.hasRemaining())
-                {
-                    return -1;
-                }
-                return byteBuffer.get() & 0xFF;
-            }
-    
-            @Override
-            public int read(byte[] bytes, int off, int len) throws IOException
-            {
-                if (!byteBuffer.hasRemaining())
-                {
-                    return -1;
-                }
-                int readLength = Math.min(len, byteBuffer.remaining());
-                byteBuffer.get(bytes, off, readLength);
-                return readLength;
-            }
-        };
+        return new ByteBufferInputStream(byteBuffer);
     }
     
 

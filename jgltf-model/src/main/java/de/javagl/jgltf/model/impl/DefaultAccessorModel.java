@@ -1,0 +1,229 @@
+/*
+ * www.javagl.de - JglTF
+ *
+ * Copyright 2015-2017 Marco Hutter - http://www.javagl.de
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
+package de.javagl.jgltf.model.impl;
+
+import java.util.logging.Logger;
+
+import de.javagl.jgltf.model.AccessorData;
+import de.javagl.jgltf.model.AccessorDatas;
+import de.javagl.jgltf.model.AccessorModel;
+import de.javagl.jgltf.model.Accessors;
+import de.javagl.jgltf.model.BufferViewModel;
+import de.javagl.jgltf.model.ElementType;
+
+/**
+ * Implementation of an {@link AccessorModel} based on glTF 1.0
+ */
+public final class DefaultAccessorModel implements AccessorModel
+{
+    /**
+     * The logger used in this class
+     */
+    private static final Logger logger = 
+        Logger.getLogger(DefaultAccessorModel.class.getName());
+    
+    /**
+     * The component type, as a GL constant
+     */
+    private final int componentType;
+    
+    /**
+     * The offset in bytes, referring to the buffer view
+     */
+    private final int byteOffset;
+    
+    /**
+     * The {@link BufferViewModel} for this model
+     */
+    private BufferViewModel bufferViewModel;
+    
+    /**
+     * The {@link ElementType} of this accessor
+     */
+    private ElementType elementType;
+    
+    /**
+     * The number of elements
+     */
+    private final int count;
+    
+    /**
+     * The stride between the start of one element and the next
+     */
+    private final int byteStride;
+    
+    /**
+     * The {@link AccessorData}
+     */
+    private AccessorData accessorData;
+    
+    /**
+     * The minimum components
+     */
+    private Number[] max;
+    
+    /**
+     * The maximum components
+     */
+    private Number[] min;
+    
+    /**
+     * Creates a new instance
+     * 
+     * @param componentType The component type GL constant
+     * @param byteOffset The byte offset
+     * @param count The number of elements
+     * @param elementType The element type
+     * @param byteStride The byte stride
+     */
+    public DefaultAccessorModel(
+        int componentType,
+        int byteOffset,
+        int count, 
+        ElementType elementType, 
+        int byteStride)
+    {
+        this.componentType = componentType;
+        this.byteOffset = byteOffset;
+        this.count = count;
+        this.elementType = elementType;
+        this.byteStride = byteStride;
+    }
+    
+    /**
+     * Set the {@link BufferViewModel} for this model
+     * 
+     * @param bufferViewModel The {@link BufferViewModel}
+     */
+    public void setBufferViewModel(BufferViewModel bufferViewModel)
+    {
+        this.bufferViewModel = bufferViewModel;
+    }
+    
+    @Override
+    public BufferViewModel getBufferViewModel()
+    {
+        return bufferViewModel;
+    }
+    
+    @Override
+    public int getComponentType()
+    {
+        return componentType;
+    }
+    
+    @Override
+    public Class<?> getComponentDataType()
+    {
+        return Accessors.getDataTypeForAccessorComponentType(
+            getComponentType());
+    }
+    
+    @Override
+    public int getByteOffset()
+    {
+        return byteOffset;
+    }
+    
+    @Override
+    public int getCount()
+    {
+        return count;
+    }
+    
+    @Override
+    public ElementType getElementType()
+    {
+        return elementType;
+    }
+    
+    @Override
+    public int getByteStride()
+    {
+        return byteStride;
+    }
+    
+    @Override
+    public AccessorData getAccessorData()
+    {
+        if (accessorData == null)
+        {
+            accessorData = createAccessorData();
+        }
+        return accessorData;
+    }
+    
+    /**
+     * Create the {@link AccessorData} for this instance. This assumes
+     * that the {@link BufferViewModel} was already set.
+     * 
+     * @return The {@link AccessorData}
+     */
+    private AccessorData createAccessorData()
+    {
+        if (getComponentDataType() == byte.class)
+        {
+            return AccessorDatas.createByte(this);
+        }
+        if (getComponentDataType() == short.class)
+        {
+            return AccessorDatas.createShort(this);
+        }
+        if (getComponentDataType() == int.class)
+        {
+            return AccessorDatas.createInt(this);
+        }
+        if (getComponentDataType() == float.class)
+        {
+            return AccessorDatas.createFloat(this);
+        }
+        // Should never happen
+        logger.severe("Invalid component data type: " + getComponentDataType());
+        return null;
+    }
+    
+    @Override
+    public Number[] getMin()
+    {
+        if (min == null)
+        {
+            min = AccessorDatas.computeMin(getAccessorData());
+        }
+        return min.clone();
+    }
+    
+    @Override
+    public Number[] getMax()
+    {
+        if (max == null)
+        {
+            max = AccessorDatas.computeMax(getAccessorData());
+        }
+        return max.clone();
+    }
+    
+}

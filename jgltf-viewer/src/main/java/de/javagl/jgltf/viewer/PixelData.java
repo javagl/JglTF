@@ -30,13 +30,13 @@ import java.nio.ByteBuffer;
 
 // TODO: This interface is supposed to allow an abstraction of pixel
 // data for future implementations that are targeting Android. There,
-// the BufferedImage class is not available. So it should not appear
+// the BufferedImage class is not available, so it should not appear
 // in the interfaces of the model- or viewer classes.
 
 /**
  * An interface describing (RGBA) pixel data for an image 
  */
-interface PixelData
+public interface PixelData
 {
     /**
      * Returns the width of the image

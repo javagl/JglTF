@@ -29,7 +29,19 @@ package de.javagl.jgltf.model;
 import java.nio.ByteBuffer;
 
 /**
- * Interface for classes that provide typed access to raw data
+ * Interface for classes that provide typed access to raw accessor data.
+ * The exact type of the data (and thus, the implementing class) is 
+ * defined by the {@link #getComponentType() component type}:<br>
+ * <ul>
+ *   <li>For <code>byte.class</code>, the implementation is an 
+ *   {@link AccessorByteData}</li>
+ *   <li>For <code>short.class</code>, the implementation is an 
+ *   {@link AccessorShortData}</li>
+ *   <li>For <code>int.class</code>, the implementation is an 
+ *   {@link AccessorIntData}</li>
+ *   <li>For <code>float.class</code>, the implementation is an 
+ *   {@link AccessorFloatData}</li>
+ * </ul>
  */
 public interface AccessorData
 {

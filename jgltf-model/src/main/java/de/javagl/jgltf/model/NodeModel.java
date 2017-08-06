@@ -26,82 +26,142 @@
  */
 package de.javagl.jgltf.model;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Supplier;
 
-import de.javagl.jgltf.impl.v1.Node;
-
 /**
- * A model representing a {@link Node} of a glTF asset 
+ * Interface for a node that is part of a scene hierarchy
  */
-public final class NodeModel
+public interface NodeModel
 {
     /**
-     * A thread-local, temporary 16-element matrix
-     */
-    private static final ThreadLocal<float[]> TEMP_MATRIX_4x4 =
-        ThreadLocal.withInitial(() -> new float[16]);
-    
-    /**
-     * The parent of this node. This is <code>null</code> for the root node.
-     */
-    private NodeModel parent;
-    
-    /**
-     * The actual glTF {@link Node}
-     */
-    private final Node node;
-    
-    /**
-     * The children of this node
-     */
-    private final List<NodeModel> children;
-    
-    /**
-     * Default constructor. 
+     * Returns the parent of this node, or <code>null</code> if this is
+     * a root node
      * 
-     * @param node The glTF {@link Node}
+     * @return The parent
      */
-    NodeModel(Node node)
-    {
-        this.node = Objects.requireNonNull(node, "The node may not be null");
-        this.children = new ArrayList<NodeModel>();
-    }
-    
-    /**
-     * Package-private method to add the given child to this node
-     * 
-     * @param child The child
-     */
-    void addChild(NodeModel child)
-    {
-        Objects.requireNonNull(child, "The child may not be null");
-        children.add(child);
-        child.parent = this;
-    }
-    
-    /**
-     * Returns the actual glTF {@link Node}
-     * 
-     * @return The actual glTF {@link Node}
-     */
-    Node getNode()
-    {
-        return node;
-    }
-    
+    NodeModel getParent();
+
     /**
      * Returns an unmodifiable view on the list of children of this node
      * 
      * @return The children
      */
-    List<NodeModel> getChildren()
-    {
-        return Collections.unmodifiableList(children);
-    }
+    List<NodeModel> getChildren();
+    
+    /**
+     * Returns an unmodifiable view on the list of {@link MeshModel} instances
+     * that are attached to this node.
+     * 
+     * @return The {@link MeshModel} list
+     */
+    List<MeshModel> getMeshModels();
+
+    /**
+     * Returns the {@link SkinModel} for this node, or <code>null</code> if
+     * this node is not associated with a skin
+     *  
+     * @return The {@link SkinModel}
+     */
+    SkinModel getSkinModel();
+    
+    /**
+     * Set the matrix of this node to be a <b>reference</b> to the given
+     * array. <br>
+     * <br>
+     * The matrix is assumed to be a 16-element array containing the matrix 
+     * in column-major order. If the given matrix is <code>null</code>, then 
+     * the {@link #getTranslation() translation},
+     * {@link #getRotation() rotation}, and
+     * {@link #getScale() scale} properties will be used for determining the 
+     * local transform.
+     * 
+     * @param matrix The matrix
+     * @throws IllegalArgumentException If the given array does not have
+     * a length of 16
+     */
+    void setMatrix(float matrix[]);
+    
+    /**
+     * Returns a <b>reference</b> to the array storing the matrix of this node.
+     * This is a 16-element array containing the matrix in column-major order, 
+     * or <code>null</code> if no matrix was set.
+     * 
+     * @return The matrix
+     */
+    float[] getMatrix();
+
+    /**
+     * Set the translation of this node to be a <b>reference</b> to the given
+     * array. 
+     * 
+     * @param translation The translation
+     * @throws IllegalArgumentException If the given array does not have
+     * a length of 3
+     */
+    void setTranslation(float translation[]);
+    
+    /**
+     * Returns a <b>reference</b> to the array storing the translation of this 
+     * node, or <code>null</code> if no translation was set.
+     * 
+     * @return The translation
+     */
+    float[] getTranslation();
+
+    /**
+     * Set the rotation of this node to be a <b>reference</b> to the given
+     * array. The array is assumed to be a quaternion, consisting of 4
+     * float elements.
+     * 
+     * @param rotation The rotation
+     * @throws IllegalArgumentException If the given array does not have
+     * a length of 4
+     */
+    void setRotation(float rotation[]);
+    
+    /**
+     * Returns a <b>reference</b> to the array storing the rotation of this 
+     * node, or <code>null</code> if no rotation was set
+     * 
+     * @return The rotation
+     */
+    float[] getRotation();
+
+    /**
+     * Set the scale of this node to be a <b>reference</b> to the given
+     * array.
+     * 
+     * @param scale The scale
+     * @throws IllegalArgumentException If the given array does not have
+     * a length of 3
+     */
+    void setScale(float scale[]);
+
+    /**
+     * Returns a <b>reference</b> to the array storing the scale of this 
+     * node, or <code>null</code> if no scale was set
+     * 
+     * @return The scale
+     */
+    float[] getScale();
+    
+    /**
+     * Set the morph target weights to be a <b>reference</b> to the given
+     * array. 
+     * 
+     * @param weights The weights
+     * @throws IllegalArgumentException If the given 
+     */
+    void setWeights(float weights[]);
+    
+    /**
+     * Returns a <b>reference</b> to the morph target weights, 
+     * or <code>null</code> if no morph target weights have been defined
+     * 
+     * @return The morph target weights
+     */
+    float[] getWeights();
     
     /**
      * Computes the local transform of this node.<br>
@@ -114,11 +174,8 @@ public final class NodeModel
      * @param result The result array
      * @return The result array
      */
-    float[] computeLocalTransform(float result[])
-    {
-        return Nodes.computeLocalTransform(node, result);
-    }
-    
+    float[] computeLocalTransform(float result[]);
+
     /**
      * Computes the global transform of this node.<br>
      * <br>
@@ -130,22 +187,8 @@ public final class NodeModel
      * @param result The result array
      * @return The result array
      */
-    float[] computeGlobalTransform(float result[])
-    {
-        float localResult[] = Utils.validate(result, 16);
-        float tempLocalTransform[] = TEMP_MATRIX_4x4.get();
-        NodeModel currentNode = this;
-        MathUtils.setIdentity4x4(localResult);
-        while (currentNode != null)
-        {
-            currentNode.computeLocalTransform(tempLocalTransform);
-            MathUtils.mul4x4(
-                tempLocalTransform, localResult, localResult);
-            currentNode = currentNode.parent;
-        }
-        return localResult;
-    }
-    
+    float[] computeGlobalTransform(float result[]);
+
     /**
      * Creates a supplier for the global transform matrix of this node 
      * model.<br>
@@ -158,12 +201,8 @@ public final class NodeModel
      * 
      * @return The supplier
      */
-    public Supplier<float[]> createGlobalTransformSupplier()
-    {
-        return Suppliers.createTransformSupplier(this, 
-            (n, t) -> n.computeGlobalTransform(t));
-    }
-    
+    Supplier<float[]> createGlobalTransformSupplier();
+
     /**
      * Creates a supplier for the local transform matrix of this node model.<br>
      * <br> 
@@ -175,11 +214,6 @@ public final class NodeModel
      * 
      * @return The supplier
      */
-    public Supplier<float[]> createLocalTransformSupplier()
-    {
-        return Suppliers.createTransformSupplier(node, 
-            (n, t) -> Nodes.computeLocalTransform(n, t));
-    }
+    Supplier<float[]> createLocalTransformSupplier();
 
-    
 }

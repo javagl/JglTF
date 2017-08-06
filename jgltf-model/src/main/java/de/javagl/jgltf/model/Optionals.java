@@ -50,6 +50,31 @@ public class Optionals
     }
     
     /**
+     * Returns the specified element from the given list, or <code>null</code>
+     * if the list is <code>null</code> or the index is not valid.
+     * 
+     * @param list The list
+     * @param index The index
+     * @return The element
+     */
+    public static <T> T get(List<T> list, int index)
+    {
+        if (list == null)
+        {
+            return null;
+        }
+        if (index < 0)
+        {
+            return null;
+        }
+        if (index >= list.size())
+        {
+            return null;
+        }
+        return list.get(index);
+    }
+    
+    /**
      * Returns the given map, or an unmodifiable empty map if the
      * given map is <code>null</code>.
      * 

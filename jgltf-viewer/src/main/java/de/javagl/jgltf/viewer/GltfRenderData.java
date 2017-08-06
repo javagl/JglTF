@@ -29,31 +29,32 @@ package de.javagl.jgltf.viewer;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
 
-import de.javagl.jgltf.impl.v1.BufferView;
-import de.javagl.jgltf.impl.v1.GlTF;
-import de.javagl.jgltf.impl.v1.Program;
-import de.javagl.jgltf.impl.v1.Sampler;
-import de.javagl.jgltf.impl.v1.Texture;
+//import de.javagl.jgltf.impl.v1.BufferView;
+//import de.javagl.jgltf.impl.v1.GlTF;
+//import de.javagl.jgltf.impl.v1.Program;
+//import de.javagl.jgltf.impl.v1.Texture;
+import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.GltfConstants;
-import de.javagl.jgltf.model.GltfData;
+import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.Optionals;
-import de.javagl.jgltf.model.gl.GltfTechniqueModel;
+import de.javagl.jgltf.model.TextureModel;
+import de.javagl.jgltf.model.gl.ProgramModel;
+import de.javagl.jgltf.model.gl.ShaderModel;
+//import de.javagl.jgltf.model.v1.gl.GltfTechniqueModel;
 
 /**
  * A class maintaining the data for rendering a glTF with OpenGL.<br>
  * <br>
  * The class offers methods to obtain the GL representations of
- * {@link Program}s, {@link Texture}s and {@link BufferView}s based
- * on the respective ID of these objects in the glTF. These GL 
- * representations are the integer values of the corresponding GL
- * objects, as generated with <code>glCreateProgram</code>, 
+ * {@link ProgramModel}, {@link TextureModel} and {@link BufferViewModel} 
+ * objects. These GL representations are the integer values of the 
+ * corresponding GL objects, as generated with <code>glCreateProgram</code>, 
  * <code>glGenTextures</code> and <code>glGenBuffers</code>. <br>
  * <br>
  * The actual creation of these objects will be done lazily when
@@ -62,7 +63,7 @@ import de.javagl.jgltf.model.gl.GltfTechniqueModel;
  * may only be called from the OpenGL thread (when the GL context
  * is current). 
  */
-class GltfRenderData
+public class GltfRenderData
 {
     /**
      * The logger used in this class
@@ -76,30 +77,19 @@ class GltfRenderData
     private final List<Integer> glVertexArrays;
     
     /**
-     * The mapping from glTF {@link Program} IDs to GL programs
+     * The mapping from glTF {@link ProgramModel} keys to GL programs
      */
-    private final Map<String, Integer> programIdToGlProgram;
+    private final Map<ProgramModel, Integer> programModelToGlProgram;
 
     /**
-     * The mapping from glTF {@link Texture} IDs to GL textures
+     * The mapping from glTF {@link TextureModel} keys to GL textures
      */
-    private final Map<String, Integer> textureIdToGlTexture;
+    private final Map<TextureModel, Integer> textureModelToGlTexture;
 
     /**
-     * The mapping from glTF {@link BufferView} IDs to GL buffers
+     * The mapping from glTF {@link BufferViewModel} keys to GL buffers
      */
-    private final Map<String, Integer> bufferViewIdToGlBufferView;
-    
-    /**
-     * The {@link GltfData} that stores the data elements of the glTF
-     */
-    private final GltfData gltfData;
-    
-    /**
-     * The {@link GltfTechniqueModel} that contains the elements for 
-     * rendering a glTF asset with GL
-     */
-    private final GltfTechniqueModel gltfTechniqueModel;
+    private final Map<BufferViewModel, Integer> bufferViewModelToGlBufferView;
     
     /**
      * The {@link GlContext} that will create the GL objects
@@ -107,34 +97,22 @@ class GltfRenderData
     private final GlContext glContext;
     
     /**
-     * The {@link GlTF} that was obtained from the {@link GltfData}
-     */
-    private final GlTF gltf;
-    
-    /**
-     * Create the render data for the given {@link GltfData}. The GL objects
-     * will be created using the given {@link GlContext}
+     * Create the render data that operates on the given  {@link GlContext}
      * 
-     * @param gltfData The {@link GltfData}
-     * @param gltfTechniqueModel The {@link GltfTechniqueModel}
      * @param glContext The {@link GlContext}
      */
-    GltfRenderData(GltfData gltfData, GltfTechniqueModel gltfTechniqueModel, 
-        GlContext glContext)
+    public GltfRenderData(GlContext glContext)
     {
-        this.gltfData = Objects.requireNonNull(gltfData, 
-            "The gltfData may not be null");
-        this.gltfTechniqueModel = Objects.requireNonNull(gltfTechniqueModel,
-            "The gltfTechniqueModel may not be null");
         this.glContext = Objects.requireNonNull(glContext,
             "The glContext may not be null");
         
-        this.gltf = gltfData.getGltf();
-        
         this.glVertexArrays = new ArrayList<Integer>();
-        this.programIdToGlProgram = new LinkedHashMap<String, Integer>();
-        this.textureIdToGlTexture = new LinkedHashMap<String, Integer>();
-        this.bufferViewIdToGlBufferView = new LinkedHashMap<String, Integer>();
+        this.programModelToGlProgram = 
+            new LinkedHashMap<ProgramModel, Integer>();
+        this.textureModelToGlTexture = 
+            new LinkedHashMap<TextureModel, Integer>();
+        this.bufferViewModelToGlBufferView = 
+            new LinkedHashMap<BufferViewModel, Integer>();
     }
 
     /**
@@ -142,23 +120,13 @@ class GltfRenderData
      * 
      * @param glVertexArray The GL vertex array
      */
-    void addGlVertexArray(int glVertexArray)
+    public void addGlVertexArray(int glVertexArray)
     {
         glVertexArrays.add(glVertexArray);
     }
     
     /**
-     * Returns an unmodifiable view on the GL vertex arrays
-     *  
-     * @return The GL vertex arrays
-     */
-    Collection<Integer> getGlVertexArrays()
-    {
-        return Collections.unmodifiableList(glVertexArrays);
-    }
-    
-    /**
-     * Obtain the OpenGL program for the given glTF {@link Program} ID.<br>
+     * Obtain the OpenGL program for the given glTF {@link ProgramModel}.<br>
      * <br>
      * If the OpenGL program for the specified program has already been 
      * requested, then the previously created GL program will be returned.
@@ -169,93 +137,58 @@ class GltfRenderData
      * due to compile- or link errors), then a warning will be printed
      * and <code>null</code> will be returned.
      *  
-     * @param programId The {@link Program} ID
+     * @param programModel The {@link ProgramModel}
      * @return The GL program
      */
-    Integer obtainGlProgram(String programId)
+    public Integer obtainGlProgram(ProgramModel programModel)
     {
-        Objects.requireNonNull(programId, "The programId may not be null");
-        
-        Integer glProgram = programIdToGlProgram.get(programId);
+        Integer glProgram = programModelToGlProgram.get(programModel);
         if (glProgram == null)
         {
-            if (!programIdToGlProgram.containsKey(programId))
+            if (!programModelToGlProgram.containsKey(programModel))
             {
-                glProgram = createGlProgram(programId);
-                programIdToGlProgram.put(programId, glProgram);
+                glProgram = createGlProgram(programModel);
+                programModelToGlProgram.put(
+                    programModel, glProgram);
             }
         }
         return glProgram;
     }
     
     /**
-     * Internal method to create the GL program for the given {@link Program}
-     * ID. If the GL program can not be created for any reason, then a 
-     * warning will be printed and <code>null</code> will be returned.
+     * Internal method to create the GL program for the given 
+     * {@link ProgramModel}. If the GL program can not be created for any 
+     * reason, then a warning will be printed and <code>null</code> will 
+     * be returned.
      * 
-     * @param programId The {@link Program} ID
+     * @param programModel The {@link ProgramModel}
      * @return The GL program
      */
-    private Integer createGlProgram(String programId)
+    private Integer createGlProgram(ProgramModel programModel)
     {
-        logger.fine("Creating GL program for program " + programId);
+        logger.fine("Creating GL program for " + programModel);
         
-        Program program = gltfTechniqueModel.obtainProgram(programId);
-        if (program == null)
-        {
-            logger.warning("Program for " + programId + " not found");
-            return null;
-        }
-        
-        String vertexShaderId = program.getVertexShader();
-        String vertexShaderSource = 
-            gltfTechniqueModel.obtainVertexShaderSource(vertexShaderId);
-        if (vertexShaderSource == null)
-        {
-            logger.warning("Source of vertex shader " + 
-                vertexShaderId + " not found");
-            return null;
-        }
-        
-        String fragmentShaderId = program.getFragmentShader();
-        String fragmentShaderSource = 
-            gltfTechniqueModel.obtainFragmentShaderSource(fragmentShaderId);
-        if (fragmentShaderSource == null)
-        {
-            logger.warning("Source of fragment shader " + 
-                fragmentShaderId + " not found");
-            return null;
-        }
-        
+        ShaderModel vertexShaderModel = 
+            programModel.getVertexShaderModel();
+        ShaderModel fragmentShaderModel = 
+            programModel.getFragmentShaderModel();
         Integer glProgram = glContext.createGlProgram(
-            vertexShaderSource, fragmentShaderSource);
+            vertexShaderModel.getShaderSource(),
+            fragmentShaderModel.getShaderSource());
         if (glProgram != null)
         {
-            logger.fine("Creating GL program for program " + 
-                programId + " DONE");
+            logger.fine("Creating GL program for " + programModel + " DONE");
         }
         else
         {
-            logger.warning("Creating GL program for program " + 
-                programId + " FAILED");
+            logger.warning("Creating GL program for " 
+                + programModel + " FAILED");
         }
         return glProgram;
     }
     
     /**
-     * Returns an unmodifiable view on the GL programs
-     * 
-     * @return The GL programs
-     */
-    Collection<Integer> getGlPrograms()
-    {
-        return Collections.unmodifiableCollection(
-            programIdToGlProgram.values());
-    }
-    
-    
-    /**
-     * Obtain the OpenGL texture for the given glTF {@link Texture} ID.<br>
+     * Obtain the OpenGL texture for the given glTF {@link TextureModel}.<br>
      * <br>
      * If the OpenGL texture for the specified texture has already been 
      * requested, then the previously created GL texture will be returned.
@@ -265,61 +198,43 @@ class GltfRenderData
      * If the GL program can not be created (e.g. due to missing data), then 
      * a warning will be printed and <code>null</code> will be returned.
      *  
-     * @param textureId The {@link Program} ID
+     * @param textureModel The {@link TextureModel}
      * @return The GL texture
      */
-    Integer obtainGlTexture(String textureId)
+    public Integer obtainGlTexture(TextureModel textureModel)
     {
-        Objects.requireNonNull(textureId, "The textureId may not be null");
-        
-        Integer glTexture = textureIdToGlTexture.get(textureId);
+        Integer glTexture = textureModelToGlTexture.get(textureModel);
         if (glTexture == null)
         {
-            if (!textureIdToGlTexture.containsKey(textureId))
+            if (!textureModelToGlTexture.containsKey(textureModel))
             {
-                glTexture = createGlTexture(textureId);
-                textureIdToGlTexture.put(textureId, glTexture);
+                glTexture = createGlTexture(textureModel);
+                textureModelToGlTexture.put(
+                    textureModel, glTexture);
             }
         }
         return glTexture;
     }
     
     /**
-     * Internal method to create the GL texture for the given {@link Texture}
-     * ID. If the GL texture can not be created for any reason, then a 
-     * warning will be printed and <code>null</code> will be returned.
+     * Internal method to create the GL texture for the given 
+     * {@link TextureModel}. If the GL texture can not be created for any 
+     * reason, then a warning will be printed and <code>null</code> will 
+     * be returned.
      * 
-     * @param textureId The {@link Texture} ID
+     * @param textureModel The {@link TextureModel} key
      * @return The GL texture
      */
-    private Integer createGlTexture(String textureId)
+    private Integer createGlTexture(TextureModel textureModel)
     {
-        logger.fine("Creating GL texture for texture " + textureId);
+        logger.fine("Creating GL texture for texture " + textureModel);
         
-        Texture texture = gltf.getTextures().get(textureId);
-        String samplerId = texture.getSampler();
-        Sampler sampler = gltf.getSamplers().get(samplerId);
-
-        String textureImageId = texture.getSource();
-        ByteBuffer imageData = gltfData.getImageData(textureImageId);
-        
-        int internalFormat = Optionals.of(
-            texture.getInternalFormat(), texture.defaultInternalFormat());
-
-        // The image data is read with the built-in routines, and
-        // always returned as RBGA pixels. So the format and type
-        // from the texture are ignored here.
-        //int format = Optional
-        //    .ofNullable(texture.getFormat())
-        //    .orElse(texture.defaultFormat());
-        //int type = Optional
-        //    .ofNullable(texture.getType())
-        //    .orElse(texture.defaultType());
-
-        // Use the fixed format and type for the RGBA pixels
+        int internalFormat = GltfConstants.GL_RGBA;
         int format = GltfConstants.GL_RGBA;
         int type = GltfConstants.GL_UNSIGNED_BYTE;
         
+        ImageModel imageModel = textureModel.getImageModel();
+        ByteBuffer imageData = imageModel.getImageData();
         PixelData pixelData = PixelDatas.create(imageData);
         int width = pixelData.getWidth();
         int height = pixelData.getHeight();
@@ -328,34 +243,23 @@ class GltfRenderData
             pixelsRGBA, internalFormat, width, height, format, type);
 
         int minFilter = Optionals.of(
-            sampler.getMinFilter(), sampler.defaultMinFilter());
+            textureModel.getMinFilter(), 
+            GltfConstants.GL_NEAREST_MIPMAP_LINEAR);
         int magFilter = Optionals.of(
-            sampler.getMagFilter(), sampler.defaultMagFilter());
-        int wrapS = Optionals.of(
-            sampler.getWrapS(), sampler.defaultWrapS());
-        int wrapT = Optionals.of(
-            sampler.getWrapT(), sampler.defaultWrapT());
+            textureModel.getMagFilter(),
+            GltfConstants.GL_LINEAR);
+        int wrapS = textureModel.getWrapS();
+        int wrapT = textureModel.getWrapT();
         
         glContext.setGlTextureParameters(
             glTexture, minFilter, magFilter, wrapS, wrapT);
         
-        logger.fine("Creating GL texture for texture " + textureId + " DONE");
+        logger.fine("Creating GL texture for texture " + textureModel + " DONE");
         return glTexture;
     }
 
     /**
-     * Returns an unmodifiable view on the GL textures
-     * 
-     * @return The GL textures
-     */
-    Collection<Integer> getGlTextures()
-    {
-        return Collections.unmodifiableCollection(
-            textureIdToGlTexture.values());
-    }
-    
-    /**
-     * Obtain the OpenGL buffer for the given glTF {@link BufferView} ID.<br>
+     * Obtain the OpenGL buffer for the given glTF {@link BufferViewModel}.<br>
      * <br>
      * If the OpenGL buffer for the specified bufferView has already been 
      * requested, then the previously created GL buffer will be returned.
@@ -365,77 +269,79 @@ class GltfRenderData
      * If the GL buffer can not be created (e.g. due to missing data), then 
      * a warning will be printed and <code>null</code> will be returned.
      *  
-     * @param bufferViewId The {@link BufferView} ID
+     * @param bufferViewModel The {@link BufferViewModel}
      * @return The GL buffer
      */
-    Integer obtainGlBufferView(String bufferViewId)
+    public Integer obtainGlBufferView(BufferViewModel bufferViewModel)
     {
-        Objects.requireNonNull(bufferViewId, 
-            "The bufferViewId may not be null");
+        Objects.requireNonNull(bufferViewModel, 
+            "The bufferViewModel may not be null");
         
-        Integer glBufferView = bufferViewIdToGlBufferView.get(bufferViewId);
+        Integer glBufferView = 
+            bufferViewModelToGlBufferView.get(bufferViewModel);
         if (glBufferView == null)
         {
-            if (!bufferViewIdToGlBufferView.containsKey(bufferViewId))
+            if (!bufferViewModelToGlBufferView.containsKey(bufferViewModel))
             {
-                glBufferView = createGlBufferView(bufferViewId);
-                bufferViewIdToGlBufferView.put(bufferViewId, glBufferView);
+                glBufferView = createGlBufferView(bufferViewModel);
+                bufferViewModelToGlBufferView.put(
+                    bufferViewModel, glBufferView);
             }
         }
         return glBufferView;
     }
     
     /**
-     * Internal method to create the GL buffer for the given {@link BufferView}
-     * ID. If the GL buffer can not be created for any reason, then a 
-     * warning will be printed and <code>null</code> will be returned.
+     * Internal method to create the GL buffer for the given 
+     * {@link BufferViewModel}. If the GL buffer can not be created for 
+     * any reason, then a warning will be printed and <code>null</code> 
+     * will be returned.
      * 
-     * @param bufferViewId The {@link BufferView} ID
+     * @param bufferViewModel The {@link BufferViewModel}
      * @return The GL buffer
      */
-    private Integer createGlBufferView(String bufferViewId)
+    private Integer createGlBufferView(BufferViewModel bufferViewModel)
     {
-        logger.fine("Creating GL bufferView for bufferView " + bufferViewId);
-
-        BufferView bufferView = gltf.getBufferViews().get(bufferViewId);
+        logger.fine("Creating GL bufferView for bufferView " + bufferViewModel);
         
-        Integer byteLength = bufferView.getByteLength();
-        if (byteLength == null)
-        {
-            // TODO: This will no longer be valid in glTF 1.0.1
-            logger.warning("No byteLength found in bufferView "+bufferViewId);
-            logger.warning("This will no longer be valid in glTF 1.0.1");
-            return null;
-        }
-        
-        ByteBuffer bufferViewData = gltfData.getBufferViewData(bufferViewId);
-        if (bufferViewData == null)
-        {
-            logger.warning("No data found for bufferView " + bufferViewId);
-            return null;
-        }
-        
+        Integer byteLength = bufferViewModel.getByteLength();
+        ByteBuffer bufferViewData = bufferViewModel.getBufferViewData();
         int target = Optionals.of(
-            bufferView.getTarget(), GltfConstants.GL_ARRAY_BUFFER);
-        
-        int glBufferView = 
-            glContext.createGlBufferView(
-                target, byteLength, bufferViewData.slice());
-        logger.fine("Creating GL bufferView for bufferView " + bufferViewId + 
-            " DONE");
+            bufferViewModel.getTarget(), GltfConstants.GL_ARRAY_BUFFER);
+        int glBufferView = glContext.createGlBufferView(
+            target, byteLength, bufferViewData.slice());
+        logger.fine("Creating GL bufferView for bufferView " 
+                + bufferViewModel + " DONE");
         return glBufferView;
     }
 
     /**
-     * Returns an unmodifiable view on the GL buffer views
-     * 
-     * @return The GL buffer views
+     * Delete all GL resources that have been created internally.
      */
-    Collection<Integer> getGlBufferViews()
+    public void delete()
     {
-        return Collections.unmodifiableCollection(
-            bufferViewIdToGlBufferView.values());
+        Collection<Integer> glTextures = 
+            textureModelToGlTexture.values();
+        for (int glTexture : glTextures)
+        {
+            glContext.deleteGlTexture(glTexture);
+        }
+        Collection<Integer> glBufferViews = 
+            bufferViewModelToGlBufferView.values();
+        for (int glBufferView : glBufferViews)
+        {
+            glContext.deleteGlBufferView(glBufferView);
+        }
+        Collection<Integer> glPrograms = 
+            programModelToGlProgram.values();
+        for (int glProgram : glPrograms)
+        {
+            glContext.deleteGlProgram(glProgram);
+        }
+        for (int glVertexArray : glVertexArrays)
+        {
+            glContext.deleteGlVertexArray(glVertexArray);
+        }
     }
-
     
 }

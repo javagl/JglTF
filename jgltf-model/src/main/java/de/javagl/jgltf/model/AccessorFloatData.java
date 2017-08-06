@@ -63,7 +63,7 @@ public final class AccessorFloatData
      * @throws IllegalArgumentException If the given byte buffer does not
      * have a sufficient capacity to provide the data for the accessor 
      */
-    AccessorFloatData(int componentType,
+    public AccessorFloatData(int componentType,
         ByteBuffer bufferViewByteBuffer, int byteOffset, int numElements,
         int numComponentsPerElement, Integer byteStride)
     {
@@ -114,7 +114,7 @@ public final class AccessorFloatData
      * 
      * @return The minimum values
      */
-    public float[] getMin()
+    public float[] computeMin()
     {
         float result[] = new float[getNumComponentsPerElement()];
         Arrays.fill(result, Float.MAX_VALUE);
@@ -135,7 +135,7 @@ public final class AccessorFloatData
      * 
      * @return The minimum values
      */
-    public float[] getMax()
+    public float[] computeMax()
     {
         float result[] = new float[getNumComponentsPerElement()];
         Arrays.fill(result, -Float.MAX_VALUE);

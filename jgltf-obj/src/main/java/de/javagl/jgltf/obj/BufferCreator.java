@@ -88,7 +88,7 @@ class BufferCreator
 
     /**
      * The mapping from the IDs of the {@link Buffer}s that have been built
-     * to the {@link Buffer} data 
+     * to their {@link Buffer} data 
      */
     private final Map<String, ByteBuffer> bufferDatas;
     

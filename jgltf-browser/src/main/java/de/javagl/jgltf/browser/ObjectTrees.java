@@ -148,8 +148,22 @@ class ObjectTrees
             return node;
         }
 
-        // Handle the case where the value is a Collection or a Map,
+        // Handle the case where the value is a List, Collection or a Map,
         // and the method should be called recursively with the values
+        if (value instanceof List<?>)
+        {
+            DefaultMutableTreeNode node = new DefaultMutableTreeNode(
+                new NodeEntry(name, value));
+            List<?> list = (List<?>)value;
+            for (int i = 0; i < list.size(); i++)
+            {
+                Object element = list.get(i);
+                DefaultMutableTreeNode childNode =
+                    createNode("[" + i + "]", element);
+                node.add(childNode);
+            }
+            return node;
+        }
         if (value instanceof Collection<?>)
         {
             DefaultMutableTreeNode node = new DefaultMutableTreeNode(
@@ -158,8 +172,8 @@ class ObjectTrees
             int index = 0;
             for (Object element : collection)
             {
-                DefaultMutableTreeNode childNode = createNode(
-                    "["+index+"]", element);
+                DefaultMutableTreeNode childNode = 
+                    createNode("[" + index + "]", element);
                 index++;
                 node.add(childNode);
             }

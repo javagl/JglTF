@@ -1,13 +1,14 @@
 package de.javagl.jgltf.validator;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import de.javagl.jgltf.model.GltfData;
-import de.javagl.jgltf.model.io.GltfDataReader;
+import de.javagl.jgltf.impl.v1.GlTF;
+import de.javagl.jgltf.model.io.v1.GltfReaderV1;
 
 /**
  * Utility to validate the sample models. For internal use only.
@@ -44,14 +45,17 @@ public class ValidateAll
     {
         logger.info("Validating "+uriString);
         
-        GltfDataReader gltfDataReader = new GltfDataReader();
-        GltfData gltfData = gltfDataReader.readGltfData(new URI(uriString));
-        Validator validator = new Validator(gltfData.getGltf());
-        ValidatorResult validatorResult = validator.validate();
-        
-        logger.info("Result:\n" + validatorResult.createString());
-        
-        return validatorResult;
+        GltfReaderV1 gltfReader = new GltfReaderV1();
+        URI uri = new URI(uriString);
+        try (InputStream inputStream = uri.toURL().openStream())
+        {
+            GlTF gltf = gltfReader.read(inputStream);
+            Validator validator = new Validator(gltf);
+            ValidatorResult validatorResult = validator.validate();
+            
+            logger.info("Result:\n" + validatorResult.createString());
+            return validatorResult;
+        }
     }
     
     

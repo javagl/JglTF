@@ -32,7 +32,7 @@ import java.util.function.Supplier;
 /**
  * Utility methods to create Supplier instances
  */
-class Suppliers
+public class Suppliers
 {
     /**
      * Create a supplier of a 4x4 matrix that is computed by applying 
@@ -48,7 +48,7 @@ class Suppliers
      * @param computer The computer function
      * @return The supplier
      */
-    static <T> Supplier<float[]> createTransformSupplier(
+    public static <T> Supplier<float[]> createTransformSupplier(
         T object, BiConsumer<T, float[]> computer)
     {
         float transform[] = new float[16];
@@ -67,4 +67,12 @@ class Suppliers
         };
     }
 
+    
+    /**
+     * Private constructor to prevent instantiation
+     */
+    private Suppliers()
+    {
+        // Private constructor to prevent instantiation
+    }
 }

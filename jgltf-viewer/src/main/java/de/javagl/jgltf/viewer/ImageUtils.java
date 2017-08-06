@@ -33,6 +33,7 @@ import java.awt.image.DataBufferInt;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 
 import javax.imageio.ImageIO;
@@ -98,7 +99,8 @@ class ImageUtils
         // is kept here, to keep the ARGB order, and not convert them
         // to BGRA implicitly.
         ByteBuffer outputByteBuffer = ByteBuffer
-            .allocateDirect(imageBuffer.remaining() * Integer.BYTES);
+            .allocateDirect(imageBuffer.remaining() * Integer.BYTES)
+            .order(ByteOrder.BIG_ENDIAN);
         IntBuffer output = outputByteBuffer.asIntBuffer();
         output.put(imageBuffer.slice());
         return outputByteBuffer;

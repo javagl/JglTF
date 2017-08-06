@@ -33,19 +33,10 @@ import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -66,16 +57,7 @@ import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import de.javagl.jgltf.model.GltfData;
-import de.javagl.jgltf.model.io.BinaryGltfDataWriter;
-import de.javagl.jgltf.model.io.GltfDataToBinaryConverter;
-import de.javagl.jgltf.model.io.GltfDataToEmbeddedConverter;
-import de.javagl.jgltf.model.io.GltfDataWriter;
-import de.javagl.jgltf.model.io.IO;
-import de.javagl.jgltf.obj.ObjGltfDataCreator;
-import de.javagl.jgltf.obj.ObjGltfDataCreator.BufferStrategy;
-import de.javagl.swing.tasks.SwingTask;
-import de.javagl.swing.tasks.SwingTaskExecutors;
+import de.javagl.jgltf.model.GltfModel;
 
 /**
  * The main glTF browser application class, containing the main frame 
@@ -224,65 +206,6 @@ class GltfBrowserApplication
         }
     };
     
-    
-    /**
-     * The Action for converting the {@link GltfData} of the currently 
-     * selected frame into an embedded glTF
-     * 
-     * @see #convertToEmbeddedGltf()
-     */
-    private final Action convertToEmbeddedGltfAction = new AbstractAction()
-    {
-        /**
-         * Serial UID
-         */
-        private static final long serialVersionUID = 8683961991846940413L;
-
-        // Initialization
-        {
-            putValue(NAME, "Convert to embedded glTF");
-            putValue(SHORT_DESCRIPTION, 
-                "Convert the currently selected glTF into an embedded glTF");
-            putValue(MNEMONIC_KEY, new Integer(KeyEvent.VK_E));
-            setEnabled(false);
-        }
-        
-        @Override
-        public void actionPerformed(ActionEvent e)
-        {
-            convertToEmbeddedGltf();
-        }
-    };
-    
-    /**
-     * The Action for converting the {@link GltfData} of the currently 
-     * selected frame into a binary glTF
-     * 
-     * @see #convertToBinaryGltf()
-     */
-    private final Action convertToBinaryGltfAction = new AbstractAction()
-    {
-        /**
-         * Serial UID
-         */
-        private static final long serialVersionUID = 8683961991846940413L;
-
-        // Initialization
-        {
-            putValue(NAME, "Convert to binary glTF");
-            putValue(SHORT_DESCRIPTION, 
-                "Convert the currently selected glTF into a binary glTF");
-            putValue(MNEMONIC_KEY, new Integer(KeyEvent.VK_B));
-            setEnabled(false);
-        }
-        
-        @Override
-        public void actionPerformed(ActionEvent e)
-        {
-            convertToBinaryGltf();
-        }
-    };
-    
     /**
      * The Action for exiting the application
      * 
@@ -310,21 +233,6 @@ class GltfBrowserApplication
 
     };
 
-    /**
-     * The menu showing the most recently used URIs
-     */
-    private JMenu recentUrisMenu;
-    
-    /**
-     * The number of recently used entries
-     */
-    private static final int NUM_RECENT_URI_ENTRIES = 8;
-    
-    /**
-     * The recent URIs
-     */
-    private Deque<URI> recentUris;
-    
     /**
      * The main frame of the application
      */
@@ -354,6 +262,11 @@ class GltfBrowserApplication
      * The FileChooser for saving binary glTF files
      */
     private final JFileChooser saveBinaryFileChooser;
+    
+    /**
+     * The {@link RecentUrisMenu} handler for the most recent URIs menu
+     */
+    private final RecentUrisMenu recentUrisMenu;
     
     /**
      * The desktop pane that will contain the internal frames with
@@ -390,8 +303,6 @@ class GltfBrowserApplication
                     {
                         selectedInternalFrame = 
                             (JInternalFrame)event.getSource();
-                        convertToEmbeddedGltfAction.setEnabled(true);
-                        convertToBinaryGltfAction.setEnabled(true);
                         saveAsAction.setEnabled(true);
                         saveAsBinaryAction.setEnabled(true);
                     }
@@ -404,18 +315,19 @@ class GltfBrowserApplication
      */
     GltfBrowserApplication()
     {
-        recentUris = new LinkedList<URI>();
-        
         frame = new JFrame("GltfBrowser");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         GltfTransferHandler transferHandler = 
             new GltfTransferHandler(this);
         frame.setTransferHandler(transferHandler);
+
+        recentUrisMenu = new RecentUrisMenu(
+            GltfBrowserApplication.class.getSimpleName(),
+            uri -> openUriInBackground(uri));
         
         menuBar = new JMenuBar();
         menuBar.add(createFileMenu());
-        menuBar.add(createConvertMenu());
         frame.setJMenuBar(menuBar);
         
         openFileChooser = new JFileChooser(".");
@@ -524,9 +436,7 @@ class GltfBrowserApplication
         fileMenu.add(new JMenuItem(openUriAction));
         fileMenu.add(new JSeparator());
 
-        recentUrisMenu = new JMenu("Recent");
-        updateRecentUrisMenu();
-        fileMenu.add(recentUrisMenu);
+        fileMenu.add(recentUrisMenu.getMenu());
         fileMenu.add(new JSeparator());
 
         fileMenu.add(new JMenuItem(importObjFileAction));
@@ -538,130 +448,6 @@ class GltfBrowserApplication
         fileMenu.add(new JMenuItem(exitAction));
         return fileMenu;
     }
-    
-    /**
-     * Update the {@link #recentUrisMenu} based on the contents of the
-     * current recent URIs file
-     */
-    private void updateRecentUrisMenu()
-    {
-        readRecentUris();
-        recentUrisMenu.removeAll();
-        for (URI uri : recentUris)
-        {
-            JMenuItem menuItem = new JMenuItem(uri.toString());
-            menuItem.addActionListener(
-                e -> openUriInBackground(uri));
-            recentUrisMenu.add(menuItem);
-        }
-    }
-    
-    /**
-     * Returns the file that stores the recently used URIs
-     * 
-     * @return The file
-     */
-    private File getRecentUrisFile()
-    {
-        return Paths.get(System.getProperty("java.io.tmpdir"), 
-            this.getClass().getSimpleName()+"_recentUris.txt").toFile();
-    }
-    
-    /**
-     * Read the {@link #recentUris} from the temporary file
-     */
-    private void readRecentUris()
-    {
-        recentUris.clear();
-        File recentUrisFile = getRecentUrisFile();
-        if (recentUrisFile.exists())
-        {
-            try
-            {
-                List<String> uriStrings = 
-                    Files.readAllLines(recentUrisFile.toPath());
-                for (String uriString : uriStrings)
-                {
-                    try
-                    {
-                        URI uri = new URI(uriString);
-                        recentUris.add(uri);
-                    } 
-                    catch (URISyntaxException e)
-                    {
-                        // Should never happen here, unless the user
-                        // messed around in the file manually...
-                        logger.warning("Invalid URI string: " + uriString);
-                    }
-                }
-            }
-            catch (IOException e)
-            {
-                logger.warning(
-                    "Could not read recent URIs: " + e.getMessage());
-            }
-        }
-    }
-    
-    /**
-     * Update the recently used URIs with the given URI. This will update
-     * the list, the file, and the menu.
-     * 
-     * @param uri The most recent URI
-     */
-    private void updateRecentUris(URI uri)
-    {
-        recentUris.remove(uri);
-        recentUris.addFirst(uri);
-        while (recentUris.size() > NUM_RECENT_URI_ENTRIES)
-        {
-            recentUris.removeLast();
-        }
-        writeRecentUris();
-        updateRecentUrisMenu();
-    }
-    
-    /**
-     * Write the current {@link #recentUris} to the recent URIs file
-     */
-    private void writeRecentUris()
-    {
-        File recentUrisFile = getRecentUrisFile();
-        try (BufferedWriter bufferedWriter = 
-                new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream(recentUrisFile))))
-        {
-            for (URI uri : recentUris)
-            {
-                bufferedWriter.write(uri.toString()+System.lineSeparator());
-            }
-        } 
-        catch (IOException e)
-        {
-            logger.warning(
-                "Could not write recent URIs: " + e.getMessage());
-        }
-    }
-    
-    
-
-
-    
-    /**
-     * Create the conversions menu
-     * 
-     * @return The conversions menu
-     */
-    private JMenu createConvertMenu()
-    {
-        JMenu convertMenu = new JMenu("Convert");
-        convertMenu.add(new JMenuItem(convertToEmbeddedGltfAction));
-        convertMenu.add(new JMenuItem(convertToBinaryGltfAction));
-        return convertMenu;
-    }
-    
-    
-    
     
     /**
      * Open the file chooser to select a file which will be 
@@ -718,9 +504,9 @@ class GltfBrowserApplication
     }
     
     /**
-     * Execute the task of loading the {@link GltfData} in a background 
+     * Execute the task of loading the {@link GltfModel} in a background 
      * thread, showing a modal dialog. When the data is loaded, it will 
-     * be passed to {@link #createGltfBrowserPanel(String, GltfData, String)}
+     * be passed to {@link #createGltfBrowserPanel(String, GltfModel)}
      * 
      * @param uri The URI to load from
      */
@@ -728,7 +514,8 @@ class GltfBrowserApplication
     {
         logger.info("Loading " + uri);
         
-        updateRecentUris(uri);
+        recentUrisMenu.update(uri);
+        
         GltfLoadingWorker gltfLoadingWorker = 
             new GltfLoadingWorker(this, frame, uri);
         gltfLoadingWorker.load();
@@ -756,64 +543,62 @@ class GltfBrowserApplication
      */
     private void importObjUriInBackground(URI uri)
     {
-        BufferStrategy bufferStrategy = 
-            objImportAccessoryPanel.getSelectedBufferStrategy();
-        Integer indicesComponentType = 
-            objImportAccessoryPanel.getSelectedIndicesComponentType();
-        boolean assigningRandomColorsToParts =
-            objImportAccessoryPanel.isAssigningRandomColorsToParts();
-        SwingTask<GltfData, ?> swingTask = new SwingTask<GltfData, Void>()
-        {
-            @Override
-            protected GltfData doInBackground() throws Exception
-            {
-                ObjGltfDataCreator objGltfDataCreator = 
-                    new ObjGltfDataCreator(bufferStrategy);
-                objGltfDataCreator.setIndicesComponentType(
-                    indicesComponentType);
-                objGltfDataCreator.setAssigningRandomColorsToParts(
-                    assigningRandomColorsToParts);
-                return objGltfDataCreator.create(uri);
-            }
-        };
-        swingTask.addDoneCallback(task -> 
-        {
-            try
-            {
-                GltfData gltfData = task.get();
-                String frameTitle =
-                    "glTF for " + IO.extractFileName(uri);
-                createGltfBrowserPanel(frameTitle, gltfData, null);
-            } 
-            catch (InterruptedException e)
-            {
-                Thread.currentThread().interrupt();
-            }
-            catch (ExecutionException e)
-            {
-                JOptionPane.showMessageDialog(frame, 
-                    "Could not read " + uri + ": " + e.getMessage(), 
-                    "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        });
-        SwingTaskExecutors.create(swingTask)
-            .build()
-            .execute();            
+        int XXX; // Not implemented yet
+//        BufferStrategy bufferStrategy = 
+//            objImportAccessoryPanel.getSelectedBufferStrategy();
+//        Integer indicesComponentType = 
+//            objImportAccessoryPanel.getSelectedIndicesComponentType();
+//        boolean assigningRandomColorsToParts =
+//            objImportAccessoryPanel.isAssigningRandomColorsToParts();
+//        SwingTask<GltfData, ?> swingTask = new SwingTask<GltfData, Void>()
+//        {
+//            @Override
+//            protected GltfData doInBackground() throws Exception
+//            {
+//                ObjGltfDataCreator objGltfDataCreator = 
+//                    new ObjGltfDataCreator(bufferStrategy);
+//                objGltfDataCreator.setIndicesComponentType(
+//                    indicesComponentType);
+//                objGltfDataCreator.setAssigningRandomColorsToParts(
+//                    assigningRandomColorsToParts);
+//                return objGltfDataCreator.create(uri);
+//            }
+//        };
+//        swingTask.addDoneCallback(task -> 
+//        {
+//            try
+//            {
+//                GltfData gltfData = task.get();
+//                String frameTitle =
+//                    "glTF for " + IO.extractFileName(uri);
+//                //createGltfBrowserPanel(frameTitle, gltfData, null);
+//            } 
+//            catch (InterruptedException e)
+//            {
+//                Thread.currentThread().interrupt();
+//            }
+//            catch (ExecutionException e)
+//            {
+//                JOptionPane.showMessageDialog(frame, 
+//                    "Could not read " + uri + ": " + e.getMessage(), 
+//                    "Error", JOptionPane.ERROR_MESSAGE);
+//            }
+//        });
+//        SwingTaskExecutors.create(swingTask)
+//            .build()
+//            .execute();            
     }
 
     /**
-     * Create the {@link GltfBrowserPanel} for the given {@link GltfData}, 
+     * Create the {@link GltfBrowserPanel} for the given {@link GltfModel}, 
      * and add it (in an internal frame with the given string as its title)
      * to the desktop pane
      * 
      * @param frameTitle The internal frame title
-     * @param gltfData The {@link GltfData}
-     * @param jsonString The JSON string that the glTF was read from. This
-     * may be <code>null</code> if the {@link GltfData} was not read, but
-     * created programmatically.
+     * @param gltfModel The {@link GltfModel}
      */
     void createGltfBrowserPanel(
-        String frameTitle, GltfData gltfData, String jsonString)
+        String frameTitle, GltfModel gltfModel)
     {
         final boolean resizable = true;
         final boolean closable = true;
@@ -823,7 +608,7 @@ class GltfBrowserApplication
             frameTitle, resizable, closable , maximizable, iconifiable);
         internalFrame.addPropertyChangeListener(selectedInternalFrameTracker);
         GltfBrowserPanel gltfBrowserPanel = 
-            new GltfBrowserPanel(gltfData, jsonString);
+            new GltfBrowserPanel(gltfModel.getGltf(), gltfModel);
         internalFrame.getContentPane().add(gltfBrowserPanel);
         internalFrame.setSize(
             desktopPane.getWidth(), 
@@ -851,13 +636,13 @@ class GltfBrowserApplication
     }
     
     /**
-     * Returns the {@link GltfData} of the {@link GltfBrowserPanel} of 
+     * Returns the {@link GltfModel} of the {@link GltfBrowserPanel} of 
      * the currently selected, or <code>null</code> if there is no
-     * selected {@link GltfData}
+     * selected {@link GltfModel}
      * 
-     * @return The selected {@link GltfData}, or <code>null</code>
+     * @return The selected {@link GltfModel}, or <code>null</code>
      */
-    private GltfData getSelectedGltfData()
+    private GltfModel getSelectedGltfModel()
     {
         if (selectedInternalFrame == null)
         {
@@ -872,53 +657,13 @@ class GltfBrowserApplication
             return null;
         }
         GltfBrowserPanel gltfBrowserPanel = (GltfBrowserPanel)component;
-        GltfData gltfData = gltfBrowserPanel.getGltfData();
-        return gltfData;
+        GltfModel gltfModel =  gltfBrowserPanel.getGltfModel();
+        return gltfModel;
     }
 
-    
-    /**
-     * Convert the {@link GltfData} of the {@link GltfBrowserPanel} of 
-     * the currently selected internal frame into an embedded glTF,
-     * and open the result in a new frame
-     */
-    private void convertToEmbeddedGltf()
-    {
-        GltfData gltfData = getSelectedGltfData();
-        if (gltfData == null)
-        {
-            return;
-        }
-        GltfData convertedGltfData = 
-            new GltfDataToEmbeddedConverter().convert(gltfData);
-        createGltfBrowserPanel(
-            "Embedded of " + selectedInternalFrame.getTitle(), 
-            convertedGltfData, null);
-    }
-    
-
-    /**
-     * Convert the {@link GltfData} of the {@link GltfBrowserPanel} of 
-     * the currently selected internal frame into a binary glTF,
-     * and open the result in a new frame
-     */
-    private void convertToBinaryGltf()
-    {
-        GltfData gltfData = getSelectedGltfData();
-        if (gltfData == null)
-        {
-            return;
-        }
-        GltfData convertedGltfData = 
-            new GltfDataToBinaryConverter().convert(gltfData);
-        createGltfBrowserPanel(
-            "Binary of " + selectedInternalFrame.getTitle(), 
-            convertedGltfData, null);
-    }
-    
     /**
      * Open a file chooser to let the user select the file that the
-     * {@link GltfData} of the {@link GltfBrowserPanel} of the currently 
+     * {@link GltfModel} of the {@link GltfBrowserPanel} of the currently 
      * selected internal frame should be written to.
      */
     void saveAs()
@@ -965,21 +710,21 @@ class GltfBrowserApplication
     
     
     /**
-     * Save the currently selected {@link GltfData} to the given file
+     * Save the currently selected {@link GltfModel} to the given file
      * 
      * @param file The target file
      */
     private void save(File file)
     {
-        GltfData gltfData = getSelectedGltfData();
-        if (gltfData == null)
+        GltfModel gltfModel = getSelectedGltfModel();
+        if (gltfModel == null)
         {
             return;
         }
         try
         {
-            new GltfDataWriter().writeGltfData(
-                gltfData, file.getAbsolutePath());
+            int XXX; // Not implemented yet
+            throw new IOException("Not implemented");
         } 
         catch (IOException e)
         {
@@ -992,7 +737,7 @@ class GltfBrowserApplication
     
     /**
      * Open a file chooser to let the user select the file that the
-     * {@link GltfData} of the {@link GltfBrowserPanel} of the currently 
+     * {@link GltfModel} of the {@link GltfBrowserPanel} of the currently 
      * selected internal frame should be written to as a binary file
      */
     void saveAsBinary()
@@ -1018,22 +763,22 @@ class GltfBrowserApplication
     }
 
     /**
-     * Save the currently selected {@link GltfData} to the given file
+     * Save the currently selected {@link GltfModel} to the given file
      * as a binary glTF
      * 
      * @param file The target file
      */
     private void saveBinary(File file)
     {
-        GltfData gltfData = getSelectedGltfData();
-        if (gltfData == null)
+        GltfModel gltfModel = getSelectedGltfModel();
+        if (gltfModel == null)
         {
             return;
         }
         try
         {
-            new BinaryGltfDataWriter().writeBinaryGltfData(
-                gltfData, file.getAbsolutePath());
+            int XXX; // Not implemented yet
+            throw new IOException("Not implemented");
         } 
         catch (IOException e)
         {

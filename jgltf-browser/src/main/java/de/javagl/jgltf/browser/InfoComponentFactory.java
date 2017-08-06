@@ -30,7 +30,6 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -41,10 +40,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.ByteBuffer;
 import java.util.LinkedHashSet;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
@@ -58,26 +53,15 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
 import javax.swing.JTextArea;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingUtilities;
 import javax.swing.tree.TreePath;
 
-import de.javagl.jgltf.impl.v1.Accessor;
 import de.javagl.jgltf.impl.v1.GlTF;
-import de.javagl.jgltf.impl.v1.Image;
-import de.javagl.jgltf.impl.v1.Shader;
-import de.javagl.jgltf.model.AccessorByteData;
-import de.javagl.jgltf.model.AccessorDatas;
-import de.javagl.jgltf.model.AccessorFloatData;
-import de.javagl.jgltf.model.AccessorIntData;
-import de.javagl.jgltf.model.AccessorShortData;
 import de.javagl.jgltf.model.GltfConstants;
-import de.javagl.jgltf.model.GltfData;
+import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.model.io.GltfWriter;
-import de.javagl.jgltf.model.io.JsonUtils;
+import de.javagl.jgltf.model.v1.GltfModelV1;
 import de.javagl.swing.tasks.SwingTask;
 import de.javagl.swing.tasks.SwingTaskExecutors;
 
@@ -94,14 +78,9 @@ class InfoComponentFactory
         Logger.getLogger(InfoComponentFactory.class.getName());
     
     /**
-     * The {@link GltfData} that the information will be obtained from
+     * The {@link GltfModel} that the information will be obtained from
      */
-    private final GltfData gltfData;
-    
-    /**
-     * The JSON string that the glTF was read from
-     */
-    private final String jsonString;
+    private final GltfModel gltfModel;
     
     /**
      * The FileChooser for saving files
@@ -110,17 +89,13 @@ class InfoComponentFactory
     
     /**
      * Create a factory for creating info components for the elements
-     * that appear in the given {@link GltfData}
+     * that appear in the given {@link GltfModel}
      * 
-     * @param gltfData The backing {@link GltfData}
-     * @param jsonString The JSON string that the glTF was read from. This 
-     * may be <code>null</code> if the given {@link GltfData} was not read, 
-     * but created programmatically.
+     * @param gltfModel The backing {@link GltfModel}
      */
-    InfoComponentFactory(GltfData gltfData, String jsonString)
+    InfoComponentFactory(GltfModel gltfModel)
     {
-        this.gltfData = gltfData;
-        this.jsonString = jsonString;
+        this.gltfModel = gltfModel;
         this.saveFileChooser = new JFileChooser();
     }
     
@@ -202,47 +177,14 @@ class InfoComponentFactory
     private JComponent createJsonInfoComponent()
     {
         JPanel jsonInfoPanel = new JPanel(new FlowLayout());
-        
-        if (jsonString == null)
+        JButton createButton = new JButton("Create JSON...");
+        createButton.addActionListener( e -> 
         {
-            jsonInfoPanel.add(new JLabel(
-                "<html>The glTF was not read from a JSON input, <br>" + 
-                "but created programmatically.</html>"));
-            JButton createButton = new JButton("Create JSON...");
-            createButton.addActionListener( e -> 
-            {
-                createButton.setText("Creating JSON...");
-                createButton.setEnabled(false);
-                createJson(jsonInfoPanel);
-            });
-            jsonInfoPanel.add(createButton);
-        }
-        else
-        {
-            jsonInfoPanel.setLayout(new BorderLayout());
-            
-            JPanel buttonPanel = new JPanel(new FlowLayout());
-            JButton formatButton = new JButton("Format JSON");
-            formatButton.addActionListener( e -> 
-            {
-                String formattedJsonString = JsonUtils.format(jsonString);
-                JComponent textInfoPanel = 
-                    createTextInfoPanel("JSON:", formattedJsonString);
-                jsonInfoPanel.removeAll();
-                jsonInfoPanel.setLayout(new GridLayout(1,1));
-                jsonInfoPanel.add(textInfoPanel);
-                jsonInfoPanel.revalidate();
-            });
-            buttonPanel.add(formatButton);
-            jsonInfoPanel.add(buttonPanel, BorderLayout.NORTH);
-            
-            JComponent textInfoPanel = 
-                createTextInfoPanel("JSON:", jsonString);
-            jsonInfoPanel.add(textInfoPanel, BorderLayout.CENTER);
-            
-            
-        }
-        
+            createButton.setText("Creating JSON...");
+            createButton.setEnabled(false);
+            createJson(jsonInfoPanel);
+        });
+        jsonInfoPanel.add(createButton);
         return jsonInfoPanel;
     }
     
@@ -255,7 +197,7 @@ class InfoComponentFactory
      */
     private void createJson(JPanel jsonInfoPanel)
     {
-        GlTF gltf = gltfData.getGltf();
+        Object gltf = gltfModel.getGltf();
         SwingTask<String, ?> swingTask = new SwingTask<String, Void>()
         {
             @Override
@@ -304,15 +246,15 @@ class InfoComponentFactory
      * may contain only an error message if creating the actual JSON string
      * caused an exception.
      * 
-     * @param gltf The {@link GlTF}
+     * @param gltf The glTF object
      * @return The The JSON string
      */
-    private static String createJsonString(GlTF gltf)
+    private static String createJsonString(Object gltf)
     {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream())
         {
             GltfWriter gltfWriter = new GltfWriter();
-            gltfWriter.writeGltf(gltf, baos);
+            gltfWriter.write(gltf, baos);
             return new String(baos.toByteArray());
         }
         catch (IOException e)
@@ -332,253 +274,21 @@ class InfoComponentFactory
      */
     private JComponent createGenericInfoComponent(Object selectedValue)
     {
-        if (selectedValue instanceof Image)
+        if (gltfModel instanceof GltfModelV1)
         {
-            return createImageInfoComponent(selectedValue);
+            GltfModelV1 gltfModelV1 = (GltfModelV1)gltfModel;
+            InfoComponentFactoryV1 infoComponentFactory =
+                new InfoComponentFactoryV1(this, gltfModelV1);
+            return infoComponentFactory.createGenericInfoComponent(
+                selectedValue);
         }
-        if (selectedValue instanceof Shader)
-        {
-            return createShaderInfoComponent(selectedValue);
-        }
-        if (selectedValue instanceof Accessor)
-        {
-            Accessor accessor = (Accessor)selectedValue;
-            return createAccessorInfoComponent(accessor);
-        }
+        
+        // TODO Implement info components for GltfModelV2
+        logger.warning("GltfModelV2 is not supported yet");
+        
         return null;
     }
 
-    /**
-     * Create an info component for the given {@link Accessor}
-     * 
-     * @param accessor The {@link Accessor}
-     * @return The info component
-     */
-    private JComponent createAccessorInfoComponent(Accessor accessor)
-    {
-        JPanel panel = new JPanel(new BorderLayout());
-        
-        JPanel controlPanel = new JPanel(new FlowLayout());
-        controlPanel.add(new JLabel("Elements per row:"));
-        JSpinner numElementsPerRowSpinner = 
-            new JSpinner(new SpinnerNumberModel(1, 0, (1<<20), 1));
-        controlPanel.add(numElementsPerRowSpinner);
-        
-        panel.add(controlPanel, BorderLayout.NORTH);
-        
-        JPanel dataPanel = new JPanel(new BorderLayout());
-        dataPanel.add(new JLabel("Accessor data:"), BorderLayout.NORTH);
-        JTextArea textArea = new JTextArea();
-        textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        dataPanel.add(new JScrollPane(textArea));
-        
-        updateAccessorDataText(textArea, accessor, 1);
-
-        panel.add(dataPanel, BorderLayout.CENTER);
-        
-        numElementsPerRowSpinner.addChangeListener(e -> 
-        {
-            Object valueObject = numElementsPerRowSpinner.getValue();
-            Number valueNumber = (Number)valueObject;
-            int elementsPerRow = valueNumber.intValue();
-            if (elementsPerRow <= 0)
-            {
-                elementsPerRow = Integer.MAX_VALUE;
-            }
-            updateAccessorDataText(textArea, accessor, elementsPerRow);
-        });
-
-        return panel;
-    }
-    
-    /**
-     * Update the text in the given text area to show the data of the
-     * given {@link Accessor}, with the specified number of elements 
-     * per row. Depending on the size of the accessor data, this may
-     * take long, so this is implemented as a background task that
-     * is shielded by a modal dialog.
-     * 
-     * @param textArea The target text area 
-     * @param accessor The {@link Accessor}
-     * @param elementsPerRow The number of elements per row
-     */
-    private void updateAccessorDataText(
-        JTextArea textArea, Accessor accessor, int elementsPerRow)
-    {
-        SwingTask<String, ?> swingTask = new SwingTask<String, Void>()
-        {
-            @Override
-            protected String doInBackground() throws Exception
-            {
-                return createDataString(accessor, elementsPerRow);
-            }
-            
-            @Override
-            protected void done()
-            {
-                try
-                {
-                    String string = get();
-                    textArea.setText(string);
-                    SwingUtilities.invokeLater(() ->
-                        textArea.scrollRectToVisible(new Rectangle(0,0,1,1)));
-                } 
-                catch (InterruptedException e)
-                {
-                    Thread.currentThread().interrupt();
-                }
-                catch (ExecutionException e)
-                {
-                    // Should never happen: createDataString handles this
-                    StringWriter sw = new StringWriter();
-                    e.printStackTrace(new PrintWriter(sw));
-                    textArea.setText(sw.toString());
-                }
-            }
-        };
-        SwingTaskExecutors.create(swingTask)
-            .setMillisToPopup(1000)
-            .build()
-            .execute();            
-        
-    }
-    
-    /**
-     * Create a (possibly large) string representation of the data of 
-     * the given accessor
-     * 
-     * @param accessor The accessor
-     * @param elementsPerRow The number of elements per row
-     * @return The string
-     */
-    private String createDataString(Accessor accessor, int elementsPerRow)
-    {
-        try
-        {
-            return createDataStringUnchecked(accessor, elementsPerRow);
-        }
-        catch (Exception e)
-        {
-            // When there have been errors in the input file, many
-            // things can go wrong when trying to create the data
-            // string. Handle this case here ... pragmatically: 
-            StringWriter sw = new StringWriter();
-            e.printStackTrace(new PrintWriter(sw));
-            return "Error while creating string. " + 
-                "Input file may be invalid.\n" + sw.toString();
-        }
-    }
-    
-    /**
-     * Create a (possibly large) string representation of the data of 
-     * the given accessor
-     * 
-     * @param accessor The accessor
-     * @param elementsPerRow The number of elements per row
-     * @return The string
-     */
-    private String createDataStringUnchecked(
-        Accessor accessor, int elementsPerRow)
-    {
-        if (accessor == null)
-        {
-            return "(null)";
-        }
-        if (AccessorDatas.hasByteComponents(accessor))
-        {
-            AccessorByteData accessorData = 
-                AccessorDatas.createByte(accessor, gltfData);
-            String accessorDataString = 
-                accessorData.createString(
-                    Locale.ENGLISH, "%4d", elementsPerRow);
-            return accessorDataString;
-        }
-        if (AccessorDatas.hasShortComponents(accessor))
-        {
-            AccessorShortData accessorData = 
-                AccessorDatas.createShort(accessor, gltfData);
-            String accessorDataString = 
-                accessorData.createString(
-                    Locale.ENGLISH, "%6d", elementsPerRow);
-            return accessorDataString;
-        }
-        if (AccessorDatas.hasIntComponents(accessor))
-        {
-            AccessorIntData accessorData = 
-                AccessorDatas.createInt(accessor, gltfData);
-            String accessorDataString = 
-                accessorData.createString(
-                    Locale.ENGLISH, "%11d", elementsPerRow);
-            return accessorDataString;
-        }
-        if (AccessorDatas.hasFloatComponents(accessor))
-        {
-            AccessorFloatData accessorData = 
-                AccessorDatas.createFloat(accessor, gltfData);
-            String accessorDataString = 
-                accessorData.createString(
-                    Locale.ENGLISH, "%10.5f", elementsPerRow);
-            return accessorDataString;
-        }
-        return "Invalid accessor component type: "+
-            GltfConstants.stringFor(accessor.getComponentType());
-
-        
-    }
-
-    /**
-     * Create an info component for the given selected value (which is 
-     * assumed to be an {@link Shader})
-     * 
-     * @param selectedValue The selected value
-     * @return The info component
-     */
-    private JComponent createShaderInfoComponent(Object selectedValue)
-    {
-        GlTF gltf = gltfData.getGltf();
-        Map<String, Shader> map = gltf.getShaders();
-        String key = findKey(map, selectedValue);
-        if (key == null)
-        {
-            return createMessageInfoPanel("Could not find shader in glTF");
-        }
-        ByteBuffer shaderData = gltfData.getShaderData(key);
-        String shaderString = Buffers.readAsString(shaderData);
-        if (shaderString == null)
-        {
-            return createMessageInfoPanel(
-                "Could not find shader data for " + selectedValue + 
-                "with ID " + key);
-        }
-        return createTextInfoPanel("Shader source code:", shaderString);
-    }
-
-    /**
-     * Create an info component for the given selected value (which is 
-     * assumed to be an {@link Image})
-     * 
-     * @param selectedValue The selected value
-     * @return The info component
-     */
-    private JComponent createImageInfoComponent(Object selectedValue)
-    {
-        GlTF gltf = gltfData.getGltf();
-        Map<String, Image> map = gltf.getImages();
-        String key = findKey(map, selectedValue);
-        if (key == null)
-        {
-            return createMessageInfoPanel("Could not find image in glTF");
-        }
-        ByteBuffer imageData = gltfData.getImageData(key);
-        BufferedImage bufferedImage = readAsBufferedImage(imageData);
-        if (bufferedImage == null)
-        {
-            return createMessageInfoPanel(
-                "Could not find image data for " + selectedValue + 
-                "with ID " + key);
-        }
-        return createImageInfoPanel(bufferedImage);
-    }
 
     /**
      * Returns the contents of the given buffer as a <code>BufferedImage</code>,
@@ -588,7 +298,7 @@ class InfoComponentFactory
      * @param byteBuffer The byte buffer
      * @return The buffered image
      */
-    private static BufferedImage readAsBufferedImage(ByteBuffer byteBuffer)
+    static BufferedImage readAsBufferedImage(ByteBuffer byteBuffer)
     {
         if (byteBuffer == null)
         {
@@ -611,7 +321,7 @@ class InfoComponentFactory
      * @param string The message string
      * @return The component
      */
-    private JComponent createMessageInfoPanel(String string)
+    JComponent createMessageInfoPanel(String string)
     {
         JPanel messageInfoPanel = new JPanel(new FlowLayout());
         messageInfoPanel.add(new JLabel(string));
@@ -624,7 +334,7 @@ class InfoComponentFactory
      * @param image The image
      * @return The component
      */
-    private JComponent createImageInfoPanel(BufferedImage image)
+    JComponent createImageInfoPanel(BufferedImage image)
     {
         JPanel imageInfoPanel = new JPanel(new BorderLayout());
         
@@ -692,7 +402,7 @@ class InfoComponentFactory
      * @param text The text
      * @return The component
      */
-    private JComponent createTextInfoPanel(String title, String text)
+    JComponent createTextInfoPanel(String title, String text)
     {
         JPanel textInfoPanel = new JPanel(new BorderLayout());
         
@@ -754,29 +464,5 @@ class InfoComponentFactory
         }
     }
 
-    /**
-     * Find the key of the given map that is mapped to the given value.
-     * Returns <code>null</code> if the given map is <code>null</code>,
-     * or if no matching key is found
-     * 
-     * @param map The map
-     * @param value The value
-     * @return The key
-     */
-    private static <K> K findKey(Map<K, ?> map, Object value)
-    {
-        if (map == null)
-        {
-            return null;
-        }
-        for (Entry<K, ?> entry : map.entrySet())
-        {
-            if (Objects.equals(entry.getValue(), value))
-            {
-                return entry.getKey();
-            }
-        }
-        return null;
-    }
     
 }

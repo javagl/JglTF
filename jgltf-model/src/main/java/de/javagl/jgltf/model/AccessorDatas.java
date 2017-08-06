@@ -1,5 +1,4 @@
 /*
- * www.javagl.de - JglTF
  *
  * Copyright 2015-2016 Marco Hutter - http://www.javagl.de
  *
@@ -28,13 +27,10 @@ package de.javagl.jgltf.model;
 
 import java.nio.ByteBuffer;
 
-import de.javagl.jgltf.impl.v1.Accessor;
-import de.javagl.jgltf.impl.v1.BufferView;
-
 /**
- * Methods to create instances of the {@link Accessor} data utility classes
+ * Methods to create instances of the accessor data utility classes
  * that allow a <i>typed</i> access to the data that is contained in the
- * {@link BufferView} that the {@link Accessor} refers to.<br>
+ * buffer view that the accessor refers to.<br>
  * <br>
  * Unless otherwise noted, none of the arguments to these methods may 
  * be <code>null</code>.
@@ -187,328 +183,284 @@ public class AccessorDatas
     
     
     /**
-     * Returns whether the {@link Accessor#getComponentType() component type}
-     * of the given {@link Accessor} is <code>GL_BYTE</code> or
+     * Returns whether the {@link AccessorModel#getComponentType() component 
+     * type} of the given {@link AccessorModel} is <code>GL_BYTE</code> or
      * <code>GL_UNSIGNED_BYTE</code>. 
      * 
      * 
-     * @param accessor The {@link Accessor}
-     * @return Whether the {@link Accessor} has <code>byte</code> components
+     * @param accessorModel The {@link AccessorModel}
+     * @return Whether the {@link AccessorModel} has <code>byte</code> 
+     * components
      */
-    public static boolean hasByteComponents(Accessor accessor)
+    public static boolean hasByteComponents(AccessorModel accessorModel)
     {
-        return isByteType(accessor.getComponentType());
+        return isByteType(accessorModel.getComponentType());
     }
 
     /**
-     * Make sure that the {@link Accessor#getComponentType() component type}
-     * of the given {@link Accessor} is <code>GL_BYTE</code> or 
+     * Make sure that the {@link AccessorModel#getComponentType() component 
+     * type} of the given {@link AccessorModel} is <code>GL_BYTE</code> or 
      * <code>GL_UNSIGNED_BYTE</code>, and throw an 
      * <code>IllegalArgumentException</code> if this is not the case.
      * 
-     * @param accessor The {@link Accessor}
-     * @throws IllegalArgumentException If the given accessor has a 
-     * {@link Accessor#getComponentType() component type} type that is not 
-     * <code>GL_BYTE</code> or <code>GL_UNSIGNED_BYTE</code>
+     * @param accessorModel The {@link AccessorModel}
+     * @throws IllegalArgumentException If the given accessorModel has a 
+     * {@link AccessorModel#getComponentType() component type} type that is 
+     * not <code>GL_BYTE</code> or <code>GL_UNSIGNED_BYTE</code>
      */
-    public static void validateByteComponents(Accessor accessor)
+    public static void validateByteComponents(AccessorModel accessorModel)
     {
-        validateByteType(accessor.getComponentType());
+        validateByteType(accessorModel.getComponentType());
     }
     
     /**
-     * Creates an {@link AccessorByteData} for the given {@link Accessor}
+     * Creates an {@link AccessorByteData} for the given {@link AccessorModel}
      * 
-     * @param accessor The {@link Accessor}
-     * @param gltfData The {@link GltfData} that contains the byte buffer of
-     * the {@link BufferView} referenced by the {@link Accessor}
+     * @param accessorModel The {@link AccessorModel}
      * @return The {@link AccessorByteData}
      * @throws IllegalArgumentException If the 
-     * {@link Accessor#getComponentType() component type} of the given
+     * {@link AccessorModel#getComponentType() component type} of the given
      * accessor is not <code>GL_BYTE</code> or <code>GL_UNSIGNED_BYTE</code>
-     * @throws GltfException If the {@link Accessor#getBufferView()} refers
-     * to a {@link BufferView} that does not exist 
      */
-    public static AccessorByteData createByte(
-        Accessor accessor, GltfData gltfData)
+    public static AccessorByteData createByte(AccessorModel accessorModel)
     {
-        String bufferViewId = accessor.getBufferView();
-        ByteBuffer bufferViewData = 
-            GltfDatas.getBufferViewData(gltfData, bufferViewId);
-        if (bufferViewData == null)
-        {
-            throw new GltfException("The data  for the accessor buffer "
-                + "view with ID " + bufferViewId + " could not be obtained");
-        }
-        return createByte(accessor, bufferViewData);
+        BufferViewModel bufferViewModel = accessorModel.getBufferViewModel();
+        return createByte(accessorModel, bufferViewModel.getBufferViewData());
     }
     
     /**
-     * Creates an {@link AccessorByteData} for the given {@link Accessor}
+     * Creates an {@link AccessorByteData} for the given {@link AccessorModel}
      * 
-     * @param accessor The {@link Accessor}
-     * @param bufferViewByteBuffer The  byte buffer of the 
-     * {@link BufferView} referenced by the {@link Accessor}
+     * @param accessorModel The {@link AccessorModel}
+     * @param bufferViewByteBuffer The byte buffer of the 
+     * {@link BufferViewModel} referenced by the {@link AccessorModel}
      * @return The {@link AccessorByteData}
      * @throws NullPointerException If any argument is <code>null</code>
      * @throws IllegalArgumentException If the 
-     * {@link Accessor#getComponentType() component type} of the given
-     * accessor is not <code>GL_BYTE</code> or <code>GL_UNSIGNED_BYTE</code>
+     * {@link AccessorModel#getComponentType() component type} of the given
+     * accessorModel is not <code>GL_BYTE</code> or 
+     * <code>GL_UNSIGNED_BYTE</code>
      */
     public static AccessorByteData createByte(
-        Accessor accessor, ByteBuffer bufferViewByteBuffer)
+        AccessorModel accessorModel, ByteBuffer bufferViewByteBuffer)
     {
-        return new AccessorByteData(accessor.getComponentType(), 
+        return new AccessorByteData(accessorModel.getComponentType(), 
             bufferViewByteBuffer,
-            accessor.getByteOffset(),
-            accessor.getCount(),
-            Accessors.getNumComponentsForAccessorType(accessor.getType()),
-            accessor.getByteStride());
+            accessorModel.getByteOffset(),
+            accessorModel.getCount(),
+            accessorModel.getElementType().getNumComponents(),
+            accessorModel.getByteStride());
     }
     
     
-    
     /**
-     * Returns whether the {@link Accessor#getComponentType() component type}
-     * of the given {@link Accessor} is <code>GL_SHORT</code> or
+     * Returns whether the {@link AccessorModel#getComponentType() component 
+     * type} of the given {@link AccessorModel} is <code>GL_SHORT</code> or
      * <code>GL_UNSIGNED_SHORT</code>. 
      * 
      * 
-     * @param accessor The {@link Accessor}
-     * @return Whether the {@link Accessor} has <code>short</code> components
+     * @param accessorModel The {@link AccessorModel}
+     * @return Whether the {@link AccessorModel} has <code>short</code> 
+     * components
      */
-    public static boolean hasShortComponents(Accessor accessor)
+    public static boolean hasShortComponents(AccessorModel accessorModel)
     {
-        return isShortType(accessor.getComponentType());
+        return isShortType(accessorModel.getComponentType());
     }
 
     /**
-     * Make sure that the {@link Accessor#getComponentType() component type}
-     * of the given {@link Accessor} is <code>GL_SHORT</code> or 
+     * Make sure that the {@link AccessorModel#getComponentType() component 
+     * type} of the given {@link AccessorModel} is <code>GL_SHORT</code> or 
      * <code>GL_UNSIGNED_SHORT</code>, and throw an 
      * <code>IllegalArgumentException</code> if this is not the case.
      * 
-     * @param accessor The {@link Accessor}
-     * @throws IllegalArgumentException If the given accessor has a 
-     * {@link Accessor#getComponentType() component type} type that is not 
+     * @param accessorModel The {@link AccessorModel}
+     * @throws IllegalArgumentException If the given accessorModel has a 
+     * {@link AccessorModel#getComponentType() component type} type that is not 
      * <code>GL_SHORT</code> or <code>GL_UNSIGNED_SHORT</code>
      */
-    public static void validateShortComponents(Accessor accessor)
+    public static void validateShortComponents(AccessorModel accessorModel)
     {
-        validateShortType(accessor.getComponentType());
+        validateShortType(accessorModel.getComponentType());
     }
     
     /**
-     * Creates an {@link AccessorShortData} for the given {@link Accessor}
+     * Creates an {@link AccessorShortData} for the given {@link AccessorModel}
      * 
-     * @param accessor The {@link Accessor}
-     * @param gltfData The {@link GltfData} that contains the byte buffer of
-     * the {@link BufferView} referenced by the {@link Accessor}
+     * @param accessorModel The {@link AccessorModel}
      * @return The {@link AccessorShortData}
      * @throws IllegalArgumentException If the 
-     * {@link Accessor#getComponentType() component type} of the given
-     * accessor is not <code>GL_SHORT</code> or <code>GL_UNSIGNED_SHORT</code> 
-     * @throws GltfException If the {@link Accessor#getBufferView()} refers
-     * to a {@link BufferView} that does not exist 
+     * {@link AccessorModel#getComponentType() component type} of the given
+     * accessorModel is not <code>GL_SHORT</code> or 
+     * <code>GL_UNSIGNED_SHORT</code> 
      */
-    public static AccessorShortData createShort(
-        Accessor accessor, GltfData gltfData)
+    public static AccessorShortData createShort(AccessorModel accessorModel)
     {
-        String bufferViewId = accessor.getBufferView();
-        ByteBuffer bufferViewData = 
-            GltfDatas.getBufferViewData(gltfData, bufferViewId);
-        if (bufferViewData == null)
-        {
-            throw new GltfException("The data  for the accessor buffer "
-                + "view with ID " + bufferViewId + " could not be obtained");
-        }
-        return createShort(accessor, bufferViewData);
+        BufferViewModel bufferViewModel = accessorModel.getBufferViewModel();
+        return createShort(accessorModel, bufferViewModel.getBufferViewData());
     }
     
     /**
-     * Creates an {@link AccessorShortData} for the given {@link Accessor}
+     * Creates an {@link AccessorShortData} for the given {@link AccessorModel}
      * 
-     * @param accessor The {@link Accessor}
-     * @param bufferViewByteBuffer The  byte buffer of the 
-     * {@link BufferView} referenced by the {@link Accessor}
+     * @param accessorModel The {@link AccessorModel}
+     * @param bufferViewByteBuffer The byte buffer of the 
+     * {@link BufferViewModel} referenced by the {@link AccessorModel}
      * @return The {@link AccessorShortData}
      * @throws NullPointerException If any argument is <code>null</code>
      * @throws IllegalArgumentException If the 
-     * {@link Accessor#getComponentType() component type} of the given
-     * accessor is not <code>GL_SHORT</code> or <code>GL_UNSIGNED_SHORT</code>
+     * {@link AccessorModel#getComponentType() component type} of the given
+     * accessorModel is not <code>GL_SHORT</code> or 
+     * <code>GL_UNSIGNED_SHORT</code>
      */
     public static AccessorShortData createShort(
-        Accessor accessor, ByteBuffer bufferViewByteBuffer)
+        AccessorModel accessorModel, ByteBuffer bufferViewByteBuffer)
     {
-        return new AccessorShortData(accessor.getComponentType(), 
+        return new AccessorShortData(accessorModel.getComponentType(), 
             bufferViewByteBuffer,
-            accessor.getByteOffset(),
-            accessor.getCount(),
-            Accessors.getNumComponentsForAccessorType(accessor.getType()),
-            accessor.getByteStride());
+            accessorModel.getByteOffset(),
+            accessorModel.getCount(),
+            accessorModel.getElementType().getNumComponents(),
+            accessorModel.getByteStride());
     }
     
 
     /**
-     * Returns whether the {@link Accessor#getComponentType() component type}
-     * of the given {@link Accessor} is <code>GL_INT</code> or
+     * Returns whether the {@link AccessorModel#getComponentType() component 
+     * type} of the given {@link AccessorModel} is <code>GL_INT</code> or
      * <code>GL_UNSIGNED_INT</code>. 
      * 
      * 
-     * @param accessor The {@link Accessor}
-     * @return Whether the {@link Accessor} has <code>int</code> components
+     * @param accessorModel The {@link AccessorModel}
+     * @return Whether the {@link AccessorModel} has <code>int</code> components
      */
-    public static boolean hasIntComponents(Accessor accessor)
+    public static boolean hasIntComponents(AccessorModel accessorModel)
     {
-        return isIntType(accessor.getComponentType());
+        return isIntType(accessorModel.getComponentType());
     }
 
     /**
-     * Make sure that the {@link Accessor#getComponentType() component type}
-     * of the given {@link Accessor} is <code>GL_INT</code> or 
+     * Make sure that the {@link AccessorModel#getComponentType() component 
+     * type} of the given {@link AccessorModel} is <code>GL_INT</code> or 
      * <code>GL_UNSIGNED_INT</code>, and throw an 
      * <code>IllegalArgumentException</code> if this is not the case.
      * 
-     * @param accessor The {@link Accessor}
-     * @throws IllegalArgumentException If the given accessor has a 
-     * {@link Accessor#getComponentType() component type} type that is not 
+     * @param accessorModel The {@link AccessorModel}
+     * @throws IllegalArgumentException If the given accessorModel has a 
+     * {@link AccessorModel#getComponentType() component type} type that is not 
      * <code>GL_INT</code> or <code>GL_UNSIGNED_INT</code>
      */
-    public static void validateIntComponents(Accessor accessor)
+    public static void validateIntComponents(AccessorModel accessorModel)
     {
-        validateIntType(accessor.getComponentType());
+        validateIntType(accessorModel.getComponentType());
     }
     
     /**
-     * Creates an {@link AccessorIntData} for the given {@link Accessor}
+     * Creates an {@link AccessorIntData} for the given {@link AccessorModel}
      * 
-     * @param accessor The {@link Accessor}
-     * @param gltfData The {@link GltfData} that contains the byte buffer of
-     * the {@link BufferView} referenced by the {@link Accessor}
+     * @param accessorModel The {@link AccessorModel}
      * @return The {@link AccessorIntData}
      * @throws IllegalArgumentException If the 
-     * {@link Accessor#getComponentType() component type} of the given
-     * accessor is not <code>GL_INT</code> or <code>GL_UNSIGNED_INT</code> 
-     * @throws GltfException If the {@link Accessor#getBufferView()} refers
-     * to a {@link BufferView} that does not exist 
+     * {@link AccessorModel#getComponentType() component type} of the given
+     * accessorModel is not <code>GL_INT</code> or <code>GL_UNSIGNED_INT</code> 
      */
-    public static AccessorIntData createInt(
-        Accessor accessor, GltfData gltfData)
+    public static AccessorIntData createInt(AccessorModel accessorModel)
     {
-        String bufferViewId = accessor.getBufferView();
-        ByteBuffer bufferViewData = 
-            GltfDatas.getBufferViewData(gltfData, bufferViewId);
-        if (bufferViewData == null)
-        {
-            throw new GltfException("The data  for the accessor buffer "
-                + "view with ID " + bufferViewId + " could not be obtained");
-        }
-        return createInt(accessor, bufferViewData);
+        BufferViewModel bufferViewModel = accessorModel.getBufferViewModel();
+        return createInt(accessorModel, bufferViewModel.getBufferViewData());
     }
     
     /**
-     * Creates an {@link AccessorIntData} for the given {@link Accessor}
+     * Creates an {@link AccessorIntData} for the given {@link AccessorModel}
      * 
-     * @param accessor The {@link Accessor}
-     * @param bufferViewByteBuffer The  byte buffer of the 
-     * {@link BufferView} referenced by the {@link Accessor}
+     * @param accessorModel The {@link AccessorModel}
+     * @param bufferViewByteBuffer The byte buffer of the 
+     * {@link BufferViewModel} referenced by the {@link AccessorModel}
      * @return The {@link AccessorIntData}
      * @throws NullPointerException If any argument is <code>null</code>
      * @throws IllegalArgumentException If the 
-     * {@link Accessor#getComponentType() component type} of the given
-     * accessor is not <code>GL_INT</code> or <code>GL_UNSIGNED_INT</code>
+     * {@link AccessorModel#getComponentType() component type} of the given
+     * accessorModel is not <code>GL_INT</code> or <code>GL_UNSIGNED_INT</code>
      */
     public static AccessorIntData createInt(
-        Accessor accessor, ByteBuffer bufferViewByteBuffer)
+        AccessorModel accessorModel, ByteBuffer bufferViewByteBuffer)
     {
-        return new AccessorIntData(accessor.getComponentType(), 
+        return new AccessorIntData(accessorModel.getComponentType(), 
             bufferViewByteBuffer,
-            accessor.getByteOffset(),
-            accessor.getCount(),
-            Accessors.getNumComponentsForAccessorType(accessor.getType()),
-            accessor.getByteStride());
+            accessorModel.getByteOffset(),
+            accessorModel.getCount(),
+            accessorModel.getElementType().getNumComponents(),
+            accessorModel.getByteStride());
     }
     
     
     /**
-     * Returns whether the {@link Accessor#getComponentType() component type}
-     * of the given {@link Accessor} is <code>GL_FLOAT</code>
+     * Returns whether the {@link AccessorModel#getComponentType() component 
+     * type} of the given {@link AccessorModel} is <code>GL_FLOAT</code>
      * 
-     * @param accessor The {@link Accessor}
-     * @return Whether the {@link Accessor} has <code>float</code> components
+     * @param accessorModel The {@link AccessorModel}
+     * @return Whether the {@link AccessorModel} has <code>float</code> 
+     * components
      */
-    public static boolean hasFloatComponents(Accessor accessor)
+    public static boolean hasFloatComponents(AccessorModel accessorModel)
     {
-        return isFloatType(accessor.getComponentType());
+        return isFloatType(accessorModel.getComponentType());
     }
 
     /**
-     * Make sure that the {@link Accessor#getComponentType() component type}
-     * of the given {@link Accessor} is <code>GL_FLOAT</code>, and throw an
-     * <code>IllegalArgumentException</code> if this is not the case.
+     * Make sure that the {@link AccessorModel#getComponentType() component 
+     * type} of the given {@link AccessorModel} is <code>GL_FLOAT</code>, 
+     * and throw an <code>IllegalArgumentException</code> if this is not the 
+     * case.
      * 
-     * @param accessor The {@link Accessor}
-     * @throws IllegalArgumentException If the given accessor has a 
-     * {@link Accessor#getComponentType() component type} type that is not 
+     * @param accessorModel The {@link AccessorModel}
+     * @throws IllegalArgumentException If the given accessorModel has a 
+     * {@link AccessorModel#getComponentType() component type} type that is not 
      * <code>GL_FLOAT</code>
      */
-    public static void validateFloatComponents(Accessor accessor)
+    public static void validateFloatComponents(AccessorModel accessorModel)
     {
-        validateFloatType(accessor.getComponentType());
+        validateFloatType(accessorModel.getComponentType());
     }
     
     /**
-     * Creates an {@link AccessorFloatData} for the given {@link Accessor}
+     * Creates an {@link AccessorFloatData} for the given {@link AccessorModel}
      * 
-     * @param accessor The {@link Accessor}
-     * @param gltfData The {@link GltfData} that contains the byte buffer of
-     * the {@link BufferView} referenced by the {@link Accessor}
+     * @param accessorModel The {@link AccessorModel}
      * @return The {@link AccessorFloatData}
      * @throws IllegalArgumentException If the 
-     * {@link Accessor#getComponentType() component type} of the given
-     * accessor is not <code>GL_FLOAT</code>
-     * @throws GltfException If the {@link Accessor#getBufferView()} refers
-     * to a {@link BufferView} that does not exist 
+     * {@link AccessorModel#getComponentType() component type} of the given
+     * accessorModel is not <code>GL_FLOAT</code>
      */
-    public static AccessorFloatData createFloat(
-        Accessor accessor, GltfData gltfData)
+    public static AccessorFloatData createFloat(AccessorModel accessorModel)
     {
-        String bufferViewId = accessor.getBufferView();
-        ByteBuffer bufferViewData = 
-            GltfDatas.getBufferViewData(gltfData, bufferViewId);
-        if (bufferViewData == null)
-        {
-            throw new GltfException("The data  for the accessor buffer "
-                + "view with ID " + bufferViewId + " could not be obtained");
-        }
-        return createFloat(accessor, bufferViewData);
+        BufferViewModel bufferViewModel = accessorModel.getBufferViewModel();
+        return createFloat(accessorModel, bufferViewModel.getBufferViewData());
     }
     
     /**
-     * Creates an {@link AccessorFloatData} for the given {@link Accessor}
+     * Creates an {@link AccessorFloatData} for the given {@link AccessorModel}
      * 
-     * @param accessor The {@link Accessor}
-     * @param bufferViewByteBuffer The  byte buffer of the 
-     * {@link BufferView} referenced by the {@link Accessor}
+     * @param accessorModel The {@link AccessorModel}
+     * @param bufferViewByteBuffer The byte buffer of the 
+     * {@link BufferViewModel} referenced by the {@link AccessorModel}
      * @return The {@link AccessorFloatData}
      * @throws NullPointerException If any argument is <code>null</code>
      * @throws IllegalArgumentException If the 
-     * {@link Accessor#getComponentType() component type} of the given
-     * accessor is not <code>GL_FLOAT</code>
      */
     public static AccessorFloatData createFloat(
-        Accessor accessor, ByteBuffer bufferViewByteBuffer)
+        AccessorModel accessorModel, ByteBuffer bufferViewByteBuffer)
     {
-        return new AccessorFloatData(accessor.getComponentType(), 
+        return new AccessorFloatData(accessorModel.getComponentType(), 
             bufferViewByteBuffer,
-            accessor.getByteOffset(),
-            accessor.getCount(),
-            Accessors.getNumComponentsForAccessorType(accessor.getType()),
-            accessor.getByteStride());
+            accessorModel.getByteOffset(),
+            accessorModel.getCount(),
+            accessorModel.getElementType().getNumComponents(),
+            accessorModel.getByteStride());
     }
 
     /**
-     * Validate that the given {@link Accessor} parameters are valid for
+     * Validate that the given {@link AccessorModel} parameters are valid for
      * accessing a buffer with the given capacity
      * 
      * @param byteOffset The byte offset 
@@ -525,12 +477,97 @@ public class AccessorDatas
         if (expectedCapacity > bufferCapacity)
         {
             throw new IllegalArgumentException(
-                "The accessor has an offset of " + byteOffset + " and " + 
+                "The accessorModel has an offset of " + byteOffset + " and " + 
                 numElements + " elements with a byte stride of " + 
                 byteStridePerElement + ", requiring " + expectedCapacity + 
                 " bytes, but the buffer view has only " + 
                 bufferCapacity + " bytes");
         }
+    }
+    
+    
+    /**
+     * Compute the the minimum component values of the given 
+     * {@link AccessorData}
+     * 
+     * @param accessorData The {@link AccessorData}
+     * @return The minimum values
+     * @throws IllegalArgumentException If the given model has an unknown type
+     */
+    public static Number[] computeMin(AccessorData accessorData)
+    {
+        if (accessorData instanceof AccessorByteData) 
+        {
+            AccessorByteData accessorByteData = 
+                (AccessorByteData) accessorData;
+            return NumberArrays.asNumbers(
+                accessorByteData.computeMinInt());
+        }
+        if (accessorData instanceof AccessorShortData) 
+        {
+            AccessorShortData accessorShortData = 
+                (AccessorShortData) accessorData;
+            return NumberArrays.asNumbers(
+                accessorShortData.computeMinInt());
+        }
+        if (accessorData instanceof AccessorIntData) 
+        {
+            AccessorIntData accessorIntData = 
+                (AccessorIntData) accessorData;
+            return NumberArrays.asNumbers(
+                accessorIntData.computeMinLong());
+        }
+        if (accessorData instanceof AccessorFloatData) 
+        {
+            AccessorFloatData accessorFloatData = 
+                (AccessorFloatData) accessorData;
+            return NumberArrays.asNumbers(
+                accessorFloatData.computeMin());
+        }
+        throw new IllegalArgumentException(
+            "Invalid data type: " + accessorData);
+    }
+    
+    /**
+     * Compute the the maximum component values of the given 
+     * {@link AccessorData}
+     * 
+     * @param accessorData The {@link AccessorData}
+     * @return The maximum values
+     * @throws IllegalArgumentException If the given model has an unknown type
+     */
+    public static Number[] computeMax(AccessorData accessorData)
+    {
+        if (accessorData instanceof AccessorByteData) 
+        {
+            AccessorByteData accessorByteData = 
+                (AccessorByteData) accessorData;
+            return NumberArrays.asNumbers(
+                accessorByteData.computeMaxInt());
+        }
+        if (accessorData instanceof AccessorShortData) 
+        {
+            AccessorShortData accessorShortData = 
+                (AccessorShortData) accessorData;
+            return NumberArrays.asNumbers(
+                accessorShortData.computeMaxInt());
+        }
+        if (accessorData instanceof AccessorIntData) 
+        {
+            AccessorIntData accessorIntData = 
+                (AccessorIntData) accessorData;
+            return NumberArrays.asNumbers(
+                accessorIntData.computeMaxLong());
+        }
+        if (accessorData instanceof AccessorFloatData) 
+        {
+            AccessorFloatData accessorFloatData = 
+                (AccessorFloatData) accessorData;
+            return NumberArrays.asNumbers(
+                accessorFloatData.computeMax());
+        }
+        throw new IllegalArgumentException(
+            "Invalid data type: " + accessorData);
     }
     
     
@@ -541,5 +578,6 @@ public class AccessorDatas
     {
         // Private constructor to prevent instantiation
     }
+    
 
 }

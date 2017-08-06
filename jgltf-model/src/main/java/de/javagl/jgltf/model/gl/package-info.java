@@ -1,6 +1,5 @@
 /**
- * Classes related to the KHR_technique_webgl extension, for rendering
- * a glTF asset with GL.
+ * Classes for modeling OpenGL rendering techniques. 
  */
 package de.javagl.jgltf.model.gl;
 

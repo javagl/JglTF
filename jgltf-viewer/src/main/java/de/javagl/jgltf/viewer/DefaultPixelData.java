@@ -77,6 +77,7 @@ final class DefaultPixelData implements PixelData
     @Override
     public ByteBuffer getPixelsRGBA()
     {
+        // The slice is BIG_ENDIAN by default
         return pixelsRGBA.slice();
     }
 
