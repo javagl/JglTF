@@ -23,25 +23,30 @@ import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.Optionals;
-import de.javagl.jgltf.model.io.v1.BinaryGltfV1;
 import de.javagl.jgltf.model.io.v1.GltfAssetV1;
+import de.javagl.jgltf.model.v1.BinaryGltfV1;
 import de.javagl.jgltf.model.v1.GltfModelV1;
 
 public class BasicTestIO
 {
     public static void main(String[] args) throws Exception
     {
-        String pathString = "C:/Develop/JglTF/TestModels/v1/Triangle/glTF/Triangle.gltf";
-        URI uri = Paths.get(pathString).toUri();
+        String pathString = null;
+        //pathString = "C:/Develop/JglTF/TestModels/v1/Triangle/glTF/";
+        //pathString = "C:/Develop/JglTF/TestModels/v1/Triangle/glTF-Embedded/";
+        pathString = "C:/Develop/JglTF/TestModels/v2/Triangle/glTF/";
+        //pathString = "C:/Develop/JglTF/TestModels/v2/Triangle/glTF-Embedded/";
+        String modelFileName = "Triangle.gltf";
+        URI uri = Paths.get(pathString + modelFileName).toUri();
         
         //testGltfReader(uri);
         //testGltfAssetReader(uri);
-        //testGltfModelReader(uri);
+        testGltfModelReader(uri);
         
         //testEmbeddedConversion(uri);
         
 
-        testGltfModelLoadingWithTasks(uri);
+        //testGltfModelLoadingWithTasks(uri);
 
     }
     

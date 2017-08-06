@@ -84,6 +84,17 @@ class GlContextJogl implements GlContext
     public Integer createGlProgram(
         String vertexShaderSource, String fragmentShaderSource)
     {
+        if (vertexShaderSource == null)
+        {
+            logger.warning("The vertexShaderSource is null");
+            return null;
+        }
+        if (fragmentShaderSource == null)
+        {
+            logger.warning("The fragmentShaderSource is null");
+            return null;
+        }
+        
         logger.fine("Creating vertex shader...");
         
         Integer glVertexShader = createGlShader(

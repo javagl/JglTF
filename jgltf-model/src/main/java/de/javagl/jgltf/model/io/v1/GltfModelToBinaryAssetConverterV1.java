@@ -44,6 +44,7 @@ import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.gl.ShaderModel;
 import de.javagl.jgltf.model.io.Buffers;
+import de.javagl.jgltf.model.v1.BinaryGltfV1;
 import de.javagl.jgltf.model.v1.GltfExtensionsV1;
 import de.javagl.jgltf.model.v1.GltfModelV1;
 

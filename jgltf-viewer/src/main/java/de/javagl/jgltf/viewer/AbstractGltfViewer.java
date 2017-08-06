@@ -46,6 +46,7 @@ import de.javagl.jgltf.model.animation.AnimationManager;
 import de.javagl.jgltf.model.animation.AnimationManager.AnimationPolicy;
 import de.javagl.jgltf.model.animation.AnimationRunner;
 import de.javagl.jgltf.model.v1.GltfModelV1;
+import de.javagl.jgltf.model.v2.GltfModelV2;
 
 /**
  * Abstract base implementation of a {@link GltfViewer}
@@ -225,9 +226,22 @@ public abstract class AbstractGltfViewer<C> implements GltfViewer<C>
             renderedGltfModel = new DefaultRenderedGltfModel(
                 glContext, gltfModelV1, textureModelLookup, viewConfiguration);
         }
+        else if (gltfModel instanceof GltfModelV2)
+        {
+            GltfModelV2 gltfModelV2 = (GltfModelV2)gltfModel;
+            
+            Function<Object, ? extends TextureModel> textureModelLookup = object -> 
+            {
+                Number number = (Number)object;
+                int index = number.intValue();
+                return gltfModelV2.getTextureModels().get(index);  
+            };
+            renderedGltfModel = new DefaultRenderedGltfModel(
+                glContext, gltfModelV2, textureModelLookup, viewConfiguration);
+        }
         else
         {
-            logger.severe("GltfModelV2 is not supported yet");
+            logger.severe("GltfModel version is not supported: " + gltfModel);
             return;
         }
         

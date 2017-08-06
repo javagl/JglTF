@@ -40,7 +40,6 @@ import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.gl.ShaderModel;
 import de.javagl.jgltf.model.io.Buffers;
-import de.javagl.jgltf.model.io.v1.BinaryGltfV1;
 
 /**
  * A class to resolve the data of {@link Image}- and {@link Shader} objects

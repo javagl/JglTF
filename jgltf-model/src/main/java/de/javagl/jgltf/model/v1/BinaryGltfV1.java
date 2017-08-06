@@ -24,7 +24,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.model.io.v1;
+package de.javagl.jgltf.model.v1;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -38,7 +38,6 @@ import de.javagl.jgltf.impl.v1.Image;
 import de.javagl.jgltf.impl.v1.Shader;
 import de.javagl.jgltf.model.GltfException;
 import de.javagl.jgltf.model.io.ImageReaders;
-import de.javagl.jgltf.model.v1.GltfExtensionsV1;
 
 /**
  * Utility methods related to the binary glTF extension of glTF 1.0

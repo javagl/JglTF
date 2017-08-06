@@ -26,9 +26,14 @@
  */
 package de.javagl.jgltf.model.v1.gl;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 
 import de.javagl.jgltf.impl.v1.Material;
 import de.javagl.jgltf.impl.v1.Shader;
@@ -52,6 +57,8 @@ import de.javagl.jgltf.model.gl.impl.DefaultTechniqueParametersModel;
 import de.javagl.jgltf.model.gl.impl.DefaultTechniqueStatesModel;
 import de.javagl.jgltf.model.gl.impl.v1.DefaultTechniqueStatesFunctionsModelV1;
 import de.javagl.jgltf.model.impl.DefaultMaterialModel;
+import de.javagl.jgltf.model.io.Buffers;
+import de.javagl.jgltf.model.io.IO;
 
 /**
  * A class containing the default {@link TechniqueModel} and 
@@ -60,6 +67,12 @@ import de.javagl.jgltf.model.impl.DefaultMaterialModel;
  */
 public class DefaultModels
 {
+    /**
+     * The logger used in this class
+     */
+    private static final Logger logger = 
+        Logger.getLogger(DefaultModels.class.getName());
+    
     /**
      * The default vertex {@link ShaderModel}
      */
@@ -91,10 +104,12 @@ public class DefaultModels
         Shader vertexShader = GltfDefaults.getDefaultVertexShader();
         DEFAULT_VERTEX_SHADER_MODEL = 
             new DefaultShaderModel(vertexShader.getUri());
+        initShaderData(DEFAULT_VERTEX_SHADER_MODEL);
         
         Shader fragmentShader = GltfDefaults.getDefaultFragmentShader();
         DEFAULT_FRAGMENT_SHADER_MODEL = 
             new DefaultShaderModel(fragmentShader.getUri());
+        initShaderData(DEFAULT_FRAGMENT_SHADER_MODEL);
         
         // Create a model for the default program
         DEFAULT_PROGRAM_MODEL = new DefaultProgramModel();
@@ -143,6 +158,29 @@ public class DefaultModels
         return DEFAULT_MATERIAL_MODEL;
     }
     
+    /**
+     * Initialize the {@link ShaderModel#setShaderData(ByteBuffer) shader data}
+     * for the given {@link ShaderModel}
+     * 
+     * @param shaderModel The {@link ShaderModel}
+     */
+    private static void initShaderData(ShaderModel shaderModel)
+    {
+        try
+        {
+            URI uri = new URI(shaderModel.getUri());
+            byte[] data = IO.read(uri);
+            ByteBuffer shaderData = Buffers.create(data);
+            shaderModel.setShaderData(shaderData);
+        }
+        catch (URISyntaxException | IOException e)
+        {
+            // This should never happen: The default shaders have valid
+            // data URI that contain the shader data.
+            logger.severe("Failed to initialize shader data");
+        }
+    }
+
     /**
      * Return the default {@link TechniqueModel}
      * 

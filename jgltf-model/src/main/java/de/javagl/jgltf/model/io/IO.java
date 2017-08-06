@@ -239,7 +239,7 @@ public class IO
      * @return The byte array
      * @throws IOException If an IO error occurs
      */
-    static byte[] read(URI uri) 
+    public static byte[] read(URI uri) 
         throws IOException
     {
         try (InputStream inputStream = createInputStream(uri))

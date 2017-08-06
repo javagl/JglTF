@@ -111,7 +111,6 @@ import de.javagl.jgltf.model.impl.DefaultNodeModel;
 import de.javagl.jgltf.model.impl.DefaultSceneModel;
 import de.javagl.jgltf.model.impl.DefaultSkinModel;
 import de.javagl.jgltf.model.impl.DefaultTextureModel;
-import de.javagl.jgltf.model.io.v1.BinaryGltfV1;
 import de.javagl.jgltf.model.v1.gl.DefaultModels;
 import de.javagl.jgltf.model.v1.gl.GltfDefaults;
 import de.javagl.jgltf.model.v1.gl.Techniques;

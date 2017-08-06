@@ -37,6 +37,7 @@ import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.io.v1.GltfAssetV1;
 import de.javagl.jgltf.model.io.v2.GltfAssetV2;
 import de.javagl.jgltf.model.v1.GltfModelV1;
+import de.javagl.jgltf.model.v2.GltfModelV2;
 
 /**
  * A class for reading a {@link GltfModel} from a URI.
@@ -157,8 +158,9 @@ public final class GltfModelReader
         {
             GltfAssetV2 gltfAsset = 
                 gltfAssetReader.getAsGltfAssetV2();
-            // TODO Create GltfModelV2
-            return null;
+            GltfModelV2 gltfModel = new GltfModelV2(
+                gltfAsset.getGltf(), gltfAsset.getBinaryData());
+            return gltfModel;
         }
         throw new IOException(
             "Unsupported major version: " + majorVersion);

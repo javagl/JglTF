@@ -40,7 +40,8 @@ public interface GlContext
     /**
      * Create an OpenGL program with a vertex- and fragment shader created
      * from the given sources. If it is not possible to create the GL
-     * program (due to compile- or link errors), then an error message
+     * program (due to compile- or link errors, or because one of the 
+     * shader sources is <code>null</code>), then an error message
      * may be printed, and <code>null</code> will be returned.
      * 
      * @param vertexShaderSource The vertex shader source code

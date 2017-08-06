@@ -29,7 +29,6 @@ package de.javagl.jgltf.model.v2;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -79,18 +78,6 @@ import de.javagl.jgltf.model.SceneModel;
 import de.javagl.jgltf.model.SkinModel;
 import de.javagl.jgltf.model.TextureModel;
 import de.javagl.jgltf.model.Utils;
-import de.javagl.jgltf.model.gl.ProgramModel;
-import de.javagl.jgltf.model.gl.ShaderModel;
-import de.javagl.jgltf.model.gl.TechniqueModel;
-import de.javagl.jgltf.model.gl.TechniqueParametersModel;
-import de.javagl.jgltf.model.gl.TechniqueStatesFunctionsModel;
-import de.javagl.jgltf.model.gl.TechniqueStatesModel;
-import de.javagl.jgltf.model.gl.impl.DefaultProgramModel;
-import de.javagl.jgltf.model.gl.impl.DefaultShaderModel;
-import de.javagl.jgltf.model.gl.impl.DefaultTechniqueModel;
-import de.javagl.jgltf.model.gl.impl.DefaultTechniqueParametersModel;
-import de.javagl.jgltf.model.gl.impl.DefaultTechniqueStatesModel;
-import de.javagl.jgltf.model.gl.impl.v2.DefaultTechniqueStatesFunctionsModelV2;
 import de.javagl.jgltf.model.impl.DefaultAccessorModel;
 import de.javagl.jgltf.model.impl.DefaultAnimationModel;
 import de.javagl.jgltf.model.impl.DefaultAnimationModel.DefaultChannel;
@@ -106,10 +93,6 @@ import de.javagl.jgltf.model.impl.DefaultNodeModel;
 import de.javagl.jgltf.model.impl.DefaultSceneModel;
 import de.javagl.jgltf.model.impl.DefaultSkinModel;
 import de.javagl.jgltf.model.impl.DefaultTextureModel;
-import de.javagl.jgltf.model.io.v2.BinaryGltfV2;
-import de.javagl.jgltf.model.v2.gl.DefaultModels;
-import de.javagl.jgltf.model.v2.gl.GltfDefaults;
-import de.javagl.jgltf.model.v2.gl.Techniques;
 
 /**
  * Implementation of a {@link GltfModel}, based on a {@link GlTF glTF 2.0}.<br>
@@ -205,24 +188,6 @@ public final class GltfModelV2 implements GltfModel
      */
     private final List<DefaultTextureModel> textureModels;
 
-    /**
-     * The {@link ShaderModel} instances that have been created from
-     * the {@link Shader} instances
-     */
-    private final List<DefaultShaderModel> shaderModels;
-
-    /**
-     * The {@link ProgramModel} instances that have been created from
-     * the {@link Program} instances
-     */
-    private final List<DefaultProgramModel> programModels;
-    
-    /**
-     * The {@link TechniqueModel} instances that have been created from
-     * the {@link Technique} instances
-     */
-    private final List<DefaultTechniqueModel> techniqueModels;
-    
 
     /**
      * Creates a new model for the given glTF
@@ -249,9 +214,6 @@ public final class GltfModelV2 implements GltfModel
         this.sceneModels = new ArrayList<DefaultSceneModel>();
         this.skinModels = new ArrayList<DefaultSkinModel>();
         this.textureModels = new ArrayList<DefaultTextureModel>();
-        this.shaderModels = new ArrayList<DefaultShaderModel>();
-        this.programModels = new ArrayList<DefaultProgramModel>();
-        this.techniqueModels = new ArrayList<DefaultTechniqueModel>();
         
         createAccessorModels();
         createAnimationModels();
@@ -264,9 +226,6 @@ public final class GltfModelV2 implements GltfModel
         createSceneModels();
         createSkinModels();
         createTextureModels();
-        createShaderModels();
-        createProgramModels();
-        createTechniqueModels();
         
         initBufferModels();
         initBufferViewModels();
@@ -283,8 +242,6 @@ public final class GltfModelV2 implements GltfModel
         initSceneModels();
         initSkinModels();
         initTextureModels();
-        initProgramModels();
-        initTechniqueModels();
         
         instantiateCameraModels();
     }
@@ -483,8 +440,8 @@ public final class GltfModelV2 implements GltfModel
         for (int i = 0; i < materials.size(); i++)
         {
             Material material = materials.get(i);
-            int XXX; // TODO Material...
-            Map<String, Object> values = null; //Optionals.of(material.getValues());
+            // TODO Create MaterialModel
+            Map<String, Object> values = Collections.emptyMap();
             materialModels.add(new DefaultMaterialModel(values));
         }
     }
@@ -753,7 +710,8 @@ public final class GltfModelV2 implements GltfModel
         {
             int XXX; // TODO Review this: DefaultModels here?
             meshPrimitiveModel.setMaterialModel(
-                de.javagl.jgltf.model.v1.gl.DefaultModels.getDefaultMaterialModel());
+                de.javagl.jgltf.model.v1.gl.DefaultModels
+                    .getDefaultMaterialModel());
         }
         else
         {
@@ -770,28 +728,27 @@ public final class GltfModelV2 implements GltfModel
     private void initNodeModels()
     {
         List<Node> nodes = Optionals.of(gltf.getNodes());
-        for (Entry<String, Node> entry : nodes.entrySet())
+        for (int i = 0; i < nodes.size(); i++)
         {
-            String nodeId = entry.getKey();
-            Node node = entry.getValue();
+            Node node = nodes.get(i);
             
-            DefaultNodeModel nodeModel = get("nodes", nodeId, nodeModels);
-            List<String> childIds = Optionals.of(node.getChildren());
-            for (String childId : childIds)
+            DefaultNodeModel nodeModel = nodeModels.get(i);
+            List<Integer> childIndices = Optionals.of(node.getChildren());
+            for (Integer childIndex : childIndices)
             {
-                DefaultNodeModel child = get("nodes", childId, nodeModels);
+                DefaultNodeModel child = nodeModels.get(childIndex);
                 nodeModel.addChild(child);
             }
-            List<String> meshIds = Optionals.of(node.getMeshes());
-            for (String meshId : meshIds)
+            Integer meshIndex = node.getMesh();
+            if (meshIndex != null)
             {
-                MeshModel meshModel = get("meshes", meshId, meshModels);
+                MeshModel meshModel = meshModels.get(meshIndex);
                 nodeModel.addMeshModel(meshModel);
             }
-            String skinId = node.getSkin();
-            if (skinId != null)
+            Integer skinIndex = node.getSkin();
+            if (skinIndex != null)
             {
-                SkinModel skinModel = get("skins", skinId, skinModels);
+                SkinModel skinModel = skinModels.get(skinIndex);
                 nodeModel.setSkinModel(skinModel);
             }
             
@@ -807,6 +764,17 @@ public final class GltfModelV2 implements GltfModel
                 rotation == null ? null : rotation.clone());
             nodeModel.setScale(
                 scale == null ? null : scale.clone());
+            
+            List<Float> weights = node.getWeights();
+            if (weights != null)
+            {
+                float weightsArray[] = new float[weights.size()];
+                for (int j = 0; j < weights.size(); j++)
+                {
+                    weightsArray[j] = weights.get(j);
+                }
+                nodeModel.setWeights(weightsArray);
+            }
         }
     }
     
@@ -815,77 +783,42 @@ public final class GltfModelV2 implements GltfModel
      */
     private void initSceneModels()
     {
-        Map<String, Scene> scenes = Optionals.of(gltf.getScenes());
-        for (Entry<String, Scene> entry : scenes.entrySet())
+        List<Scene> scenes = Optionals.of(gltf.getScenes());
+        for (int i = 0; i < scenes.size(); i++)
         {
-            String sceneId = entry.getKey();
-            Scene scene = entry.getValue();
+            Scene scene = scenes.get(i);
 
-            DefaultSceneModel sceneModel =
-                get("scenes", sceneId, sceneModels);
-            List<String> nodes = Optionals.of(scene.getNodes());
-            for (String nodeId : nodes)
+            DefaultSceneModel sceneModel = sceneModels.get(i);
+            List<Integer> nodeIndices = Optionals.of(scene.getNodes());
+            for (Integer nodeIndex : nodeIndices)
             {
-                NodeModel nodeModel = get("nodes", nodeId, nodeModels);
+                NodeModel nodeModel = nodeModels.get(nodeIndex);
                 sceneModel.addNode(nodeModel);
             }
         }
     }
     
     /**
-     * Compute the mapping from joint names to the ID of the {@link Node} with
-     * the respective {@link Node#getJointName() joint name}
-     * 
-     * @param gltf The {@link GlTF}
-     * @return The mapping
-     */
-    private static Map<String, String> computeJointNameToNodeIdMap(GlTF gltf)
-    {
-        Map<String, String> map = new LinkedHashMap<String, String>();
-        Map<String, Node> nodes = Optionals.of(gltf.getNodes());
-        for (Entry<String, Node> entry : nodes.entrySet())
-        {
-            String nodeId = entry.getKey();
-            Node node = entry.getValue();
-            if (node.getJointName() != null)
-            {
-                String oldNodeId = map.put(node.getJointName(), nodeId);
-                if (oldNodeId != null)
-                {
-                    logger.warning("Joint name " + node.getJointName()
-                        + " is mapped to nodes with IDs " + nodeId + " and "
-                        + oldNodeId);
-                }
-            }
-        }
-        return map;
-    }
-
-    /**
      * Initialize the {@link SkinModel} instances
      */
     private void initSkinModels()
     {
-        Map<String, String> jointNameToNodeIdMap = 
-            computeJointNameToNodeIdMap(gltf);
-        Map<String, Skin> skins = Optionals.of(gltf.getSkins());
-        for (Entry<String, Skin> entry : skins.entrySet())
+        List<Skin> skins = Optionals.of(gltf.getSkins());
+        for (int i = 0; i < skins.size(); i++)
         {
-            String skinId = entry.getKey();
-            Skin skin = entry.getValue();
-            DefaultSkinModel skinModel = get("skins", skinId, skinModels);
+            Skin skin = skins.get(i);
+            DefaultSkinModel skinModel = skinModels.get(i);
             
-            List<String> jointNames = skin.getJointNames();
-            for (String jointName : jointNames)
+            List<Integer> jointIndices = skin.getJoints();
+            for (Integer jointIndex : jointIndices)
             {
-                String nodeId = jointNameToNodeIdMap.get(jointName);
-                NodeModel nodeModel = get("nodes", nodeId, nodeModels);
-                skinModel.addJoint(nodeModel);
+                NodeModel jointNodeModel = nodeModels.get(jointIndex);
+                skinModel.addJoint(jointNodeModel);
             }
             
-            String inverseBindMatricesId = skin.getInverseBindMatrices();
-            DefaultAccessorModel inverseBindMatrices =
-                get("accessors", inverseBindMatricesId, accessorModels);
+            Integer inverseBindMatricesIndex = skin.getInverseBindMatrices();
+            DefaultAccessorModel inverseBindMatrices = 
+                accessorModels.get(inverseBindMatricesIndex);
             skinModel.setInverseBindMatrices(inverseBindMatrices);
         }
     }
@@ -895,188 +828,31 @@ public final class GltfModelV2 implements GltfModel
      */
     private void initTextureModels()
     {
-        Map<String, Texture> textures = Optionals.of(gltf.getTextures());
-        for (Entry<String, Texture> entry : textures.entrySet())
+        List<Texture> textures = Optionals.of(gltf.getTextures());
+        for (int i = 0; i < textures.size(); i++)
         {
-            String textureId = entry.getKey();
-            Texture texture = entry.getValue();
-            DefaultTextureModel textureModel = 
-                get("textures", textureId, textureModels);
-            String imageId = texture.getSource();
-            DefaultImageModel imageModel = 
-                get("images", imageId, imageModels);
+            Texture texture = textures.get(i);
+            DefaultTextureModel textureModel = textureModels.get(i);
+            Integer imageIndex = texture.getSource();
+            DefaultImageModel imageModel = imageModels.get(imageIndex);
             textureModel.setImageModel(imageModel);
         }
     }
-    
-    /**
-     * Initialize the {@link ProgramModel} instances
-     */
-    void initProgramModels()
-    {
-        Map<String, Program> programs = Optionals.of(gltf.getPrograms());
-        for (Entry<String, Program> entry : programs.entrySet())
-        {
-            String programId = entry.getKey();
-            Program program = entry.getValue();
-            DefaultProgramModel programModel = 
-                get("programs", programId, programModels);
-            
-            String vertexShaderId = program.getVertexShader();
-            DefaultShaderModel vertexShaderModel =
-                get("shaders", vertexShaderId, shaderModels);
-            programModel.setVertexShaderModel(vertexShaderModel);
-            
-            String fragmentShaderId = program.getFragmentShader();
-            DefaultShaderModel fragmentShaderModel =
-                get("shaders", fragmentShaderId, shaderModels);
-            programModel.setFragmentShaderModel(fragmentShaderModel);
-        }
-    }
-
-    
-    /**
-     * Add all {@link TechniqueParametersModel} instances for the 
-     * attributes of the given {@link Technique} to the given
-     * {@link TechniqueModel}
-     * 
-     * @param technique The {@link Technique}
-     * @param techniqueModel The {@link TechniqueModel}
-     */
-    private void addParameters(Technique technique,
-        DefaultTechniqueModel techniqueModel)
-    {
-        Map<String, TechniqueParameters> parameters = 
-            Optionals.of(technique.getParameters());
-        for (Entry<String, TechniqueParameters> entry : parameters.entrySet())
-        {
-            String parameterName = entry.getKey();
-            TechniqueParameters parameter = entry.getValue();
-            
-            int type = parameter.getType();
-            int count = Optionals.of(parameter.getCount(), 1);
-            String semantic = parameter.getSemantic();
-            Object value = parameter.getValue();
-            String nodeId = parameter.getNode();
-            NodeModel nodeModel = null;
-            if (nodeId != null)
-            {
-                nodeModel = get("nodes", nodeId, nodeModels);
-            }
-            
-            TechniqueParametersModel techniqueParametersModel =
-                new DefaultTechniqueParametersModel(
-                    type, count, semantic, value, nodeModel);
-            techniqueModel.addParameter(
-                parameterName, techniqueParametersModel);
-        }
-    }
-
-    /**
-     * Add all attribute entries of the given {@link Technique} to the given
-     * {@link TechniqueModel}
-     * 
-     * @param technique The {@link Technique}
-     * @param techniqueModel The {@link TechniqueModel}
-     */
-    private static void addAttributes(Technique technique,
-        DefaultTechniqueModel techniqueModel)
-    {
-        Map<String, String> attributes = 
-            Optionals.of(technique.getAttributes());
-        for (Entry<String, String> entry : attributes.entrySet())
-        {
-            String attributeName = entry.getKey();
-            String parameterName = entry.getValue();
-            techniqueModel.addAttribute(attributeName, parameterName);
-        }
-    }
-
-    /**
-     * Add all uniform entries of the given {@link Technique} to the given
-     * {@link TechniqueModel}
-     * 
-     * @param technique The {@link Technique}
-     * @param techniqueModel The {@link TechniqueModel}
-     */
-    private static void addUniforms(Technique technique,
-        DefaultTechniqueModel techniqueModel)
-    {
-        Map<String, String> uniforms = 
-            Optionals.of(technique.getUniforms());
-        for (Entry<String, String> entry : uniforms.entrySet())
-        {
-            String uniformName = entry.getKey();
-            String parameterName = entry.getValue();
-            techniqueModel.addUniform(uniformName, parameterName);
-        }
-    }
-    
-    
-    /**
-     * Initialize the {@link TechniqueModel} instances
-     */
-    private void initTechniqueModels()
-    {
-        Map<String, Technique> techniques = Optionals.of(gltf.getTechniques());
-        for (Entry<String, Technique> entry : techniques.entrySet())
-        {
-            String techniqueId = entry.getKey();
-            Technique technique = entry.getValue();
-            DefaultTechniqueModel techniqueModel = 
-                get("techniques", techniqueId, techniqueModels);
-            
-            String programId = technique.getProgram();
-            DefaultProgramModel programModel = 
-                get("programs", programId, programModels);
-            techniqueModel.setProgramModel(programModel);
-            
-            addParameters(technique, techniqueModel);
-            addAttributes(technique, techniqueModel);
-            addUniforms(technique, techniqueModel);
-            
-            List<Integer> enable = 
-                Techniques.obtainEnabledStates(technique);
-            TechniqueStatesFunctions functions = 
-                Techniques.obtainTechniqueStatesFunctions(technique);
-
-            TechniqueStatesFunctionsModel techniqueStatesFunctionsModel =
-                new DefaultTechniqueStatesFunctionsModelV1(functions);
-            TechniqueStatesModel techniqueStatesModel = 
-                new DefaultTechniqueStatesModel(
-                    enable, techniqueStatesFunctionsModel);
-            techniqueModel.setTechniqueStatesModel(techniqueStatesModel);
-        }
-    }
-
-    
     
     /**
      * Initialize the {@link MaterialModel} instances
      */
     private void initMaterialModels()
     {
-        Map<String, Material> materials = Optionals.of(gltf.getMaterials());
-        for (Entry<String, Material> entry : materials.entrySet())
+        List<Material> materials = Optionals.of(gltf.getMaterials());
+        for (int i = 0; i < materials.size(); i++)
         {
-            String materialId = entry.getKey();
-            Material material = entry.getValue();
-            DefaultMaterialModel materialModel = 
-                get("materials", materialId, materialModels);
-            
-            String techniqueId = material.getTechnique();
-            if (techniqueId == null ||
-                GltfDefaults.isDefaultTechniqueId(techniqueId))
-            {
-                materialModel.setTechniqueModel(
-                    DefaultModels.getDefaultTechniqueModel());
-            }
-            else
-            {
-                DefaultTechniqueModel techniqueModel =
-                    get("techniques", techniqueId, techniqueModels);
-                materialModel.setTechniqueModel(techniqueModel);
-            }
+            Material material = materials.get(i);
+            // TODO Initialize MaterialModel
+            DefaultMaterialModel materialModel = materialModels.get(i);
+            materialModel.setTechniqueModel(
+                de.javagl.jgltf.model.v1.gl.DefaultModels
+                    .getDefaultTechniqueModel());
         }
     }
 
@@ -1090,19 +866,18 @@ public final class GltfModelV2 implements GltfModel
      */
     private void instantiateCameraModels()
     {
-        Map<String, Node> nodes = Optionals.of(gltf.getNodes());
-        Map<String, Camera> cameras = Optionals.of(gltf.getCameras());
-        for (Entry<String, Node> entry : nodes.entrySet())
+        List<Node> nodes = Optionals.of(gltf.getNodes());
+        List<Camera> cameras = Optionals.of(gltf.getCameras());
+        for (int i = 0; i < nodes.size(); i++)
         {
-            String nodeId = entry.getKey();
-            Node node = entry.getValue();
+            Node node = nodes.get(i);
             
-            String cameraId = node.getCamera();
-            if (cameraId != null)
+            Integer cameraIndex = node.getCamera();
+            if (cameraIndex != null)
             {
-                Camera camera = cameras.get(cameraId);
-                NodeModel nodeModel = get("nodes", nodeId, nodeModels);
-                String name = nodeId + "." + cameraId;
+                Camera camera = cameras.get(cameraIndex);
+                NodeModel nodeModel = nodeModels.get(i);
+                String name = "node" + i + "." + "camera" + cameraIndex;
                 Function<float[], float[]> viewMatrixComputer = result -> 
                 {
                     float localResult[] = Utils.validate(result, 16);
@@ -1114,7 +889,7 @@ public final class GltfModelV2 implements GltfModel
                     (result, aspectRatio) -> 
                 {
                     float localResult[] = Utils.validate(result, 16);
-                    CamerasV1.computeProjectionMatrix(
+                    CamerasV2.computeProjectionMatrix(
                         camera, aspectRatio, localResult);
                     return localResult;
                 };
@@ -1187,17 +962,6 @@ public final class GltfModelV2 implements GltfModel
         return Collections.unmodifiableList(textureModels);
     }
     
-    /**
-     * Returns an unmodifiable view on the list of {@link ShaderModel} 
-     * instances that have been created for the glTF.
-     * 
-     * @return The {@link ShaderModel} instances
-     */
-    public List<ShaderModel> getShaderModels()
-    {
-        return Collections.unmodifiableList(shaderModels);
-    }
-
     @Override
     public GlTF getGltf()
     {

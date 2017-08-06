@@ -24,28 +24,28 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.model.v1;
+package de.javagl.jgltf.model.v2;
 
 import java.util.logging.Logger;
 
-import de.javagl.jgltf.impl.v1.Camera;
-import de.javagl.jgltf.impl.v1.CameraOrthographic;
-import de.javagl.jgltf.impl.v1.CameraPerspective;
+import de.javagl.jgltf.impl.v2.Camera;
+import de.javagl.jgltf.impl.v2.CameraOrthographic;
+import de.javagl.jgltf.impl.v2.CameraPerspective;
 import de.javagl.jgltf.model.MathUtils;
 import de.javagl.jgltf.model.Utils;
 
 /**
- * Utility methods related to cameras in glTF 1.0
+ * Utility methods related to cameras in glTF 2.0
  */
-class CamerasV1
+class CamerasV2
 {
-    int XXX; // TODO This is the same as CamerasV2 - try to generalize this!
+    int XXX; // TODO This is the same as CamerasV1 - try to generalize this!
     
     /**
      * The logger used in this class
      */
     private static final Logger logger = 
-        Logger.getLogger(CamerasV1.class.getName());
+        Logger.getLogger(CamerasV2.class.getName());
     
     /**
      * Compute the projection matrix for the given {@link Camera}. If the 
@@ -121,7 +121,7 @@ class CamerasV1
     /**
      * Private constructor to prevent instantiation
      */
-    private CamerasV1()
+    private CamerasV2()
     {
         // Private constructor to prevent instantiation
     }
