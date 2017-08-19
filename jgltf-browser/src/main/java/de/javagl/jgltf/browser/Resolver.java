@@ -190,6 +190,7 @@ class Resolver
         m.put("glTF.scene", getMap(gltf, "scenes"));
         m.put("glTF.scenes.*.nodes.*", getMap(gltf, "nodes"));
         m.put("glTF.bufferViews.*.buffer", getMap(gltf, "buffers"));
+        m.put("glTF.images.*.bufferView", getMap(gltf, "bufferViews"));
         m.put("glTF.nodes.*.camera", getMap(gltf, "cameras"));
         m.put("glTF.nodes.*.meshes.*", getMap(gltf, "meshes"));
         m.put("glTF.nodes.*.children.*", getMap(gltf, "nodes"));
@@ -341,6 +342,10 @@ class Resolver
         {
             Method method = c.getMethod("get" + capitalizeFirstLetter(name));
             Object result = method.invoke(object);
+            if (result == null)
+            {
+                return null;
+            }
             if (result instanceof List<?>)
             {
                 List<?> list = (List<?>)result;
@@ -360,7 +365,7 @@ class Resolver
                IllegalArgumentException | 
                InvocationTargetException e)
         {
-            logger.info("Could not access " + name + ": " + e.getMessage());
+            logger.fine("Could not access " + name + ": " + e.getMessage());
             return Collections.emptyMap();
         }
     }

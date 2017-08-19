@@ -62,6 +62,7 @@ import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.model.io.GltfWriter;
 import de.javagl.jgltf.model.v1.GltfModelV1;
+import de.javagl.jgltf.model.v2.GltfModelV2;
 import de.javagl.swing.tasks.SwingTask;
 import de.javagl.swing.tasks.SwingTaskExecutors;
 
@@ -146,6 +147,10 @@ class InfoComponentFactory
         glConstantPaths.add("glTF.textures.*.target");
         glConstantPaths.add("glTF.textures.*.type");
         glConstantPaths.add("glTF.bufferViews.*.target");
+        glConstantPaths.add("glTF.samplers.*.wrapS");
+        glConstantPaths.add("glTF.samplers.*.wrapT");
+        glConstantPaths.add("glTF.samplers.*.minFilter");
+        glConstantPaths.add("glTF.samplers.*.magFilter");
         for (String glConstantPath : glConstantPaths)
         {
             if (RegEx.matches(pathString, glConstantPath))
@@ -282,10 +287,18 @@ class InfoComponentFactory
             return infoComponentFactory.createGenericInfoComponent(
                 selectedValue);
         }
-        
-        // TODO Implement info components for GltfModelV2
-        logger.warning("GltfModelV2 is not supported yet");
-        
+        else if (gltfModel instanceof GltfModelV2)
+        {
+            GltfModelV2 gltfModelV2 = (GltfModelV2)gltfModel;
+            InfoComponentFactoryV2 infoComponentFactory =
+                new InfoComponentFactoryV2(this, gltfModelV2);
+            return infoComponentFactory.createGenericInfoComponent(
+                selectedValue);
+        }
+        else
+        {
+            logger.warning("GltfModel version is not supported yet");
+        }
         return null;
     }
 
