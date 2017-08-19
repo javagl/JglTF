@@ -26,6 +26,7 @@
  */
 package de.javagl.jgltf.viewer;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -191,7 +192,27 @@ class UniformGetters
         {
             Object object = getUniformValueObject(
                 uniformName, materialModel);
-            value[0] = object == null ? null : String.valueOf(object); 
+            if (object == null)
+            {
+                value[0] = null;
+            }
+            else if (object instanceof Collection<?>)
+            {
+                Collection<?> collection = (Collection<?>)object;
+                if (collection.size() == 0)
+                {
+                    value[0] = null;
+                }
+                else
+                {
+                    Object element = collection.iterator().next();
+                    value[0] = String.valueOf(element);
+                }
+            }
+            else
+            {
+                value[0] = String.valueOf(object);
+            }
             return value;
         };
     }
