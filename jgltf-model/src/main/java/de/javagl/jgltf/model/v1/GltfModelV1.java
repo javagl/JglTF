@@ -748,7 +748,6 @@ public final class GltfModelV1 implements GltfModel
             DefaultAccessorModel accessorModel =
                 get("accessors", accessorId, accessorModels);
             accessorModel.setBufferViewModel(bufferViewModel);
-            accessorModel.setAccessorData(AccessorDatas.create(accessorModel));
         }
     }
 
