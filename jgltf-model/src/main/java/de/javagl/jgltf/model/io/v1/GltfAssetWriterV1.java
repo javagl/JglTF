@@ -61,16 +61,11 @@ public class GltfAssetWriterV1
     private static final int CONTENT_FORMAT_JSON = 0;
     
     /**
-     * The {@link GltfWriter} for the JSON part
-     */
-    private final GltfWriter gltfWriter;
-    
-    /**
      * Default constructor
      */
-    GltfAssetWriterV1()
+    public GltfAssetWriterV1()
     {
-        this.gltfWriter = new GltfWriter();
+        // Default constructor
     }
     
     /**
@@ -105,6 +100,7 @@ public class GltfAssetWriterV1
         throws IOException
     {
         GlTF gltf = gltfAsset.getGltf();
+        GltfWriter gltfWriter = new GltfWriter();
         gltfWriter.write(gltf, outputStream);
     }
     
@@ -144,6 +140,7 @@ public class GltfAssetWriterV1
         byte sceneData[];
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream())
         {
+            GltfWriter gltfWriter = new GltfWriter();
             gltfWriter.write(gltf, baos);
             sceneData = baos.toByteArray();
         }
