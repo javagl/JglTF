@@ -24,7 +24,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.obj;
+package de.javagl.jgltf.obj.v1;
 
 import java.util.ArrayList;
 import java.util.Arrays;

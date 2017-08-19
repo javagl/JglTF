@@ -24,7 +24,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.obj;
+package de.javagl.jgltf.obj.v1;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -34,6 +34,7 @@ import de.javagl.jgltf.impl.v1.Image;
 import de.javagl.jgltf.impl.v1.Sampler;
 import de.javagl.jgltf.impl.v1.Texture;
 import de.javagl.jgltf.model.GltfConstants;
+import de.javagl.jgltf.model.v1.GltfIds;
 
 /**
  * A class for managing the {@link Texture}s of a {@link GlTF}. It allows
@@ -88,7 +89,7 @@ class TextureHandler
         if (samplerId == null)
         {
             Sampler sampler = new Sampler();
-            samplerId = Gltfs.generateId("sampler", gltf.getSamplers());
+            samplerId = GltfIds.generateId("sampler", gltf.getSamplers());
             gltf.addSamplers(samplerId, sampler);
         }
         
@@ -101,7 +102,7 @@ class TextureHandler
         // Create the image 
         Image image = new Image();
         image.setUri(imageUri);
-        String imageId = Gltfs.generateId("image", gltf.getImages());
+        String imageId = GltfIds.generateId("image", gltf.getImages());
         gltf.addImages(imageId, image);
         
         // Create the texture that refers to the image
@@ -112,7 +113,7 @@ class TextureHandler
         texture.setTarget(GltfConstants.GL_TEXTURE_2D);
         texture.setType(GltfConstants.GL_UNSIGNED_BYTE);
         texture.setSampler(samplerId);
-        textureId = Gltfs.generateId("texture", gltf.getTextures()); 
+        textureId = GltfIds.generateId("texture", gltf.getTextures()); 
         gltf.addTextures(textureId, texture);
 
         imageUriToTextureId.put(imageUri, textureId);

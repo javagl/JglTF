@@ -24,7 +24,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.obj;
+package de.javagl.jgltf.obj.v1;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -39,6 +39,7 @@ import de.javagl.jgltf.impl.v1.TechniqueParameters;
 import de.javagl.jgltf.impl.v1.TechniqueStates;
 import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.gl.Semantic;
+import de.javagl.jgltf.model.v1.GltfIds;
 
 /**
  * A class for managing the {@link Technique}s that may be required for
@@ -192,22 +193,62 @@ class TechniqueHandler
                 return;
             }
         }
-        String programId = Gltfs.generateId("program", gltf.getPrograms()); 
+        String programId = GltfIds.generateId("program", gltf.getPrograms()); 
         
         Shader vertexShader = new Shader();
         vertexShader.setUri(vertexShaderUri);
         vertexShader.setType(GltfConstants.GL_VERTEX_SHADER);
-        String vertexShaderId = Gltfs.generateId(
+        String vertexShaderId = GltfIds.generateId(
             "vertexShader_for_" + programId, gltf.getShaders());
         gltf.addShaders(vertexShaderId, vertexShader);
         
         Shader fragmentShader = new Shader();
         fragmentShader.setUri(fragmentShaderUri);
         fragmentShader.setType(GltfConstants.GL_FRAGMENT_SHADER);
-        String fragmentShaderId = Gltfs.generateId(
+        String fragmentShaderId = GltfIds.generateId(
             "fragmentShader_for_" + programId, gltf.getShaders());
         gltf.addShaders(fragmentShaderId, fragmentShader);
         
+        Program program = createProgram(
+            withTexture, withNormals, vertexShaderId, fragmentShaderId);
+        gltf.addPrograms(programId, program);
+        
+        
+        Technique technique = new Technique();
+        technique.setProgram(programId);
+
+        Map<String, String> techniqueAttributes =
+            createTechniqueAttributes(withTexture, withNormals);
+        technique.setAttributes(techniqueAttributes);
+
+        Map<String, TechniqueParameters> techniqueParameters =
+            createTechniqueParameters(withTexture, withNormals);
+        technique.setParameters(techniqueParameters);
+        
+        Map<String, String> techniqueUniforms = 
+            createTechniqueUniforms(withNormals);
+        technique.setUniforms(techniqueUniforms);
+        
+        TechniqueStates states = new TechniqueStates();
+        states.addEnable(GltfConstants.GL_DEPTH_TEST);
+        technique.setStates(states);
+        
+        gltf.addTechniques(techniqueId, technique);
+    }
+
+
+    /**
+     * Create a {@link Program} for the given configuration
+     * 
+     * @param withTexture Whether a texture is present
+     * @param withNormals Whether normals are present
+     * @param vertexShaderId The vertex {@link Shader} ID
+     * @param fragmentShaderId The fragment {@link Shader} ID
+     * @return The {@link Program}
+     */
+    private Program createProgram(boolean withTexture, boolean withNormals,
+        String vertexShaderId, String fragmentShaderId)
+    {
         Program program = new Program();
         program.setVertexShader(vertexShaderId);
         program.setFragmentShader(fragmentShaderId);
@@ -222,12 +263,20 @@ class TechniqueHandler
             programAttributes.add("a_normal");
         }
         program.setAttributes(programAttributes);
-        gltf.addPrograms(programId, program);
-        
-        
-        Technique technique = new Technique();
-        technique.setProgram(programId);
+        return program;
+    }
 
+    /**
+     * Creates the mapping from attribute names to 
+     * {@link Technique#getParameters() technique parameters} names 
+     * 
+     * @param withTexture Whether a texture is present
+     * @param withNormals Whether normals are present
+     * @return The uniform mapping
+     */
+    private Map<String, String> createTechniqueAttributes(
+        boolean withTexture, boolean withNormals)
+    {
         Map<String, String> techniqueAttributes = 
             new LinkedHashMap<String, String>();
         techniqueAttributes.put("a_position", "position");
@@ -239,9 +288,45 @@ class TechniqueHandler
         {
             techniqueAttributes.put("a_normal", "normal");
         }
-        technique.setAttributes(techniqueAttributes);
-        
+        return techniqueAttributes;
+    }
+    
+    /**
+     * Creates the mapping from uniform names to 
+     * {@link Technique#getParameters() technique parameters} names 
+     * 
+     * @param withNormals Whether normals are present
+     * @return The uniform mapping
+     */
+    private static Map<String, String> createTechniqueUniforms(
+        boolean withNormals)
+    {
+        Map<String, String> techniqueUniforms = 
+            new LinkedHashMap<String, String>();
+        techniqueUniforms.put("u_ambient", AMBIENT_NAME);
+        techniqueUniforms.put("u_diffuse", DIFFUSE_NAME);
+        techniqueUniforms.put("u_specular", SPECULAR_NAME);
+        techniqueUniforms.put("u_shininess", SHININESS_NAME);
+        techniqueUniforms.put("u_modelViewMatrix", "modelViewMatrix");
+        if (withNormals)
+        {
+            techniqueUniforms.put("u_normalMatrix", "normalMatrix");
+        }
+        techniqueUniforms.put("u_projectionMatrix", "projectionMatrix");
+        return techniqueUniforms;
+    }
 
+    /**
+     * Create the {@link TechniqueParameters} mapping for a {@link Technique} 
+     * with the specified configuration
+     * 
+     * @param withTexture Whether a texture is present
+     * @param withNormals Whether normals are present
+     * @return The {@link TechniqueParameters} mapping
+     */
+    private static Map<String, TechniqueParameters> createTechniqueParameters(
+        boolean withTexture, boolean withNormals)
+    {
         Map<String, TechniqueParameters> techniqueParameters = 
             new LinkedHashMap<String, TechniqueParameters>();
         
@@ -299,28 +384,7 @@ class TechniqueHandler
         techniqueParameters.put(SHININESS_NAME, 
             createTechniqueParameters(
                 GltfConstants.GL_FLOAT));
-        
-        technique.setParameters(techniqueParameters);
-        
-        Map<String, String> techniqueUniforms = 
-            new LinkedHashMap<String, String>();
-        techniqueUniforms.put("u_ambient", AMBIENT_NAME);
-        techniqueUniforms.put("u_diffuse", DIFFUSE_NAME);
-        techniqueUniforms.put("u_specular", SPECULAR_NAME);
-        techniqueUniforms.put("u_shininess", SHININESS_NAME);
-        techniqueUniforms.put("u_modelViewMatrix", "modelViewMatrix");
-        if (withNormals)
-        {
-            techniqueUniforms.put("u_normalMatrix", "normalMatrix");
-        }
-        techniqueUniforms.put("u_projectionMatrix", "projectionMatrix");
-        technique.setUniforms(techniqueUniforms);
-        
-        TechniqueStates states = new TechniqueStates();
-        states.addEnable(GltfConstants.GL_DEPTH_TEST);
-        technique.setStates(states);
-        
-        gltf.addTechniques(techniqueId, technique);
+        return techniqueParameters;
     }
     
     /**

@@ -1,7 +1,7 @@
 /*
  * www.javagl.de - JglTF
  *
- * Copyright 2015-2016 Marco Hutter - http://www.javagl.de
+ * Copyright 2015-2017 Marco Hutter - http://www.javagl.de
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,53 +24,53 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.obj;
+package de.javagl.jgltf.model.impl.creation;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-
-import de.javagl.jgltf.impl.v1.GlTF;
+import de.javagl.jgltf.model.AccessorModel;
 
 /**
- * Utility methods for {@link GlTF}s.
+ * Utility methods related to {@link AccessorModel} instances
  */
-class Gltfs
+class AccessorModels 
 {
     /**
-     * Generate an unspecified ID string with the given prefix that is not
-     * yet contained in the key set of the given map
+     * Compute the number of bytes that the given {@link AccessorModel} data
+     * has to be aligned to. 
      * 
-     * @param prefix The prefix for the ID string
-     * @param map The map from the existing IDs. This may be <code>null</code>.
-     * @return The new ID
+     * @param accessorModel The {@link AccessorModel}
+     * @return The alignment bytes
      */
-    static String generateId(
-        String prefix, Map<? extends String, ?> map)
+    static int computeAlignmentBytes(AccessorModel accessorModel)
     {
-        Set<? extends String> set = Collections.emptySet();
-        if (map != null)
-        {
-            set = map.keySet();
-        }
-        int counter = set.size();
-        while (true)
-        {
-            String id = prefix + counter;
-            if (!set.contains(id))
-            {
-                return id;
-            }
-            counter++;
-        }
+        return accessorModel.getComponentSizeInBytes();
     }
-
+    
+    /**
+     * Compute the alignment for the given {@link AccessorModel} instances.
+     * This is the least common multiple of the alignment of all instances.
+     * 
+     * @param accessorModels The {@link AccessorModel} instances
+     * @return The alignment
+     */
+    static int computeAlignmentBytes(
+        Iterable<? extends AccessorModel> accessorModels)
+    {
+        int alignmentBytes = 1;
+        for (AccessorModel accessorModel : accessorModels)
+        {
+            alignmentBytes = Utils.computeLeastCommonMultiple(alignmentBytes, 
+                AccessorModels.computeAlignmentBytes(accessorModel));
+        }
+        return alignmentBytes;
+    }
+    
     /**
      * Private constructor to prevent instantiation
      */
-    private Gltfs()
+    private AccessorModels()
     {
         // Private constructor to prevent instantiation
     }
-
+    
+    
 }

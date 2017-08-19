@@ -26,6 +26,7 @@
  */
 package de.javagl.jgltf.obj;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Paths;
@@ -33,8 +34,12 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.logging.Logger;
 
+import de.javagl.jgltf.model.io.v1.GltfAssetV1;
+import de.javagl.jgltf.model.io.v1.GltfAssetWriterV1;
+import de.javagl.jgltf.model.io.v1.GltfModelToBinaryAssetConverterV1;
+import de.javagl.jgltf.model.io.v1.GltfModelWriterV1;
 import de.javagl.jgltf.model.v1.GltfModelV1;
-import de.javagl.jgltf.obj.ObjGltfModelCreatorV1.BufferStrategy;
+import de.javagl.jgltf.obj.v1.ObjGltfModelCreatorV1;
 
 /**
  * A class for converting OBJ files to glTF
@@ -139,27 +144,23 @@ public class ObjToGltf
         GltfModelV1 gltfModel = 
             new ObjGltfModelCreatorV1(bufferStrategy).create(objUri);
 
-//        if (binary)
-//        {
-//            logger.info("Converting to binary glTF");
-//            gltfData = new GltfDataToBinaryConverter().convert(gltfData);
-//            
-//            logger.info("Writing binary glTF to " + outputFileName);
-//            int XXX; // XXX Not implemented
-////            new BinaryGltfDataWriter().writeBinaryGltfData(
-////                gltfData, outputFileName);
-//        }
-//        else
-//        {
-//            if (embedded)
-//            {
-//                logger.info("Converting to embedded glTF");
-//                gltfData = new GltfDataToEmbeddedConverter().convert(gltfData);
-//            }
-//    
-//            logger.info("Writing glTF to " + outputFileName);
-//            new GltfDataWriter().writeGltfData(gltfData, outputFileName);
-//        }
+        GltfModelWriterV1 gltfModelWriter = new GltfModelWriterV1();
+        if (binary)
+        {
+            logger.info("Writing binary glTF to " + outputFileName);
+            gltfModelWriter.writeBinary(gltfModel, new File(outputFileName));
+        }
+        else if (embedded)
+        {
+            logger.info("Writing embedded glTF to " + outputFileName);
+            gltfModelWriter.writeEmbedded(gltfModel, new File(outputFileName));
+        }
+        else
+        {
+            logger.info("Writing glTF to " + outputFileName);
+            gltfModelWriter.write(gltfModel, new File(outputFileName));
+        }
+    
         
         long afterNs = System.nanoTime();
         double durationS = (afterNs - beforeNs) * 1e-9;

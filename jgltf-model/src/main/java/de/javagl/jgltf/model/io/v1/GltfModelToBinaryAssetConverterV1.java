@@ -31,7 +31,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.function.Function;
 
 import de.javagl.jgltf.impl.v1.Buffer;
@@ -46,6 +45,7 @@ import de.javagl.jgltf.model.gl.ShaderModel;
 import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.model.v1.BinaryGltfV1;
 import de.javagl.jgltf.model.v1.GltfExtensionsV1;
+import de.javagl.jgltf.model.v1.GltfIds;
 import de.javagl.jgltf.model.v1.GltfModelV1;
 
 /**
@@ -165,7 +165,8 @@ public class GltfModelToBinaryAssetConverterV1
 
             // Store the BufferView under a newly generated ID
             String generatedBufferViewId = 
-                createNewBufferViewId("image_" + id, oldBufferViews.keySet());
+                GltfIds.generateId("bufferView_for_image_" + id, 
+                    oldBufferViews.keySet());
             newBufferViews.put(generatedBufferViewId, imageBufferView);
 
             // Let the image refer to the BufferView via its extension object
@@ -202,8 +203,9 @@ public class GltfModelToBinaryAssetConverterV1
             shaderBufferView.setByteLength(byteLength);
 
             // Store the BufferView under a newly generated ID
-            String generatedBufferViewId = 
-                createNewBufferViewId("shader_" + id, oldBufferViews.keySet());
+            String generatedBufferViewId =
+                GltfIds.generateId("bufferView_for_shader_" + id, 
+                    oldBufferViews.keySet());
             newBufferViews.put(generatedBufferViewId, shaderBufferView);
 
             // Let the shader refer to the BufferView via its extension object
@@ -232,36 +234,6 @@ public class GltfModelToBinaryAssetConverterV1
             convertedGltf.setBufferViews(newBufferViews);
         }
         return new GltfAssetV1(convertedGltf, binaryGltfByteBuffer);
-    }
-
-
-    /**
-     * Create an unspecified {@link BufferView} ID that does not exist yet
-     * 
-     * @param namePart A string that should appear in the ID
-     * @param existingBufferViewIds The existing IDs
-     * @return The new ID
-     */
-    private static String createNewBufferViewId(
-        String namePart, Set<String> existingBufferViewIds)
-    {
-        int counter = 0;
-        while (true)
-        {
-            String bufferViewId = "bufferView_for_"+namePart;
-            if (counter > 0)
-            {
-                bufferViewId += "_"+counter;
-            }
-            if (existingBufferViewIds.contains(bufferViewId))
-            {
-                counter++;
-            }
-            else
-            {
-                return bufferViewId;
-            }
-        }
     }
 
 

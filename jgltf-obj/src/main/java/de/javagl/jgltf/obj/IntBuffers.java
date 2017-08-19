@@ -28,15 +28,13 @@ package de.javagl.jgltf.obj;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
-import java.util.Collection;
 
 /**
- * Utility methods related to buffers
+ * Utility methods related to <code>IntBuffer</code> instances 
  */
-class Buffers
+public class IntBuffers
 {
     /**
      * Convert the given input buffer to a byte buffer that contains the data
@@ -53,7 +51,7 @@ class Buffers
      * @throws IllegalStateException If the given element size is neither
      * 1, 2 nor 4
      */
-    static ByteBuffer convertToByteBuffer(
+    public static ByteBuffer convertToByteBuffer(
         IntBuffer inputBuffer, int elementSize)
     {
         switch (elementSize)
@@ -129,53 +127,9 @@ class Buffers
     }
     
     /**
-     * Create a direct byte buffer with native byte order that contains the 
-     * bytes of the elements of the given input buffer. 
-     *  
-     * @param inputBuffer The input buffer
-     * @return The byte buffer
-     */
-    static ByteBuffer createFloatByteBuffer(FloatBuffer inputBuffer)
-    {
-        ByteBuffer byteBuffer = 
-            ByteBuffer.allocateDirect(inputBuffer.capacity() * Float.BYTES)
-            .order(ByteOrder.nativeOrder());
-        FloatBuffer floatBuffer = byteBuffer.asFloatBuffer();
-        floatBuffer.slice().put(inputBuffer.slice());
-        return byteBuffer;
-    }
-    
-    /**
-     * Create a direct byte buffer with native byte order whose contents is
-     * a concatenation of the given byte buffers 
-     * 
-     * @param byteBuffers The input byte buffers
-     * @return The concatenated byte buffer
-     */
-    static ByteBuffer concat(Collection<? extends ByteBuffer> byteBuffers)
-    {
-        if (byteBuffers.isEmpty())
-        {
-            return ByteBuffer.allocateDirect(0).order(ByteOrder.nativeOrder());
-        }
-        int resultCapacity = byteBuffers.stream()
-            .mapToInt(ByteBuffer::capacity)
-            .reduce(0, (a,b) -> a + b);
-        ByteBuffer newByteBuffer = ByteBuffer
-            .allocateDirect(resultCapacity)
-            .order(ByteOrder.nativeOrder());
-        for (ByteBuffer byteBuffer : byteBuffers)
-        {
-            newByteBuffer.put(byteBuffer.slice());
-        }
-        newByteBuffer.position(0);
-        return newByteBuffer;
-    }
-
-    /**
      * Private constructor to prevent instantiation
      */
-    private Buffers()
+    private IntBuffers()
     {
         // Private constructor to prevent instantiation
     }
