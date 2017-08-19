@@ -218,7 +218,7 @@ public abstract class AbstractGltfViewer<C> implements GltfViewer<C>
         {
             GltfModelV1 gltfModelV1 = (GltfModelV1)gltfModel;
             
-            Function<Object, ? extends TextureModel> textureModelLookup = object -> 
+            Function<Object, TextureModel> textureModelLookup = object -> 
             {
                 String textureId = String.valueOf(object);
                 return gltfModelV1.getTextureModelById(textureId);  
@@ -230,7 +230,7 @@ public abstract class AbstractGltfViewer<C> implements GltfViewer<C>
         {
             GltfModelV2 gltfModelV2 = (GltfModelV2)gltfModel;
             
-            Function<Object, ? extends TextureModel> textureModelLookup = object -> 
+            Function<Object, TextureModel> textureModelLookup = object -> 
             {
                 Number number = (Number)object;
                 int index = number.intValue();
