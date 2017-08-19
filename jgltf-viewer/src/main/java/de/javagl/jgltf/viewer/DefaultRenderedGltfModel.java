@@ -35,6 +35,7 @@ import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 import de.javagl.jgltf.model.AccessorModel;
+import de.javagl.jgltf.model.Accessors;
 import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.CameraModel;
 import de.javagl.jgltf.model.GltfConstants;
@@ -219,14 +220,14 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
      */
     private void processSceneModel(SceneModel sceneModel)
     {
-        logger.info("Processing scene " + sceneModel);
+        logger.fine("Processing scene " + sceneModel);
         
         List<NodeModel> nodeModels = sceneModel.getNodeModels();
         for (NodeModel nodeModel : nodeModels)
         {
             processNodeModel(nodeModel);
         }
-        logger.info("Processing scene " + sceneModel + " DONE");
+        logger.fine("Processing scene " + sceneModel + " DONE");
     }
     
     
@@ -689,7 +690,12 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
                 bufferViewModel.getTarget(), GltfConstants.GL_ARRAY_BUFFER);
             int size = accessorModel.getElementType().getNumComponents();
             int type = accessorModel.getComponentType();
-            int stride = accessorModel.getByteStride();
+            Integer stride = bufferViewModel.getByteStride();
+            if (stride == null)
+            {
+                stride = size * 
+                    Accessors.getNumBytesForAccessorComponentType(type);
+            }
             int offset = accessorModel.getByteOffset();
             
             glContext.createVertexAttribute(glVertexArray, 
