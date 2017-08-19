@@ -27,6 +27,7 @@
 package de.javagl.jgltf.model.impl;
 
 import java.nio.ByteBuffer;
+import java.util.function.Consumer;
 
 import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.BufferViewModel;
@@ -45,12 +46,12 @@ public final class DefaultBufferViewModel implements BufferViewModel
     /**
      * The byte offset
      */
-    private final int byteOffset;
+    private int byteOffset;
     
     /**
      * The byte length
      */
-    private final int byteLength;
+    private int byteLength;
     
     /**
      * The byte stride
@@ -61,22 +62,46 @@ public final class DefaultBufferViewModel implements BufferViewModel
      * The optional target
      */
     private final Integer target;
+
+    /**
+     * An optional callback that will be used to perform the
+     * substitution of sparse accessor data in the 
+     * {@link #getBufferViewData() buffer view data}
+     * when it is obtained for the first time. 
+     */
+    private Consumer<? super ByteBuffer> sparseSubstitutionCallback;
+    
+    /**
+     * Whether the sparse substitution was already applied
+     */
+    private boolean sparseSubstitutionApplied;
     
     /**
      * Creates a new instance
      * 
-     * @param byteOffset The byte offset
-     * @param byteLength The byte length
      * @param byteStride The optional byte stride
      * @param target The optional target
      */
     public DefaultBufferViewModel(
-        int byteOffset, int byteLength, Integer byteStride, Integer target)
+        Integer byteStride, Integer target)
     {
-        this.byteOffset = byteOffset;
-        this.byteLength = byteLength;
+        this.byteOffset = 0;
+        this.byteLength = 0;
         this.byteStride = byteStride;
         this.target = target;
+    }
+    
+    /**
+     * Set the callback that will perform the substitution of sparse accessor 
+     * data in the {@link #getBufferViewData() buffer view data} when it is 
+     * obtained for the first time.
+     *  
+     * @param sparseSubstitutionCallback The callback
+     */
+    public void setSparseSubstitutionCallback(
+        Consumer<? super ByteBuffer> sparseSubstitutionCallback)
+    {
+        this.sparseSubstitutionCallback = sparseSubstitutionCallback;
     }
     
     /**
@@ -89,12 +114,38 @@ public final class DefaultBufferViewModel implements BufferViewModel
         this.bufferModel = bufferModel;
     }
     
+    /**
+     * Set the byte offset of this view referring to its {@link BufferModel}
+     *  
+     * @param byteOffset The byte offset
+     */
+    public void setByteOffset(int byteOffset)
+    {
+        this.byteOffset = byteOffset;
+    }
+
+    /**
+     * Set the byte length of this buffer view
+     * 
+     * @param byteLength The byte length
+     */
+    public void setByteLength(int byteLength)
+    {
+        this.byteLength = byteLength;
+    }
+    
+    
     @Override
     public ByteBuffer getBufferViewData()
     {
         ByteBuffer bufferData = bufferModel.getBufferData();
         ByteBuffer bufferViewData = 
             Buffers.createSlice(bufferData, getByteOffset(), getByteLength());
+        if (sparseSubstitutionCallback != null && !sparseSubstitutionApplied)
+        {
+            sparseSubstitutionCallback.accept(bufferViewData);
+            sparseSubstitutionApplied = true;
+        }
         return bufferViewData;
     }
 

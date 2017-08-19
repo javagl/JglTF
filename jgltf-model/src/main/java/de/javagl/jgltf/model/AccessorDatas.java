@@ -26,6 +26,7 @@
 package de.javagl.jgltf.model;
 
 import java.nio.ByteBuffer;
+import java.util.logging.Logger;
 
 /**
  * Methods to create instances of the accessor data utility classes
@@ -37,6 +38,121 @@ import java.nio.ByteBuffer;
  */
 public class AccessorDatas
 {
+    /**
+     * The logger used in this class
+     */
+    private static final Logger logger = 
+        Logger.getLogger(AccessorDatas.class.getName());
+    
+    
+    /**
+     * Create the {@link AccessorData} for the given {@link AccessorModel}
+     * 
+     * @param accessorModel The {@link AccessorModel}
+     * @return The {@link AccessorData}
+     */
+    public static AccessorData create(AccessorModel accessorModel)
+    {
+        BufferViewModel bufferViewModel = accessorModel.getBufferViewModel();
+        ByteBuffer bufferViewData = bufferViewModel.getBufferViewData();
+        return create(accessorModel, bufferViewData);
+    }
+
+    /**
+     * Create the {@link AccessorData} for the given {@link AccessorModel}
+     * that refers to the data from the given buffer.
+     * 
+     * @param accessorModel The {@link AccessorModel}
+     * @param byteBuffer The byte buffer containing the data
+     * @return The {@link AccessorData}
+     */
+    public static AccessorData create(
+        AccessorModel accessorModel, ByteBuffer byteBuffer)
+    {
+        if (accessorModel.getComponentDataType() == byte.class)
+        {
+            return createByte(accessorModel, byteBuffer);
+        }
+        if (accessorModel.getComponentDataType() == short.class)
+        {
+            return createShort(accessorModel, byteBuffer);
+        }
+        if (accessorModel.getComponentDataType() == int.class)
+        {
+            return createInt(accessorModel, byteBuffer);
+        }
+        if (accessorModel.getComponentDataType() == float.class)
+        {
+            return createFloat(accessorModel, byteBuffer);
+        }
+        // Should never happen
+        logger.severe("Invalid component data type: "
+            + accessorModel.getComponentDataType());
+        return null;
+    }
+    
+    /**
+     * Create an {@link AccessorData} depending on the given component type.
+     * This will return an {@link AccessorByteData}, {@link AccessorShortData},
+     * {@link AccessorIntData} or {@link AccessorFloatData}
+     * 
+     * @param componentType The component type, as a GL constant (for example,
+     * <code>GL_UNSIGNED_SHORT</code> or <code>GL_FLOAT</code>)
+     * @param bufferViewData The buffer view data that the accessor refers to
+     * @param byteOffset The byte offset for the accessor
+     * @param count The count (number of elements) for the accessor
+     * @param numComponentsPerElement The number of components per element.
+     * For example, if the accessor type is <code>"VEC3"</code>, then this
+     * will be 3
+     * @param byteStride The optional byte stride for the accessor data
+     * @return The {@link AccessorData}
+     * @throws IllegalArgumentException If the given component type is
+     * not a valid GL constant
+     */
+    public static AccessorData create(
+        int componentType, ByteBuffer bufferViewData, int byteOffset, 
+        int count, int numComponentsPerElement, Integer byteStride)
+    {
+        if (componentType == GltfConstants.GL_BYTE ||
+            componentType == GltfConstants.GL_UNSIGNED_BYTE)
+        {
+            return new AccessorByteData(
+                componentType, bufferViewData, byteOffset, count, 
+                numComponentsPerElement, byteStride);
+        }
+        if (componentType == GltfConstants.GL_SHORT ||
+            componentType == GltfConstants.GL_UNSIGNED_SHORT)
+        {
+            return new AccessorShortData(
+                componentType, bufferViewData, byteOffset, count, 
+                numComponentsPerElement, byteStride);
+        }
+        if (componentType == GltfConstants.GL_INT ||
+            componentType == GltfConstants.GL_UNSIGNED_INT)
+        {
+            return new AccessorIntData(
+                componentType, bufferViewData, byteOffset, count, 
+                numComponentsPerElement, byteStride);
+        }
+        if (componentType == GltfConstants.GL_INT ||
+            componentType == GltfConstants.GL_UNSIGNED_INT)
+        {
+            return new AccessorIntData(
+                componentType, bufferViewData, byteOffset, count, 
+                numComponentsPerElement, byteStride);
+        }
+        if (componentType == GltfConstants.GL_FLOAT)
+        {
+            return new AccessorFloatData(
+                componentType, bufferViewData, byteOffset, count, 
+                numComponentsPerElement, byteStride);
+        }
+        throw new IllegalArgumentException(
+            "Not a valid component type: " + componentType);
+    }
+    
+    
+    
     /**
      * Returns whether the given constant is <code>GL_BYTE</code> or
      * <code>GL_UNSIGNED_BYTE</code>. 

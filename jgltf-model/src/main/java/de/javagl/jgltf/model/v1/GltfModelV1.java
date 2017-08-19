@@ -62,6 +62,7 @@ import de.javagl.jgltf.impl.v1.Technique;
 import de.javagl.jgltf.impl.v1.TechniqueParameters;
 import de.javagl.jgltf.impl.v1.TechniqueStatesFunctions;
 import de.javagl.jgltf.impl.v1.Texture;
+import de.javagl.jgltf.model.AccessorDatas;
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.Accessors;
 import de.javagl.jgltf.model.AnimationModel;
@@ -506,7 +507,7 @@ public final class GltfModelV1 implements GltfModel
         Integer componentType = accessor.getComponentType();
         Integer byteOffset = accessor.getByteOffset();
         Integer count = accessor.getCount();
-        ElementType elementType = ElementType.valueOf(accessor.getType());
+        ElementType elementType = ElementType.forString(accessor.getType());
         Integer byteStride = accessor.getByteStride();
         if (byteStride == null)
         {
@@ -514,9 +515,9 @@ public final class GltfModelV1 implements GltfModel
                 Accessors.getNumBytesForAccessorComponentType(
                     componentType);
         }
-        DefaultAccessorModel accessorModel = 
-            new DefaultAccessorModel(componentType, byteOffset, count,
-                elementType, byteStride);
+        DefaultAccessorModel accessorModel = new DefaultAccessorModel(
+            componentType, count, elementType, byteStride);
+        accessorModel.setByteOffset(byteOffset);
         return accessorModel;
     }
 
@@ -580,8 +581,9 @@ public final class GltfModelV1 implements GltfModel
         Integer byteStride = null;
         Integer target = bufferView.getTarget();
         DefaultBufferViewModel bufferViewModel = 
-            new DefaultBufferViewModel(
-                byteOffset, byteLength, byteStride, target);
+            new DefaultBufferViewModel(byteStride, target);
+        bufferViewModel.setByteOffset(byteOffset);
+        bufferViewModel.setByteLength(byteLength);
         return bufferViewModel;
     }
     
@@ -746,6 +748,7 @@ public final class GltfModelV1 implements GltfModel
             DefaultAccessorModel accessorModel =
                 get("accessors", accessorId, accessorModels);
             accessorModel.setBufferViewModel(bufferViewModel);
+            accessorModel.setAccessorData(AccessorDatas.create(accessorModel));
         }
     }
 

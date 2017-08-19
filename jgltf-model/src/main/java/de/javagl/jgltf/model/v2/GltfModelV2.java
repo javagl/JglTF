@@ -39,6 +39,9 @@ import java.util.function.Function;
 import java.util.logging.Logger;
 
 import de.javagl.jgltf.impl.v2.Accessor;
+import de.javagl.jgltf.impl.v2.AccessorSparse;
+import de.javagl.jgltf.impl.v2.AccessorSparseIndices;
+import de.javagl.jgltf.impl.v2.AccessorSparseValues;
 import de.javagl.jgltf.impl.v2.Animation;
 import de.javagl.jgltf.impl.v2.AnimationChannel;
 import de.javagl.jgltf.impl.v2.AnimationChannelTarget;
@@ -56,7 +59,13 @@ import de.javagl.jgltf.impl.v2.Sampler;
 import de.javagl.jgltf.impl.v2.Scene;
 import de.javagl.jgltf.impl.v2.Skin;
 import de.javagl.jgltf.impl.v2.Texture;
+import de.javagl.jgltf.model.AccessorByteData;
+import de.javagl.jgltf.model.AccessorData;
+import de.javagl.jgltf.model.AccessorDatas;
+import de.javagl.jgltf.model.AccessorFloatData;
+import de.javagl.jgltf.model.AccessorIntData;
 import de.javagl.jgltf.model.AccessorModel;
+import de.javagl.jgltf.model.AccessorShortData;
 import de.javagl.jgltf.model.Accessors;
 import de.javagl.jgltf.model.AnimationModel;
 import de.javagl.jgltf.model.AnimationModel.Channel;
@@ -65,6 +74,7 @@ import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.CameraModel;
 import de.javagl.jgltf.model.ElementType;
+import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.GltfReference;
 import de.javagl.jgltf.model.ImageModel;
@@ -93,6 +103,7 @@ import de.javagl.jgltf.model.impl.DefaultNodeModel;
 import de.javagl.jgltf.model.impl.DefaultSceneModel;
 import de.javagl.jgltf.model.impl.DefaultSkinModel;
 import de.javagl.jgltf.model.impl.DefaultTextureModel;
+import de.javagl.jgltf.model.io.Buffers;
 
 /**
  * Implementation of a {@link GltfModel}, based on a {@link GlTF glTF 2.0}.<br>
@@ -340,12 +351,12 @@ public final class GltfModelV2 implements GltfModel
         Integer componentType = accessor.getComponentType();
         Integer byteOffset = accessor.getByteOffset();
         Integer count = accessor.getCount();
-        ElementType elementType = ElementType.valueOf(accessor.getType());
+        ElementType elementType = ElementType.forString(accessor.getType());
         Integer byteStride = elementType.getNumComponents() *
             Accessors.getNumBytesForAccessorComponentType(componentType);
-        DefaultAccessorModel accessorModel = 
-            new DefaultAccessorModel(componentType, byteOffset, count,
-                elementType, byteStride);
+        DefaultAccessorModel accessorModel =  new DefaultAccessorModel(
+            componentType, count, elementType, byteStride);
+        accessorModel.setByteOffset(byteOffset);
         return accessorModel;
     }
 
@@ -410,8 +421,9 @@ public final class GltfModelV2 implements GltfModel
         Integer byteStride = bufferView.getByteStride();
         Integer target = bufferView.getTarget();
         DefaultBufferViewModel bufferViewModel = 
-            new DefaultBufferViewModel(
-                byteOffset, byteLength, byteStride, target);
+            new DefaultBufferViewModel(byteStride, target);
+        bufferViewModel.setByteOffset(byteOffset);
+        bufferViewModel.setByteLength(byteLength);
         return bufferViewModel;
     }
     
@@ -490,7 +502,6 @@ public final class GltfModelV2 implements GltfModel
         List<Skin> skins = Optionals.of(gltf.getSkins());
         for (int i = 0; i < skins.size(); i++)
         {
-            Skin skin = skins.get(i);
             skinModels.add(new DefaultSkinModel(null));
         }
     }
@@ -529,14 +540,296 @@ public final class GltfModelV2 implements GltfModel
         for (int i = 0; i < accessors.size(); i++)
         {
             Accessor accessor = accessors.get(i);
-            int bufferViewIndex = accessor.getBufferView();
-            BufferViewModel bufferViewModel = 
-                bufferViewModels.get(bufferViewIndex);
             DefaultAccessorModel accessorModel = accessorModels.get(i);
-            accessorModel.setBufferViewModel(bufferViewModel);
+
+            AccessorSparse accessorSparse = accessor.getSparse();
+            if (accessorSparse == null)
+            {
+                initDenseAccessorModel(accessor, accessorModel);
+            }
+            else
+            {
+                initSparseAccessorModel(accessor, accessorModel);
+            }
         }
     }
 
+
+    /**
+     * Initialize the {@link AccessorModel} by setting its 
+     * {@link AccessorModel#getBufferViewModel() buffer view model}
+     * for the case that the accessor is dense (i.e. not sparse)
+     * 
+     * @param accessor The {@link Accessor}
+     * @param accessorModel The {@link AccessorModel}
+     */
+    private void initDenseAccessorModel(
+        Accessor accessor, DefaultAccessorModel accessorModel)
+    {
+        Integer bufferViewIndex = accessor.getBufferView();
+        if (bufferViewIndex != null)
+        {
+            // When there is a BufferView referenced from the accessor, then 
+            // the corresponding BufferViewModel may be assigned directly
+            DefaultBufferViewModel bufferViewModel = 
+                bufferViewModels.get(bufferViewIndex);
+            accessorModel.setBufferViewModel(bufferViewModel);
+        }
+        else
+        {
+            // When there is no BufferView referenced from the accessor,
+            // then a NEW BufferViewModel (and Buffer) have to be created
+            int count = accessorModel.getCount();
+            int elementSizeInBytes = accessorModel.getElementSizeInBytes();
+            int byteLength = elementSizeInBytes * count;
+            ByteBuffer bufferData = Buffers.create(byteLength);
+            DefaultBufferViewModel bufferViewModel = 
+                createBufferViewModel(bufferData);
+            accessorModel.setBufferViewModel(bufferViewModel);
+        }
+    }
+    
+    
+    /**
+     * Initialize the {@link AccessorModel} by setting its 
+     * {@link AccessorModel#getAccessorData() accessor data} and
+     * {@link AccessorModel#getBufferViewModel() buffer view model}
+     * for the case that the accessor is sparse. 
+     * 
+     * @param accessor The {@link Accessor}
+     * @param accessorModel The {@link AccessorModel}
+     */
+    private void initSparseAccessorModel(
+        Accessor accessor, DefaultAccessorModel accessorModel)
+    {
+        // When the (sparse!) Accessor already refers to a BufferView,
+        // then this BufferView has to be replaced with a new one,
+        // to which the data substitution will be applied 
+        int count = accessorModel.getCount();
+        int elementSizeInBytes = accessorModel.getElementSizeInBytes();
+        int byteLength = elementSizeInBytes * count;
+        ByteBuffer bufferData = Buffers.create(byteLength);
+        DefaultBufferViewModel denseBufferViewModel = 
+            createBufferViewModel(bufferData);
+        accessorModel.setBufferViewModel(denseBufferViewModel);
+        accessorModel.setByteOffset(0);
+        
+        Integer bufferViewIndex = accessor.getBufferView();
+        if (bufferViewIndex != null)
+        {
+            // If the accessor refers to a BufferView, then the corresponding
+            // data serves as the basis for the initialization of the values, 
+            // before the sparse substitution is applied
+            Consumer<ByteBuffer> sparseSubstitutionCallback = denseByteBuffer -> 
+            {
+                logger.fine("Substituting sparse accessor data,"
+                    + " based on existing buffer view");
+                
+                DefaultBufferViewModel baseBufferViewModel = 
+                    bufferViewModels.get(bufferViewIndex);
+                ByteBuffer baseBufferViewData = 
+                    baseBufferViewModel.getBufferViewData();
+                AccessorData baseAccessorData = AccessorDatas.create(
+                    accessorModel, baseBufferViewData);
+                AccessorData denseAccessorData = 
+                    AccessorDatas.create(accessorModel, bufferData);
+                substituteSparseAccessorData(accessor, accessorModel, 
+                    denseAccessorData, baseAccessorData); 
+            };
+            denseBufferViewModel.setSparseSubstitutionCallback(
+                sparseSubstitutionCallback);
+        }
+        else
+        {
+            // When the sparse accessor does not yet refer to a BufferView,
+            // then a new one is created, 
+            Consumer<ByteBuffer> sparseSubstitutionCallback = denseByteBuffer -> 
+            {
+                logger.fine("Substituting sparse accessor data, "
+                    + "without an existing buffer view");
+                
+                AccessorData denseAccessorData = 
+                    AccessorDatas.create(accessorModel, bufferData);
+                substituteSparseAccessorData(accessor, accessorModel, 
+                    denseAccessorData, null); 
+            };
+            denseBufferViewModel.setSparseSubstitutionCallback(
+                sparseSubstitutionCallback);
+        }
+    }
+    
+    /**
+     * Create a new {@link BufferViewModel} with an associated 
+     * {@link BufferModel} that serves as the basis for a sparse accessor, or 
+     * an accessor that does not refer to a {@link BufferView})
+     * 
+     * @param bufferData The buffer data
+     * @return The new {@link BufferViewModel}
+     */
+    private static DefaultBufferViewModel createBufferViewModel(
+        ByteBuffer bufferData)
+    {
+        String uri = "DUMMY_BUFFER"; // TODO Which URI to use here?!
+        BufferModel bufferModel = new DefaultBufferModel(uri);
+        bufferModel.setBufferData(bufferData);
+
+        DefaultBufferViewModel bufferViewModel = 
+            new DefaultBufferViewModel(null, null);
+        bufferViewModel.setByteOffset(0);
+        bufferViewModel.setByteLength(bufferData.capacity());
+        bufferViewModel.setBufferModel(bufferModel);
+        
+        return bufferViewModel;
+    }
+
+
+    /**
+     * Substitute the sparse accessor data in the given dense 
+     * {@link AccessorData} for the given {@link AccessorModel}
+     * based on the sparse accessor data that is defined in the given 
+     * {@link Accessor}.
+     * 
+     * @param accessor The {@link Accessor}
+     * @param accessorModel The {@link AccessorModel}
+     * @param denseAccessorData The dense {@link AccessorData}
+     * @param baseAccessorData The optional {@link AccessorData} that contains 
+     * the base data. If this is not <code>null</code>, then it will be used 
+     * to initialize the {@link AccessorData}, before the sparse data 
+     * substitution takes place
+     */
+    private void substituteSparseAccessorData(
+        Accessor accessor, AccessorModel accessorModel, 
+        AccessorData denseAccessorData, AccessorData baseAccessorData)
+    {
+        AccessorSparse accessorSparse = accessor.getSparse();
+        int count = accessorSparse.getCount();
+        
+        AccessorSparseIndices accessorSparseIndices = 
+            accessorSparse.getIndices();
+        AccessorData sparseIndicesAcessorData = 
+            createSparseIndicesAccessorData(accessorSparseIndices, count);
+        
+        AccessorSparseValues accessorSparseValues = accessorSparse.getValues();
+        ElementType elementType = accessorModel.getElementType();
+        AccessorData sparseValuesAccessorData =
+            createSparseValuesAccessorData(accessorSparseValues, 
+                accessorModel.getComponentType(),
+                elementType.getNumComponents(), count);
+        
+        int componentType = accessor.getComponentType();
+
+        if (componentType == GltfConstants.GL_BYTE ||
+            componentType == GltfConstants.GL_UNSIGNED_BYTE)
+        {
+            AccessorByteData sparseValuesAccessorByteData = 
+                (AccessorByteData)sparseValuesAccessorData;
+            AccessorByteData baseAccessorByteData =
+                (AccessorByteData)baseAccessorData;
+            AccessorByteData denseAccessorByteData =
+                (AccessorByteData)denseAccessorData;
+            AccessorSparseUtils.substituteByteAccessorData(
+                denseAccessorByteData, 
+                baseAccessorByteData, 
+                sparseIndicesAcessorData, 
+                sparseValuesAccessorByteData);
+        }
+        else if (componentType == GltfConstants.GL_SHORT ||
+            componentType == GltfConstants.GL_UNSIGNED_SHORT)
+        {
+            AccessorShortData sparseValuesAccessorShortData = 
+                (AccessorShortData)sparseValuesAccessorData;
+            AccessorShortData baseAccessorShortData =
+                (AccessorShortData)baseAccessorData;
+            AccessorShortData denseAccessorShortData =
+                (AccessorShortData)denseAccessorData;
+            AccessorSparseUtils.substituteShortAccessorData(
+                denseAccessorShortData,
+                baseAccessorShortData,
+                sparseIndicesAcessorData,
+                sparseValuesAccessorShortData);
+        }
+        else if (componentType == GltfConstants.GL_INT ||
+            componentType == GltfConstants.GL_UNSIGNED_INT)
+        {
+            AccessorIntData sparseValuesAccessorIntData = 
+                (AccessorIntData)sparseValuesAccessorData;
+            AccessorIntData baseAccessorIntData =
+                (AccessorIntData)baseAccessorData;
+            AccessorIntData denseAccessorIntData =
+                (AccessorIntData)denseAccessorData;
+            AccessorSparseUtils.substituteIntAccessorData(
+                denseAccessorIntData, 
+                baseAccessorIntData,
+                sparseIndicesAcessorData,
+                sparseValuesAccessorIntData);
+        }
+        else if (componentType == GltfConstants.GL_FLOAT)
+        {
+            AccessorFloatData sparseValuesAccessorFloatData = 
+                (AccessorFloatData)sparseValuesAccessorData;
+            AccessorFloatData baseAccessorFloatData =
+                (AccessorFloatData)baseAccessorData;
+            AccessorFloatData denseAccessorFloatData =
+                (AccessorFloatData)denseAccessorData;
+            
+            AccessorSparseUtils.substituteFloatAccessorData(
+                denseAccessorFloatData, 
+                baseAccessorFloatData,
+                sparseIndicesAcessorData,
+                sparseValuesAccessorFloatData);
+        }
+        else 
+        {
+            logger.warning("Invalid component type for accessor: "
+                + GltfConstants.stringFor(componentType));
+        }
+    }
+    
+    
+    /**
+     * Create the {@link AccessorData} for the given 
+     * {@link AccessorSparseIndices}
+     * 
+     * @param accessorSparseIndices The {@link AccessorSparseIndices}
+     * @param count The count from the {@link AccessorSparse} 
+     * @return The {@link AccessorData}
+     */
+    private AccessorData createSparseIndicesAccessorData(
+        AccessorSparseIndices accessorSparseIndices, int count)
+    {
+        Integer componentType = accessorSparseIndices.getComponentType();
+        Integer bufferViewIndex = accessorSparseIndices.getBufferView();
+        BufferViewModel bufferViewModel = bufferViewModels.get(bufferViewIndex);
+        ByteBuffer bufferViewData = bufferViewModel.getBufferViewData();
+        int byteOffset = Optionals.of(accessorSparseIndices.getByteOffset(), 0);
+        return AccessorDatas.create(
+            componentType, bufferViewData, byteOffset, count, 1, null);
+    }
+    
+    /**
+     * Create the {@link AccessorData} for the given 
+     * {@link AccessorSparseValues}
+     * 
+     * @param accessorSparseValues The {@link AccessorSparseValues}
+     * @param componentType The component type of the {@link Accessor}
+     * @param numComponentsPerElement The number of components per element
+     * of the {@link AccessorModel#getElementType() accessor element type}
+     * @param count The count from the {@link AccessorSparse} 
+     * @return The {@link AccessorData}
+     */
+    private AccessorData createSparseValuesAccessorData(
+        AccessorSparseValues accessorSparseValues, 
+        int componentType, int numComponentsPerElement, int count)
+    {
+        Integer bufferViewIndex = accessorSparseValues.getBufferView();
+        BufferViewModel bufferViewModel = bufferViewModels.get(bufferViewIndex);
+        ByteBuffer bufferViewData = bufferViewModel.getBufferViewData();
+        int byteOffset = Optionals.of(accessorSparseValues.getByteOffset(), 0);
+        return AccessorDatas.create(
+            componentType, bufferViewData, byteOffset, count, 
+            numComponentsPerElement, null);
+    }
+    
     /**
      * Initialize the {@link AnimationModel} instances
      */

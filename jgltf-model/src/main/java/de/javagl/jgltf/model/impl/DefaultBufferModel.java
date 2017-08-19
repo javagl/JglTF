@@ -57,21 +57,26 @@ public final class DefaultBufferModel implements BufferModel
     }
     
     @Override
-    public void setBufferData(ByteBuffer bufferData)
-    {
-        this.bufferData = bufferData;
-    }
-
-    @Override
     public String getUri()
     {
         return uri;
     }
 
+    @Override
+    public int getByteLength()
+    {
+        return bufferData.capacity();
+    }
     
     @Override
     public ByteBuffer getBufferData()
     {
         return Buffers.createSlice(bufferData);
+    }
+    
+    @Override
+    public void setBufferData(ByteBuffer bufferData)
+    {
+        this.bufferData = bufferData;
     }
 }

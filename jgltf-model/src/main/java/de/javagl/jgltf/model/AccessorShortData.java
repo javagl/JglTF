@@ -123,6 +123,38 @@ public final class AccessorShortData
         return get(elementIndex, componentIndex);
     }
 
+    /**
+     * Set the value of the specified component of the specified element
+     * 
+     * @param elementIndex The element index
+     * @param componentIndex The component index
+     * @param value The value
+     * @throws IndexOutOfBoundsException If the given indices cause the
+     * underlying buffer to be accessed out of bounds
+     */
+    public void set(int elementIndex, int componentIndex, short value)
+    {
+        int byteIndex = getByteIndex(elementIndex, componentIndex);
+        getBufferViewByteBuffer().putShort(byteIndex, value);
+    }
+    
+    /**
+     * Set the value of the specified component
+     * 
+     * @param globalComponentIndex The global component index
+     * @param value The value
+     * @throws IndexOutOfBoundsException If the given index causes the
+     * underlying buffer to be accessed out of bounds
+     */
+    public void set(int globalComponentIndex, short value)
+    {
+        int elementIndex = 
+            globalComponentIndex / getNumComponentsPerElement();
+        int componentIndex = 
+            globalComponentIndex % getNumComponentsPerElement();
+        set(elementIndex, componentIndex, value);
+    }
+    
     
     /**
      * Returns the value of the specified component of the specified element, 

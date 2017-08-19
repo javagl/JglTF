@@ -57,6 +57,20 @@ public interface AccessorModel
     Class<?> getComponentDataType();
     
     /**
+     * Returns the size of one component, in bytes
+     * 
+     * @return The component size, in bytes
+     */
+    int getComponentSizeInBytes();
+    
+    /**
+     * Returns the size of one element, in bytes
+     * 
+     * @return The element size, in bytes
+     */
+    int getElementSizeInBytes();
+    
+    /**
      * Returns the byte offset of this accessor referring to its 
      * {@link BufferViewModel}
      * 

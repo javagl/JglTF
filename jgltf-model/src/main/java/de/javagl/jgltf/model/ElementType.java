@@ -90,4 +90,45 @@ public enum ElementType
     {
         return numComponents;
     }
+    
+    /**
+     * Returns whether the given string is a valid element type name, and may be
+     * passed to <code>ElementType.valueOf</code> without causing an exception.
+     * 
+     * @param s The string
+     * @return Whether the given string is a valid element type
+     */
+    public static boolean contains(String s)
+    {
+        for (ElementType elementType : values())
+        {
+            if (elementType.name().equals(s))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Returns the element type for the given string. If the string is 
+     * <code>null</code> or does not describe a valid element type,
+     * then <code>null</code> is returned
+     * 
+     * @param string The string
+     * @return The element type
+     */
+    public static ElementType forString(String string)
+    {
+        if (string == null)
+        {
+            return null;
+        }
+        if (!contains(string))
+        {
+            return null;
+        }
+        return ElementType.valueOf(string);
+    }
+    
 }

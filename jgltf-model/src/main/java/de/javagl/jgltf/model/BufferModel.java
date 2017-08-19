@@ -41,6 +41,13 @@ public interface BufferModel
     String getUri();
     
     /**
+     * Returns the length, in bytes, of the {@link #getBufferData() buffer data}
+     * 
+     * @return The buffer length, in bytes
+     */
+    int getByteLength();
+    
+    /**
      * Returns the actual buffer data. This will return a slice of the buffer 
      * that is stored internally. Thus, changes to the contents of this buffer 
      * will affect this model, but modifications of the position and limit of 

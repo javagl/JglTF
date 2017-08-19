@@ -108,6 +108,39 @@ public final class AccessorFloatData
     }
     
     /**
+     * Set the value of the specified component of the specified element
+     * 
+     * @param elementIndex The element index
+     * @param componentIndex The component index
+     * @param value The value
+     * @throws IndexOutOfBoundsException If the given indices cause the
+     * underlying buffer to be accessed out of bounds
+     */
+    public void set(int elementIndex, int componentIndex, float value)
+    {
+        int byteIndex = getByteIndex(elementIndex, componentIndex);
+        getBufferViewByteBuffer().putFloat(byteIndex, value);
+    }
+    
+    /**
+     * Set the value of the specified component
+     * 
+     * @param globalComponentIndex The global component index
+     * @param value The value
+     * @throws IndexOutOfBoundsException If the given index causes the
+     * underlying buffer to be accessed out of bounds
+     */
+    public void set(int globalComponentIndex, float value)
+    {
+        int elementIndex = 
+            globalComponentIndex / getNumComponentsPerElement();
+        int componentIndex = 
+            globalComponentIndex % getNumComponentsPerElement();
+        set(elementIndex, componentIndex, value);
+    }
+    
+    
+    /**
      * Returns an array containing the minimum component values of all elements 
      * of this accessor data. This will be an array whose length is the 
      * {@link #getNumComponentsPerElement() number of components per element}.

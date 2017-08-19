@@ -36,8 +36,8 @@ public interface BufferViewModel
 {
     /**
      * Return the actual data that this view stands for. This will be a new
-     * slice of the buffer of the {@link BufferModel}. Changes in the position 
-     * or limit of this buffer will not affect this model
+     * slice of the buffer of the data that is stored internally. Changes 
+     * in the position or limit of this buffer will not affect this model
      *  
      * @return The buffer view data
      */

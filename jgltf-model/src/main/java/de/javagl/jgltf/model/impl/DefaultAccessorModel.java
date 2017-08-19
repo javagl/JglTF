@@ -26,8 +26,6 @@
  */
 package de.javagl.jgltf.model.impl;
 
-import java.util.logging.Logger;
-
 import de.javagl.jgltf.model.AccessorData;
 import de.javagl.jgltf.model.AccessorDatas;
 import de.javagl.jgltf.model.AccessorModel;
@@ -41,12 +39,6 @@ import de.javagl.jgltf.model.ElementType;
 public final class DefaultAccessorModel implements AccessorModel
 {
     /**
-     * The logger used in this class
-     */
-    private static final Logger logger = 
-        Logger.getLogger(DefaultAccessorModel.class.getName());
-    
-    /**
      * The component type, as a GL constant
      */
     private final int componentType;
@@ -54,7 +46,7 @@ public final class DefaultAccessorModel implements AccessorModel
     /**
      * The offset in bytes, referring to the buffer view
      */
-    private final int byteOffset;
+    private int byteOffset;
     
     /**
      * The {@link BufferViewModel} for this model
@@ -95,20 +87,17 @@ public final class DefaultAccessorModel implements AccessorModel
      * Creates a new instance
      * 
      * @param componentType The component type GL constant
-     * @param byteOffset The byte offset
      * @param count The number of elements
      * @param elementType The element type
      * @param byteStride The byte stride
      */
     public DefaultAccessorModel(
         int componentType,
-        int byteOffset,
         int count, 
         ElementType elementType, 
         int byteStride)
     {
         this.componentType = componentType;
-        this.byteOffset = byteOffset;
         this.count = count;
         this.elementType = elementType;
         this.byteStride = byteStride;
@@ -122,6 +111,26 @@ public final class DefaultAccessorModel implements AccessorModel
     public void setBufferViewModel(BufferViewModel bufferViewModel)
     {
         this.bufferViewModel = bufferViewModel;
+    }
+    
+    /**
+     * Set the byte offset, referring to the {@link BufferViewModel}
+     * 
+     * @param byteOffset The byte offset
+     */
+    public void setByteOffset(int byteOffset)
+    {
+        this.byteOffset = byteOffset;
+    }
+
+    /**
+     * Set the {@link AccessorData} for this model
+     * 
+     * @param accessorData The {@link AccessorData}
+     */
+    public void setAccessorData(AccessorData accessorData)
+    {
+        this.accessorData = accessorData;
     }
     
     @Override
@@ -141,6 +150,18 @@ public final class DefaultAccessorModel implements AccessorModel
     {
         return Accessors.getDataTypeForAccessorComponentType(
             getComponentType());
+    }
+    
+    @Override
+    public int getComponentSizeInBytes()
+    {
+        return Accessors.getNumBytesForAccessorComponentType(componentType);
+    }
+    
+    @Override
+    public int getElementSizeInBytes()
+    {
+        return elementType.getNumComponents() * getComponentSizeInBytes();
     }
     
     @Override
@@ -172,39 +193,11 @@ public final class DefaultAccessorModel implements AccessorModel
     {
         if (accessorData == null)
         {
-            accessorData = createAccessorData();
+            accessorData = AccessorDatas.create(this);
         }
         return accessorData;
     }
     
-    /**
-     * Create the {@link AccessorData} for this instance. This assumes
-     * that the {@link BufferViewModel} was already set.
-     * 
-     * @return The {@link AccessorData}
-     */
-    private AccessorData createAccessorData()
-    {
-        if (getComponentDataType() == byte.class)
-        {
-            return AccessorDatas.createByte(this);
-        }
-        if (getComponentDataType() == short.class)
-        {
-            return AccessorDatas.createShort(this);
-        }
-        if (getComponentDataType() == int.class)
-        {
-            return AccessorDatas.createInt(this);
-        }
-        if (getComponentDataType() == float.class)
-        {
-            return AccessorDatas.createFloat(this);
-        }
-        // Should never happen
-        logger.severe("Invalid component data type: " + getComponentDataType());
-        return null;
-    }
     
     @Override
     public Number[] getMin()
