@@ -29,6 +29,10 @@ package de.javagl.jgltf.model.io;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
+import java.util.Collection;
 
 /**
  * Utility methods related to buffers
@@ -176,6 +180,87 @@ public class Buffers
         return new ByteBufferInputStream(byteBuffer);
     }
     
+    
+    /**
+     * Create a direct byte buffer with native byte order whose contents is
+     * a concatenation of the given byte buffers. If the given collection
+     * is <code>null</code> or empty, then a 0-byte buffer will be created.
+     * The given collection may not contain <code>null</code> elements.
+     * 
+     * @param byteBuffers The input byte buffers
+     * @return The concatenated byte buffer
+     */
+    public static ByteBuffer concat(
+        Collection<? extends ByteBuffer> byteBuffers)
+    {
+        if (byteBuffers == null || byteBuffers.isEmpty())
+        {
+            return ByteBuffer.allocateDirect(0).order(ByteOrder.nativeOrder());
+        }
+        int resultCapacity = byteBuffers.stream()
+            .mapToInt(ByteBuffer::capacity)
+            .reduce(0, (a, b) -> a + b);
+        ByteBuffer newByteBuffer = ByteBuffer
+            .allocateDirect(resultCapacity)
+            .order(ByteOrder.nativeOrder());
+        for (ByteBuffer byteBuffer : byteBuffers)
+        {
+            newByteBuffer.put(byteBuffer.slice());
+        }
+        newByteBuffer.position(0);
+        return newByteBuffer;
+    }
+    
+    /**
+     * Create a new direct byte buffer with native byte order that has the
+     * same contents as the given float buffer.
+     *  
+     * @param buffer The input buffer
+     * @return The new byte buffer
+     */
+    public static ByteBuffer createByteBufferFrom(FloatBuffer buffer)
+    {
+        ByteBuffer byteBuffer = 
+            ByteBuffer.allocateDirect(buffer.capacity() * Float.BYTES);
+        FloatBuffer floatBuffer = 
+            byteBuffer.order(ByteOrder.nativeOrder()).asFloatBuffer();
+        floatBuffer.put(buffer.slice());
+        return byteBuffer;
+    }
+
+    /**
+     * Create a new direct byte buffer with native byte order that has the
+     * same contents as the given int buffer.
+     *  
+     * @param buffer The input buffer
+     * @return The new byte buffer
+     */
+    public static ByteBuffer createByteBufferFrom(IntBuffer buffer)
+    {
+        ByteBuffer byteBuffer = 
+            ByteBuffer.allocateDirect(buffer.capacity() * Integer.BYTES);
+        IntBuffer intBuffer = 
+            byteBuffer.order(ByteOrder.nativeOrder()).asIntBuffer();
+        intBuffer.put(buffer.slice());
+        return byteBuffer;
+    }
+
+    /**
+     * Create a new direct byte buffer with native byte order that has the
+     * same contents as the given short buffer.
+     *  
+     * @param buffer The input buffer
+     * @return The new byte buffer
+     */
+    public static ByteBuffer createByteBufferFrom(ShortBuffer buffer)
+    {
+        ByteBuffer byteBuffer = 
+            ByteBuffer.allocateDirect(buffer.capacity() * Short.BYTES);
+        ShortBuffer shortBuffer = 
+            byteBuffer.order(ByteOrder.nativeOrder()).asShortBuffer();
+        shortBuffer.put(buffer.slice());
+        return byteBuffer;
+    }
 
     /**
      * Private constructor to prevent instantiation
