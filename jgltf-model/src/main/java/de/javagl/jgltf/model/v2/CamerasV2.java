@@ -39,7 +39,8 @@ import de.javagl.jgltf.model.Utils;
  */
 class CamerasV2
 {
-    int XXX; // TODO This is the same as CamerasV1 - try to generalize this!
+    // TODO This is the same as CamerasV2, except for the package names
+    // names of the classes that it operates on. 
     
     /**
      * The logger used in this class
