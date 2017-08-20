@@ -176,4 +176,5 @@ public class GltfAssetWriterV1
         writableByteChannel.write(ByteBuffer.wrap(sceneData));
         writableByteChannel.write(binaryData.slice());
     }
+    
 }

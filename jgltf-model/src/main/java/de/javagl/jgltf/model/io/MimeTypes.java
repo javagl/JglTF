@@ -130,8 +130,65 @@ public class MimeTypes
                 imageReader.dispose();
             }
         }
-        
     }
+    
+    /**
+     * Tries to detect the format of the given image data, and return the
+     * corresponding string of the <code>"image/..."</code> MIME type.
+     * This may, for example, be <code>"png"</code> or <code>"gif"</code>
+     * or <code>"jpeg"</code> (**not** <code>"jpg"</code>!)
+     *  
+     * @param imageData The image data
+     * @return The image format string
+     */
+    public static String guessImageMimeTypeStringUnchecked(ByteBuffer imageData) 
+    {
+        try
+        {
+            return guessImageMimeTypeString(imageData);
+        }
+        catch (IOException e)
+        {
+            return null;
+        }
+    }
+    
+    /**
+     * Tries to detect the format of the given image URI and its data and 
+     * return the corresponding string of the <code>"image/..."</code> MIME 
+     * type. This may, for example, be <code>"png"</code> or <code>"gif"</code>
+     * or <code>"jpeg"</code> (<b>not</b> <code>"jpg"</code>!).<br>
+     * <br>
+     * This method will do an (unspecified) best-effort approach to detect 
+     * the mime type, either from the image or from the image data (which
+     * are both optional). If the type can not be determined, then 
+     * <code>null</code> will be returned. 
+     *  
+     * @param uriString The URI string
+     * @param imageData The image data
+     * @return The image format string, or <code>null</code> if it can not
+     * be detected.
+     */
+    public static String guessImageMimeTypeString(
+        String uriString, ByteBuffer imageData)
+    {
+        if (uriString != null)
+        {
+            String imageMimeTypeString = 
+                MimeTypes.guessImageMimeTypeString(uriString);
+            if (imageMimeTypeString != null)
+            {
+                return imageMimeTypeString;
+            }
+        }
+        if (imageData != null)
+        {
+            return guessImageMimeTypeStringUnchecked(imageData);
+        }
+        return null;
+    }
+    
+    
 
     /**
      * Private constructor to prevent instantiation

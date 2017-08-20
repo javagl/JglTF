@@ -24,7 +24,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.model.io.v1;
+package de.javagl.jgltf.model.io.v2;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -32,16 +32,15 @@ import java.io.IOException;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import de.javagl.jgltf.impl.v1.BufferView;
-import de.javagl.jgltf.impl.v1.GlTF;
-import de.javagl.jgltf.impl.v1.Image;
-import de.javagl.jgltf.impl.v1.Shader;
+import de.javagl.jgltf.impl.v2.BufferView;
+import de.javagl.jgltf.impl.v2.GlTF;
+import de.javagl.jgltf.impl.v2.Image;
 import de.javagl.jgltf.model.GltfException;
 
 /**
  * Utility methods related to {@link GlTF}s
  */
-class GltfUtilsV1
+class GltfUtilsV2
 {
     /**
      * Creates a deep copy of the given {@link GlTF}.<br>
@@ -88,6 +87,7 @@ class GltfUtilsV1
         copy.setByteOffset(bufferView.getByteOffset());
         copy.setByteLength(bufferView.getByteLength());
         copy.setTarget(bufferView.getTarget());
+        copy.setByteStride(bufferView.getByteStride());
         return copy;
     }
     
@@ -105,30 +105,15 @@ class GltfUtilsV1
         copy.setExtras(image.getExtras());
         copy.setName(image.getName());
         copy.setUri(image.getUri());
-        return copy;
-    }
-    
-    /**
-     * Creates a shallow copy of the given {@link Shader}
-     * 
-     * @param shader The {@link Shader}
-     * @return The copy
-     */
-    static Shader copy(Shader shader)
-    {
-        Shader copy = new Shader();
-        copy.setExtensions(shader.getExtensions());
-        copy.setExtras(shader.getExtras());
-        copy.setName(shader.getName());
-        copy.setType(shader.getType());
-        copy.setUri(shader.getUri());
+        copy.setBufferView(image.getBufferView());
+        copy.setMimeType(image.getMimeType());
         return copy;
     }
     
     /**
      * Private constructor to prevent instantiation
      */
-    private GltfUtilsV1()
+    private GltfUtilsV2()
     {
         // Private constructor to prevent instantiation
     }

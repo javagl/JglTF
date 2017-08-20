@@ -211,6 +211,7 @@ public class Buffers
         return newByteBuffer;
     }
     
+    
     /**
      * Create a new direct byte buffer with native byte order that has the
      * same contents as the given float buffer.
@@ -263,10 +264,37 @@ public class Buffers
     }
 
     /**
+     * Creates a copy of the given buffer, as a direct buffer with the 
+     * same byte order, and the given capacity. If the given capacity
+     * is smaller than that of the given buffer, the copy will be 
+     * truncated. If it is larger, the additional bytes will be 
+     * initialized to zero.
+     *  
+     * @param buffer The input buffer
+     * @param newCapacity The new capacity
+     * @return The copy
+     */
+    public static ByteBuffer copyOf(ByteBuffer buffer, int newCapacity)
+    {
+        ByteBuffer copy = ByteBuffer.allocateDirect(newCapacity);
+        copy.order(buffer.order());
+        if (newCapacity < buffer.capacity())
+        {
+            copy.slice().put(createSlice(buffer, 0, newCapacity));
+        }
+        else
+        {
+            copy.slice().put(createSlice(buffer));
+        }
+        return copy;
+    }
+    
+    /**
      * Private constructor to prevent instantiation
      */
     private Buffers()
     {
         // Private constructor to prevent instantiation
     }
+
 }

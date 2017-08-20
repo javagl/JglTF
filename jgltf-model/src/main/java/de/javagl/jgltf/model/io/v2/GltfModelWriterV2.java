@@ -136,13 +136,12 @@ public class GltfModelWriterV2
     public void writeBinary(GltfModelV2 gltfModel, OutputStream outputStream) 
         throws IOException
     {
-        int XXX; // TODO Not implemented yet
-//        GltfModelToBinaryAssetConverterV2 gltfModelToBinaryAssetConverter =
-//            new GltfModelToBinaryAssetConverterV2();
-//        GltfAssetV2 gltfAsset = 
-//            gltfModelToBinaryAssetConverter.convert(gltfModel);
-//        GltfAssetWriterV2 gltfAssetWriter = new GltfAssetWriterV2();
-//        gltfAssetWriter.writeBinary(gltfAsset, outputStream);
+        GltfModelToBinaryAssetConverterV2 gltfModelToBinaryAssetConverter =
+            new GltfModelToBinaryAssetConverterV2();
+        GltfAssetV2 gltfAsset = 
+            gltfModelToBinaryAssetConverter.convert(gltfModel);
+        GltfAssetWriterV2 gltfAssetWriter = new GltfAssetWriterV2();
+        gltfAssetWriter.writeBinary(gltfAsset, outputStream);
     }
     
 
@@ -175,14 +174,13 @@ public class GltfModelWriterV2
     public void writeEmbedded(GltfModelV2 gltfModel, OutputStream outputStream) 
         throws IOException
     {
-        int XXX; // TODO Not implemented yet
-//        GltfModelToEmbeddedAssetConverterV2 gltfModelToEmbeddedAssetConverter = 
-//            new GltfModelToEmbeddedAssetConverterV2();
-//        GltfAssetV2 gltfAsset = 
-//            gltfModelToEmbeddedAssetConverter.convert(gltfModel);
-//        GltfWriter gltfWriter = new GltfWriter();
-//        GlTF gltf = gltfAsset.getGltf();
-//        gltfWriter.write(gltf, outputStream);
+        GltfModelToEmbeddedAssetConverterV2 gltfModelToEmbeddedAssetConverter = 
+            new GltfModelToEmbeddedAssetConverterV2();
+        GltfAssetV2 gltfAsset = 
+            gltfModelToEmbeddedAssetConverter.convert(gltfModel);
+        GltfWriter gltfWriter = new GltfWriter();
+        GlTF gltf = gltfAsset.getGltf();
+        gltfWriter.write(gltf, outputStream);
     }
     
     
