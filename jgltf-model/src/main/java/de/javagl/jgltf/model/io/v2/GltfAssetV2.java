@@ -29,10 +29,10 @@ package de.javagl.jgltf.model.io.v2;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import de.javagl.jgltf.impl.v2.Buffer;
@@ -73,7 +73,7 @@ public final class GltfAssetV2 implements GltfAsset
     {
         this.gltf = Objects.requireNonNull(gltf, "The gltf may not be null");
         this.binaryData = binaryData;
-        this.referenceDatas = new LinkedHashMap<String, ByteBuffer>();
+        this.referenceDatas = new ConcurrentHashMap<String, ByteBuffer>();
     }
     
     /**
