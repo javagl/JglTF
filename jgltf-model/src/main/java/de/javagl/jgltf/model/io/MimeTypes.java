@@ -66,7 +66,8 @@ public class MimeTypes
             if ("data".equalsIgnoreCase(uri.getScheme()))
             {
                 String raw = uri.getRawSchemeSpecificPart().toLowerCase();
-                return getStringBetween(raw, "image/", ";base64");
+                String type = getStringBetween(raw, "image/", ";base64");
+                return "image/" + type.toLowerCase();
             }
         } 
         catch (URISyntaxException e)
@@ -79,11 +80,11 @@ public class MimeTypes
             return null;
         }
         String end = uriString.substring(lastDotIndex + 1).toLowerCase();
-        if (end.equals("jpg") || end.equals("jpeg"))
+        if (end.equalsIgnoreCase("jpg") || end.equalsIgnoreCase("jpeg"))
         {
             return "image/jpeg";
         }
-        return "image/" + end;
+        return "image/" + end.toLowerCase();
     }
     
     /**
