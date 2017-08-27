@@ -102,13 +102,18 @@ public class IO
     }
     
     /**
-     * Returns whether the given string is a data URI. 
+     * Returns whether the given string is a data URI. If the given string
+     * is <code>null</code>, then <code>false</code> will be returned. 
      * 
      * @param uriString The URI string
      * @return Whether the string is a data URI
      */
     public static boolean isDataUriString(String uriString)
     {
+        if (uriString == null)
+        {
+            return false;
+        }
         try
         {
             URI uri = new URI(uriString);

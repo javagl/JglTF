@@ -76,7 +76,6 @@ import de.javagl.jgltf.model.CameraModel;
 import de.javagl.jgltf.model.ElementType;
 import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.GltfModel;
-import de.javagl.jgltf.model.GltfReference;
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.MaterialModel;
 import de.javagl.jgltf.model.MathUtils;
@@ -104,6 +103,7 @@ import de.javagl.jgltf.model.impl.DefaultSceneModel;
 import de.javagl.jgltf.model.impl.DefaultSkinModel;
 import de.javagl.jgltf.model.impl.DefaultTextureModel;
 import de.javagl.jgltf.model.io.Buffers;
+import de.javagl.jgltf.model.io.v2.GltfAssetV2;
 
 /**
  * Implementation of a {@link GltfModel}, based on a {@link GlTF glTF 2.0}.<br>
@@ -116,6 +116,11 @@ public final class GltfModelV2 implements GltfModel
     private static final Logger logger = 
         Logger.getLogger(GltfModelV2.class.getName());
 
+    /**
+     * The {@link GltfAssetV2} of this model
+     */
+    private final GltfAssetV2 gltfAsset;
+    
     /**
      * The {@link GlTF} of this model
      */
@@ -203,15 +208,14 @@ public final class GltfModelV2 implements GltfModel
     /**
      * Creates a new model for the given glTF
      * 
-     * @param gltf The {@link GlTF}
-     * @param binaryData The binary data, for the case that the glTF was
-     * read from a binary file
+     * @param gltfAsset The {@link GltfAssetV2}
      */
-    public GltfModelV2(GlTF gltf, ByteBuffer binaryData)
+    public GltfModelV2(GltfAssetV2 gltfAsset)
     {
-        this.gltf = Objects.requireNonNull(gltf, 
-            "The gltf may not be null");
-        this.binaryData = binaryData;
+        this.gltfAsset = Objects.requireNonNull(gltfAsset, 
+            "The gltfAsset may not be null");
+        this.gltf = gltfAsset.getGltf();
+        this.binaryData = gltfAsset.getBinaryData();
         
         this.accessorModels = new ArrayList<DefaultAccessorModel>();
         this.animationModels = new ArrayList<DefaultAnimationModel>();
@@ -237,16 +241,13 @@ public final class GltfModelV2 implements GltfModel
         createSceneModels();
         createSkinModels();
         createTextureModels();
-        
+
         initBufferModels();
         initBufferViewModels();
         
-        BinaryGltfDataResolverV2 binaryGltfDataResolver =
-            new BinaryGltfDataResolverV2(this);
-        binaryGltfDataResolver.resolve();
-        
         initAccessorModels();
         initAnimationModels();
+        initImageModels();
         initMaterialModels();
         initMeshModels();
         initNodeModels();
@@ -257,73 +258,6 @@ public final class GltfModelV2 implements GltfModel
         instantiateCameraModels();
     }
     
-    
-    @Override
-    public List<GltfReference> getReferences()
-    {
-        List<GltfReference> references = new ArrayList<GltfReference>();
-        references.addAll(getBufferReferences());
-        references.addAll(getImageReferences());
-        return references;
-    }
-    
-    /**
-     * Create a list containing all {@link GltfReference} objects for the
-     * buffers that are contained in this model.
-     * 
-     * @return The references
-     */
-    public List<GltfReference> getBufferReferences()
-    {
-        List<GltfReference> references = new ArrayList<GltfReference>();
-        List<Buffer> buffers = Optionals.of(gltf.getBuffers());
-        for (int i = 0; i < buffers.size(); i++)
-        {
-            Buffer buffer = buffers.get(i);
-            if (buffer.getUri() == null)
-            {
-                // This is the binary glTF buffer
-                continue;
-            }
-            BufferModel bufferModel = bufferModels.get(i);
-            String uri = bufferModel.getUri();
-            Consumer<ByteBuffer> target = 
-                byteBuffer -> bufferModel.setBufferData(byteBuffer);
-            GltfReference reference =
-                new GltfReference("buffer " + i, uri, target);
-            references.add(reference);
-        }
-        return references;
-    }
-    
-    /**
-     * Create a list containing all {@link GltfReference} objects for the
-     * images that are contained in this model.
-     * 
-     * @return The references
-     */
-    public List<GltfReference> getImageReferences()
-    {
-        List<GltfReference> references = new ArrayList<GltfReference>();
-        List<Image> images = Optionals.of(gltf.getImages());
-        for (int i = 0; i < images.size(); i++)
-        {
-            Image image = images.get(i);
-            if (image.getUri() == null)
-            {
-                // This is an image that refers to a buffer view
-                continue;
-            }
-            ImageModel imageModel = imageModels.get(i);
-            String uri = imageModel.getUri();
-            Consumer<ByteBuffer> target = 
-                byteBuffer -> imageModel.setImageData(byteBuffer);
-            GltfReference reference = 
-                new GltfReference("image " + i, uri, target);
-            references.add(reference);
-        }
-        return references;
-    }
     
     
     /**
@@ -381,8 +315,8 @@ public final class GltfModelV2 implements GltfModel
         for (int i = 0; i < buffers.size(); i++)
         {
             Buffer buffer = buffers.get(i);
-            DefaultBufferModel bufferModel = 
-                new DefaultBufferModel(buffer.getUri());
+            DefaultBufferModel bufferModel = new DefaultBufferModel();
+            bufferModel.setUri(buffer.getUri());
             bufferModels.add(bufferModel);
         }
     }
@@ -436,9 +370,11 @@ public final class GltfModelV2 implements GltfModel
         for (int i = 0; i < images.size(); i++)
         {
             Image image = images.get(i);
-            String uri = image.getUri();
+            String mimeType = image.getMimeType();
             DefaultImageModel imageModel = 
-                new DefaultImageModel(uri, null, null);
+                new DefaultImageModel(mimeType, null);
+            String uri = image.getUri();
+            imageModel.setUri(uri);
             imageModels.add(imageModel);
         }
     }
@@ -666,11 +602,13 @@ public final class GltfModelV2 implements GltfModel
      * @param bufferData The buffer data
      * @return The new {@link BufferViewModel}
      */
-    private static DefaultBufferViewModel createBufferViewModel(
+    private DefaultBufferViewModel createBufferViewModel(
         ByteBuffer bufferData)
     {
-        String uri = "DUMMY_BUFFER"; // TODO Which URI to use here?!
-        BufferModel bufferModel = new DefaultBufferModel(uri);
+        int XXX; // URI string?!
+        //String uriString = UriStrings.createBufferUriString(bufferModels);
+        DefaultBufferModel bufferModel = new DefaultBufferModel();
+        //bufferModel.setUri(uriString);
         bufferModel.setBufferData(bufferData);
 
         DefaultBufferViewModel bufferViewModel = 
@@ -911,16 +849,26 @@ public final class GltfModelV2 implements GltfModel
     private void initBufferModels()
     {
         List<Buffer> buffers = Optionals.of(gltf.getBuffers());
-        if (binaryData != null)
+
+        if (buffers.isEmpty() && binaryData != null)
         {
-            if (buffers.isEmpty()) 
+            logger.warning("Binary data was given, but no buffers");
+            return;
+        }
+
+        for (int i = 0; i < buffers.size(); i++)
+        {
+            DefaultBufferModel bufferModel = bufferModels.get(i);
+            if (i == 0 && binaryData != null)
             {
-                logger.warning("Binary data was given, but no buffers");
+                bufferModel.setBufferData(binaryData);
             }
             else
             {
-                BufferModel bufferModel = bufferModels.get(0);
-                bufferModel.setBufferData(binaryData);
+                Buffer buffer = buffers.get(i);
+                String uri = buffer.getUri();
+                ByteBuffer bufferData = gltfAsset.getReferenceData(uri);
+                bufferModel.setBufferData(bufferData);
             }
         }
     }
@@ -1133,6 +1081,32 @@ public final class GltfModelV2 implements GltfModel
     }
     
     /**
+     * Initialize the {@link ImageModel} instances
+     */
+    private void initImageModels()
+    {
+        List<Image> images = Optionals.of(gltf.getImages());
+        for (int i = 0; i < images.size(); i++)
+        {
+            Image image = images.get(i);
+            DefaultImageModel imageModel = imageModels.get(i);
+            Integer bufferViewIndex = image.getBufferView();
+            if (bufferViewIndex != null)
+            {
+                BufferViewModel bufferViewModel = 
+                    bufferViewModels.get(bufferViewIndex);
+                imageModel.setBufferViewModel(bufferViewModel);
+            }
+            else
+            {
+                String uri = image.getUri();
+                ByteBuffer imageData = gltfAsset.getReferenceData(uri);
+                imageModel.setImageData(imageData);
+            }
+        }
+    }
+    
+    /**
      * Initialize the {@link MaterialModel} instances
      */
     private void initMaterialModels()
@@ -1255,7 +1229,14 @@ public final class GltfModelV2 implements GltfModel
         return Collections.unmodifiableList(textureModels);
     }
     
-    @Override
+    /**
+     * Returns the raw glTF object, which is a
+     * {@link de.javagl.jgltf.impl.v1.GlTF version 2.0 glTF}.<br>
+     * <br>
+     * This method should usually not be called by clients.
+     * 
+     * @return The glTF object
+     */
     public GlTF getGltf()
     {
         return gltf;

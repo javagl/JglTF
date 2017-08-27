@@ -41,9 +41,9 @@ import java.util.function.Consumer;
 import java.util.function.LongConsumer;
 import java.util.logging.Logger;
 
-import de.javagl.jgltf.model.GltfModel;
-import de.javagl.jgltf.model.GltfReference;
-import de.javagl.jgltf.model.io.GltfModelReader;
+import de.javagl.jgltf.model.io.GltfAsset;
+import de.javagl.jgltf.model.io.GltfAssetReader;
+import de.javagl.jgltf.model.io.GltfReference;
 import de.javagl.jgltf.model.io.GltfReferenceLoader;
 import de.javagl.jgltf.model.io.IO;
 import de.javagl.jgltf.model.io.JsonError;
@@ -54,21 +54,21 @@ import de.javagl.swing.tasks.executors.ObservableExecutorService;
 import de.javagl.swing.tasks.executors.ObservableExecutors;
 
 /**
- * A reader that loads {@link GltfModel} using multiple threads,
+ * A reader that loads {@link GltfAsset} using multiple threads,
  * and publishes progress information. 
  */
-class GltfModelReaderThreaded
+public class GltfAssetReaderThreaded
 {
     /**
      * The logger used in this class
      */
     private static final Logger logger = 
-        Logger.getLogger(GltfModelReaderThreaded.class.getName());
+        Logger.getLogger(GltfAssetReaderThreaded.class.getName());
     
     /**
-     * The {@link GltfModelReader} that does the initial read step 
+     * The {@link GltfAssetReader} that does the initial read step 
      */
-    private final GltfModelReader gltfModelReader;
+    private final GltfAssetReader gltfAssetReader;
     
     /**
      * The list of {@link ProgressListener}s that have been attached to
@@ -112,9 +112,9 @@ class GltfModelReaderThreaded
     private URI uri;
 
     /**
-     * The {@link GltfModel} that is currently being read
+     * The {@link GltfAsset} that is currently being read
      */
-    private GltfModel gltfModel;
+    private GltfAsset gltfAsset;
 
     /**
      * Creates a threaded glTF data reader
@@ -124,11 +124,11 @@ class GltfModelReaderThreaded
      * necessary. If this is 0, then the number of threads will be the same
      * as the number of available processors. 
      */
-    GltfModelReaderThreaded(int numThreads)
+    GltfAssetReaderThreaded(int numThreads)
     {
         this.numThreads = numThreads;
         this.progressListeners = new CopyOnWriteArrayList<ProgressListener>();
-        this.gltfModelReader = new GltfModelReader();
+        this.gltfAssetReader = new GltfAssetReader();
     }
     
     /**
@@ -140,7 +140,7 @@ class GltfModelReaderThreaded
     void setJsonErrorConsumer(
         Consumer<? super JsonError> jsonErrorConsumer)
     {
-        gltfModelReader.setJsonErrorConsumer(jsonErrorConsumer);
+        gltfAssetReader.setJsonErrorConsumer(jsonErrorConsumer);
     }
     
     /**
@@ -256,38 +256,38 @@ class GltfModelReaderThreaded
     }
     
     /**
-     * Read the {@link GltfModel} from the given URI
+     * Read the {@link GltfAsset} from the given URI
      * 
      * @param uri The URI
-     * @return The {@link GltfModel}
+     * @return The {@link GltfAsset}
      * @throws IOException If an IO error occurs
      */
-    GltfModel readGltfModel(URI uri) throws IOException
+    GltfAsset readGltfAsset(URI uri) throws IOException
     {
         Objects.requireNonNull(uri, "The URI may not be null");
 
         this.uri = uri;
         
-        Callable<Void> gltfModelLoadingTask = 
-            createGltfModelLoadingTask();
+        Callable<Void> gltfAssetLoadingTask = 
+            createGltfAssetLoadingTask();
         
-        fireMessageChanged("Loading glTF model");
+        fireMessageChanged("Loading glTF asset");
         Throwable gltfLoadingError = 
             ExecutorServiceUtils.invokeAll(
                 getObservableExecutorService(),
                 progress -> fireProgressChanged(progress),
-                Collections.singletonList(gltfModelLoadingTask));
+                Collections.singletonList(gltfAssetLoadingTask));
         if (gltfLoadingError != null)
         {
             throw new IOException(gltfLoadingError);
         }
-        if (gltfModel == null)
+        if (gltfAsset == null)
         {
-            throw new IOException("Could not load glTF model");
+            throw new IOException("Could not load glTF asset");
         }
         
         List<Callable<Void>> loadingTasks = new ArrayList<Callable<Void>>();
-        List<GltfReference> references = gltfModel.getReferences();
+        List<GltfReference> references = gltfAsset.getReferences();
         for (GltfReference reference : references)
         {
             Callable<Void> loadingTask = createReferenceLoadingTask(reference);
@@ -309,30 +309,30 @@ class GltfModelReaderThreaded
         // Clean up and return the result
         fireMessageChanged("Done");
         
-        GltfModel result = gltfModel;
-        setGltfModel(null);
+        GltfAsset result = gltfAsset;
+        setGltfAsset(null);
         return result;
     }
     
     /**
-     * Set the {@link GltfModel} that is currently being read
+     * Set the {@link GltfAsset} that is currently being read
      * 
-     * @param gltfModel The {@link GltfModel}
+     * @param gltfAsset The {@link GltfAsset}
      */
-    private void setGltfModel(GltfModel gltfModel)
+    private void setGltfAsset(GltfAsset gltfAsset)
     {
-        this.gltfModel = gltfModel;
+        this.gltfAsset = gltfAsset;
     }
     
     
     /**
-     * Create the task for loading the {@link GltfModel} from the current URI
+     * Create the task for loading the {@link GltfAsset} from the current URI
      * 
      * @return The task
      * @throws IOException If the task cannot be created 
      */
     @SuppressWarnings("resource")
-    private Callable<Void> createGltfModelLoadingTask() throws IOException
+    private Callable<Void> createGltfAssetLoadingTask() throws IOException
     {
         InputStream uriInputStream = uri.toURL().openStream();
         ProgressInputStream progressInputStream = 
@@ -347,9 +347,9 @@ class GltfModelReaderThreaded
                     forwardingProgressListener);
             progressInputStream.addTotalNumBytesReadConsumer(
                 progressForwarder);
-            GltfModel loadedGltfModel = 
-                gltfModelReader.readWithoutReferences(progressInputStream);
-            setGltfModel(loadedGltfModel);
+            GltfAsset loadedGltfAsset = 
+                gltfAssetReader.readWithoutReferences(progressInputStream);
+            setGltfAsset(loadedGltfAsset);
             try
             {
                 progressInputStream.close();

@@ -34,11 +34,8 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.logging.Logger;
 
-import de.javagl.jgltf.model.io.v1.GltfAssetV1;
-import de.javagl.jgltf.model.io.v1.GltfAssetWriterV1;
-import de.javagl.jgltf.model.io.v1.GltfModelToBinaryAssetConverterV1;
-import de.javagl.jgltf.model.io.v1.GltfModelWriterV1;
-import de.javagl.jgltf.model.v1.GltfModelV1;
+import de.javagl.jgltf.model.GltfModel;
+import de.javagl.jgltf.model.io.GltfModelWriter;
 import de.javagl.jgltf.obj.v1.ObjGltfModelCreatorV1;
 
 /**
@@ -141,24 +138,30 @@ public class ObjToGltf
         long beforeNs = System.nanoTime();
         
         URI objUri = Paths.get(inputFileName).toUri();
-        GltfModelV1 gltfModel = 
+        GltfModel gltfModel = 
             new ObjGltfModelCreatorV1(bufferStrategy).create(objUri);
 
-        GltfModelWriterV1 gltfModelWriter = new GltfModelWriterV1();
+        GltfModelWriter gltfModelWriter = new GltfModelWriter();
+        File outputFile = new File(outputFileName);
+        File parentFile = outputFile.getParentFile();
+        if (parentFile != null)
+        {
+            parentFile.mkdirs();
+        }
         if (binary)
         {
             logger.info("Writing binary glTF to " + outputFileName);
-            gltfModelWriter.writeBinary(gltfModel, new File(outputFileName));
+            gltfModelWriter.writeBinary(gltfModel, outputFile);
         }
         else if (embedded)
         {
             logger.info("Writing embedded glTF to " + outputFileName);
-            gltfModelWriter.writeEmbedded(gltfModel, new File(outputFileName));
+            gltfModelWriter.writeEmbedded(gltfModel, outputFile);
         }
         else
         {
             logger.info("Writing glTF to " + outputFileName);
-            gltfModelWriter.write(gltfModel, new File(outputFileName));
+            gltfModelWriter.write(gltfModel, outputFile);
         }
     
         
@@ -191,6 +194,6 @@ public class ObjToGltf
         System.out.println("========");
         System.out.println("");
         System.out.println("  ObjToGltf -b -s=part -i=C:/Input/Example.obj " + 
-            "-o=C:/Output/Example/");
+            "-o=C:/Output/Example.glb");
     }
 }

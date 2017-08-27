@@ -30,19 +30,29 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageReader;
 
 /**
- * Utility methods to detect the MIME type from data URLs or image data
+ * Utility methods to related to the MIME type from data URLs or image data
  */
 public class MimeTypes
 {
     /**
+     * The logger used in this class
+     */
+    private static final Logger logger = 
+        Logger.getLogger(MimeTypes.class.getName());
+    
+    /**
      * Tries to detect the format of the image data from the given URI, and 
-     * return the corresponding string of the <code>"image/..."</code> MIME 
-     * type. This may, for example, be <code>"png"</code> or <code>"gif"</code>
-     * or <code>"jpeg"</code> (<b>not</b> <code>"jpg"</code>!)
+     * return the corresponding MIME type string.<br>
+     * <br>
+     * This may,  for example, be <code>"image/png"</code> or 
+     * <code>"image/gif"</code> or <code>"image/jpeg"</code> (<b>not</b> 
+     * <code>"image/jpg"</code>!).<br> 
+     * <br>
      *  
      * @param uriString The image data
      * @return The image format string, or <code>null</code> if it can not
@@ -71,9 +81,9 @@ public class MimeTypes
         String end = uriString.substring(lastDotIndex + 1).toLowerCase();
         if (end.equals("jpg") || end.equals("jpeg"))
         {
-            return "jpeg";
+            return "image/jpeg";
         }
-        return end;
+        return "image/" + end;
     }
     
     /**
@@ -106,9 +116,12 @@ public class MimeTypes
     
     /**
      * Tries to detect the format of the given image data, and return the
-     * corresponding string of the <code>"image/..."</code> MIME type.
-     * This may, for example, be <code>"png"</code> or <code>"gif"</code>
-     * or <code>"jpeg"</code> (**not** <code>"jpg"</code>!)
+     * corresponding MIME type string.<br>
+     * <br>
+     * This may,  for example, be <code>"image/png"</code> or 
+     * <code>"image/gif"</code> or <code>"image/jpeg"</code> (<b>not</b> 
+     * <code>"image/jpg"</code>!).<br> 
+     * <br>
      *  
      * @param imageData The image data
      * @return The image format string
@@ -121,7 +134,7 @@ public class MimeTypes
         try
         {
             imageReader = ImageReaders.findImageReader(imageData);
-            return imageReader.getFormatName();
+            return "image/" + imageReader.getFormatName();
         }
         finally
         {
@@ -134,10 +147,12 @@ public class MimeTypes
     
     /**
      * Tries to detect the format of the given image data, and return the
-     * corresponding string of the <code>"image/..."</code> MIME type.
-     * This may, for example, be <code>"png"</code> or <code>"gif"</code>
-     * or <code>"jpeg"</code> (**not** <code>"jpg"</code>!)
-     *  
+     * corresponding MIME type string.<br>
+     * <br>
+     * This may,  for example, be <code>"image/png"</code> or 
+     * <code>"image/gif"</code> or <code>"image/jpeg"</code> (<b>not</b> 
+     * <code>"image/jpg"</code>!).<br> 
+     * <br>     *  
      * @param imageData The image data
      * @return The image format string
      */
@@ -155,9 +170,11 @@ public class MimeTypes
     
     /**
      * Tries to detect the format of the given image URI and its data and 
-     * return the corresponding string of the <code>"image/..."</code> MIME 
-     * type. This may, for example, be <code>"png"</code> or <code>"gif"</code>
-     * or <code>"jpeg"</code> (<b>not</b> <code>"jpg"</code>!).<br>
+     * return the corresponding string of the MIME type string.<br> 
+     * <br>
+     * This may,  for example, be <code>"image/png"</code> or 
+     * <code>"image/gif"</code> or <code>"image/jpeg"</code> (<b>not</b> 
+     * <code>"image/jpg"</code>!).<br> 
      * <br>
      * This method will do an (unspecified) best-effort approach to detect 
      * the mime type, either from the image or from the image data (which
@@ -187,7 +204,40 @@ public class MimeTypes
         }
         return null;
     }
-    
+
+    /**
+     * Obtain the file name extension (without the <code>"."</code> dot) for
+     * an image file with the given MIME type. Valid input and return values
+     * are
+     * <ul>
+     *   <li><code>"image/jpeg"</code> : <code>"jpg"</code></li>
+     *   <li><code>"image/png"</code> : <code>"png"</code></li>
+     *   <li><code>"image/gif"</code> : <code>"gif"</code></li>
+     * </ul>
+     * For other inputs, a warning will be printed, and <code>null</code> will
+     * be returned.
+     *  
+     * @param mimeTypeString The MIME type string
+     * @return The file extension
+     */
+    public static String imageFileNameExtensionForMimeTypeString(
+        String mimeTypeString)
+    {
+        if ("image/jpeg".equals(mimeTypeString))
+        {
+            return "jpg";
+        }
+        if ("image/png".equals(mimeTypeString))
+        {
+            return "png";
+        }
+        if ("image/gif".equals(mimeTypeString))
+        {
+            return "gif";
+        }
+        logger.warning("Invalid MIME type string: " + mimeTypeString);
+        return null;
+    }
     
 
     /**

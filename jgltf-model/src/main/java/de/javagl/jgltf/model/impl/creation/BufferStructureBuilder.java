@@ -298,7 +298,8 @@ public final class BufferStructureBuilder
      */
     public DefaultBufferModel createBufferModel(String id, String uri) 
     {
-        DefaultBufferModel bufferModel = new DefaultBufferModel(uri);
+        DefaultBufferModel bufferModel = new DefaultBufferModel();
+        bufferModel.setUri(uri);
         int accumulatedBufferBytes = 0;
         for (DefaultBufferViewModel bufferViewModel : currentBufferViewModels)
         {

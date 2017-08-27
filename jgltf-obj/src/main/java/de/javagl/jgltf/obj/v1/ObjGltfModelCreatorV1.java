@@ -57,14 +57,15 @@ import de.javagl.jgltf.impl.v1.Scene;
 import de.javagl.jgltf.model.Accessors;
 import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.GltfConstants;
-import de.javagl.jgltf.model.GltfReference;
 import de.javagl.jgltf.model.impl.creation.BufferStructure;
 import de.javagl.jgltf.model.impl.creation.BufferStructureBuilder;
 import de.javagl.jgltf.model.impl.creation.BufferStructureGltfV1;
 import de.javagl.jgltf.model.io.Buffers;
+import de.javagl.jgltf.model.io.GltfReference;
 import de.javagl.jgltf.model.io.GltfReferenceLoader;
 import de.javagl.jgltf.model.io.IO;
 import de.javagl.jgltf.model.io.UriResolvers;
+import de.javagl.jgltf.model.io.v1.GltfAssetV1;
 import de.javagl.jgltf.model.v1.GltfIds;
 import de.javagl.jgltf.model.v1.GltfModelV1;
 import de.javagl.jgltf.obj.BufferStrategy;
@@ -345,15 +346,12 @@ public class ObjGltfModelCreatorV1
         
         gltf.setScene(sceneId);
 
-        // Finally, create the GltfModel from the glTF
-        GltfModelV1 gltfModel = new GltfModelV1(gltf, null);
+        // Create the GltfAsset from the glTF
+        GltfAssetV1 gltfAsset = new GltfAssetV1(gltf, null);
         
-        // For each BufferModel in the GltfModel, obtain the data from the 
+        // For each Buffer reference in the GltfAsset,obtain the data from the 
         // BufferModel instance that has been created by the 
         // BufferStructureBuilder.
-        // TODO This is somehow odd. But the GltfModelV1 will always create NEW 
-        // BufferModel instances, and the ones that have been created in the 
-        // BufferStructureBuilder cannot be passed to the model...
         List<BufferModel> bufferModels = bufferStructure.getBufferModels();
         Map<String, BufferModel> uriToBufferModel = 
             new LinkedHashMap<String, BufferModel>();
@@ -363,7 +361,7 @@ public class ObjGltfModelCreatorV1
             uriToBufferModel.put(uri, bufferModel);
         }
         List<GltfReference> bufferReferences = 
-            gltfModel.getBufferReferences();
+            gltfAsset.getBufferReferences();
         for (GltfReference bufferReference : bufferReferences)
         {
             String uri = bufferReference.getUri();
@@ -380,7 +378,7 @@ public class ObjGltfModelCreatorV1
             Function<String, InputStream> externalUriResolver = 
                 UriResolvers.createBaseUriResolver(baseUri);
             List<GltfReference> imageReferences = 
-                gltfModel.getImageReferences();
+                gltfAsset.getImageReferences();
             GltfReferenceLoader.loadAll(imageReferences, externalUriResolver);
             
             // Resolve the shader data, by reading the resources that are
@@ -390,11 +388,11 @@ public class ObjGltfModelCreatorV1
                 UriResolvers.createResourceUriResolver(
                     ObjGltfModelCreatorV1.class);
             List<GltfReference> shaderReferences = 
-                gltfModel.getShaderReferences();
+                gltfAsset.getShaderReferences();
             GltfReferenceLoader.loadAll(shaderReferences, internalUriResolver);
         }
         
-        return gltfModel;
+        return new GltfModelV1(gltfAsset);
     }
     
     

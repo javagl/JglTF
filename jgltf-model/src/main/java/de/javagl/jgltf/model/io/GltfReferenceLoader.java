@@ -28,6 +28,7 @@ package de.javagl.jgltf.model.io;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -35,12 +36,9 @@ import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.javagl.jgltf.model.GltfModel;
-import de.javagl.jgltf.model.GltfReference;
-
 /**
  * A class for loading the external data of {@link GltfReference} objects
- * that are obtained from a {@link GltfModel}
+ * that are obtained from a {@link GltfAsset}
  */
 public class GltfReferenceLoader
 {
@@ -54,6 +52,24 @@ public class GltfReferenceLoader
      * The log level
      */
     private static final Level level = Level.FINE;
+    
+    /**
+     * Calls {@link #load(GltfReference, Function)} with each 
+     * {@link GltfReference} of the given list, resolving the
+     * URIs of the references against the given base URI
+     * 
+     * @param references The {@link GltfReference} objects
+     * @param baseUri The base URI that references will be resolved against
+     */
+    public static void loadAll(
+        Iterable<? extends GltfReference> references, URI baseUri)
+    {
+        Objects.requireNonNull(references, "The references may not be null");
+        Objects.requireNonNull(baseUri, "The baseUri may not be null");
+        Function<String, InputStream> uriResolver = 
+            UriResolvers.createBaseUriResolver(baseUri);
+        loadAll(references, uriResolver);
+    }
     
     /**
      * Calls {@link #load(GltfReference, Function)} with each 

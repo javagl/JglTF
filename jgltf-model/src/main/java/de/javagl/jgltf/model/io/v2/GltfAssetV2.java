@@ -27,16 +27,26 @@
 package de.javagl.jgltf.model.io.v2;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.Consumer;
 
+import de.javagl.jgltf.impl.v2.Buffer;
 import de.javagl.jgltf.impl.v2.GlTF;
+import de.javagl.jgltf.impl.v2.Image;
+import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.io.Buffers;
+import de.javagl.jgltf.model.io.GltfAsset;
+import de.javagl.jgltf.model.io.GltfReference;
 
 /**
- * A low-level representation of a glTF asset. It summarizes the {@link GlTF}
- * and the (optional) binary data.
+ * Implementation of the {@link GltfAsset} interface for glTF 2.0.
  */
-public final class GltfAssetV2
+public final class GltfAssetV2 implements GltfAsset
 {
     /**
      * The {@link GlTF}
@@ -47,6 +57,11 @@ public final class GltfAssetV2
      * The optional binary data
      */
     private final ByteBuffer binaryData;
+
+    /**
+     * The mapping from (relative) URI strings to the associated external data
+     */
+    private final Map<String, ByteBuffer> referenceDatas;
     
     /**
      * Creates a new instance
@@ -58,32 +73,115 @@ public final class GltfAssetV2
     {
         this.gltf = Objects.requireNonNull(gltf, "The gltf may not be null");
         this.binaryData = binaryData;
+        this.referenceDatas = new LinkedHashMap<String, ByteBuffer>();
     }
     
     /**
-     * Returns the {@link GlTF} of this asset
+     * Store the given byte buffer under the given (relative) URI string
      * 
-     * @return The {@link GlTF}
+     * @param uriString The URI string
+     * @param byteBuffer The byte buffer
      */
+    void putReferenceData(String uriString, ByteBuffer byteBuffer)
+    {
+        if (byteBuffer == null)
+        {
+            referenceDatas.remove(uriString);
+        }
+        else
+        {
+            referenceDatas.put(uriString, byteBuffer);
+        }
+    }
+    
+    @Override
     public GlTF getGltf()
     {
         return gltf;
     }
     
-    /**
-     * Returns the binary data of this asset, or <code>null</code> if this
-     * asset does not have associated binary data.<br>
-     * <br>
-     * The returned buffer will be a slice of the data that is stored 
-     * internally. So changes of the contents of the buffer will affect
-     * this asset, but changes of the limit or position of the buffer
-     * will not affect this asset.
-     *  
-     * @return the optional binary data
-     */
+    @Override
     public ByteBuffer getBinaryData()
     {
         return Buffers.createSlice(binaryData);
     }
+    
+    @Override
+    public List<GltfReference> getReferences()
+    {
+        List<GltfReference> references = new ArrayList<GltfReference>();
+        references.addAll(getBufferReferences());
+        references.addAll(getImageReferences());
+        return references;
+    }
+    
+    /**
+     * Create a list containing all {@link GltfReference} objects for the
+     * buffers that are contained in this model.
+     * 
+     * @return The references
+     */
+    public List<GltfReference> getBufferReferences()
+    {
+        List<GltfReference> references = new ArrayList<GltfReference>();
+        List<Buffer> buffers = Optionals.of(gltf.getBuffers());
+        for (int i = 0; i < buffers.size(); i++)
+        {
+            Buffer buffer = buffers.get(i);
+            if (buffer.getUri() == null)
+            {
+                // This is the binary glTF buffer
+                continue;
+            }
+            String uri = buffer.getUri();
+            Consumer<ByteBuffer> target = 
+                byteBuffer -> referenceDatas.put(uri, byteBuffer);
+            GltfReference reference =
+                new GltfReference("buffer " + i, uri, target);
+            references.add(reference);
+        }
+        return references;
+    }
+    
+    /**
+     * Create a list containing all {@link GltfReference} objects for the
+     * images that are contained in this model.
+     * 
+     * @return The references
+     */
+    public List<GltfReference> getImageReferences()
+    {
+        List<GltfReference> references = new ArrayList<GltfReference>();
+        List<Image> images = Optionals.of(gltf.getImages());
+        for (int i = 0; i < images.size(); i++)
+        {
+            Image image = images.get(i);
+            if (image.getUri() == null)
+            {
+                // This is an image that refers to a buffer view
+                continue;
+            }
+            String uri = image.getUri();
+            Consumer<ByteBuffer> target = 
+                byteBuffer -> referenceDatas.put(uri, byteBuffer);
+            GltfReference reference = 
+                new GltfReference("image " + i, uri, target);
+            references.add(reference);
+        }
+        return references;
+    }
+    
+    @Override
+    public ByteBuffer getReferenceData(String uriString)
+    {
+        return Buffers.createSlice(referenceDatas.get(uriString));
+    }
+
+    @Override
+    public Map<String, ByteBuffer> getReferenceDatas()
+    {
+        return Collections.unmodifiableMap(referenceDatas);
+    }
+    
     
 }

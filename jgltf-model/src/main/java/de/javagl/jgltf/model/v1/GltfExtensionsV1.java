@@ -60,6 +60,24 @@ public class GltfExtensionsV1
         }
     }
     
+    /**
+     * If the {@link GlTF#getExtensionsUsed() used extensions} of the given 
+     * {@link GlTF} contains the given extension name, then it will be set 
+     * to a new list that contains all previous extension names, except
+     * for the given one.
+     * 
+     * @param gltf The {@link GlTF}
+     * @param extensionName The name of the extension to remove
+     */
+    public static void removeExtensionUsed(GlTF gltf, String extensionName)
+    {
+        List<String> oldExtensionsUsed = gltf.getExtensionsUsed();
+        if (oldExtensionsUsed != null && 
+            oldExtensionsUsed.contains(extensionName))
+        {
+            gltf.removeExtensionsUsed(extensionName);
+        }
+    }
     
     /**
      * Return the key-value mapping that is stored as the 

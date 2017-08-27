@@ -55,19 +55,6 @@ public interface ImageModel
      * @return The {@link BufferViewModel}
      */
     BufferViewModel getBufferViewModel();
-
-    /**
-     * Set the image data. This method is usually not supposed to be called
-     * by clients. <br>
-     * <br>
-     * This method will store a reference to the given buffer. So the ownership 
-     * of the given buffer data will go to this instance. The given buffer 
-     * should have its position and limit represent the actual intended 
-     * buffer data. It may not be modified after being passed to this method. 
-     * 
-     * @param imageData The image data
-     */
-    void setImageData(ByteBuffer imageData);
     
     /**
      * Returns the actual image data. This will return a slice of the
@@ -75,10 +62,6 @@ public interface ImageModel
      * of this buffer will affect this model, but modifications of the 
      * position and limit of the returned buffer will not affect this 
      * model.<br>
-     * <br>
-     * This method may only be called after the buffer data has been set
-     * with {@link #setImageData(ByteBuffer)}, which is usually done 
-     * internally, when the model is constructed.
      * 
      * @return The image data
      */

@@ -37,6 +37,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -58,6 +60,12 @@ import javax.swing.event.InternalFrameEvent;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import de.javagl.jgltf.model.GltfModel;
+import de.javagl.jgltf.model.io.GltfModelWriter;
+import de.javagl.jgltf.model.io.IO;
+import de.javagl.jgltf.obj.BufferStrategy;
+import de.javagl.jgltf.obj.v1.ObjGltfModelCreatorV1;
+import de.javagl.swing.tasks.SwingTask;
+import de.javagl.swing.tasks.SwingTaskExecutors;
 
 /**
  * The main glTF browser application class, containing the main frame 
@@ -153,7 +161,8 @@ class GltfBrowserApplication
     /**
      * The Action for saving a glTF
      * 
-     * @see #saveAs()
+     * @see #saveAs(Consumer)
+     * @see #saveChecked(File)
      */
     private final Action saveAsAction = new AbstractAction()
     {
@@ -174,14 +183,15 @@ class GltfBrowserApplication
         @Override
         public void actionPerformed(ActionEvent e)
         {
-            saveAs();
+            saveAs(f -> saveChecked(f));
         }
     };
     
     /**
      * The Action for saving a glTF as a binary glTF
      * 
-     * @see #saveAsBinary()
+     * @see #saveAs(Consumer)
+     * @see #saveBinary(File)
      */
     private final Action saveAsBinaryAction = new AbstractAction()
     {
@@ -202,9 +212,39 @@ class GltfBrowserApplication
         @Override
         public void actionPerformed(ActionEvent e)
         {
-            saveAsBinary();
+            saveAs(f -> saveBinary(f));
         }
     };
+    
+    /**
+     * The Action for saving a glTF as an embedded glTF
+     * 
+     * @see #saveAs(Consumer)
+     * @see #saveEmbedded(File)
+     */
+    private final Action saveAsEmbeddedAction = new AbstractAction()
+    {
+        /**
+         * Serial UID
+         */
+        private static final long serialVersionUID = 8683961991846940413L;
+
+        // Initialization
+        {
+            putValue(NAME, "Save as embedded...");
+            putValue(SHORT_DESCRIPTION, 
+                "Save the selected glTF to an embedded glTF");
+            putValue(MNEMONIC_KEY, new Integer(KeyEvent.VK_E));
+            setEnabled(false);
+        }
+        
+        @Override
+        public void actionPerformed(ActionEvent e)
+        {
+            saveAs(f -> saveEmbedded(f));
+        }
+    };
+    
     
     /**
      * The Action for exiting the application
@@ -259,11 +299,6 @@ class GltfBrowserApplication
     private final JFileChooser saveFileChooser;
 
     /**
-     * The FileChooser for saving binary glTF files
-     */
-    private final JFileChooser saveBinaryFileChooser;
-    
-    /**
      * The {@link RecentUrisMenu} handler for the most recent URIs menu
      */
     private final RecentUrisMenu recentUrisMenu;
@@ -305,6 +340,7 @@ class GltfBrowserApplication
                             (JInternalFrame)event.getSource();
                         saveAsAction.setEnabled(true);
                         saveAsBinaryAction.setEnabled(true);
+                        saveAsEmbeddedAction.setEnabled(true);
                     }
                 }
             }
@@ -344,7 +380,6 @@ class GltfBrowserApplication
                 "OBJ files (.obj)", "obj"));
         
         saveFileChooser = new JFileChooser(".");
-        saveBinaryFileChooser = new JFileChooser(".");
         
         desktopPane = new JDesktopPane();
         frame.getContentPane().add(desktopPane);
@@ -444,6 +479,7 @@ class GltfBrowserApplication
         
         fileMenu.add(new JMenuItem(saveAsAction));
         fileMenu.add(new JMenuItem(saveAsBinaryAction));
+        fileMenu.add(new JMenuItem(saveAsEmbeddedAction));
         fileMenu.add(new JSeparator());
         fileMenu.add(new JMenuItem(exitAction));
         return fileMenu;
@@ -543,50 +579,49 @@ class GltfBrowserApplication
      */
     private void importObjUriInBackground(URI uri)
     {
-        int XXX; // Not implemented yet
-//        BufferStrategy bufferStrategy = 
-//            objImportAccessoryPanel.getSelectedBufferStrategy();
-//        Integer indicesComponentType = 
-//            objImportAccessoryPanel.getSelectedIndicesComponentType();
-//        boolean assigningRandomColorsToParts =
-//            objImportAccessoryPanel.isAssigningRandomColorsToParts();
-//        SwingTask<GltfData, ?> swingTask = new SwingTask<GltfData, Void>()
-//        {
-//            @Override
-//            protected GltfData doInBackground() throws Exception
-//            {
-//                ObjGltfDataCreator objGltfDataCreator = 
-//                    new ObjGltfDataCreator(bufferStrategy);
-//                objGltfDataCreator.setIndicesComponentType(
-//                    indicesComponentType);
-//                objGltfDataCreator.setAssigningRandomColorsToParts(
-//                    assigningRandomColorsToParts);
-//                return objGltfDataCreator.create(uri);
-//            }
-//        };
-//        swingTask.addDoneCallback(task -> 
-//        {
-//            try
-//            {
-//                GltfData gltfData = task.get();
-//                String frameTitle =
-//                    "glTF for " + IO.extractFileName(uri);
-//                //createGltfBrowserPanel(frameTitle, gltfData, null);
-//            } 
-//            catch (InterruptedException e)
-//            {
-//                Thread.currentThread().interrupt();
-//            }
-//            catch (ExecutionException e)
-//            {
-//                JOptionPane.showMessageDialog(frame, 
-//                    "Could not read " + uri + ": " + e.getMessage(), 
-//                    "Error", JOptionPane.ERROR_MESSAGE);
-//            }
-//        });
-//        SwingTaskExecutors.create(swingTask)
-//            .build()
-//            .execute();            
+        BufferStrategy bufferStrategy = 
+            objImportAccessoryPanel.getSelectedBufferStrategy();
+        Integer indicesComponentType = 
+            objImportAccessoryPanel.getSelectedIndicesComponentType();
+        boolean assigningRandomColorsToParts =
+            objImportAccessoryPanel.isAssigningRandomColorsToParts();
+        SwingTask<GltfModel, ?> swingTask = new SwingTask<GltfModel, Void>()
+        {
+            @Override
+            protected GltfModel doInBackground() throws Exception
+            {
+                ObjGltfModelCreatorV1 objGltfModelCreator = 
+                    new ObjGltfModelCreatorV1(bufferStrategy);
+                objGltfModelCreator.setIndicesComponentType(
+                    indicesComponentType);
+                objGltfModelCreator.setAssigningRandomColorsToParts(
+                    assigningRandomColorsToParts);
+                return objGltfModelCreator.create(uri);
+            }
+        };
+        swingTask.addDoneCallback(task -> 
+        {
+            try
+            {
+                GltfModel gltfModel = task.get();
+                String frameTitle =
+                    "glTF for " + IO.extractFileName(uri);
+                createGltfBrowserPanel(frameTitle, gltfModel);
+            } 
+            catch (InterruptedException e)
+            {
+                Thread.currentThread().interrupt();
+            }
+            catch (ExecutionException e)
+            {
+                JOptionPane.showMessageDialog(frame, 
+                    "Could not read " + uri + ": " + e.getMessage(), 
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        SwingTaskExecutors.create(swingTask)
+            .build()
+            .execute();            
     }
 
     /**
@@ -608,7 +643,7 @@ class GltfBrowserApplication
             frameTitle, resizable, closable , maximizable, iconifiable);
         internalFrame.addPropertyChangeListener(selectedInternalFrameTracker);
         GltfBrowserPanel gltfBrowserPanel = 
-            new GltfBrowserPanel(gltfModel.getGltf(), gltfModel);
+            new GltfBrowserPanel(gltfModel);
         internalFrame.getContentPane().add(gltfBrowserPanel);
         internalFrame.setSize(
             desktopPane.getWidth(), 
@@ -661,12 +696,17 @@ class GltfBrowserApplication
         return gltfModel;
     }
 
+    
     /**
      * Open a file chooser to let the user select the file that the
      * {@link GltfModel} of the {@link GltfBrowserPanel} of the currently 
-     * selected internal frame should be written to.
+     * selected internal frame should be written to. If the file
+     * already exists, the user will be asked for confirmation to
+     * overwrite the file.
+     * 
+     * @param fileConsumer The consumer for the selected file
      */
-    void saveAs()
+    void saveAs(Consumer<? super File> fileConsumer)
     {
         int returnState = saveFileChooser.showSaveDialog(frame);
         if (returnState == JFileChooser.APPROVE_OPTION) 
@@ -681,33 +721,49 @@ class GltfBrowserApplication
                         JOptionPane.WARNING_MESSAGE);
                 if (confirmState != JOptionPane.YES_OPTION)
                 {
-                    saveAs();
+                    // The file should NOT be overwritten. 
+                    // Let the user select a new one.
+                    saveAs(fileConsumer);
+                    return;
                 }
             }
-            
-            // TODO Could check the buffer/shader/image URIs here, 
-            // to see whether files would *really* be overridden.
-            // Also, this check does not cover the case of relative
-            // paths (subdirectories in URIs) where the files may
-            // be stored.
-            File siblingFiles[] = file.getParentFile().listFiles();
-            if (siblingFiles.length != 0)
-            {
-                int confirmState = 
-                    JOptionPane.showConfirmDialog(frame, 
-                        "The directory of the target file is not empty. " + 
-                        "Existing files may be overwritten. Do you want " +
-                        "to continue?", "Confirm", JOptionPane.YES_NO_OPTION,
-                        JOptionPane.WARNING_MESSAGE);
-                if (confirmState != JOptionPane.YES_OPTION)
-                {
-                    saveAs();
-                }
-            }
-            save(file);
+            fileConsumer.accept(file);
         }        
     }
     
+    
+    
+    /**
+     * Save the currently selected {@link GltfModel} to the given file. 
+     * If the target directory is not empty, then the user will be 
+     * asked for confirmation, because existing files might be 
+     * overwritten.
+     * 
+     * @param file The target file
+     */
+    private void saveChecked(File file)
+    {
+        // TODO Could check the buffer/shader/image URIs here, 
+        // to see whether files would *really* be overridden.
+        // Also, this check does not cover the case of relative
+        // paths (subdirectories in URIs) where the files may
+        // be stored.
+        File siblingFiles[] = file.getParentFile().listFiles();
+        if (siblingFiles.length != 0)
+        {
+            int confirmState = 
+                JOptionPane.showConfirmDialog(frame, 
+                    "The directory of the target file is not empty. " + 
+                    "Existing files may be overwritten. Do you want " +
+                    "to continue?", "Confirm", JOptionPane.YES_NO_OPTION,
+                    JOptionPane.WARNING_MESSAGE);
+            if (confirmState != JOptionPane.YES_OPTION)
+            {
+                saveAs(f -> saveChecked(f));
+            }
+        }
+        save(file);
+    }
     
     /**
      * Save the currently selected {@link GltfModel} to the given file
@@ -723,8 +779,8 @@ class GltfBrowserApplication
         }
         try
         {
-            int XXX; // Not implemented yet
-            throw new IOException("Not implemented");
+            GltfModelWriter gltfModelWriter = new GltfModelWriter();
+            gltfModelWriter.write(gltfModel, file);
         } 
         catch (IOException e)
         {
@@ -732,34 +788,6 @@ class GltfBrowserApplication
                 "Could not save file to " + file + ": " + e.getMessage(), 
                 "Error", JOptionPane.ERROR_MESSAGE);
         }
-    }
-    
-    
-    /**
-     * Open a file chooser to let the user select the file that the
-     * {@link GltfModel} of the {@link GltfBrowserPanel} of the currently 
-     * selected internal frame should be written to as a binary file
-     */
-    void saveAsBinary()
-    {
-        int returnState = saveBinaryFileChooser.showSaveDialog(frame);
-        if (returnState == JFileChooser.APPROVE_OPTION) 
-        {
-            File file = saveBinaryFileChooser.getSelectedFile();
-            if (file.exists())
-            {
-                int confirmState = 
-                    JOptionPane.showConfirmDialog(frame, 
-                        "File already exists, do you want to overwrite it?", 
-                        "Confirm", JOptionPane.YES_NO_OPTION, 
-                        JOptionPane.WARNING_MESSAGE);
-                if (confirmState != JOptionPane.YES_OPTION)
-                {
-                    saveAsBinary();
-                }
-            }
-            saveBinary(file);
-        }        
     }
 
     /**
@@ -777,8 +805,34 @@ class GltfBrowserApplication
         }
         try
         {
-            int XXX; // Not implemented yet
-            throw new IOException("Not implemented");
+            GltfModelWriter gltfModelWriter = new GltfModelWriter();
+            gltfModelWriter.writeBinary(gltfModel, file);
+        } 
+        catch (IOException e)
+        {
+            JOptionPane.showMessageDialog(frame, 
+                "Could not save file to " + file + ": " + e.getMessage(), 
+                "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    /**
+     * Save the currently selected {@link GltfModel} to the given file
+     * as a embedded glTF
+     * 
+     * @param file The target file
+     */
+    private void saveEmbedded(File file)
+    {
+        GltfModel gltfModel = getSelectedGltfModel();
+        if (gltfModel == null)
+        {
+            return;
+        }
+        try
+        {
+            GltfModelWriter gltfModelWriter = new GltfModelWriter();
+            gltfModelWriter.writeEmbedded(gltfModel, file);
         } 
         catch (IOException e)
         {

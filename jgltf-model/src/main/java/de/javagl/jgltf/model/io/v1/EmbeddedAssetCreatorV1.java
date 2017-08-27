@@ -24,92 +24,88 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.model.io.v2;
+package de.javagl.jgltf.model.io.v1;
 
 import java.nio.ByteBuffer;
 import java.util.Base64;
-import java.util.List;
 
-import de.javagl.jgltf.impl.v2.Buffer;
-import de.javagl.jgltf.impl.v2.GlTF;
-import de.javagl.jgltf.impl.v2.Image;
+import de.javagl.jgltf.impl.v1.Buffer;
+import de.javagl.jgltf.impl.v1.GlTF;
+import de.javagl.jgltf.impl.v1.Image;
+import de.javagl.jgltf.impl.v1.Shader;
 import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.GltfException;
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.Optionals;
+import de.javagl.jgltf.model.gl.ShaderModel;
+import de.javagl.jgltf.model.io.GltfAsset;
 import de.javagl.jgltf.model.io.IO;
 import de.javagl.jgltf.model.io.MimeTypes;
-import de.javagl.jgltf.model.v2.GltfModelV2;
+import de.javagl.jgltf.model.v1.GltfModelV1;
 
 /**
- * A class for converting {@link GltfModelV2} to a {@link GltfAssetV2} with
+ * A class for converting {@link GltfModelV1} to a {@link GltfAssetV1} with
  * an "embedded" data representation, where data elements are not
  * referred to via URIs, but encoded directly in the glTF JSON as
  * data URIs. 
  */
-public class GltfModelToEmbeddedAssetConverterV2
+public class EmbeddedAssetCreatorV1
 {
     /**
      * Creates a new glTF model to embedded converter
      */
-    public GltfModelToEmbeddedAssetConverterV2()
+    public EmbeddedAssetCreatorV1()
     {
         // Default constructor
     }
 
     /**
-     * Convert the given {@link GltfModelV2} to a {@link GltfAssetV2} with 
-     * an "embedded" data representation. <br>
+     * Create a {@link GltfAssetV1} with "embedded" data representation from 
+     * the given {@link GltfModelV1}.<br>
      * <br>
-     * The returned {@link GltfAssetV2} will contain a {@link GlTF} where the
-     * the URIs that appear in {@link Buffer} and {@link Image} instances are 
-     * replaced with data URIs that contain the corresponding data. 
-     * Its {@link GltfAssetV2#getBinaryData() binary data} will be
-     * <code>null</code>. 
+     * The returned {@link GltfAssetV1} will contain a {@link GlTF} where the
+     * the URIs that appear in {@link Buffer}, {@link Image} or {@link Shader}
+     * instances are replaced with data URIs that contain the corresponding 
+     * data. Its {@link GltfAsset#getBinaryData() binary data} will be
+     * <code>null</code>, and its {@link GltfAsset#getReferenceDatas() 
+     * reference data elements} will be empty.
      *  
-     * @param gltfModel The input {@link GltfModelV2}
-     * @return The embedded {@link GltfAssetV2}
+     * @param gltfModel The input {@link GltfModelV1}
+     * @return The embedded {@link GltfAssetV1}
      */
-    public GltfAssetV2 convert(GltfModelV2 gltfModel)
+    public GltfAssetV1 create(GltfModelV1 gltfModel)
     {
         GlTF inputGltf = gltfModel.getGltf();
-        GlTF convertedGltf = GltfUtilsV2.copy(inputGltf);
+        GlTF convertedGltf = GltfUtilsV1.copy(inputGltf);
 
-        List<Buffer> buffers = Optionals.of(convertedGltf.getBuffers());
-        for (int i = 0; i < buffers.size(); i++)
-        {
-            Buffer buffer = buffers.get(i);
-            convertBufferToEmbedded(gltfModel, i, buffer);
-        }
-        
-        List<Image> images = Optionals.of(convertedGltf.getImages());
-        for (int i = 0; i < images.size(); i++)
-        {
-            Image image = images.get(i);
-            convertImageToEmbedded(gltfModel, i, image);
-        }
+        Optionals.of(convertedGltf.getBuffers()).forEach((id, value) -> 
+            convertBufferToEmbedded(gltfModel, id, value));
+        Optionals.of(convertedGltf.getImages()).forEach((id, value) -> 
+            convertImageToEmbedded(gltfModel, id, value));
+        Optionals.of(convertedGltf.getShaders()).forEach((id, value) -> 
+            convertShaderToEmbedded(gltfModel, id, value));
 
-        return new GltfAssetV2(convertedGltf, null);
+        return new GltfAssetV1(convertedGltf, null);
     }
 
     /**
-     * Convert the given {@link Buffer} from the given {@link GltfModelV2} into
+     * Convert the given {@link Buffer} from the given {@link GltfModelV1} into
      * an embedded buffer, by replacing its URI with a data URI, if the 
      * URI is not already a data URI
      * 
-     * @param gltfModel The {@link GltfModelV2}
-     * @param index The index of the {@link Buffer}
+     * @param gltfModel The {@link GltfModelV1}
+     * @param id The ID of the {@link Buffer}
      * @param buffer The {@link Buffer}
      */
     private static void convertBufferToEmbedded(
-        GltfModelV2 gltfModel, int index, Buffer buffer)
+        GltfModelV1 gltfModel, String id, Buffer buffer)
     {
         String uriString = buffer.getUri();
         if (IO.isDataUriString(uriString))
         {
             return;
         }
-        BufferModel bufferModel = gltfModel.getBufferModels().get(index);
+        BufferModel bufferModel = gltfModel.getBufferModelById(id);
         ByteBuffer bufferData = bufferModel.getBufferData();
         byte data[] = new byte[bufferData.capacity()];
         bufferData.slice().get(data);
@@ -120,25 +116,25 @@ public class GltfModelToEmbeddedAssetConverterV2
     }
 
     /**
-     * Convert the given {@link Image} from the given {@link GltfModelV2} into
+     * Convert the given {@link Image} from the given {@link GltfModelV1} into
      * an embedded image, by replacing its URI with a data URI, if the 
      * URI is not already a data URI
      * 
-     * @param gltfModel The {@link GltfModelV2}
-     * @param index The index of the {@link Image}
+     * @param gltfModel The {@link GltfModelV1}
+     * @param id The ID of the {@link Image}
      * @param image The {@link Image}
      * @throws GltfException If the image format (and thus, the MIME type)
      * can not be determined from the image data  
      */
     private static void convertImageToEmbedded(
-        GltfModelV2 gltfModel, int index, Image image)
+        GltfModelV1 gltfModel, String id, Image image)
     {
         String uriString = image.getUri();
         if (IO.isDataUriString(uriString))
         {
             return;
         }
-        ImageModel imageModel = gltfModel.getImageModels().get(index);
+        ImageModel imageModel = gltfModel.getImageModelById(id);
         ByteBuffer imageData = imageModel.getImageData();
         String uri = image.getUri();
         String imageMimeTypeString =
@@ -146,15 +142,42 @@ public class GltfModelToEmbeddedAssetConverterV2
         if (imageMimeTypeString == null)
         {
             throw new GltfException(
-                "Could not detect MIME type of image " + index);
+                "Could not detect MIME type of image " + id);
         }
 
         byte data[] = new byte[imageData.capacity()];
         imageData.slice().get(data);
         String encodedData = Base64.getEncoder().encodeToString(data);
         String dataUriString =
-            "data:image/" + imageMimeTypeString + ";base64," + encodedData;
+            "data:" + imageMimeTypeString + ";base64," + encodedData;
         image.setUri(dataUriString);
+    }
+
+    /**
+     * Convert the given {@link Shader} from the given {@link GltfModelV1} into
+     * an embedded shader, by replacing its URI with a data URI, if the 
+     * URI is not already a data URI
+     * 
+     * @param gltfModel The {@link GltfModelV1}
+     * @param id The ID of the {@link Shader}
+     * @param shader The {@link Shader}
+     */
+    private static void convertShaderToEmbedded(
+        GltfModelV1 gltfModel, String id, Shader shader)
+    {
+        String uriString = shader.getUri();
+        if (IO.isDataUriString(uriString))
+        {
+            return;
+        }
+        ShaderModel shaderModel = gltfModel.getShaderModelById(id);
+        ByteBuffer shaderData = shaderModel.getShaderData();
+        byte data[] = new byte[shaderData.capacity()];
+        shaderData.slice().get(data);
+        String encodedData = Base64.getEncoder().encodeToString(data);
+        String dataUriString = 
+            "data:text/plain;base64," + encodedData;
+        shader.setUri(dataUriString);
     }
 
 

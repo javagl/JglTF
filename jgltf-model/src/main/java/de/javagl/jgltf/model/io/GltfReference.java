@@ -24,14 +24,14 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.model;
+package de.javagl.jgltf.model.io;
 
 import java.nio.ByteBuffer;
 import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
- * A reference to an external resource that belongs to a {@link GltfModel}.
+ * A reference to an external resource that belongs to a {@link GltfAsset}.
  */
 public final class GltfReference
 {

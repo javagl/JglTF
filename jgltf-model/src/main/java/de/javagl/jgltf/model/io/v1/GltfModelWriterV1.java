@@ -30,25 +30,18 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
-import java.nio.channels.WritableByteChannel;
-import java.nio.file.Path;
-import java.util.List;
 
 import de.javagl.jgltf.impl.v1.GlTF;
-import de.javagl.jgltf.model.BufferModel;
-import de.javagl.jgltf.model.ImageModel;
-import de.javagl.jgltf.model.gl.ShaderModel;
+import de.javagl.jgltf.model.io.GltfAssetWriter;
+import de.javagl.jgltf.model.io.GltfModelWriter;
 import de.javagl.jgltf.model.io.GltfWriter;
-import de.javagl.jgltf.model.io.IO;
 import de.javagl.jgltf.model.v1.GltfModelV1;
 
 /**
- * A class for writing a {@link GltfModelV1}. The model can be written as
- * a default glTF, consisting of a JSON file and the files that are 
- * referred to via URIs, or as a binary file, or an embedded file where
- * all external references are replaced by data URIs.
+ * A class for writing a {@link GltfModelV1}. This class contains  
+ * implementations for the methods of the {@link GltfModelWriter},
+ * for glTF 1.0 assets. Clients should not use this class directly,
+ * but only the {@link GltfModelWriter}.
  */
 public class GltfModelWriterV1
 {
@@ -74,49 +67,10 @@ public class GltfModelWriterV1
     public void write(GltfModelV1 gltfModel, File file) 
         throws IOException
     {
-        File directory = file.getParentFile();
-        directory.mkdirs();
-        
-        GlTF gltf = gltfModel.getGltf();
-        try (OutputStream outputStream = new FileOutputStream(file))
-        {
-            GltfWriter gltfWriter = new GltfWriter();
-            gltfWriter.write(gltf, outputStream);
-        }
-        
-
-        List<BufferModel> bufferModels = gltfModel.getBufferModels();
-        for (BufferModel bufferModel : bufferModels)
-        {
-            String uri = bufferModel.getUri();
-            if (!IO.isDataUriString(uri))
-            {
-                ByteBuffer bufferData = bufferModel.getBufferData();
-                writeData(directory, uri, bufferData);
-            }
-        }
-        
-        List<ImageModel> imageModels = gltfModel.getImageModels();
-        for (ImageModel imageModel : imageModels)
-        {
-            String uri = imageModel.getUri();
-            if (!IO.isDataUriString(uri))
-            {
-                ByteBuffer imageData = imageModel.getImageData();
-                writeData(directory, uri, imageData);
-            }
-        }
-        
-        List<ShaderModel> shaderModels = gltfModel.getShaderModels();
-        for (ShaderModel shaderModel : shaderModels)
-        {
-            String uri = shaderModel.getUri();
-            if (!IO.isDataUriString(uri))
-            {
-                ByteBuffer shaderData = shaderModel.getShaderData();
-                writeData(directory, uri, shaderData);
-            }
-        }
+        DefaultAssetCreatorV1 assetCreator = new DefaultAssetCreatorV1();
+        GltfAssetV1 gltfAsset = assetCreator.create(gltfModel);
+        GltfAssetWriter gltfAssetWriter = new GltfAssetWriter();
+        gltfAssetWriter.write(gltfAsset, file);
     }
     
     /**
@@ -148,30 +102,10 @@ public class GltfModelWriterV1
     public void writeBinary(GltfModelV1 gltfModel, OutputStream outputStream) 
         throws IOException
     {
-        GltfModelToBinaryAssetConverterV1 gltfModelToBinaryAssetConverter =
-            new GltfModelToBinaryAssetConverterV1();
-        GltfAssetV1 gltfAsset = 
-            gltfModelToBinaryAssetConverter.convert(gltfModel);
+        BinaryAssetCreatorV1 assetCreator = new BinaryAssetCreatorV1();
+        GltfAssetV1 gltfAsset = assetCreator.create(gltfModel);
         GltfAssetWriterV1 gltfAssetWriter = new GltfAssetWriterV1();
         gltfAssetWriter.writeBinary(gltfAsset, outputStream);
-    }
-    
-
-    /**
-     * Write the given {@link GltfModelV1} as an embedded glTF asset to the
-     * given file
-     * 
-     * @param gltfModel The {@link GltfModelV1}
-     * @param file The file
-     * @throws IOException If an IO error occurs
-     */
-    public void writeEmbedded(GltfModelV1 gltfModel, File file) 
-        throws IOException
-    {
-        try (OutputStream outputStream = new FileOutputStream(file))
-        {
-            writeEmbedded(gltfModel, outputStream);
-        }
     }
     
     /**
@@ -186,36 +120,10 @@ public class GltfModelWriterV1
     public void writeEmbedded(GltfModelV1 gltfModel, OutputStream outputStream) 
         throws IOException
     {
-        GltfModelToEmbeddedAssetConverterV1 gltfModelToEmbeddedAssetConverter = 
-            new GltfModelToEmbeddedAssetConverterV1();
-        GltfAssetV1 gltfAsset = 
-            gltfModelToEmbeddedAssetConverter.convert(gltfModel);
+        EmbeddedAssetCreatorV1 assetCreator = new EmbeddedAssetCreatorV1();
+        GltfAssetV1 gltfAsset = assetCreator.create(gltfModel);
         GltfWriter gltfWriter = new GltfWriter();
         GlTF gltf = gltfAsset.getGltf();
         gltfWriter.write(gltf, outputStream);
-    }
-    
-    
-    /**
-     * Write the given data into a file that is defined by the given directory
-     * and the given (possibly relative) URI.
-     * 
-     * @param directory The directory
-     * @param uri The URI
-     * @param data The data to write
-     * @throws IOException If an IO error occurs
-     */
-    private static void writeData(File directory, String uri, ByteBuffer data) 
-        throws IOException
-    {
-        Path directoryPath = directory.toPath();
-        Path bufferFilePath = directoryPath.resolve(uri);
-        File bufferFile = bufferFilePath.toFile();
-        try (OutputStream outputStream = new FileOutputStream(bufferFile);
-            WritableByteChannel writableByteChannel =
-                Channels.newChannel(outputStream))
-        {
-            writableByteChannel.write(data.slice());
-        }
     }
 }

@@ -29,14 +29,12 @@ package de.javagl.jgltf.browser;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.ExecutionException;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -45,7 +43,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingUtilities;
 
 import de.javagl.jgltf.impl.v2.Accessor;
 import de.javagl.jgltf.impl.v2.GlTF;
@@ -59,8 +56,6 @@ import de.javagl.jgltf.model.AccessorShortData;
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.v2.GltfModelV2;
-import de.javagl.swing.tasks.SwingTask;
-import de.javagl.swing.tasks.SwingTaskExecutors;
 
 /**
  * Utility class for creating info components for elements of a glTF 2.0 model
@@ -168,42 +163,8 @@ class InfoComponentFactoryV2
     private void updateAccessorDataText(
         JTextArea textArea, Accessor accessor, int elementsPerRow)
     {
-        SwingTask<String, ?> swingTask = new SwingTask<String, Void>()
-        {
-            @Override
-            protected String doInBackground() throws Exception
-            {
-                return createDataString(accessor, elementsPerRow);
-            }
-            
-            @Override
-            protected void done()
-            {
-                try
-                {
-                    String string = get();
-                    textArea.setText(string);
-                    SwingUtilities.invokeLater(() ->
-                        textArea.scrollRectToVisible(new Rectangle(0,0,1,1)));
-                } 
-                catch (InterruptedException e)
-                {
-                    Thread.currentThread().interrupt();
-                }
-                catch (ExecutionException e)
-                {
-                    // Should never happen: createDataString handles this
-                    StringWriter sw = new StringWriter();
-                    e.printStackTrace(new PrintWriter(sw));
-                    textArea.setText(sw.toString());
-                }
-            }
-        };
-        SwingTaskExecutors.create(swingTask)
-            .setMillisToPopup(1000)
-            .build()
-            .execute();            
-        
+        InfoComponentFactory.updateTextInBackground(textArea, 
+            () -> createDataString(accessor, elementsPerRow));
     }
     
     /**

@@ -52,6 +52,23 @@ public class GltfModelWriter
     {
         // Default constructor
     }
+
+    /**
+     * Write the given {@link GltfModel} to a file with the given name. 
+     * External references of buffers or images that are given via the 
+     * respective URI string will be resolved against the parent directory 
+     * of the file, and the corresponding data will be written into the 
+     * corresponding files. 
+     * 
+     * @param gltfModel The {@link GltfModel}
+     * @param fileName The file name
+     * @throws IOException If an IO error occurs
+     */
+    public void write(GltfModel gltfModel, String fileName) 
+        throws IOException
+    {
+        write(gltfModel, new File(fileName));
+    }
     
     /**
      * Write the given {@link GltfModel} to the given file. External

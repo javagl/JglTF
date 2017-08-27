@@ -51,18 +51,18 @@ import de.javagl.jgltf.model.v1.GltfModelV1;
 /**
  * A class for converting {@link GltfModelV1} to a binary glTF asset 
  */
-public class GltfModelToBinaryAssetConverterV1
+public class BinaryAssetCreatorV1
 {
     /**
      * Creates a new glTF to binary converter
      */
-    public GltfModelToBinaryAssetConverterV1()
+    public BinaryAssetCreatorV1()
     {
         // Default constructor
     }
     
     /**
-     * Convert the given {@link GltfModelV1} into a binary {@link GltfAssetV1}.
+     * Create a binary {@link GltfAssetV1} from the given {@link GltfModelV1}.
      * The resulting asset will have a {@link GlTF} that uses the binary
      * glTF extension objects in its {@link Buffer}, {@link Image} and
      * {@link Shader} elements, to refer to the 
@@ -71,7 +71,7 @@ public class GltfModelToBinaryAssetConverterV1
      * @param gltfModel The {@link GltfModelV1}
      * @return The {@link GltfAssetV1}
      */
-    public GltfAssetV1 convert(GltfModelV1 gltfModel)
+    public GltfAssetV1 create(GltfModelV1 gltfModel)
     {
         GlTF inputGltf = gltfModel.getGltf();
         GlTF convertedGltf = GltfUtilsV1.copy(inputGltf);

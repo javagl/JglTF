@@ -49,24 +49,24 @@ import de.javagl.jgltf.model.v2.GltfModelV2;
 /**
  * A class for converting {@link GltfModelV2} to a binary glTF asset 
  */
-public class GltfModelToBinaryAssetConverterV2
+public class BinaryAssetCreatorV2
 {
     /**
      * The logger used in this class
      */
     private static final Logger logger =
-        Logger.getLogger(GltfModelToBinaryAssetConverterV2.class.getName());
+        Logger.getLogger(BinaryAssetCreatorV2.class.getName());
     
     /**
      * Creates a new glTF to binary converter
      */
-    public GltfModelToBinaryAssetConverterV2()
+    public BinaryAssetCreatorV2()
     {
         // Default constructor
     }
     
     /**
-     * Convert the given {@link GltfModelV2} into a binary {@link GltfAssetV2}.
+     * Create a binary {@link GltfAssetV2} from the given {@link GltfModelV2}.
      * The resulting asset will have a {@link GlTF} that uses references to
      * {@link BufferView} objects in its {@link Buffer} and {@link Image}
      * elements. 
@@ -74,7 +74,7 @@ public class GltfModelToBinaryAssetConverterV2
      * @param gltfModel The {@link GltfModelV2}
      * @return The {@link GltfAssetV2}
      */
-    public GltfAssetV2 convert(GltfModelV2 gltfModel)
+    public GltfAssetV2 create(GltfModelV2 gltfModel)
     {
         GlTF inputGltf = gltfModel.getGltf();
         GlTF convertedGltf = GltfUtilsV2.copy(inputGltf);

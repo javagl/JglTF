@@ -30,6 +30,7 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -42,6 +43,7 @@ import java.nio.ByteBuffer;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
@@ -54,6 +56,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 import javax.swing.tree.TreePath;
 
 import de.javagl.jgltf.impl.v1.GlTF;
@@ -202,7 +205,7 @@ class InfoComponentFactory
      */
     private void createJson(JPanel jsonInfoPanel)
     {
-        Object gltf = gltfModel.getGltf();
+        Object gltf = GltfBrowserPanel.getGltf(gltfModel);
         SwingTask<String, ?> swingTask = new SwingTask<String, Void>()
         {
             @Override
@@ -327,6 +330,57 @@ class InfoComponentFactory
             return null;
         }
     }
+    
+    
+    /**
+     * Update the text in the given text area to show the text that is
+     * provided by the given supplier. Calling the supplier is done
+     * in a background thread, possibly shielded by a modal dialog.
+     * 
+     * @param textArea The target text area 
+     * @param textSupplier The supplier for the text
+     */
+    static void updateTextInBackground(
+        JTextArea textArea, Supplier<? extends String> textSupplier)
+    {
+        SwingTask<String, ?> swingTask = new SwingTask<String, Void>()
+        {
+            @Override
+            protected String doInBackground() throws Exception
+            {
+                return textSupplier.get();
+            }
+            
+            @Override
+            protected void done()
+            {
+                try
+                {
+                    String string = get();
+                    textArea.setText(string);
+                    SwingUtilities.invokeLater(() ->
+                        textArea.scrollRectToVisible(new Rectangle(0,0,1,1)));
+                } 
+                catch (InterruptedException e)
+                {
+                    Thread.currentThread().interrupt();
+                }
+                catch (ExecutionException e)
+                {
+                    // Should never happen: createDataString handles this
+                    StringWriter sw = new StringWriter();
+                    e.printStackTrace(new PrintWriter(sw));
+                    textArea.setText(sw.toString());
+                }
+            }
+        };
+        SwingTaskExecutors.create(swingTask)
+            .setMillisToPopup(1000)
+            .build()
+            .execute();            
+        
+    }
+    
     
     /**
      * Create an info component with the given message

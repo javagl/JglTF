@@ -27,7 +27,6 @@
 package de.javagl.jgltf.model.io.v1;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
@@ -37,10 +36,14 @@ import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
 
 import de.javagl.jgltf.impl.v1.GlTF;
+import de.javagl.jgltf.model.io.GltfAssetWriter;
 import de.javagl.jgltf.model.io.GltfWriter;
 
 /**
- * A class for writing a glTF 1.0 asset
+ * A class for writing a glTF 1.0 asset in binary format to an output stream.
+ * This class contains  implementations for the methods of the 
+ * {@link GltfAssetWriter}, for glTF 1.0 assets. Clients should not use this 
+ * class directly, but only the {@link GltfAssetWriter}.
  */
 public class GltfAssetWriterV1
 {
@@ -67,61 +70,7 @@ public class GltfAssetWriterV1
     {
         // Default constructor
     }
-    
-    /**
-     * Write the JSON part of the given {@link GltfAssetV1} to a file with 
-     * the given name. The {@link GltfAssetV1#getBinaryData() binary data}
-     * will be ignored.
-     * 
-     * @param gltfAsset The {@link GltfAssetV1}
-     * @param fileName The file name for the JSON file
-     * @throws IOException If an IO error occurred
-     */
-    public void writeJson(GltfAssetV1 gltfAsset, String fileName) 
-        throws IOException
-    {
-        try (OutputStream outputStream = new FileOutputStream(fileName))
-        {
-            writeJson(gltfAsset, outputStream);
-        }
-    }
-    
-    /**
-     * Write the JSON part of the given {@link GltfAssetV1} to the given
-     * output stream. The {@link GltfAssetV1#getBinaryData() binary data}
-     * will be ignored. The caller is responsible for closing the given
-     * stream.
-     * 
-     * @param gltfAsset The {@link GltfAssetV1}
-     * @param outputStream The output stream
-     * @throws IOException If an IO error occurred
-     */
-    public void writeJson(GltfAssetV1 gltfAsset, OutputStream outputStream) 
-        throws IOException
-    {
-        GlTF gltf = gltfAsset.getGltf();
-        GltfWriter gltfWriter = new GltfWriter();
-        gltfWriter.write(gltf, outputStream);
-    }
-    
 
-    /**
-     * Write the given {@link GltfAssetV1} as a binary glTF asset to file with 
-     * the given name.
-     * 
-     * @param gltfAsset The {@link GltfAssetV1}
-     * @param fileName The file name for the JSON file
-     * @throws IOException If an IO error occurred
-     */
-    public void writeBinary(GltfAssetV1 gltfAsset, String fileName) 
-        throws IOException
-    {
-        try (OutputStream outputStream = new FileOutputStream(fileName))
-        {
-            writeBinary(gltfAsset, outputStream);
-        }
-    }
-    
     /**
      * Write the given {@link GltfAssetV1} as a binary glTF asset to the 
      * given output stream. The caller is responsible for closing the 

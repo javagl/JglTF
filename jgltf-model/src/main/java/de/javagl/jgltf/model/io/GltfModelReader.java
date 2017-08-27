@@ -29,9 +29,7 @@ package de.javagl.jgltf.model.io;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.Objects;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.io.v1.GltfAssetV1;
@@ -79,33 +77,12 @@ public final class GltfModelReader
      */
     public GltfModel read(URI uri) throws IOException
     {
-        try (InputStream inputStream = uri.toURL().openStream())
-        {
-            GltfModel gltfModel = readWithoutReferences(inputStream);
-            URI baseUri = IO.getParent(uri);
-            resolveReferences(gltfModel, baseUri);
-            return gltfModel;
-        }
+        GltfAssetReader gltfAssetReader = new GltfAssetReader();
+        gltfAssetReader.setJsonErrorConsumer(jsonErrorConsumer);
+        GltfAsset gltfAsset = gltfAssetReader.read(uri);
+        return createModel(gltfAsset);
     }
     
-    /**
-     * Resolve all external references of the given {@link GltfModel},
-     * reading the buffer data, image data and possibly shader data,
-     * and storing the resulting data in the model classes.
-     * 
-     * @param gltfModel The {@link GltfModel}
-     * @param baseUri The base URI to resolve references against.
-     */
-    private void resolveReferences(GltfModel gltfModel, URI baseUri)
-    {
-        Objects.requireNonNull(gltfModel, "The gltfModel may not be null");
-        Objects.requireNonNull(baseUri, "The baseUri may not be null");
-        
-        Function<String, InputStream> uriResolver = 
-            UriResolvers.createBaseUriResolver(baseUri);
-        GltfReferenceLoader.loadAll(gltfModel.getReferences(), uriResolver);
-    }
-
     /**
      * Read the {@link GltfModel} from the given URI. In contrast to the 
      * {@link #read(URI)} method, this method will not resolve any 
@@ -130,7 +107,7 @@ public final class GltfModelReader
     /**
      * Read the {@link GltfModel} from the given input stream. In contrast
      * to the {@link #read(URI)} method, this method will not resolve any 
-     * references that are contained in the {@link GltfModel}. <br>
+     * references that are contained in the {@link GltfAsset}. <br>
      * <br>
      * This is mainly intended for binary- or embedded glTF assets that do not
      * have external references.
@@ -144,26 +121,32 @@ public final class GltfModelReader
     {
         GltfAssetReader gltfAssetReader = new GltfAssetReader();
         gltfAssetReader.setJsonErrorConsumer(jsonErrorConsumer);
-        gltfAssetReader.read(inputStream);
-        int majorVersion = gltfAssetReader.getMajorVersion();
-        if (majorVersion == 1)
+        GltfAsset gltfAsset = 
+            gltfAssetReader.readWithoutReferences(inputStream);
+        return createModel(gltfAsset);
+    }
+    
+    /**
+     * Creates a {@link GltfModel} instance from the given {@link GltfAsset}
+     * 
+     * @param gltfAsset The {@link GltfAsset}
+     * @return The {@link GltfModel}
+     * @throws IOException If the given asset has an unknown version
+     */
+    private static GltfModel createModel(GltfAsset gltfAsset) throws IOException
+    {
+        if (gltfAsset instanceof GltfAssetV1)
         {
-            GltfAssetV1 gltfAsset = 
-                gltfAssetReader.getAsGltfAssetV1();
-            GltfModelV1 gltfModel = new GltfModelV1(
-                gltfAsset.getGltf(), gltfAsset.getBinaryData());
-            return gltfModel;
+            GltfAssetV1 gltfAssetV1 = (GltfAssetV1)gltfAsset;
+            return new GltfModelV1(gltfAssetV1);
         }
-        if (majorVersion == 2)
+        if (gltfAsset instanceof GltfAssetV2)
         {
-            GltfAssetV2 gltfAsset = 
-                gltfAssetReader.getAsGltfAssetV2();
-            GltfModelV2 gltfModel = new GltfModelV2(
-                gltfAsset.getGltf(), gltfAsset.getBinaryData());
-            return gltfModel;
+            GltfAssetV2 gltfAssetV2 = (GltfAssetV2)gltfAsset;
+            return new GltfModelV2(gltfAssetV2);
         }
         throw new IOException(
-            "Unsupported major version: " + majorVersion);
+            "The glTF asset has an unknown version: " + gltfAsset);
     }
     
 }

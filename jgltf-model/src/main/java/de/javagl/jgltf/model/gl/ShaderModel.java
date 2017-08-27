@@ -34,6 +34,22 @@ import java.nio.ByteBuffer;
 public interface ShaderModel
 {
     /**
+     * Enumeration of different shader types
+     */
+    public enum ShaderType 
+    {
+        /**
+         * The vertex shader type
+         */
+        VERTEX_SHADER,
+        
+        /**
+         * The fragment shader type
+         */
+        FRAGMENT_SHADER
+    }
+    
+    /**
      * Returns the URI of the shader data
      * 
      * @return The URI
@@ -41,28 +57,11 @@ public interface ShaderModel
     String getUri();
 
     /**
-     * Set the shader data. This method is usually not supposed to be called
-     * by clients. <br>
-     * <br>
-     * This method will store a reference to the given buffer. So the ownership 
-     * of the given buffer data will go to this instance. The given buffer 
-     * should have its position and limit represent the actual intended 
-     * shader data. It may not be modified after being passed to this method. 
-     * 
-     * @param shaderData The shader data
-     */
-    void setShaderData(ByteBuffer shaderData);
-    
-    /**
      * Returns the actual shader data. This will return a slice of the
      * buffer that is stored internally. Thus, changes to the contents
      * of this buffer will affect this model, but modifications of the 
      * position and limit of the returned buffer will not affect this 
      * model.<br>
-     * <br>
-     * This method may only be called after the buffer data has been set
-     * with {@link #setShaderData(ByteBuffer)}, which is usually done 
-     * internally, when the model is constructed.
      * 
      * @return The shader data
      */
@@ -76,5 +75,12 @@ public interface ShaderModel
      * @return The shader source code
      */
     String getShaderSource();
+    
+    /**
+     * Returns the {@link ShaderType} of this shader
+     * 
+     * @return The {@link ShaderType}
+     */
+    ShaderType getShaderType();
     
 }

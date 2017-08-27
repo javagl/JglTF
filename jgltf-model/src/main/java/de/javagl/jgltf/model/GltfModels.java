@@ -26,35 +26,47 @@
  */
 package de.javagl.jgltf.model;
 
-import java.nio.ByteBuffer;
+import de.javagl.jgltf.model.io.GltfAsset;
+import de.javagl.jgltf.model.io.v1.GltfAssetV1;
+import de.javagl.jgltf.model.io.v2.GltfAssetV2;
+import de.javagl.jgltf.model.v1.GltfModelV1;
+import de.javagl.jgltf.model.v2.GltfModelV2;
 
 /**
- * Interface for a buffer of a glTF asset
+ * Methods to create {@link GltfModel} instances from a {@link GltfAsset}
  */
-public interface BufferModel
+public class GltfModels
 {
     /**
-     * Returns the URI of the buffer data
+     * Creates a {@link GltfModel} instance from the given {@link GltfAsset}
      * 
-     * @return The URI
+     * @param gltfAsset The {@link GltfAsset}
+     * @return The {@link GltfModel}
+     * @throws IllegalArgumentException If the given asset has an 
+     * unknown version
      */
-    String getUri();
+    public static GltfModel create(GltfAsset gltfAsset)
+    {
+        if (gltfAsset instanceof GltfAssetV1)
+        {
+            GltfAssetV1 gltfAssetV1 = (GltfAssetV1)gltfAsset;
+            return new GltfModelV1(gltfAssetV1);
+        }
+        if (gltfAsset instanceof GltfAssetV2)
+        {
+            GltfAssetV2 gltfAssetV2 = (GltfAssetV2)gltfAsset;
+            return new GltfModelV2(gltfAssetV2);
+        }
+        throw new IllegalArgumentException(
+            "The glTF asset has an unknown version: " + gltfAsset);
+    }
+    
     
     /**
-     * Returns the length, in bytes, of the {@link #getBufferData() buffer data}
-     * 
-     * @return The buffer length, in bytes
+     * Private constructor to prevent instantiation
      */
-    int getByteLength();
-    
-    /**
-     * Returns the actual buffer data. This will return a slice of the buffer 
-     * that is stored internally. Thus, changes to the contents of this buffer 
-     * will affect this model, but modifications of the position and limit of 
-     * the returned buffer will not affect this model.<br>
-     * 
-     * @return The buffer data
-     */
-    ByteBuffer getBufferData();
-    
+    private GltfModels()
+    {
+        // Private constructor to prevent instantiation
+    }
 }

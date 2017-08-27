@@ -30,7 +30,7 @@ import de.javagl.jgltf.impl.v1.Buffer;
 
 /**
  * An enumeration of strategies for the creation of {@link Buffer}
- * instances
+ * instances when converting an OBJ file into a glTF asset.
  */
 public enum BufferStrategy
 {

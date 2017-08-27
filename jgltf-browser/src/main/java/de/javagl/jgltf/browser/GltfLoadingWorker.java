@@ -43,6 +43,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import de.javagl.jgltf.model.GltfModel;
+import de.javagl.jgltf.model.GltfModels;
+import de.javagl.jgltf.model.io.GltfAsset;
 import de.javagl.jgltf.model.io.IO;
 import de.javagl.swing.tasks.ProgressListener;
 import de.javagl.swing.tasks.SwingTask;
@@ -50,11 +52,11 @@ import de.javagl.swing.tasks.SwingTaskExecutors;
 import de.javagl.swing.tasks.SwingTaskViews;
 
 /**
- * The worker class for loading a {@link GltfModel} from a URI. This is a 
+ * The worker class for loading a {@link GltfAsset} from a URI. This is a 
  * swing task that performs the loading in a background thread, while 
  * showing a modal dialog with progress information. 
  */
-final class GltfLoadingWorker extends SwingTask<GltfModel, Object>
+final class GltfLoadingWorker extends SwingTask<GltfAsset, Object>
 {
     /**
      * The logger used in this class
@@ -80,7 +82,7 @@ final class GltfLoadingWorker extends SwingTask<GltfModel, Object>
     /**
      * The reader that will execute the background tasks
      */
-    private final GltfModelReaderThreaded gltfModelReaderThreaded;
+    private final GltfAssetReaderThreaded gltfAssetReaderThreaded;
 
     /**
      * The {@link GltfLoaderPanel} that will be shown in the modal
@@ -102,9 +104,9 @@ final class GltfLoadingWorker extends SwingTask<GltfModel, Object>
         this.frame = frame;
         this.uri = uri;
 
-        this.gltfModelReaderThreaded = new GltfModelReaderThreaded(-1);
+        this.gltfAssetReaderThreaded = new GltfAssetReaderThreaded(-1);
         this.gltfLoaderPanel = new GltfLoaderPanel(
-            gltfModelReaderThreaded.getObservableExecutorService());
+            gltfAssetReaderThreaded.getObservableExecutorService());
     }
 
     /**
@@ -124,7 +126,7 @@ final class GltfLoadingWorker extends SwingTask<GltfModel, Object>
     }
 
     @Override
-    protected GltfModel doInBackground() throws IOException
+    protected GltfAsset doInBackground() throws IOException
     {
         String message = "Loading glTF from " + IO.extractFileName(uri);
         long contentLength = IO.getContentLength(uri);
@@ -149,15 +151,15 @@ final class GltfLoadingWorker extends SwingTask<GltfModel, Object>
                 setProgress(progress);
             }
         }; 
-        gltfModelReaderThreaded.addProgressListener(progressListener);
-        gltfModelReaderThreaded.setJsonErrorConsumer(jsonError ->
+        gltfAssetReaderThreaded.addProgressListener(progressListener);
+        gltfAssetReaderThreaded.setJsonErrorConsumer(jsonError ->
         {
             String jsonErrorString = 
                 jsonError.getMessage() + ",\n at JSON path: " + 
                     jsonError.getJsonPathString() + "\n";
             gltfLoaderPanel.appendMessage(jsonErrorString);
         });
-        return gltfModelReaderThreaded.readGltfModel(uri);
+        return gltfAssetReaderThreaded.readGltfAsset(uri);
     }
 
     @Override
@@ -165,15 +167,16 @@ final class GltfLoadingWorker extends SwingTask<GltfModel, Object>
     {
         try
         {
-            GltfModel gltfModel = get();
+            GltfAsset gltfAsset = get();
             String fileName = IO.extractFileName(uri);
+            GltfModel gltfModel = GltfModels.create(gltfAsset);
             owner.createGltfBrowserPanel(fileName, gltfModel);
         } 
         catch (CancellationException e)
         {
             logger.info("Cancelled loading " + uri + 
                 " (" + e.getMessage() + ")");
-            gltfModelReaderThreaded.cancel();
+            gltfAssetReaderThreaded.cancel();
             //e.printStackTrace();
             return;
         }
@@ -181,7 +184,7 @@ final class GltfLoadingWorker extends SwingTask<GltfModel, Object>
         {
             logger.info("Interrupted while loading " + uri + 
                 " (" + e.getMessage() + ")");
-            gltfModelReaderThreaded.cancel();
+            gltfAssetReaderThreaded.cancel();
             Thread.currentThread().interrupt();
         }
         catch (ExecutionException e)

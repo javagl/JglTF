@@ -45,29 +45,41 @@ public class DefaultShaderModel implements ShaderModel
      * The actual raw shader data
      */
     private ByteBuffer shaderData;
+
+    /**
+     * The {@link de.javagl.jgltf.model.gl.ShaderModel.ShaderType}
+     */
+    private ShaderType shaderType;
     
     /**
      * Default constructor 
      * 
      * @param uri The URI
+     * @param shaderType The 
+     * {@link de.javagl.jgltf.model.gl.ShaderModel.ShaderType}
      */
-    public DefaultShaderModel(String uri)
+    public DefaultShaderModel(String uri, ShaderType shaderType)
     {
         this.uri = uri;
+        this.shaderType = shaderType;
     }
     
+    /**
+     * Set the data of this shader
+     * 
+     * @param shaderData The shader data
+     */
+    public void setShaderData(ByteBuffer shaderData)
+    {
+        this.shaderData = shaderData;
+    }
+
     @Override
     public String getUri()
     {
         return uri;
     }
 
-    @Override
-    public void setShaderData(ByteBuffer shaderData)
-    {
-        this.shaderData = shaderData;
-    }
-    
     @Override
     public ByteBuffer getShaderData()
     {
@@ -80,4 +92,9 @@ public class DefaultShaderModel implements ShaderModel
         return Buffers.readAsString(shaderData);
     }
     
+    @Override
+    public ShaderType getShaderType()
+    {
+        return shaderType;
+    }
 }

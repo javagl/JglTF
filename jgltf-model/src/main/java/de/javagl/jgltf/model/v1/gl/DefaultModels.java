@@ -50,6 +50,7 @@ import de.javagl.jgltf.model.gl.TechniqueModel;
 import de.javagl.jgltf.model.gl.TechniqueParametersModel;
 import de.javagl.jgltf.model.gl.TechniqueStatesFunctionsModel;
 import de.javagl.jgltf.model.gl.TechniqueStatesModel;
+import de.javagl.jgltf.model.gl.ShaderModel.ShaderType;
 import de.javagl.jgltf.model.gl.impl.DefaultProgramModel;
 import de.javagl.jgltf.model.gl.impl.DefaultShaderModel;
 import de.javagl.jgltf.model.gl.impl.DefaultTechniqueModel;
@@ -76,12 +77,12 @@ public class DefaultModels
     /**
      * The default vertex {@link ShaderModel}
      */
-    private static final ShaderModel DEFAULT_VERTEX_SHADER_MODEL;
+    private static final DefaultShaderModel DEFAULT_VERTEX_SHADER_MODEL;
     
     /**
      * The default fragment {@link ShaderModel}
      */
-    private static final ShaderModel DEFAULT_FRAGMENT_SHADER_MODEL;
+    private static final DefaultShaderModel DEFAULT_FRAGMENT_SHADER_MODEL;
     
     /**
      * The default {@link ProgramModel}
@@ -103,12 +104,14 @@ public class DefaultModels
         // Create models for the default vertex- and fragment shader
         Shader vertexShader = GltfDefaults.getDefaultVertexShader();
         DEFAULT_VERTEX_SHADER_MODEL = 
-            new DefaultShaderModel(vertexShader.getUri());
+            new DefaultShaderModel(vertexShader.getUri(),
+                ShaderType.VERTEX_SHADER);
         initShaderData(DEFAULT_VERTEX_SHADER_MODEL);
         
         Shader fragmentShader = GltfDefaults.getDefaultFragmentShader();
         DEFAULT_FRAGMENT_SHADER_MODEL = 
-            new DefaultShaderModel(fragmentShader.getUri());
+            new DefaultShaderModel(fragmentShader.getUri(),
+                ShaderType.FRAGMENT_SHADER);
         initShaderData(DEFAULT_FRAGMENT_SHADER_MODEL);
         
         // Create a model for the default program
@@ -159,12 +162,12 @@ public class DefaultModels
     }
     
     /**
-     * Initialize the {@link ShaderModel#setShaderData(ByteBuffer) shader data}
-     * for the given {@link ShaderModel}
+     * Initialize the {@link DefaultShaderModel#setShaderData(ByteBuffer) 
+     * shader data} for the given {@link ShaderModel}
      * 
      * @param shaderModel The {@link ShaderModel}
      */
-    private static void initShaderData(ShaderModel shaderModel)
+    private static void initShaderData(DefaultShaderModel shaderModel)
     {
         try
         {

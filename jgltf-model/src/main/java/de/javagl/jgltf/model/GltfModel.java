@@ -34,14 +34,6 @@ import java.util.List;
 public interface GltfModel
 {
     /**
-     * Return a list of all {@link GltfReference} objects that refer to
-     * external resources for this model
-     * 
-     * @return The {@link GltfReference} objects
-     */
-    List<GltfReference> getReferences();
-    
-    /**
      * Returns an unmodifiable view on the list of {@link AccessorModel} 
      * instances that have been created for the glTF.
      * 
@@ -120,16 +112,5 @@ public interface GltfModel
      * @return The {@link TextureModel} instances
      */
     List<TextureModel> getTextureModels();
-    
-    /**
-     * Returns the raw glTF object. Depending on the version of the asset
-     * that this model was created from, this may be a 
-     * {@link de.javagl.jgltf.impl.v1.GlTF version 1.0 glTF} or a
-     * {@link de.javagl.jgltf.impl.v1.GlTF version 2.0 glTF}.<br>
-     * <br>
-     * This method should usually not be called by clients.
-     * 
-     * @return The glTF object
-     */
-    Object getGltf();
 }
+

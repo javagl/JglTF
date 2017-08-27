@@ -39,7 +39,7 @@ public final class DefaultBufferModel implements BufferModel
     /**
      * The URI of the buffer data
      */
-    private final String uri;
+    private String uri;
     
     /**
      * The actual data of the buffer
@@ -48,12 +48,30 @@ public final class DefaultBufferModel implements BufferModel
     
     /**
      * Creates a new instance
-     * 
+     */
+    public DefaultBufferModel()
+    {
+        // Default constructor
+    }
+    
+    /**
+     * Set the URI for the buffer data
+     *  
      * @param uri The URI of the buffer data
      */
-    public DefaultBufferModel(String uri)
+    public void setUri(String uri)
     {
         this.uri = uri;
+    }
+
+    /**
+     * Set the data of this buffer
+     * 
+     * @param bufferData The buffer data
+     */
+    public void setBufferData(ByteBuffer bufferData)
+    {
+        this.bufferData = bufferData;
     }
     
     @Override
@@ -74,9 +92,4 @@ public final class DefaultBufferModel implements BufferModel
         return Buffers.createSlice(bufferData);
     }
     
-    @Override
-    public void setBufferData(ByteBuffer bufferData)
-    {
-        this.bufferData = bufferData;
-    }
 }
