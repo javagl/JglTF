@@ -135,7 +135,7 @@ public class MimeTypes
         try
         {
             imageReader = ImageReaders.findImageReader(imageData);
-            return "image/" + imageReader.getFormatName();
+            return "image/" + imageReader.getFormatName().toLowerCase();
         }
         finally
         {
