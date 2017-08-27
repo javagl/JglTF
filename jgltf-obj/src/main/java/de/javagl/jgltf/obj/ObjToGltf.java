@@ -35,8 +35,10 @@ import java.util.Locale;
 import java.util.logging.Logger;
 
 import de.javagl.jgltf.model.GltfModel;
+import de.javagl.jgltf.model.GltfModels;
+import de.javagl.jgltf.model.io.GltfAsset;
 import de.javagl.jgltf.model.io.GltfModelWriter;
-import de.javagl.jgltf.obj.v1.ObjGltfModelCreatorV1;
+import de.javagl.jgltf.obj.v1.ObjGltfAssetCreatorV1;
 
 /**
  * A class for converting OBJ files to glTF
@@ -138,8 +140,10 @@ public class ObjToGltf
         long beforeNs = System.nanoTime();
         
         URI objUri = Paths.get(inputFileName).toUri();
-        GltfModel gltfModel = 
-            new ObjGltfModelCreatorV1(bufferStrategy).create(objUri);
+        ObjGltfAssetCreatorV1 gltfAssetCreator = 
+            new ObjGltfAssetCreatorV1(bufferStrategy);
+        GltfAsset gltfAsset = gltfAssetCreator.create(objUri);
+        GltfModel gltfModel = GltfModels.create(gltfAsset);
 
         GltfModelWriter gltfModelWriter = new GltfModelWriter();
         File outputFile = new File(outputFileName);
