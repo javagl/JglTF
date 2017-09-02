@@ -35,7 +35,6 @@ import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 import de.javagl.jgltf.model.AccessorModel;
-import de.javagl.jgltf.model.Accessors;
 import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.CameraModel;
 import de.javagl.jgltf.model.GltfConstants;
@@ -690,12 +689,7 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
                 bufferViewModel.getTarget(), GltfConstants.GL_ARRAY_BUFFER);
             int size = accessorModel.getElementType().getNumComponents();
             int type = accessorModel.getComponentType();
-            Integer stride = bufferViewModel.getByteStride();
-            if (stride == null)
-            {
-                stride = size * 
-                    Accessors.getNumBytesForAccessorComponentType(type);
-            }
+            int stride = accessorModel.getByteStride();
             int offset = accessorModel.getByteOffset();
             
             glContext.createVertexAttribute(glVertexArray, 
