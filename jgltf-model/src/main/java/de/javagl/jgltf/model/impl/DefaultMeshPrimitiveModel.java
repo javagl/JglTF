@@ -121,7 +121,7 @@ public final class DefaultMeshPrimitiveModel implements MeshPrimitiveModel
      * 
      * @param target The target
      */
-    public void addTarget(Map<String,AccessorModel> target)
+    public void addTarget(Map<String, AccessorModel> target)
     {
         Objects.requireNonNull(target, "The target may not be null");
         this.targets.add(target);

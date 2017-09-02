@@ -56,7 +56,7 @@ public final class DefaultAccessorModel implements AccessorModel
     /**
      * The {@link ElementType} of this accessor
      */
-    private ElementType elementType;
+    private final ElementType elementType;
     
     /**
      * The number of elements

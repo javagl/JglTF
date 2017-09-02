@@ -42,7 +42,7 @@ import de.javagl.jgltf.model.v2.GltfModelV2;
  * for glTF 2.0 assets. Clients should not use this class directly,
  * but only the {@link GltfModelWriter}.
  */
-public class GltfModelWriterV2
+public final class GltfModelWriterV2
 {
     /**
      * Default constructor

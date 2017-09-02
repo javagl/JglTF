@@ -53,12 +53,12 @@ import de.javagl.jgltf.model.v1.GltfModelV1;
  * {@link GltfModelV1}.<br>
  * <br>
  */
-public class BinaryAssetCreatorV1
+final class BinaryAssetCreatorV1
 {
     /**
      * Creates a new asset creator
      */
-    public BinaryAssetCreatorV1()
+    BinaryAssetCreatorV1()
     {
         // Default constructor
     }
@@ -73,7 +73,7 @@ public class BinaryAssetCreatorV1
      * @param gltfModel The {@link GltfModelV1}
      * @return The {@link GltfAssetV1}
      */
-    public GltfAssetV1 create(GltfModelV1 gltfModel)
+    GltfAssetV1 create(GltfModelV1 gltfModel)
     {
         GlTF inputGltf = gltfModel.getGltf();
         GlTF outputGltf = GltfUtilsV1.copy(inputGltf);

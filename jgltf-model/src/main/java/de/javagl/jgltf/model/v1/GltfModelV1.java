@@ -346,21 +346,6 @@ public final class GltfModelV1 implements GltfModel
     }
     
     /**
-     * Returns the {@link NodeModel} for the {@link Node} with the given ID.
-     * If the given ID is not valid, then a warning will be printed and 
-     * <code>null</code> will be returned.<br>
-     * <br>
-     * This is only used for supporting the legacy technique-based rendering.
-     *  
-     * @param nodeId The {@link Node} ID
-     * @return The {@link NodeModel}
-     */
-    public NodeModel getNodeModelById(String nodeId)
-    {
-        return get("nodes", nodeId, nodeModels);
-    }
-    
-    /**
      * Returns the {@link TextureModel} for the {@link Texture} with the given
      * ID. If the given ID is not valid, then a warning will be printed and 
      * <code>null</code> will be returned.<br>

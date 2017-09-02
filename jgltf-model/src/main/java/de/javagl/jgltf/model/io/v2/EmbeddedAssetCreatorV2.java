@@ -49,12 +49,12 @@ import de.javagl.jgltf.model.v2.GltfModelV2;
  * In the "embedded" data representation, the data of elements like 
  * {@link Buffer} or {@link Image} objects is stored in data URIs.
  */
-public class EmbeddedAssetCreatorV2
+final class EmbeddedAssetCreatorV2
 {
     /**
      * Creates a new asset creator
      */
-    public EmbeddedAssetCreatorV2()
+    EmbeddedAssetCreatorV2()
     {
         // Default constructor
     }
@@ -73,7 +73,7 @@ public class EmbeddedAssetCreatorV2
      * @param gltfModel The input {@link GltfModelV2}
      * @return The embedded {@link GltfAssetV2}
      */
-    public GltfAssetV2 create(GltfModelV2 gltfModel)
+    GltfAssetV2 create(GltfModelV2 gltfModel)
     {
         GlTF inputGltf = gltfModel.getGltf();
         GlTF outputGltf = GltfUtilsV2.copy(inputGltf);

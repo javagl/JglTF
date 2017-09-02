@@ -38,7 +38,7 @@ import de.javagl.jgltf.model.animation.Animation;
 import de.javagl.jgltf.model.animation.AnimationListener;
 import de.javagl.jgltf.model.animation.AnimationManager;
 import de.javagl.jgltf.model.animation.AnimationManager.AnimationPolicy;
-import de.javagl.jgltf.model.animation.Interpolators.InterpolatorType;
+import de.javagl.jgltf.model.animation.InterpolatorType;
 
 /**
  * Utility methods to create {@link AnimationManager} instances that

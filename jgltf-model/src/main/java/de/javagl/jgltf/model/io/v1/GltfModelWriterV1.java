@@ -43,7 +43,7 @@ import de.javagl.jgltf.model.v1.GltfModelV1;
  * for glTF 1.0 assets. Clients should not use this class directly,
  * but only the {@link GltfModelWriter}.
  */
-public class GltfModelWriterV1
+public final class GltfModelWriterV1
 {
     /**
      * Default constructor

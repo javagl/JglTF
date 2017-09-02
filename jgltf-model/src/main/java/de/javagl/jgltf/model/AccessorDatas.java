@@ -213,7 +213,7 @@ public class AccessorDatas
      * @param type The type constant
      * @return Whether the type is an unsigned type
      */
-    public static boolean isUnsignedType(int type)
+    static boolean isUnsignedType(int type)
     {
         return 
             type == GltfConstants.GL_UNSIGNED_BYTE ||
@@ -231,7 +231,7 @@ public class AccessorDatas
      * @throws IllegalArgumentException If the given type is not 
      * <code>GL_BYTE</code> or <code>GL_UNSIGNED_BYTE</code>
      */
-    public static void validateByteType(int type)
+    static void validateByteType(int type)
     {
         if (!isByteType(type))
         {
@@ -250,7 +250,7 @@ public class AccessorDatas
      * @throws IllegalArgumentException If the given type is not 
      * <code>GL_SHORT</code> or <code>GL_UNSIGNED_BYTE</code>
      */
-    public static void validateShortType(int type)
+    static void validateShortType(int type)
     {
         if (!isShortType(type))
         {
@@ -269,7 +269,7 @@ public class AccessorDatas
      * @throws IllegalArgumentException If the given type is not 
      * <code>GL_INT</code> or <code>GL_UNSIGNED_INT</code>
      */
-    public static void validateIntType(int type)
+    static void validateIntType(int type)
     {
         if (!isIntType(type))
         {
@@ -287,7 +287,7 @@ public class AccessorDatas
      * @throws IllegalArgumentException If the given type is not 
      * <code>GL_FLOAT</code>
      */
-    public static void validateFloatType(int type)
+    static void validateFloatType(int type)
     {
         if (!isFloatType(type))
         {
@@ -308,7 +308,7 @@ public class AccessorDatas
      * @return Whether the {@link AccessorModel} has <code>byte</code> 
      * components
      */
-    public static boolean hasByteComponents(AccessorModel accessorModel)
+    static boolean hasByteComponents(AccessorModel accessorModel)
     {
         return isByteType(accessorModel.getComponentType());
     }
@@ -324,7 +324,7 @@ public class AccessorDatas
      * {@link AccessorModel#getComponentType() component type} type that is 
      * not <code>GL_BYTE</code> or <code>GL_UNSIGNED_BYTE</code>
      */
-    public static void validateByteComponents(AccessorModel accessorModel)
+    static void validateByteComponents(AccessorModel accessorModel)
     {
         validateByteType(accessorModel.getComponentType());
     }
@@ -338,7 +338,7 @@ public class AccessorDatas
      * {@link AccessorModel#getComponentType() component type} of the given
      * accessor is not <code>GL_BYTE</code> or <code>GL_UNSIGNED_BYTE</code>
      */
-    public static AccessorByteData createByte(AccessorModel accessorModel)
+    static AccessorByteData createByte(AccessorModel accessorModel)
     {
         BufferViewModel bufferViewModel = accessorModel.getBufferViewModel();
         return createByte(accessorModel, bufferViewModel.getBufferViewData());
@@ -357,7 +357,7 @@ public class AccessorDatas
      * accessorModel is not <code>GL_BYTE</code> or 
      * <code>GL_UNSIGNED_BYTE</code>
      */
-    public static AccessorByteData createByte(
+    private static AccessorByteData createByte(
         AccessorModel accessorModel, ByteBuffer bufferViewByteBuffer)
     {
         return new AccessorByteData(accessorModel.getComponentType(), 
@@ -379,7 +379,7 @@ public class AccessorDatas
      * @return Whether the {@link AccessorModel} has <code>short</code> 
      * components
      */
-    public static boolean hasShortComponents(AccessorModel accessorModel)
+    static boolean hasShortComponents(AccessorModel accessorModel)
     {
         return isShortType(accessorModel.getComponentType());
     }
@@ -395,7 +395,7 @@ public class AccessorDatas
      * {@link AccessorModel#getComponentType() component type} type that is not 
      * <code>GL_SHORT</code> or <code>GL_UNSIGNED_SHORT</code>
      */
-    public static void validateShortComponents(AccessorModel accessorModel)
+    static void validateShortComponents(AccessorModel accessorModel)
     {
         validateShortType(accessorModel.getComponentType());
     }
@@ -410,7 +410,7 @@ public class AccessorDatas
      * accessorModel is not <code>GL_SHORT</code> or 
      * <code>GL_UNSIGNED_SHORT</code> 
      */
-    public static AccessorShortData createShort(AccessorModel accessorModel)
+    static AccessorShortData createShort(AccessorModel accessorModel)
     {
         BufferViewModel bufferViewModel = accessorModel.getBufferViewModel();
         return createShort(accessorModel, bufferViewModel.getBufferViewData());
@@ -429,7 +429,7 @@ public class AccessorDatas
      * accessorModel is not <code>GL_SHORT</code> or 
      * <code>GL_UNSIGNED_SHORT</code>
      */
-    public static AccessorShortData createShort(
+    private static AccessorShortData createShort(
         AccessorModel accessorModel, ByteBuffer bufferViewByteBuffer)
     {
         return new AccessorShortData(accessorModel.getComponentType(), 
@@ -450,7 +450,7 @@ public class AccessorDatas
      * @param accessorModel The {@link AccessorModel}
      * @return Whether the {@link AccessorModel} has <code>int</code> components
      */
-    public static boolean hasIntComponents(AccessorModel accessorModel)
+    static boolean hasIntComponents(AccessorModel accessorModel)
     {
         return isIntType(accessorModel.getComponentType());
     }
@@ -466,7 +466,7 @@ public class AccessorDatas
      * {@link AccessorModel#getComponentType() component type} type that is not 
      * <code>GL_INT</code> or <code>GL_UNSIGNED_INT</code>
      */
-    public static void validateIntComponents(AccessorModel accessorModel)
+    static void validateIntComponents(AccessorModel accessorModel)
     {
         validateIntType(accessorModel.getComponentType());
     }
@@ -480,7 +480,7 @@ public class AccessorDatas
      * {@link AccessorModel#getComponentType() component type} of the given
      * accessorModel is not <code>GL_INT</code> or <code>GL_UNSIGNED_INT</code> 
      */
-    public static AccessorIntData createInt(AccessorModel accessorModel)
+    static AccessorIntData createInt(AccessorModel accessorModel)
     {
         BufferViewModel bufferViewModel = accessorModel.getBufferViewModel();
         return createInt(accessorModel, bufferViewModel.getBufferViewData());
@@ -498,7 +498,7 @@ public class AccessorDatas
      * {@link AccessorModel#getComponentType() component type} of the given
      * accessorModel is not <code>GL_INT</code> or <code>GL_UNSIGNED_INT</code>
      */
-    public static AccessorIntData createInt(
+    private static AccessorIntData createInt(
         AccessorModel accessorModel, ByteBuffer bufferViewByteBuffer)
     {
         return new AccessorIntData(accessorModel.getComponentType(), 
@@ -518,7 +518,7 @@ public class AccessorDatas
      * @return Whether the {@link AccessorModel} has <code>float</code> 
      * components
      */
-    public static boolean hasFloatComponents(AccessorModel accessorModel)
+    static boolean hasFloatComponents(AccessorModel accessorModel)
     {
         return isFloatType(accessorModel.getComponentType());
     }
@@ -534,7 +534,7 @@ public class AccessorDatas
      * {@link AccessorModel#getComponentType() component type} type that is not 
      * <code>GL_FLOAT</code>
      */
-    public static void validateFloatComponents(AccessorModel accessorModel)
+    static void validateFloatComponents(AccessorModel accessorModel)
     {
         validateFloatType(accessorModel.getComponentType());
     }
@@ -564,7 +564,7 @@ public class AccessorDatas
      * @throws NullPointerException If any argument is <code>null</code>
      * @throws IllegalArgumentException If the 
      */
-    public static AccessorFloatData createFloat(
+    private static AccessorFloatData createFloat(
         AccessorModel accessorModel, ByteBuffer bufferViewByteBuffer)
     {
         return new AccessorFloatData(accessorModel.getComponentType(), 
@@ -586,7 +586,7 @@ public class AccessorDatas
      * @throws IllegalArgumentException If the given byte buffer does not
      * have a sufficient capacity
      */
-    public static void validateCapacity(int byteOffset, int numElements,
+    static void validateCapacity(int byteOffset, int numElements,
         int byteStridePerElement, int bufferCapacity)
     {
         int expectedCapacity = numElements * byteStridePerElement;

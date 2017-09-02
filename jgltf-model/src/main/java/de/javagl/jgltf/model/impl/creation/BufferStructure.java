@@ -174,7 +174,7 @@ public final class BufferStructure
      * @param bufferModel The {@link BufferModel}
      * @param index The index
      */
-    void addPaddingByteIndex(BufferModel bufferModel, int index)
+    private void addPaddingByteIndex(BufferModel bufferModel, int index)
     {
         this.paddingByteIndices.computeIfAbsent(bufferModel, 
             bm -> new LinkedHashSet<Integer>()).add(index);

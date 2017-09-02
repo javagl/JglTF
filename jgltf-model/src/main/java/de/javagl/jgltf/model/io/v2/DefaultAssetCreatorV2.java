@@ -54,7 +54,7 @@ import de.javagl.jgltf.model.v2.GltfModelV2;
  * objects that used the binary glTF extension or data URIs will be 
  * converted to refer to their data using URIs.
  */
-public class DefaultAssetCreatorV2
+final class DefaultAssetCreatorV2
 {
     /**
      * The {@link GltfAssetV2} that is currently being created
@@ -74,7 +74,7 @@ public class DefaultAssetCreatorV2
     /**
      * Creates a new asset creator
      */
-    public DefaultAssetCreatorV2()
+    DefaultAssetCreatorV2()
     {
         // Default constructor
     }
@@ -85,7 +85,7 @@ public class DefaultAssetCreatorV2
      * @param gltfModel The input {@link GltfModelV2}
      * @return The default {@link GltfAssetV2}
      */
-    public GltfAssetV2 create(GltfModelV2 gltfModel)
+    GltfAssetV2 create(GltfModelV2 gltfModel)
     {
         GlTF inputGltf = gltfModel.getGltf();
         GlTF outputGltf = GltfUtilsV2.copy(inputGltf);

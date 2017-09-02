@@ -52,12 +52,12 @@ import de.javagl.jgltf.model.v1.GltfModelV1;
  * {@link Buffer}, {@link Image} or {@link Shader} objects is stored 
  * in data URIs.
  */
-public class EmbeddedAssetCreatorV1
+final class EmbeddedAssetCreatorV1
 {
     /**
      * Creates a new asset creator
      */
-    public EmbeddedAssetCreatorV1()
+    EmbeddedAssetCreatorV1()
     {
         // Default constructor
     }
@@ -76,7 +76,7 @@ public class EmbeddedAssetCreatorV1
      * @param gltfModel The input {@link GltfModelV1}
      * @return The embedded {@link GltfAssetV1}
      */
-    public GltfAssetV1 create(GltfModelV1 gltfModel)
+    GltfAssetV1 create(GltfModelV1 gltfModel)
     {
         GlTF inputGltf = gltfModel.getGltf();
         GlTF outputGltf = GltfUtilsV1.copy(inputGltf);

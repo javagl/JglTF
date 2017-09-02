@@ -30,8 +30,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import de.javagl.jgltf.model.animation.Interpolators.InterpolatorType;
-
 /**
  * A class representing a generic animation. The animation consists of
  * a mapping between time key frames and values, and allows 

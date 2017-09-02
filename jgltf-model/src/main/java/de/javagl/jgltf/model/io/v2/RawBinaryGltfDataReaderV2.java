@@ -10,7 +10,7 @@ import de.javagl.jgltf.model.io.RawGltfData;
 
 /**
  * A class for reading a {@link RawGltfData} from a buffer that contains
- * binary glTF 2.0 data 
+ * binary glTF 2.0 data.
  */
 public class RawBinaryGltfDataReaderV2
 {

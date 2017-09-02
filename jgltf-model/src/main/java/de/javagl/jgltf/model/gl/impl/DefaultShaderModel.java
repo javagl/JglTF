@@ -49,7 +49,7 @@ public class DefaultShaderModel implements ShaderModel
     /**
      * The {@link de.javagl.jgltf.model.gl.ShaderModel.ShaderType}
      */
-    private ShaderType shaderType;
+    private final ShaderType shaderType;
     
     /**
      * Default constructor 

@@ -51,7 +51,7 @@ import de.javagl.jgltf.model.v2.GltfModelV2;
  * {@link GltfModelV2}.<br>
  * <br>
  */
-public class BinaryAssetCreatorV2
+final class BinaryAssetCreatorV2
 {
     /**
      * The logger used in this class
@@ -62,7 +62,7 @@ public class BinaryAssetCreatorV2
     /**
      * Creates a new asset creator
      */
-    public BinaryAssetCreatorV2()
+    BinaryAssetCreatorV2()
     {
         // Default constructor
     }
@@ -76,7 +76,7 @@ public class BinaryAssetCreatorV2
      * @param gltfModel The {@link GltfModelV2}
      * @return The {@link GltfAssetV2}
      */
-    public GltfAssetV2 create(GltfModelV2 gltfModel)
+    GltfAssetV2 create(GltfModelV2 gltfModel)
     {
         GlTF inputGltf = gltfModel.getGltf();
         GlTF outputGltf = GltfUtilsV2.copy(inputGltf);

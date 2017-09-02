@@ -34,17 +34,11 @@ import java.util.logging.Logger;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import de.javagl.jgltf.model.io.v1.GltfReaderV1;
-import de.javagl.jgltf.model.io.v2.GltfReaderV2;
-
 /**
  * A class for reading the JSON for a glTF asset in a version-agnostic form.
  * It a allows determining the version of the glTF and returning it as 
  * a properly typed object - that is, as a {@link de.javagl.jgltf.impl.v1.GlTF}
  * or a {@link de.javagl.jgltf.impl.v2.GlTF}.<br>
- * <br>
- * If the type of the input data is known, {@link GltfReaderV1} or
- * {@link GltfReaderV2} may be used instead.
  */
 final class GltfReader
 {

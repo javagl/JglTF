@@ -47,7 +47,7 @@ import de.javagl.jgltf.model.io.GltfWriter;
  * {@link GltfAssetWriter}, for glTF 1.0 assets. Clients should not use this 
  * class directly, but only the {@link GltfAssetWriter}.
  */
-public class GltfAssetWriterV2
+public final class GltfAssetWriterV2
 {
     /**
      * The magic binary glTF header.
