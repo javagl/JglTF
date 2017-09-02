@@ -48,7 +48,7 @@ import de.javagl.jgltf.model.io.v2.RawBinaryGltfDataReaderV2;
  * the JSON data and the binary data, and which may then be processed
  * further.
  */
-public class RawGltfDataReader
+class RawGltfDataReader
 {
     /**
      * The magic binary glTF header.

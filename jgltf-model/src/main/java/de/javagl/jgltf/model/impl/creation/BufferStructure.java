@@ -26,7 +26,6 @@
  */
 package de.javagl.jgltf.model.impl.creation;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -52,12 +51,6 @@ import de.javagl.jgltf.model.BufferViewModel;
  */
 public final class BufferStructure
 {
-    /**
-     * The mapping from {@link AccessorModel} instances to the byte buffers
-     * containing their data
-     */
-    private final Map<AccessorModel, ByteBuffer> accessorByteBuffers;
-    
     /**
      * The mapping from {@link AccessorModel} instances to their IDs
      */
@@ -109,8 +102,6 @@ public final class BufferStructure
     BufferStructure()
     {
         this.accessorIds = new LinkedHashMap<AccessorModel, String>();
-        this.accessorByteBuffers = 
-            new LinkedHashMap<AccessorModel, ByteBuffer>();
 
         this.bufferViewModels = new ArrayList<BufferViewModel>();
         this.bufferViewIds = 
@@ -133,13 +124,10 @@ public final class BufferStructure
      * 
      * @param accessorModel The {@link AccessorModel}
      * @param accessorId The ID
-     * @param accessorByteBuffer The byte buffer
      */
-    void addAccessorModel(AccessorModel accessorModel, 
-        String accessorId, ByteBuffer accessorByteBuffer)
+    void addAccessorModel(AccessorModel accessorModel, String accessorId)
     {
         this.accessorIds.put(accessorModel, accessorId);
-        this.accessorByteBuffers.put(accessorModel, accessorByteBuffer);
     }
     
     /**
@@ -190,6 +178,23 @@ public final class BufferStructure
     {
         this.paddingByteIndices.computeIfAbsent(bufferModel, 
             bm -> new LinkedHashSet<Integer>()).add(index);
+    }
+    
+    /**
+     * Add the specified indices as a padding byte index for the given 
+     * {@link BufferModel}
+     * 
+     * @param bufferModel The {@link BufferModel}
+     * @param startIndex The start index
+     * @param count The number of bytes
+     */
+    void addPaddingByteIndices(
+        BufferModel bufferModel, int startIndex, int count)
+    {
+        for (int index = startIndex; index < startIndex + count; index++)
+        {
+            addPaddingByteIndex(bufferModel, index);
+        }
     }
     
     /**
@@ -284,7 +289,7 @@ public final class BufferStructure
     public List<AccessorModel> getAccessorModels()
     {
         List<AccessorModel> allAccessorModels = 
-            new ArrayList<AccessorModel>(accessorByteBuffers.keySet());
+            new ArrayList<AccessorModel>(accessorIds.keySet());
         return Collections.unmodifiableList(allAccessorModels);
     }
     
@@ -298,18 +303,6 @@ public final class BufferStructure
     public String getAccessorId(AccessorModel accessorModel) 
     {
         return accessorIds.get(accessorModel);
-    }
-
-    /**
-     * Returns a direct reference to the byte buffer that was given for
-     * the given {@link AccessorModel}
-     * 
-     * @param accessorModel The {@link AccessorModel}
-     * @return The byte buffer
-     */
-    public ByteBuffer getAccessorByteBuffer(AccessorModel accessorModel)
-    {
-        return accessorByteBuffers.get(accessorModel);
     }
 
     /**

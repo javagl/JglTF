@@ -66,7 +66,7 @@ public final class DefaultAccessorModel implements AccessorModel
     /**
      * The stride between the start of one element and the next
      */
-    private final int byteStride;
+    private int byteStride;
     
     /**
      * The {@link AccessorData}
@@ -89,18 +89,15 @@ public final class DefaultAccessorModel implements AccessorModel
      * @param componentType The component type GL constant
      * @param count The number of elements
      * @param elementType The element type
-     * @param byteStride The byte stride
      */
     public DefaultAccessorModel(
         int componentType,
         int count, 
-        ElementType elementType, 
-        int byteStride)
+        ElementType elementType)
     {
         this.componentType = componentType;
         this.count = count;
         this.elementType = elementType;
-        this.byteStride = byteStride;
     }
     
     /**
@@ -121,6 +118,17 @@ public final class DefaultAccessorModel implements AccessorModel
     public void setByteOffset(int byteOffset)
     {
         this.byteOffset = byteOffset;
+    }
+    
+    /**
+     * Set the byte stride, indicating the number of bytes between the start
+     * of one element and the start of the next element
+     * 
+     * @param byteStride The byte stride
+     */
+    public void setByteStride(int byteStride)
+    {
+        this.byteStride = byteStride;
     }
 
     /**

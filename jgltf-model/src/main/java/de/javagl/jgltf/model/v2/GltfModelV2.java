@@ -289,8 +289,9 @@ public final class GltfModelV2 implements GltfModel
         Integer byteStride = elementType.getNumComponents() *
             Accessors.getNumBytesForAccessorComponentType(componentType);
         DefaultAccessorModel accessorModel =  new DefaultAccessorModel(
-            componentType, count, elementType, byteStride);
+            componentType, count, elementType);
         accessorModel.setByteOffset(byteOffset);
+        accessorModel.setByteStride(byteStride);
         return accessorModel;
     }
 
@@ -346,18 +347,14 @@ public final class GltfModelV2 implements GltfModel
         BufferView bufferView)
     {
         int byteOffset = bufferView.getByteOffset();
-        Integer byteLength = bufferView.getByteLength();
-        if (byteLength == null)
-        {
-            logger.warning("No byteLength found in BufferView");
-            byteLength = 0;
-        }
+        int byteLength = bufferView.getByteLength();
         Integer byteStride = bufferView.getByteStride();
         Integer target = bufferView.getTarget();
         DefaultBufferViewModel bufferViewModel = 
-            new DefaultBufferViewModel(byteStride, target);
+            new DefaultBufferViewModel(target);
         bufferViewModel.setByteOffset(byteOffset);
         bufferViewModel.setByteLength(byteLength);
+        bufferViewModel.setByteStride(byteStride);
         return bufferViewModel;
     }
     
@@ -612,7 +609,7 @@ public final class GltfModelV2 implements GltfModel
         bufferModel.setBufferData(bufferData);
 
         DefaultBufferViewModel bufferViewModel = 
-            new DefaultBufferViewModel(null, null);
+            new DefaultBufferViewModel(null);
         bufferViewModel.setByteOffset(0);
         bufferViewModel.setByteLength(bufferData.capacity());
         bufferViewModel.setBufferModel(bufferModel);

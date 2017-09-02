@@ -288,6 +288,9 @@ public final class GltfModelV1 implements GltfModel
         initBufferViewModels();
         
         initAccessorModels();
+        
+        assignBufferViewByteStrides();
+        
         initAnimationModels();
         initImageModels();
         initMaterialModels();
@@ -433,8 +436,9 @@ public final class GltfModelV1 implements GltfModel
                     componentType);
         }
         DefaultAccessorModel accessorModel = new DefaultAccessorModel(
-            componentType, count, elementType, byteStride);
+            componentType, count, elementType);
         accessorModel.setByteOffset(byteOffset);
+        accessorModel.setByteStride(byteStride);
         return accessorModel;
     }
 
@@ -495,10 +499,9 @@ public final class GltfModelV1 implements GltfModel
             logger.warning("No byteLength found in BufferView");
             byteLength = 0;
         }
-        Integer byteStride = null;
         Integer target = bufferView.getTarget();
         DefaultBufferViewModel bufferViewModel = 
-            new DefaultBufferViewModel(byteStride, target);
+            new DefaultBufferViewModel(target);
         bufferViewModel.setByteOffset(byteOffset);
         bufferViewModel.setByteLength(byteLength);
         return bufferViewModel;
@@ -856,7 +859,82 @@ public final class GltfModelV1 implements GltfModel
         }
     }
     
+    /**
+     * Compute all {@link AccessorModel} instances that refer to the
+     * given {@link BufferViewModel}
+     * 
+     * @param bufferViewModel The {@link BufferViewModel}
+     * @return The list of {@link AccessorModel} instances
+     */
+    private List<DefaultAccessorModel> computeAccessorModelsOf(
+        BufferViewModel bufferViewModel)
+    {
+        List<DefaultAccessorModel> result = 
+            new ArrayList<DefaultAccessorModel>();
+        for (DefaultAccessorModel accessorModel : accessorModels)
+        {
+            BufferViewModel b = accessorModel.getBufferViewModel();
+            if (bufferViewModel.equals(b))
+            {
+                result.add(accessorModel);
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Computes the {@link AccessorModel#getByteStride() byte stride} of
+     * the given {@link AccessorModel} instances. If the given instances
+     * do not have the same byte stride, then a warning will be printed.
+     * 
+     * @param accessorModels The {@link AccessorModel} instances
+     * @return The common byte stride
+     */
+    private static int computeCommonByteStride(
+        Iterable<? extends AccessorModel> accessorModels)
+    {
+        int commonByteStride = -1;
+        for (AccessorModel accessorModel : accessorModels)
+        {
+            int byteStride = accessorModel.getByteStride();
+            if (commonByteStride == -1)
+            {
+                commonByteStride = byteStride;
+            }
+            else
+            {
+                if (commonByteStride != byteStride)
+                {
+                    logger.warning("The accessor models do not have the "
+                        + "same byte stride: " + commonByteStride 
+                        + " and " + byteStride);
+                }
+            }
+        }
+        return commonByteStride;
+    }
+    
 
+    /**
+     * Set the {@link BufferViewModel#getByteStride() byte strides} of all
+     * {@link BufferViewModel} instances, depending on the 
+     * {@link AccessorModel} instances that refer to them
+     */
+    private void assignBufferViewByteStrides()
+    {
+        for (DefaultBufferViewModel bufferViewModel : bufferViewModels)
+        {
+            List<DefaultAccessorModel> accessorModelsOfBufferView = 
+                computeAccessorModelsOf(bufferViewModel);
+            if (accessorModelsOfBufferView.size() > 1)
+            {
+                int byteStride = 
+                    computeCommonByteStride(accessorModelsOfBufferView);
+                bufferViewModel.setByteStride(byteStride);
+            }
+        }
+    }
+    
     /**
      * Initialize the {@link MeshModel} instances
      */

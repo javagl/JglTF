@@ -290,6 +290,31 @@ public class Buffers
     }
     
     /**
+     * Perform a copy of the specified buffer range, analogously to 
+     * <code>System#arraycopy</code>.
+     * 
+     * @param src The source buffer
+     * @param srcPos The source position
+     * @param dst The destination buffer
+     * @param dstPos The destination position
+     * @param length The length
+     * @throws IndexOutOfBoundsException If the indices are invalid.
+     */
+    public static void bufferCopy(
+        ByteBuffer src, int srcPos,
+        ByteBuffer dst, int dstPos,
+        int length)
+    {
+        // This could be optimized for large lengths, by using bulk operations
+        // on slices of the buffers
+        for (int i = 0; i < length; i++)
+        {
+            byte b = src.get(srcPos + i);
+            dst.put(dstPos + i, b);
+        }
+    }
+    
+    /**
      * Private constructor to prevent instantiation
      */
     private Buffers()

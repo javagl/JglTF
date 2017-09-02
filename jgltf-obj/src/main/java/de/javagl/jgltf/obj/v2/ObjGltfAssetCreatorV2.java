@@ -24,7 +24,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.obj.v1;
+package de.javagl.jgltf.obj.v2;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,29 +44,29 @@ import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.javagl.jgltf.impl.v1.Accessor;
-import de.javagl.jgltf.impl.v1.Asset;
-import de.javagl.jgltf.impl.v1.Buffer;
-import de.javagl.jgltf.impl.v1.BufferView;
-import de.javagl.jgltf.impl.v1.GlTF;
-import de.javagl.jgltf.impl.v1.Material;
-import de.javagl.jgltf.impl.v1.Mesh;
-import de.javagl.jgltf.impl.v1.MeshPrimitive;
-import de.javagl.jgltf.impl.v1.Node;
-import de.javagl.jgltf.impl.v1.Scene;
+import de.javagl.jgltf.impl.v2.Accessor;
+import de.javagl.jgltf.impl.v2.Asset;
+import de.javagl.jgltf.impl.v2.Buffer;
+import de.javagl.jgltf.impl.v2.BufferView;
+import de.javagl.jgltf.impl.v2.GlTF;
+import de.javagl.jgltf.impl.v2.Material;
+import de.javagl.jgltf.impl.v2.Mesh;
+import de.javagl.jgltf.impl.v2.MeshPrimitive;
+import de.javagl.jgltf.impl.v2.Node;
+import de.javagl.jgltf.impl.v2.Scene;
 import de.javagl.jgltf.model.Accessors;
 import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.GltfConstants;
+import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.impl.creation.BufferStructure;
 import de.javagl.jgltf.model.impl.creation.BufferStructureBuilder;
-import de.javagl.jgltf.model.impl.creation.BufferStructureGltfV1;
+import de.javagl.jgltf.model.impl.creation.BufferStructureGltfV2;
 import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.model.io.GltfReference;
 import de.javagl.jgltf.model.io.GltfReferenceLoader;
 import de.javagl.jgltf.model.io.IO;
 import de.javagl.jgltf.model.io.UriResolvers;
-import de.javagl.jgltf.model.io.v1.GltfAssetV1;
-import de.javagl.jgltf.model.v1.GltfIds;
+import de.javagl.jgltf.model.io.v2.GltfAssetV2;
 import de.javagl.jgltf.obj.BufferStrategy;
 import de.javagl.jgltf.obj.IntBuffers;
 import de.javagl.jgltf.obj.ObjSplitting;
@@ -80,9 +80,9 @@ import de.javagl.obj.ObjUtils;
 import de.javagl.obj.ReadableObj;
 
 /**
- * A class for creating {@link GltfAssetV1} objects from OBJ files 
+ * A class for creating {@link GltfAssetV2} objects from OBJ files 
  */
-public class ObjGltfAssetCreatorV1
+public class ObjGltfAssetCreatorV2
 {
     // TODO The configuration, consisting of the BufferStrategy,
     // the indicesComponentType and the OBJ splitter, should be
@@ -92,13 +92,13 @@ public class ObjGltfAssetCreatorV1
     // component type should be GL_UNSIGNED_SHORT
     
     // TODO Obviously, there's a lot of code duplication between
-    // here and ObjGltfAssetCreatorV2. Try to refactor this.
+    // here and ObjGltfAssetCreatorV1. Try to refactor this.
     
     /**
      * The logger used in this class
      */
     private static final Logger logger = 
-        Logger.getLogger(ObjGltfAssetCreatorV1.class.getName());
+        Logger.getLogger(ObjGltfAssetCreatorV2.class.getName());
     
     /**
      * The log level
@@ -147,7 +147,7 @@ public class ObjGltfAssetCreatorV1
     /**
      * Default constructor
      */
-    public ObjGltfAssetCreatorV1()
+    public ObjGltfAssetCreatorV2()
     {
         this(BufferStrategy.BUFFER_PER_FILE);
     }
@@ -157,7 +157,7 @@ public class ObjGltfAssetCreatorV1
      * 
      * @param bufferStrategy The {@link BufferStrategy} to use
      */
-    public ObjGltfAssetCreatorV1(BufferStrategy bufferStrategy)
+    public ObjGltfAssetCreatorV2(BufferStrategy bufferStrategy)
     {
         this.bufferStrategy = bufferStrategy;
         this.objSplitter = ObjSplitting::split;
@@ -209,13 +209,13 @@ public class ObjGltfAssetCreatorV1
     }
     
     /**
-     * Create a {@link GltfAssetV1} from the OBJ file with the given URI
+     * Create a {@link GltfAssetV2} from the OBJ file with the given URI
      * 
      * @param objUri The OBJ URI
-     * @return The {@link GltfAssetV1}
+     * @return The {@link GltfAssetV2}
      * @throws IOException If an IO error occurs
      */
-    public GltfAssetV1 create(URI objUri) throws IOException
+    public GltfAssetV2 create(URI objUri) throws IOException
     {
         logger.log(level, "Creating glTF with " + bufferStrategy + 
             " buffer strategy");
@@ -282,15 +282,15 @@ public class ObjGltfAssetCreatorV1
     
     
     /**
-     * Convert the given OBJ into a {@link GltfAssetV1}.
+     * Convert the given OBJ into a {@link GltfAssetV2}.
      *   
      * @param obj The OBJ
      * @param mtlsMap The mapping from material names to MTL instances
      * @param baseName The base name for the glTF
      * @param baseUri The base URI to resolve shaders and textures against
-     * @return The {@link GltfAssetV1}
+     * @return The {@link GltfAssetV2}
      */
-    GltfAssetV1 convert(
+    GltfAssetV2 convert(
         ReadableObj obj, Map<String, Mtl> mtlsMap, String baseName, URI baseUri)
     {
         // Basic setup 
@@ -316,16 +316,16 @@ public class ObjGltfAssetCreatorV1
         // Transfer the data from the buffer structure into the glTF
         BufferStructure bufferStructure = bufferStructureBuilder.build();
         
-        Map<String, Accessor> accessors = 
-            BufferStructureGltfV1.createAccessors(bufferStructure);
+        List<Accessor> accessors = 
+            BufferStructureGltfV2.createAccessors(bufferStructure);
         gltf.setAccessors(accessors);
 
-        Map<String, BufferView> bufferViews = 
-            BufferStructureGltfV1.createBufferViews(bufferStructure);
+        List<BufferView> bufferViews = 
+            BufferStructureGltfV2.createBufferViews(bufferStructure);
         gltf.setBufferViews(bufferViews);
 
-        Map<String, Buffer> buffers = 
-            BufferStructureGltfV1.createBuffers(bufferStructure);
+        List<Buffer> buffers = 
+            BufferStructureGltfV2.createBuffers(bufferStructure);
         gltf.setBuffers(buffers);
         
         
@@ -333,23 +333,23 @@ public class ObjGltfAssetCreatorV1
         // (containing the MeshPrimitives) in a single Node in a single Scene
         Mesh mesh = new Mesh();
         mesh.setPrimitives(meshPrimitives);
-        String meshId = GltfIds.generateId("mesh", gltf.getMeshes());
-        gltf.addMeshes(meshId, mesh);
+        int meshIndex = Optionals.of(gltf.getMeshes()).size();
+        gltf.addMeshes(mesh);
 
         Node node = new Node();
-        node.setMeshes(Collections.singletonList(meshId));
-        String nodeId = GltfIds.generateId("node", gltf.getNodes());
-        gltf.addNodes(nodeId, node);
+        node.setMesh(meshIndex);
+        int nodeIndex = Optionals.of(gltf.getNodes()).size();
+        gltf.addNodes(node);
         
         Scene scene = new Scene();
-        scene.setNodes(Collections.singletonList(nodeId));
-        String sceneId = GltfIds.generateId("scene", gltf.getScenes());
-        gltf.addScenes(sceneId, scene);
+        scene.setNodes(Collections.singletonList(nodeIndex));
+        int sceneIndex = Optionals.of(gltf.getScenes()).size();
+        gltf.addScenes(scene);
         
-        gltf.setScene(sceneId);
+        gltf.setScene(sceneIndex);
 
         // Create the GltfAsset from the glTF
-        GltfAssetV1 gltfAsset = new GltfAssetV1(gltf, null);
+        GltfAssetV2 gltfAsset = new GltfAssetV2(gltf, null);
         
         // For each Buffer reference in the GltfAsset, obtain the data from the 
         // BufferModel instance that has been created by the 
@@ -382,16 +382,6 @@ public class ObjGltfAssetCreatorV1
             List<GltfReference> imageReferences = 
                 gltfAsset.getImageReferences();
             GltfReferenceLoader.loadAll(imageReferences, externalUriResolver);
-            
-            // Resolve the shader data, by reading the resources that are
-            // referenced via the Shader URIs
-            logger.log(level, "Resolving Shader data");
-            Function<String, InputStream> internalUriResolver = 
-                UriResolvers.createResourceUriResolver(
-                    ObjGltfAssetCreatorV1.class);
-            List<GltfReference> shaderReferences = 
-                gltfAsset.getShaderReferences();
-            GltfReferenceLoader.loadAll(shaderReferences, internalUriResolver);
         }
         
         return gltfAsset;
@@ -407,7 +397,7 @@ public class ObjGltfAssetCreatorV1
     {
         Asset asset = new Asset();
         asset.setGenerator("jgltf-obj from https://github.com/javagl/JglTF");
-        asset.setVersion("1.0");
+        asset.setVersion("2.0");
         return asset;
     }
 
@@ -509,12 +499,11 @@ public class ObjGltfAssetCreatorV1
         ReadableObj obj, Mtl mtl)
     {
         Material material = mtlMaterialHandler.createMaterial(obj, mtl);
-        String materialId = 
-            GltfIds.generateId("material", gltf.getMaterials());
-        gltf.addMaterials(materialId, material);
+        int materialIndex = Optionals.of(gltf.getMaterials()).size();
+        gltf.addMaterials(material);
         for (MeshPrimitive meshPrimitive : meshPrimitives)
         {
-            meshPrimitive.setMaterial(materialId);
+            meshPrimitive.setMaterial(materialIndex);
         }
     }
     
@@ -531,12 +520,11 @@ public class ObjGltfAssetCreatorV1
     {
         Material material = mtlMaterialHandler.createMaterialWithColor(
             withNormals, 0.75f, 0.75f, 0.75f);
-        String materialId = 
-            GltfIds.generateId("material", gltf.getMaterials());
-        gltf.addMaterials(materialId, material);
+        int materialIndex = Optionals.of(gltf.getMaterials()).size();
+        gltf.addMaterials(material);
         for (MeshPrimitive meshPrimitive : meshPrimitives)
         {
-            meshPrimitive.setMaterial(materialId);
+            meshPrimitive.setMaterial(materialIndex);
         }
     }
 
@@ -560,10 +548,9 @@ public class ObjGltfAssetCreatorV1
             Material material = 
                 mtlMaterialHandler.createMaterialWithColor(
                     withNormals, r, g, b);
-            String materialId = 
-                GltfIds.generateId("material", gltf.getMaterials());
-            gltf.addMaterials(materialId, material);
-            meshPrimitive.setMaterial(materialId);
+            int materialIndex = Optionals.of(gltf.getMaterials()).size();
+            gltf.addMaterials(material);
+            meshPrimitive.setMaterial(materialIndex);
         }
     }
     
@@ -620,22 +607,26 @@ public class ObjGltfAssetCreatorV1
         meshPrimitive.setMode(GltfConstants.GL_TRIANGLES);
 
         // Add the indices data from the OBJ to the buffer structure
-        String indicesAccessorId = partName + "_indices"; 
+        int indicesAccessorIndex = 
+            bufferStructureBuilder.getNumAccessorModels();
         bufferStructureBuilder.createAccessorModel(
-            indicesAccessorId, indicesComponentType, "SCALAR", 
+            "indicesAccessor_" + indicesAccessorIndex,
+            indicesComponentType, "SCALAR", 
             createIndicesByteBuffer(part, indicesComponentType));
-        meshPrimitive.setIndices(indicesAccessorId);
+        meshPrimitive.setIndices(indicesAccessorIndex);
         
         bufferStructureBuilder.createArrayElementBufferViewModel(
             partName + "_indices_bufferView");
         
         // Add the vertices (positions) from the OBJ to the buffer structure
-        String positionsAccessorId = partName + "_positions";
+        int positionsAccessorIndex = 
+            bufferStructureBuilder.getNumAccessorModels();
         FloatBuffer objVertices = ObjData.getVertices(part);
         bufferStructureBuilder.createAccessorModel(
-            positionsAccessorId, GltfConstants.GL_FLOAT, "VEC3", 
+            "positionsAccessor_" + positionsAccessorIndex,
+            GltfConstants.GL_FLOAT, "VEC3", 
             Buffers.createByteBufferFrom(objVertices));
-        meshPrimitive.addAttributes("POSITION", positionsAccessorId);
+        meshPrimitive.addAttributes("POSITION", positionsAccessorIndex);
 
         // Add the texture coordinates from the OBJ to the buffer structure
         FloatBuffer objTexCoords = ObjData.getTexCoords(part, 2);
@@ -645,22 +636,26 @@ public class ObjGltfAssetCreatorV1
             {
                 objTexCoords.put(j, 1.0f - objTexCoords.get(j));
             }
-            String texCoordsAccessorId = partName + "_texcoords0";
+            int texCoordsAccessorIndex = 
+                bufferStructureBuilder.getNumAccessorModels();
             bufferStructureBuilder.createAccessorModel(
-                texCoordsAccessorId, GltfConstants.GL_FLOAT, "VEC2", 
+                "texCoordsAccessor_" + texCoordsAccessorIndex, 
+                GltfConstants.GL_FLOAT, "VEC2", 
                 Buffers.createByteBufferFrom(objTexCoords));
-            meshPrimitive.addAttributes("TEXCOORD_0", texCoordsAccessorId);
+            meshPrimitive.addAttributes("TEXCOORD_0", texCoordsAccessorIndex);
         }
         
         // Add the normals from the OBJ to the buffer structure
         FloatBuffer objNormals = ObjData.getNormals(part);
         if (objNormals.capacity() > 0)
         {
-            String normalsAccessorId = partName + "_normals";
+            int normalsAccessorIndex = 
+                bufferStructureBuilder.getNumAccessorModels();
             bufferStructureBuilder.createAccessorModel(
-                normalsAccessorId, GltfConstants.GL_FLOAT, "VEC3", 
+                "normalsAccessor_" + normalsAccessorIndex, 
+                GltfConstants.GL_FLOAT, "VEC3", 
                 Buffers.createByteBufferFrom(objNormals));
-            meshPrimitive.addAttributes("NORMAL", normalsAccessorId);
+            meshPrimitive.addAttributes("NORMAL", normalsAccessorIndex);
         }
 
         bufferStructureBuilder.createArrayBufferViewModel(

@@ -47,7 +47,9 @@ import de.javagl.jgltf.model.io.MimeTypes;
 import de.javagl.jgltf.model.v2.GltfModelV2;
 
 /**
- * A class for converting {@link GltfModelV2} to a binary glTF asset 
+ * A class for creating a binary {@link GltfAssetV2} from a 
+ * {@link GltfModelV2}.<br>
+ * <br>
  */
 public class BinaryAssetCreatorV2
 {
@@ -58,7 +60,7 @@ public class BinaryAssetCreatorV2
         Logger.getLogger(BinaryAssetCreatorV2.class.getName());
     
     /**
-     * Creates a new glTF to binary converter
+     * Creates a new asset creator
      */
     public BinaryAssetCreatorV2()
     {
@@ -77,7 +79,7 @@ public class BinaryAssetCreatorV2
     public GltfAssetV2 create(GltfModelV2 gltfModel)
     {
         GlTF inputGltf = gltfModel.getGltf();
-        GlTF convertedGltf = GltfUtilsV2.copy(inputGltf);
+        GlTF outputGltf = GltfUtilsV2.copy(inputGltf);
         
         // Create the new byte buffer for the data of the "binary_glTF" Buffer
         int binaryGltfBufferSize = 
@@ -88,10 +90,10 @@ public class BinaryAssetCreatorV2
         // Create the binary Buffer, 
         Buffer binaryGltfBuffer = new Buffer();
         binaryGltfBuffer.setByteLength(binaryGltfBufferSize);
-        convertedGltf.setBuffers(Collections.singletonList(binaryGltfBuffer));
+        outputGltf.setBuffers(Collections.singletonList(binaryGltfBuffer));
 
         // Create a defensive copy of the original image list
-        List<Image> oldImages = copy(convertedGltf.getImages());
+        List<Image> oldImages = copy(outputGltf.getImages());
 
         // Place the data from buffers and images into the new binary glTF 
         // buffer. The mappings from IDs to offsets inside the resulting 
@@ -113,7 +115,7 @@ public class BinaryAssetCreatorV2
         // For all existing BufferViews, create new ones that are updated to 
         // refer to the new binary glTF buffer, with the appropriate offset
         List<BufferView> oldBufferViews = 
-            copy(convertedGltf.getBufferViews());
+            copy(outputGltf.getBufferViews());
         List<BufferView> newBufferViews = 
             new ArrayList<BufferView>();
         for (int i = 0; i < oldBufferViews.size(); i++)
@@ -169,17 +171,17 @@ public class BinaryAssetCreatorV2
             newImages.add(newImage);
         }
 
-        // Place the newly created lists into the converted glTF,
+        // Place the newly created lists into the output glTF,
         // if there have been non-null lists for them in the input
         if (inputGltf.getImages() != null)
         {
-            convertedGltf.setImages(newImages);
+            outputGltf.setImages(newImages);
         }
         if (!newBufferViews.isEmpty())
         {
-            convertedGltf.setBufferViews(newBufferViews);
+            outputGltf.setBufferViews(newBufferViews);
         }
-        return new GltfAssetV2(convertedGltf, binaryGltfByteBuffer);
+        return new GltfAssetV2(outputGltf, binaryGltfByteBuffer);
     }
 
 

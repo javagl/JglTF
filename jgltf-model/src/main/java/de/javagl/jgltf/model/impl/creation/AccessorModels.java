@@ -65,6 +65,27 @@ class AccessorModels
     }
     
     /**
+     * Compute the byte stride that is common for the given 
+     * {@link AccessorModel} instances. This is the maximum of the
+     * {@link AccessorModel#getElementSizeInBytes() element sizes}
+     * of the given models.
+     * 
+     * @param accessorModels The {@link AccessorModel} instances
+     * @return The common byte stride
+     */
+    static int computeCommonByteStride(
+        Iterable<? extends AccessorModel> accessorModels)
+    {
+        int commonByteStride = 1;
+        for (AccessorModel accessorModel : accessorModels)
+        {
+            int elementSize = accessorModel.getElementSizeInBytes();
+            commonByteStride = Math.max(commonByteStride, elementSize);
+        }
+        return commonByteStride;
+    }
+    
+    /**
      * Private constructor to prevent instantiation
      */
     private AccessorModels()

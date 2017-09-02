@@ -43,15 +43,16 @@ import de.javagl.jgltf.model.io.MimeTypes;
 import de.javagl.jgltf.model.v2.GltfModelV2;
 
 /**
- * A class for converting {@link GltfModelV2} to a {@link GltfAssetV2} with
- * an "embedded" data representation, where data elements are not
- * referred to via URIs, but encoded directly in the glTF JSON as
- * data URIs. 
+ * A class for creating a {@link GltfAssetV2} with an "embedded" data 
+ * representation from a {@link GltfModelV2}.<br>
+ * <br>
+ * In the "embedded" data representation, the data of elements like 
+ * {@link Buffer} or {@link Image} objects is stored in data URIs.
  */
 public class EmbeddedAssetCreatorV2
 {
     /**
-     * Creates a new glTF model to embedded converter
+     * Creates a new asset creator
      */
     public EmbeddedAssetCreatorV2()
     {
@@ -75,29 +76,28 @@ public class EmbeddedAssetCreatorV2
     public GltfAssetV2 create(GltfModelV2 gltfModel)
     {
         GlTF inputGltf = gltfModel.getGltf();
-        GlTF convertedGltf = GltfUtilsV2.copy(inputGltf);
+        GlTF outputGltf = GltfUtilsV2.copy(inputGltf);
 
-        List<Buffer> buffers = Optionals.of(convertedGltf.getBuffers());
+        List<Buffer> buffers = Optionals.of(outputGltf.getBuffers());
         for (int i = 0; i < buffers.size(); i++)
         {
             Buffer buffer = buffers.get(i);
             convertBufferToEmbedded(gltfModel, i, buffer);
         }
         
-        List<Image> images = Optionals.of(convertedGltf.getImages());
+        List<Image> images = Optionals.of(outputGltf.getImages());
         for (int i = 0; i < images.size(); i++)
         {
             Image image = images.get(i);
             convertImageToEmbedded(gltfModel, i, image);
         }
 
-        return new GltfAssetV2(convertedGltf, null);
+        return new GltfAssetV2(outputGltf, null);
     }
 
     /**
-     * Convert the given {@link Buffer} from the given {@link GltfModelV2} into
-     * an embedded buffer, by replacing its URI with a data URI, if the 
-     * URI is not already a data URI
+     * Convert the given {@link Buffer} into an embedded buffer, by replacing 
+     * its URI with a data URI, if the URI is not already a data URI
      * 
      * @param gltfModel The {@link GltfModelV2}
      * @param index The index of the {@link Buffer}
@@ -113,18 +113,19 @@ public class EmbeddedAssetCreatorV2
         }
         BufferModel bufferModel = gltfModel.getBufferModels().get(index);
         ByteBuffer bufferData = bufferModel.getBufferData();
+        
         byte data[] = new byte[bufferData.capacity()];
         bufferData.slice().get(data);
         String encodedData = Base64.getEncoder().encodeToString(data);
         String dataUriString = 
             "data:application/gltf-buffer;base64," + encodedData;
+        
         buffer.setUri(dataUriString);
     }
 
     /**
-     * Convert the given {@link Image} from the given {@link GltfModelV2} into
-     * an embedded image, by replacing its URI with a data URI, if the 
-     * URI is not already a data URI
+     * Convert the given {@link Image} into an embedded image, by replacing 
+     * its URI with a data URI, if the URI is not already a data URI
      * 
      * @param gltfModel The {@link GltfModelV2}
      * @param index The index of the {@link Image}
@@ -142,6 +143,7 @@ public class EmbeddedAssetCreatorV2
         }
         ImageModel imageModel = gltfModel.getImageModels().get(index);
         ByteBuffer imageData = imageModel.getImageData();
+        
         String uri = image.getUri();
         String imageMimeTypeString =
             MimeTypes.guessImageMimeTypeString(uri, imageData);
@@ -156,6 +158,7 @@ public class EmbeddedAssetCreatorV2
         String encodedData = Base64.getEncoder().encodeToString(data);
         String dataUriString =
             "data:" + imageMimeTypeString + ";base64," + encodedData;
+        
         image.setUri(dataUriString);
     }
 

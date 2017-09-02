@@ -56,7 +56,7 @@ public final class DefaultBufferViewModel implements BufferViewModel
     /**
      * The byte stride
      */
-    private final Integer byteStride;
+    private Integer byteStride;
     
     /**
      * The optional target
@@ -79,15 +79,12 @@ public final class DefaultBufferViewModel implements BufferViewModel
     /**
      * Creates a new instance
      * 
-     * @param byteStride The optional byte stride
      * @param target The optional target
      */
-    public DefaultBufferViewModel(
-        Integer byteStride, Integer target)
+    public DefaultBufferViewModel(Integer target)
     {
         this.byteOffset = 0;
         this.byteLength = 0;
-        this.byteStride = byteStride;
         this.target = target;
     }
     
@@ -132,6 +129,18 @@ public final class DefaultBufferViewModel implements BufferViewModel
     public void setByteLength(int byteLength)
     {
         this.byteLength = byteLength;
+    }
+
+    /**
+     * Set the optional byte stride. This byte stride must be 
+     * non-<code>null</code> if more than one accessor refers
+     * to this buffer view.
+     *  
+     * @param byteStride The byte stride
+     */
+    public void setByteStride(Integer byteStride)
+    {
+        this.byteStride = byteStride;
     }
     
     

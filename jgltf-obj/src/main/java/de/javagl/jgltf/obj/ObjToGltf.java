@@ -39,6 +39,7 @@ import de.javagl.jgltf.model.GltfModels;
 import de.javagl.jgltf.model.io.GltfAsset;
 import de.javagl.jgltf.model.io.GltfModelWriter;
 import de.javagl.jgltf.obj.v1.ObjGltfAssetCreatorV1;
+import de.javagl.jgltf.obj.v2.ObjGltfAssetCreatorV2;
 
 /**
  * A class for converting OBJ files to glTF
@@ -75,6 +76,7 @@ public class ObjToGltf
         boolean embedded = false;
         boolean binary = false;
         BufferStrategy bufferStrategy = BufferStrategy.BUFFER_PER_FILE;
+        int version = 2;
         for (String arg : args)
         {
             if (arg.startsWith("-i="))
@@ -115,6 +117,20 @@ public class ObjToGltf
                     return;
                 }
             }
+            else if (arg.startsWith("-v="))
+            {
+                String s = arg.substring(3);
+                try
+                {
+                    version = Integer.parseInt(s);
+                }
+                catch (NumberFormatException e)
+                {
+                    System.err.println("Invalid argument: " + arg);
+                    displayHelp();
+                    return;
+                }
+            }
             else
             {
                 System.err.println("Invalid argument: " + arg);
@@ -138,11 +154,22 @@ public class ObjToGltf
         logger.info("Reading input file " + inputFileName);
         
         long beforeNs = System.nanoTime();
-        
+
         URI objUri = Paths.get(inputFileName).toUri();
-        ObjGltfAssetCreatorV1 gltfAssetCreator = 
-            new ObjGltfAssetCreatorV1(bufferStrategy);
-        GltfAsset gltfAsset = gltfAssetCreator.create(objUri);
+
+        GltfAsset gltfAsset = null;
+        if (version == 1)
+        {
+            ObjGltfAssetCreatorV1 gltfAssetCreator = 
+                new ObjGltfAssetCreatorV1(bufferStrategy);
+            gltfAsset = gltfAssetCreator.create(objUri);
+        }
+        else
+        {
+            ObjGltfAssetCreatorV2 gltfAssetCreator = 
+                new ObjGltfAssetCreatorV2(bufferStrategy);
+            gltfAsset = gltfAssetCreator.create(objUri);
+        }
         GltfModel gltfModel = GltfModels.create(gltfAsset);
 
         GltfModelWriter gltfModelWriter = new GltfModelWriter();
@@ -184,15 +211,16 @@ public class ObjToGltf
         System.out.println("Usage: ");
         System.out.println("======");
         System.out.println("");
-        System.out.println("  -i=<file> : The input file name");
-        System.out.println("  -o=<file> : The output file name");
-        System.out.println("  -e        : Write the output as embedded glTF");
-        System.out.println("  -b        : Write the output as binary glTF");
-        System.out.println("  -s=       : The buffer strategy:");
-        System.out.println("     file   : Create one buffer for the whole file");
-        System.out.println("     group  : Create one buffer for each material group");
-        System.out.println("     part   : Create one buffer for each part");
-        System.out.println("  -h        : Print this message.");
+        System.out.println("  -i=<file>   : The input file name");
+        System.out.println("  -o=<file>   : The output file name");
+        System.out.println("  -e          : Write the output as embedded glTF");
+        System.out.println("  -b          : Write the output as binary glTF");
+        System.out.println("  -s=         : The buffer strategy:");
+        System.out.println("     file     : Create one buffer for the whole file");
+        System.out.println("     group    : Create one buffer for each material group");
+        System.out.println("     part     : Create one buffer for each part");
+        System.out.println("  -h          : Print this message.");
+        System.out.println("  -v=<number> : The target glTF version. The number may be 1 or 2. The default is 2.");
         System.out.println("");
         System.out.println("Example: ");
         System.out.println("========");

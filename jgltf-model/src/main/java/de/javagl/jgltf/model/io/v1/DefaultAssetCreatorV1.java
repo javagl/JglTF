@@ -50,11 +50,13 @@ import de.javagl.jgltf.model.v1.GltfExtensionsV1;
 import de.javagl.jgltf.model.v1.GltfModelV1;
 
 /**
- * A class for converting {@link GltfModelV1} to a {@link GltfAssetV1} with
- * a default data representation, where data elements are referred to via
- * URIs. Data elements like {@link Buffer}, {@link Image} or {@link Shader}
- * objects that used the binary glTF extension or data URIs will be converted
- * to refer to their data using URIs.
+ * A class for creating a {@link GltfAssetV1} with a default data 
+ * representation from a {@link GltfModelV1}.<br>
+ * <br>
+ * In the default data representation, elements are referred to via URIs. 
+ * Data elements like {@link Buffer}, {@link Image} or {@link Shader}
+ * objects that used the binary glTF extension or data URIs will be 
+ * converted to refer to their data using URIs.
  */
 public class DefaultAssetCreatorV1
 {
@@ -79,7 +81,7 @@ public class DefaultAssetCreatorV1
     private Set<String> existingShaderUriStrings;
     
     /**
-     * Creates a new glTF model to default converter
+     * Creates a new asset creator
      */
     public DefaultAssetCreatorV1()
     {
@@ -95,10 +97,10 @@ public class DefaultAssetCreatorV1
     public GltfAssetV1 create(GltfModelV1 gltfModel)
     {
         GlTF inputGltf = gltfModel.getGltf();
-        GlTF convertedGltf = GltfUtilsV1.copy(inputGltf);
+        GlTF outputGltf = GltfUtilsV1.copy(inputGltf);
         
         // Remove the binary glTF extension, if it was used
-        GltfExtensionsV1.removeExtensionUsed(convertedGltf, 
+        GltfExtensionsV1.removeExtensionUsed(outputGltf, 
             BinaryGltfV1.getBinaryGltfExtensionName());
 
         existingBufferUriStrings = collectUriStrings(
@@ -111,14 +113,14 @@ public class DefaultAssetCreatorV1
             Optionals.of(inputGltf.getShaders()).values(),
             Shader::getUri);
 
-        gltfAsset = new GltfAssetV1(convertedGltf, null);
+        this.gltfAsset = new GltfAssetV1(outputGltf, null);
         
-        Optionals.of(convertedGltf.getBuffers()).forEach((id, value) -> 
-            convertBufferToDefault(gltfModel, id, value));
-        Optionals.of(convertedGltf.getImages()).forEach((id, value) -> 
-            convertImageToDefault(gltfModel, id, value));
-        Optionals.of(convertedGltf.getShaders()).forEach((id, value) -> 
-            convertShaderToDefault(gltfModel, id, value));
+        Optionals.of(outputGltf.getBuffers()).forEach((id, value) -> 
+            storeBufferAsDefault(gltfModel, id, value));
+        Optionals.of(outputGltf.getImages()).forEach((id, value) -> 
+            storeImageAsDefault(gltfModel, id, value));
+        Optionals.of(outputGltf.getShaders()).forEach((id, value) -> 
+            storeShaderAsDefault(gltfModel, id, value));
 
         return gltfAsset;
     }
@@ -144,100 +146,127 @@ public class DefaultAssetCreatorV1
     
 
     /**
-     * Convert the given {@link Buffer} from the given {@link GltfModelV1} into
-     * a default buffer: If its URI is a data URI, it will receive a new URI.
-     * This URI refers to the buffer data, which is then stored as 
-     * {@link GltfAsset#getReferenceData(String) reference data} in the
-     * asset. 
-     * 
-     * @param gltfModel The {@link GltfModelV1}
+     * Store the given {@link Buffer} with the given ID in the current 
+     * output asset. <br>
+     * <br>
+     * If the {@link Buffer#getUri() buffer URI} is <code>null</code> or a 
+     * data URI, it will receive a new URI, which refers to the buffer data, 
+     * which is then stored as {@link GltfAsset#getReferenceData(String) 
+     * reference data} in the asset.<br>
+     * <br>
+     * If the given ID is the binary glTF buffer ID, <code>"binary_glTF"</code>,
+     * then the buffer will also receive a new URI. 
+     * <br>
+     * The given {@link Buffer} object will be modified accordingly, if 
+     * necessary: Its URI will be set to be the new URI.
+     *  
+     * @param gltfModel The {@link GltfModelV1} 
      * @param id The ID of the {@link Buffer}
      * @param buffer The {@link Buffer}
      */
-    private void convertBufferToDefault(
+    private void storeBufferAsDefault(
         GltfModelV1 gltfModel, String id, Buffer buffer)
     {
-        String uriString = buffer.getUri();
-        if (BinaryGltfV1.isBinaryGltfBufferId(id) ||
-            IO.isDataUriString(uriString))
+        BufferModel bufferModel = gltfModel.getBufferModelById(id);
+        ByteBuffer bufferData = bufferModel.getBufferData();
+        
+        String oldUriString = buffer.getUri();
+        String newUriString = oldUriString;
+        if (oldUriString == null ||
+            IO.isDataUriString(oldUriString) ||
+            BinaryGltfV1.isBinaryGltfBufferId(id))
         {
-            BufferModel bufferModel = gltfModel.getBufferModelById(id);
-            String bufferUriString = UriStrings.createBufferUriString(
+            newUriString = UriStrings.createBufferUriString(
                 existingBufferUriStrings);
-            buffer.setUri(bufferUriString);
-            existingBufferUriStrings.add(bufferUriString);
-            
-            ByteBuffer bufferData = bufferModel.getBufferData();
-            gltfAsset.putReferenceData(bufferUriString, bufferData);
+            buffer.setUri(newUriString);
+            existingBufferUriStrings.add(newUriString);
         }
+        gltfAsset.putReferenceData(newUriString, bufferData);
     }
 
     /**
-     * Convert the given {@link Image} from the given {@link GltfModelV1} into
-     * an default image. If its URI is a data URI, or it refers to data via
-     * the binary glTF extension, it will receive a new URI. This URI refers 
-     * to the image data, which is then stored as 
-     * {@link GltfAsset#getReferenceData(String) reference data} in the
-     * asset. 
+     * Store the given {@link Image} with the given ID in the current 
+     * output asset. <br>
+     * <br>
+     * If the {@link Image#getUri() image URI} is <code>null</code> or a 
+     * data URI, it will receive a new URI, which refers to the image data, 
+     * which is then stored as {@link GltfAsset#getReferenceData(String) 
+     * reference data} in the asset.<br>
+     * <br>
+     * The given {@link Image} object will be modified accordingly, if 
+     * necessary: Its URI will be set to be the new URI. If it referred
+     * to a buffer view, using the binary glTF extension, then this
+     * reference will be removed. 
      * 
-     * @param gltfModel The {@link GltfModelV1}
-     * @param id The ID of the {@link Image}
+     * @param gltfModel The {@link GltfModelV1} 
+     * @param id The id of the {@link Image}
      * @param image The {@link Image}
      * @throws GltfException If the image format (and thus, the MIME type)
      * can not be determined from the image data  
      */
-    private void convertImageToDefault(
+    private void storeImageAsDefault(
         GltfModelV1 gltfModel, String id, Image image)
     {
-        String uriString = image.getUri();
-        if (BinaryGltfV1.hasBinaryGltfExtension(image) ||
-            IO.isDataUriString(uriString))
+        ImageModel imageModel = gltfModel.getImageModelById(id);
+        ByteBuffer imageData = imageModel.getImageData();
+
+        String oldUriString = image.getUri();
+        String newUriString = oldUriString;
+        if (oldUriString == null ||
+            IO.isDataUriString(oldUriString) ||
+            BinaryGltfV1.hasBinaryGltfExtension(image))
         {
-            ImageModel imageModel = gltfModel.getImageModelById(id);
-            
-            String imageUriString = UriStrings.createImageUriString(
+            newUriString = UriStrings.createImageUriString(
                 imageModel, existingImageUriStrings);
-            image.setUri(imageUriString);
-            existingImageUriStrings.add(imageUriString);
+            image.setUri(newUriString);
+            existingImageUriStrings.add(newUriString);
             
-            ByteBuffer imageData = imageModel.getImageData();
-            gltfAsset.putReferenceData(imageUriString, imageData);
-            
-            return;
+            // Remove the extension object, if necessary
+            image.removeExtensions(BinaryGltfV1.getBinaryGltfExtensionName());
         }
+        gltfAsset.putReferenceData(newUriString, imageData);
     }
 
+    
     /**
-     * Convert the given {@link Shader} from the given {@link GltfModelV1} into
-     * a default shader. If its URI is a data URI, or it refers to data via
-     * the binary glTF extension, it will receive a new URI. This URI refers 
-     * to the shader data, which is then stored as 
-     * {@link GltfAsset#getReferenceData(String) reference data} in the
-     * asset. 
+     * Store the given {@link Shader} with the given ID in the current 
+     * output asset. <br>
+     * <br>
+     * If the {@link Shader#getUri() shader URI} is <code>null</code> or a 
+     * data URI, it will receive a new URI, which refers to the shader data, 
+     * which is then stored as {@link GltfAsset#getReferenceData(String) 
+     * reference data} in the asset.<br>
+     * <br>
+     * The given {@link Shader} object will be modified accordingly, if 
+     * necessary: Its URI will be set to be the new URI. If it referred
+     * to a buffer view, using the binary glTF extension, then this
+     * reference will be removed. 
      * 
-     * @param gltfModel The {@link GltfModelV1}
-     * @param id The ID of the {@link Shader}
+     * @param gltfModel The {@link GltfModelV1} 
+     * @param id The id of the {@link Shader}
      * @param shader The {@link Shader}
      */
-    private void convertShaderToDefault(
+    private void storeShaderAsDefault(
         GltfModelV1 gltfModel, String id, Shader shader)
     {
-        String uriString = shader.getUri();
-        if (BinaryGltfV1.hasBinaryGltfExtension(shader) ||
-            IO.isDataUriString(uriString))
+        ShaderModel shaderModel = gltfModel.getShaderModelById(id);
+        ByteBuffer shaderData = shaderModel.getShaderData();
+
+        String oldUriString = shader.getUri();
+        String newUriString = oldUriString;
+        if (oldUriString == null ||
+            IO.isDataUriString(oldUriString) ||
+            BinaryGltfV1.hasBinaryGltfExtension(shader))
         {
-            ShaderModel shaderModel = gltfModel.getShaderModelById(id);
-            
-            String shaderUriString = UriStrings.createShaderUriString(
+            newUriString = UriStrings.createShaderUriString(
                 shaderModel, existingShaderUriStrings);
-            shader.setUri(shaderUriString);
-            existingShaderUriStrings.add(shaderUriString);
+            shader.setUri(newUriString);
+            existingShaderUriStrings.add(newUriString);
             
-            ByteBuffer shaderData = shaderModel.getShaderData();
-            gltfAsset.putReferenceData(shaderUriString, shaderData);
-            
-            return;
+            // Remove the extension object, if necessary
+            shader.removeExtensions(BinaryGltfV1.getBinaryGltfExtensionName());
         }
+        gltfAsset.putReferenceData(newUriString, shaderData);
     }
 
 
