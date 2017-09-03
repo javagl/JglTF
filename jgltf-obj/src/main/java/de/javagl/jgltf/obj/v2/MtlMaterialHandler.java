@@ -100,6 +100,7 @@ public class MtlMaterialHandler
         MaterialPbrMetallicRoughness pbrMetallicRoughness = 
             new MaterialPbrMetallicRoughness();
         pbrMetallicRoughness.setBaseColorTexture(baseColorTexture);
+        pbrMetallicRoughness.setMetallicFactor(0.0f);
 
         Material material = new Material();
         material.setPbrMetallicRoughness(pbrMetallicRoughness);
@@ -123,7 +124,8 @@ public class MtlMaterialHandler
             new MaterialPbrMetallicRoughness();
         float[] baseColorFactor = new float[] { r, g, b, 1.0f };
         pbrMetallicRoughness.setBaseColorFactor(baseColorFactor);
-
+        pbrMetallicRoughness.setMetallicFactor(0.0f);
+        
         Material material = new Material();
         material.setPbrMetallicRoughness(pbrMetallicRoughness);
 
