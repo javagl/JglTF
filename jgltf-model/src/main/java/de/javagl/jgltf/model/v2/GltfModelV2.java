@@ -71,7 +71,6 @@ import de.javagl.jgltf.model.AccessorFloatData;
 import de.javagl.jgltf.model.AccessorIntData;
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.AccessorShortData;
-import de.javagl.jgltf.model.Accessors;
 import de.javagl.jgltf.model.AnimationModel;
 import de.javagl.jgltf.model.AnimationModel.Channel;
 import de.javagl.jgltf.model.AnimationModel.Interpolation;
@@ -276,30 +275,13 @@ public final class GltfModelV2 implements GltfModel
         for (int i = 0; i < accessors.size(); i++)
         {
             Accessor accessor = accessors.get(i);
-            DefaultAccessorModel accessorModel = createAccessorModel(accessor);
+            Integer componentType = accessor.getComponentType();
+            Integer count = accessor.getCount();
+            ElementType elementType = ElementType.forString(accessor.getType());
+            DefaultAccessorModel accessorModel =  new DefaultAccessorModel(
+                componentType, count, elementType);
             accessorModels.add(accessorModel);
         }
-    }
-
-    /**
-     * Create a {@link DefaultAccessorModel} for the given {@link Accessor}
-     * 
-     * @param accessor The {@link Accessor}
-     * @return The {@link AccessorModel}
-     */
-    private static DefaultAccessorModel createAccessorModel(Accessor accessor)
-    {
-        Integer componentType = accessor.getComponentType();
-        Integer byteOffset = accessor.getByteOffset();
-        Integer count = accessor.getCount();
-        ElementType elementType = ElementType.forString(accessor.getType());
-        Integer byteStride = elementType.getNumComponents() *
-            Accessors.getNumBytesForAccessorComponentType(componentType);
-        DefaultAccessorModel accessorModel =  new DefaultAccessorModel(
-            componentType, count, elementType);
-        accessorModel.setByteOffset(byteOffset);
-        accessorModel.setByteStride(byteStride);
-        return accessorModel;
     }
 
     /**
@@ -478,6 +460,9 @@ public final class GltfModelV2 implements GltfModel
         {
             Accessor accessor = accessors.get(i);
             DefaultAccessorModel accessorModel = accessorModels.get(i);
+            
+            Integer byteOffset = accessor.getByteOffset();
+            accessorModel.setByteOffset(byteOffset);
 
             AccessorSparse accessorSparse = accessor.getSparse();
             if (accessorSparse == null)
@@ -523,6 +508,18 @@ public final class GltfModelV2 implements GltfModel
             DefaultBufferViewModel bufferViewModel = 
                 createBufferViewModel(bufferData);
             accessorModel.setBufferViewModel(bufferViewModel);
+        }
+        
+        BufferViewModel bufferViewModel = accessorModel.getBufferViewModel(); 
+        Integer byteStride = bufferViewModel.getByteStride();
+        if (byteStride == null)
+        {
+            accessorModel.setByteStride(
+                accessorModel.getElementSizeInBytes());
+        }
+        else
+        {
+            accessorModel.setByteStride(byteStride);
         }
     }
     
@@ -1150,6 +1147,10 @@ public final class GltfModelV2 implements GltfModel
                 "TEXCOORD_" + baseColorTextureInfo.getTexCoord());
             values.put("baseColorTexture", baseColorTextureInfo.getIndex());
         }
+        else
+        {
+            values.put("hasBaseColorTexture", 0);
+        }
         float[] baseColorFactor = Optionals.of(
             pbrMetallicRoughness.getBaseColorFactor(),
             pbrMetallicRoughness.defaultBaseColorFactor());
@@ -1165,6 +1166,10 @@ public final class GltfModelV2 implements GltfModel
                 "TEXCOORD_" + metallicRoughnessTextureInfo.getTexCoord());
             values.put("metallicRoughnessTexture", 
                 metallicRoughnessTextureInfo.getIndex());
+        }
+        else
+        {
+            values.put("hasMetallicRoughnessTexture", 0);
         }
         float metallicFactor = Optionals.of(
             pbrMetallicRoughness.getMetallicFactor(),
@@ -1192,6 +1197,11 @@ public final class GltfModelV2 implements GltfModel
                 normalTextureInfo.defaultScale());
             values.put("normalScale", normalScale);
         }
+        else
+        {
+            values.put("hasNormalTexture", 0);
+            values.put("normalScale", 1.0);
+        }
 
         MaterialOcclusionTextureInfo occlusionTextureInfo = 
             material.getOcclusionTexture();
@@ -1208,6 +1218,13 @@ public final class GltfModelV2 implements GltfModel
                 occlusionTextureInfo.defaultStrength());
             values.put("occlusionStrength", occlusionStrength);
         }
+        else
+        {
+            values.put("hasOcclusionTexture", 0);
+            
+            // TODO Should this really be 1.0?
+            values.put("occlusionStrength", 1.0); 
+        }
 
         TextureInfo emissiveTextureInfo = 
             material.getEmissiveTexture();
@@ -1219,6 +1236,11 @@ public final class GltfModelV2 implements GltfModel
             values.put("emissiveTexture", 
                 emissiveTextureInfo.getIndex());
         }
+        else
+        {
+            values.put("hasEmissiveTexture", 0);
+        }
+        
         float[] emissiveFactor = Optionals.of(
             material.getEmissiveFactor(),
             material.defaultEmissiveFactor());
