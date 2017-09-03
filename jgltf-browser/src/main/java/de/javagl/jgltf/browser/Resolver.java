@@ -204,6 +204,14 @@ class Resolver
         m.put("glTF.programs.*.fragmentShader", getMap(gltf, "shaders"));
         m.put("glTF.programs.*.vertexShader", getMap(gltf, "shaders"));
         m.put("glTF.materials.*.technique", getMap(gltf, "techniques"));
+        m.put("glTF.materials.*.pbrMetallicRoughness.baseColorTexture.index", 
+            getMap(gltf, "textures"));
+        m.put("glTF.materials.*.emissiveTexture.index", 
+            getMap(gltf, "textures"));
+        m.put("glTF.materials.*.normalTexture.index", 
+            getMap(gltf, "textures"));
+        m.put("glTF.materials.*.occlusionTexture.index", 
+            getMap(gltf, "textures"));
         m.put("glTF.techniques.*.program", getMap(gltf, "programs"));
         m.put("glTF.techniques.*.parameters.*.node", getMap(gltf, "nodes"));
         m.put("glTF.animations.*.channels.*.target.id", getMap(gltf, "nodes"));
