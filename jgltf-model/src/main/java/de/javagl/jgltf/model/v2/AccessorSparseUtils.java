@@ -103,7 +103,7 @@ class AccessorSparseUtils
      * objects. <br>
      * <br>
      * The <code>baseAccessorData</code> is the data that the dense data 
-     * will be initialized with, <b>before</b> applying the substitution 
+     * will be initialized with, <b>before</b> applying the displacement 
      * that is defined by the given sparse indices and values.<br>
      * <br>
      * The <code>sparseIndicesAccessorData</code> is an {@link AccessorData}
@@ -148,15 +148,17 @@ class AccessorSparseUtils
             }
         }
         
-        // Substitute the data from the sparse indices and values
+        // Apply the displacement based on the sparse indices and values
         int indices[] = extractIndices(sparseIndicesAccessorData);
         for (int i = 0; i < indices.length; i++)
         {
             int targetElementIndex = indices[i];
             for (int c = 0; c < numComponentsPerElement; c++)
             {
-                byte value = sparseValuesAccessorData.get(i, c);
-                denseAccessorData.set(targetElementIndex, c, value);
+                byte oldValue = denseAccessorData.get(targetElementIndex, c);
+                byte displacement = sparseValuesAccessorData.get(i, c);
+                denseAccessorData.set(targetElementIndex, c, 
+                    (byte)(oldValue + displacement));
             }
         }
     }
@@ -194,15 +196,17 @@ class AccessorSparseUtils
             }
         }
         
-        // Substitute the data from the sparse indices and values
+        // Apply the displacement based on the sparse indices and values
         int indices[] = extractIndices(sparseIndicesAccessorData);
         for (int i = 0; i < indices.length; i++)
         {
             int targetElementIndex = indices[i];
             for (int c = 0; c < numComponentsPerElement; c++)
             {
-                short value = sparseValuesAccessorData.get(i, c);
-                denseAccessorData.set(targetElementIndex, c, value);
+                short oldValue = denseAccessorData.get(targetElementIndex, c);
+                short displacement = sparseValuesAccessorData.get(i, c);
+                denseAccessorData.set(targetElementIndex, c, 
+                    (short)(oldValue + displacement));
             }
         }
     }
@@ -240,15 +244,17 @@ class AccessorSparseUtils
             }
         }
         
-        // Substitute the data from the sparse indices and values
+        // Apply the displacement based on the sparse indices and values
         int indices[] = extractIndices(sparseIndicesAccessorData);
         for (int i = 0; i < indices.length; i++)
         {
             int targetElementIndex = indices[i];
             for (int c = 0; c < numComponentsPerElement; c++)
             {
-                int value = sparseValuesAccessorData.get(i, c);
-                denseAccessorData.set(targetElementIndex, c, value);
+                int oldValue = denseAccessorData.get(targetElementIndex, c);
+                int displacement = sparseValuesAccessorData.get(i, c);
+                denseAccessorData.set(targetElementIndex, c, 
+                    oldValue + displacement);
             }
         }
     }
@@ -286,15 +292,17 @@ class AccessorSparseUtils
             }
         }
         
-        // Substitute the data from the sparse indices and values
+        // Apply the displacement based on the sparse indices and values
         int indices[] = extractIndices(sparseIndicesAccessorData);
         for (int i = 0; i < indices.length; i++)
         {
             int targetElementIndex = indices[i];
             for (int c = 0; c < numComponentsPerElement; c++)
             {
-                float value = sparseValuesAccessorData.get(i, c);
-                denseAccessorData.set(targetElementIndex, c, value);
+                float oldValue = denseAccessorData.get(targetElementIndex, c);
+                float displacement = sparseValuesAccessorData.get(i, c);
+                denseAccessorData.set(targetElementIndex, c, 
+                    oldValue + displacement);
             }
         }
     }
