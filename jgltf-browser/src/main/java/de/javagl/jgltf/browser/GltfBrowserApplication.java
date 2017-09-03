@@ -63,9 +63,9 @@ import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.GltfModels;
 import de.javagl.jgltf.model.io.GltfModelWriter;
 import de.javagl.jgltf.model.io.IO;
-import de.javagl.jgltf.model.io.v1.GltfAssetV1;
+import de.javagl.jgltf.model.io.v2.GltfAssetV2;
 import de.javagl.jgltf.obj.BufferStrategy;
-import de.javagl.jgltf.obj.v1.ObjGltfAssetCreatorV1;
+import de.javagl.jgltf.obj.v2.ObjGltfAssetCreatorV2;
 import de.javagl.swing.tasks.SwingTask;
 import de.javagl.swing.tasks.SwingTaskExecutors;
 
@@ -592,13 +592,13 @@ class GltfBrowserApplication
             @Override
             protected GltfModel doInBackground() throws Exception
             {
-                ObjGltfAssetCreatorV1 objGltfAssetCreator = 
-                    new ObjGltfAssetCreatorV1(bufferStrategy);
+                ObjGltfAssetCreatorV2 objGltfAssetCreator = 
+                    new ObjGltfAssetCreatorV2(bufferStrategy);
                 objGltfAssetCreator.setIndicesComponentType(
                     indicesComponentType);
                 objGltfAssetCreator.setAssigningRandomColorsToParts(
                     assigningRandomColorsToParts);
-                GltfAssetV1 gltfAsset = objGltfAssetCreator.create(uri);
+                GltfAssetV2 gltfAsset = objGltfAssetCreator.create(uri);
                 return GltfModels.create(gltfAsset);
             }
         };
