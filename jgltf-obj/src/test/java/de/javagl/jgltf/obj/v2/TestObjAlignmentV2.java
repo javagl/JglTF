@@ -1,23 +1,24 @@
-package de.javagl.jgltf.obj.v1;
+package de.javagl.jgltf.obj.v2;
 
 import static org.junit.Assert.assertEquals;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.Map;
+import java.util.List;
 
 import org.junit.Test;
 
-import de.javagl.jgltf.impl.v1.Accessor;
-import de.javagl.jgltf.impl.v1.BufferView;
-import de.javagl.jgltf.impl.v1.GlTF;
+import de.javagl.jgltf.impl.v2.Accessor;
+import de.javagl.jgltf.impl.v2.BufferView;
+import de.javagl.jgltf.impl.v2.GlTF;
 import de.javagl.jgltf.model.GltfConstants;
-import de.javagl.jgltf.model.io.v1.GltfAssetV1;
+import de.javagl.jgltf.model.io.v2.GltfAssetV2;
+import de.javagl.jgltf.obj.v2.ObjGltfAssetCreatorV2;
 import de.javagl.obj.Obj;
 import de.javagl.obj.Objs;
 
 @SuppressWarnings("javadoc")
-public class TestObjAlignment
+public class TestObjAlignmentV2
 {
     /**
      * Test whether the padding bytes are inserted that are necessary to
@@ -40,20 +41,20 @@ public class TestObjAlignment
         // Create the GltfData, using GL_UNSIGNED_SHORT indices, causing
         // an offset of 6 bytes. (This means that 2 padding bytes will
         // have to be inserted for the subsequent vertex positions data)
-        ObjGltfAssetCreatorV1 objGltfAssetCreator = new ObjGltfAssetCreatorV1();
+        ObjGltfAssetCreatorV2 objGltfAssetCreator = new ObjGltfAssetCreatorV2();
         objGltfAssetCreator.setIndicesComponentType(
             GltfConstants.GL_UNSIGNED_SHORT);
-        GltfAssetV1 gltfAsset = 
+        GltfAssetV2 gltfAsset = 
             objGltfAssetCreator.convert(obj, null, "test", null);
         
         // Obtain the glTF and the accessor and buffer view of the vertices
         GlTF gltf = gltfAsset.getGltf();
 
-        Map<String, Accessor> accessors = gltf.getAccessors();
-        Accessor accessor = accessors.get("obj_positions"); 
+        List<Accessor> accessors = gltf.getAccessors();
+        Accessor accessor = accessors.get(1); 
         
-        Map<String, BufferView> bufferViews = gltf.getBufferViews();
-        BufferView bufferView = bufferViews.get("obj_attributes_bufferView");
+        List<BufferView> bufferViews = gltf.getBufferViews();
+        BufferView bufferView = bufferViews.get(0);
         
         // Compute the byte offset of the accessor referring to the
         // buffer view, and the total byte offset referring to the buffer

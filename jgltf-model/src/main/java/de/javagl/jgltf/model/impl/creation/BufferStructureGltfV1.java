@@ -90,6 +90,7 @@ public class BufferStructureGltfV1
         accessor.setComponentType(accessorModel.getComponentType());
         accessor.setCount(accessorModel.getCount());
         accessor.setType(accessorModel.getElementType().toString());
+        accessor.setByteStride(accessorModel.getByteStride());
         
         AccessorData accessorData = accessorModel.getAccessorData();
         accessor.setMax(AccessorDatas.computeMax(accessorData));
