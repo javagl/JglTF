@@ -129,9 +129,9 @@ public class RenderCommandUtils
             }
             return Arrays.toString(array);
         }
-        if (value instanceof String[])
+        if (value instanceof Object[])
         {
-            String array[] = (String[])value;
+            Object array[] = (Object[])value;
             return Arrays.toString(array);
         }
         return String.valueOf(value);
