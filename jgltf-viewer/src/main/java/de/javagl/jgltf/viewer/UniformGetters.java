@@ -66,7 +66,11 @@ class UniformGetters
      *                     technique.parameters.count is null, then this
      *                     will be a single-element array. 
      * 
-     * GL_SAMPLER_2D     : A String[1] containing the texture ID
+     * GL_SAMPLER_2D     : A Object[1] containing the texture reference. The
+     *                     type of this may be a string (namely, the texture
+     *                     ID for glTF 1.0) or an integer (namely, the texture
+     *                     index for glTF 2.0)
+     * 
      * </code></pre> 
      * <br>
      * The returned suppliers MAY always return the same array instances.
@@ -119,7 +123,7 @@ class UniformGetters
             
             case GltfConstants.GL_SAMPLER_2D:
             {
-                return createStringArraySupplier(
+                return createObjectArraySupplier(
                     uniformName, materialModel);
             }
             
@@ -176,18 +180,18 @@ class UniformGetters
 
     /**
      * Returns a supplier for the specified uniform value. This supplier
-     * will return a String[1] array, with the only element being the
+     * will return a Object[1] array, with the only element being the
      * value of the uniform. This value may be <code>null</code>, or
-     * the string representation of the actual value object.
+     * the actual value object.
      * 
      * @param uniformName The uniform name
      * @param materialModel The {@link MaterialModel}
      * @return The supplier
      */
-    private static Supplier<?> createStringArraySupplier(
+    private static Supplier<?> createObjectArraySupplier(
         String uniformName, MaterialModel materialModel)
     {
-        String value[] = new String[1];
+        Object value[] = new Object[1];
         return () ->
         {
             Object object = getUniformValueObject(
@@ -206,12 +210,12 @@ class UniformGetters
                 else
                 {
                     Object element = collection.iterator().next();
-                    value[0] = String.valueOf(element);
+                    value[0] = element;
                 }
             }
             else
             {
-                value[0] = String.valueOf(object);
+                value[0] = object;
             }
             return value;
         };
@@ -249,6 +253,10 @@ class UniformGetters
                     }
                     Number number = (Number)object;
                     value[0] = number.intValue();
+                }
+                else if (object instanceof int[])
+                {
+                    return (int[])object;
                 }
                 else
                 {
@@ -293,6 +301,10 @@ class UniformGetters
                     }
                     Number number = (Number)object;
                     value[0] = number.floatValue();
+                }
+                else if (object instanceof float[])
+                {
+                    return (float[])object;
                 }
                 else
                 {

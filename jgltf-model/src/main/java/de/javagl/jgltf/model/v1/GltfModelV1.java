@@ -515,11 +515,9 @@ public final class GltfModelV1 implements GltfModel
     private void createMaterialModels()
     {
         Map<String, Material> materials = Optionals.of(gltf.getMaterials());
-        for (Entry<String, Material> entry : materials.entrySet())
+        for (int i = 0; i < materials.size(); i++)
         {
-            Material material = entry.getValue();
-            Map<String, Object> values = Optionals.of(material.getValues());
-            materialModels.add(new DefaultMaterialModel(values));
+            materialModels.add(new DefaultMaterialModel());
         }
     }
     
@@ -1327,6 +1325,8 @@ public final class GltfModelV1 implements GltfModel
             Material material = entry.getValue();
             DefaultMaterialModel materialModel = 
                 get("materials", materialId, materialModels);
+            
+            materialModel.setValues(material.getValues());
             
             String techniqueId = material.getTechnique();
             if (techniqueId == null ||

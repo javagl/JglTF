@@ -46,17 +46,34 @@ public final class DefaultMaterialModel implements MaterialModel
     /**
      * The material parameter values
      */
-    private final Map<String, Object> values;
+    private Map<String, Object> values;
     
     /**
      * Creates a new instance
+     */
+    public DefaultMaterialModel()
+    {
+        this.values = Collections.emptyMap();
+    }
+    
+    /**
+     * Set the material parameter values to be an unmodifiable shallow
+     * copy of the given map (or the empty map if the given map is
+     * <code>null</code>)
      * 
      * @param values The material parameter values
      */
-    public DefaultMaterialModel(Map<String, Object> values)
+    public void setValues(Map<String, Object> values)
     {
-        this.values = Collections.unmodifiableMap(
-            new LinkedHashMap<String, Object>(values));
+        if (values == null)
+        {
+            this.values = Collections.emptyMap();
+        }
+        else
+        {
+            this.values = Collections.unmodifiableMap(
+                new LinkedHashMap<String, Object>(values));
+        }
     }
     
     /**

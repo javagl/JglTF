@@ -110,7 +110,10 @@ class UniformSetterFactory
                 return () ->
                 {
                     int value[] = supplier.get();
-                    glContext.setUniformiv(type, location, count, value);
+                    if (value != null)
+                    {
+                        glContext.setUniformiv(type, location, count, value);
+                    }
                 };
             }
 
@@ -124,7 +127,10 @@ class UniformSetterFactory
                 return () ->
                 {
                     float value[] = supplier.get();
-                    glContext.setUniformfv(type, location, count, value);
+                    if (value != null)
+                    {
+                        glContext.setUniformfv(type, location, count, value);
+                    }
                 };
             }
                 
@@ -137,7 +143,11 @@ class UniformSetterFactory
                 return () ->
                 {
                     float value[] = supplier.get();
-                    glContext.setUniformMatrixfv(type, location, count, value);
+                    if (value != null)
+                    {
+                        glContext.setUniformMatrixfv(
+                            type, location, count, value);
+                    }
                 };
             }
             

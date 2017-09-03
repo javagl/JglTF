@@ -145,8 +145,8 @@ public class DefaultModels
 
         // Create a model for the default material
         Material material = GltfDefaults.getDefaultMaterial();
-        Map<String, Object> values = Optionals.of(material.getValues());
-        DEFAULT_MATERIAL_MODEL = new DefaultMaterialModel(values);
+        DEFAULT_MATERIAL_MODEL = new DefaultMaterialModel();
+        DEFAULT_MATERIAL_MODEL.setValues(material.getValues());
         DEFAULT_MATERIAL_MODEL.setTechniqueModel(DEFAULT_TECHNIQUE_MODEL);
         
     }
@@ -269,6 +269,13 @@ public class DefaultModels
     }
     
     
+    /**
+     * Private constructor to prevent instantiation
+     */
+    private DefaultModels()
+    {
+        // Private constructor to prevent instantiation
+    }
     
     
 }

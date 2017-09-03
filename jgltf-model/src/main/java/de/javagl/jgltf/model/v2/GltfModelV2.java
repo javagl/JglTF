@@ -29,6 +29,7 @@ package de.javagl.jgltf.model.v2;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -52,6 +53,9 @@ import de.javagl.jgltf.impl.v2.Camera;
 import de.javagl.jgltf.impl.v2.GlTF;
 import de.javagl.jgltf.impl.v2.Image;
 import de.javagl.jgltf.impl.v2.Material;
+import de.javagl.jgltf.impl.v2.MaterialNormalTextureInfo;
+import de.javagl.jgltf.impl.v2.MaterialOcclusionTextureInfo;
+import de.javagl.jgltf.impl.v2.MaterialPbrMetallicRoughness;
 import de.javagl.jgltf.impl.v2.Mesh;
 import de.javagl.jgltf.impl.v2.MeshPrimitive;
 import de.javagl.jgltf.impl.v2.Node;
@@ -59,6 +63,7 @@ import de.javagl.jgltf.impl.v2.Sampler;
 import de.javagl.jgltf.impl.v2.Scene;
 import de.javagl.jgltf.impl.v2.Skin;
 import de.javagl.jgltf.impl.v2.Texture;
+import de.javagl.jgltf.impl.v2.TextureInfo;
 import de.javagl.jgltf.model.AccessorByteData;
 import de.javagl.jgltf.model.AccessorData;
 import de.javagl.jgltf.model.AccessorDatas;
@@ -104,6 +109,8 @@ import de.javagl.jgltf.model.impl.DefaultSkinModel;
 import de.javagl.jgltf.model.impl.DefaultTextureModel;
 import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.model.io.v2.GltfAssetV2;
+import de.javagl.jgltf.model.v2.gl.DefaultModels;
+import de.javagl.jgltf.model.v2.gl.Materials;
 
 /**
  * Implementation of a {@link GltfModel}, based on a {@link GlTF glTF 2.0}.<br>
@@ -384,10 +391,7 @@ public final class GltfModelV2 implements GltfModel
         List<Material> materials = Optionals.of(gltf.getMaterials());
         for (int i = 0; i < materials.size(); i++)
         {
-            Material material = materials.get(i);
-            // TODO Create MaterialModel
-            Map<String, Object> values = Collections.emptyMap();
-            materialModels.add(new DefaultMaterialModel(values));
+            materialModels.add(new DefaultMaterialModel());
         }
     }
     
@@ -946,10 +950,8 @@ public final class GltfModelV2 implements GltfModel
         Integer materialIndex = meshPrimitive.getMaterial();
         if (materialIndex == null)
         {
-            int XXX; // TODO Review this: DefaultModels here?
             meshPrimitiveModel.setMaterialModel(
-                de.javagl.jgltf.model.v1.gl.DefaultModels
-                    .getDefaultMaterialModel());
+                DefaultModels.getPbrMaterialModel());
         }
         else
         {
@@ -1112,12 +1114,117 @@ public final class GltfModelV2 implements GltfModel
         for (int i = 0; i < materials.size(); i++)
         {
             Material material = materials.get(i);
-            // TODO Initialize MaterialModel
             DefaultMaterialModel materialModel = materialModels.get(i);
             materialModel.setTechniqueModel(
-                de.javagl.jgltf.model.v1.gl.DefaultModels
-                    .getDefaultTechniqueModel());
+                DefaultModels.getPbrTechniqueModel());
+            initMaterialModel(materialModel, material);
         }
+    }
+
+    /**
+     * Initialize the given {@link MaterialModel} from the values of the
+     * given {@link Material}
+     * 
+     * @param materialModel The {@link MaterialModel}
+     * @param material The {@link Material}
+     */
+    private void initMaterialModel(DefaultMaterialModel materialModel,
+        Material material)
+    {
+        MaterialPbrMetallicRoughness pbrMetallicRoughness = 
+            material.getPbrMetallicRoughness();
+        if (pbrMetallicRoughness == null)
+        {
+            pbrMetallicRoughness = 
+                Materials.createDefaultMaterialPbrMetallicRoughness();
+        }
+        
+        Map<String, Object> values = new LinkedHashMap<String, Object>();
+        
+        TextureInfo baseColorTextureInfo = 
+            pbrMetallicRoughness.getBaseColorTexture();
+        if (baseColorTextureInfo != null)
+        {
+            values.put("hasBaseColorTexture", 1);
+            values.put("baseColorTexCoord",
+                "TEXCOORD_" + baseColorTextureInfo.getTexCoord());
+            values.put("baseColorTexture", baseColorTextureInfo.getIndex());
+        }
+        float[] baseColorFactor = Optionals.of(
+            pbrMetallicRoughness.getBaseColorFactor(),
+            pbrMetallicRoughness.defaultBaseColorFactor());
+        values.put("baseColorFactor", baseColorFactor);
+        
+        
+        TextureInfo metallicRoughnessTextureInfo = 
+            pbrMetallicRoughness.getMetallicRoughnessTexture();
+        if (metallicRoughnessTextureInfo != null)
+        {
+            values.put("hasMetallicRoughnessTexture", 1);
+            values.put("metallicRoughnessTexCoord",
+                "TEXCOORD_" + metallicRoughnessTextureInfo.getTexCoord());
+            values.put("metallicRoughnessTexture", 
+                metallicRoughnessTextureInfo.getIndex());
+        }
+        float metallicFactor = Optionals.of(
+            pbrMetallicRoughness.getMetallicFactor(),
+            pbrMetallicRoughness.defaultMetallicFactor());
+        values.put("metallicFactor", metallicFactor);
+        
+        float roughnessFactor = Optionals.of(
+            pbrMetallicRoughness.getRoughnessFactor(),
+            pbrMetallicRoughness.defaultRoughnessFactor());
+        values.put("roughnessFactor", roughnessFactor);
+        
+        
+        MaterialNormalTextureInfo normalTextureInfo = 
+            material.getNormalTexture();
+        if (normalTextureInfo != null)
+        {
+            values.put("hasNormalTexture", 1);
+            values.put("normalTexCoord",
+                "TEXCOORD_" + normalTextureInfo.getTexCoord());
+            values.put("normalTexture", 
+                normalTextureInfo.getIndex());
+            
+            float normalScale = Optionals.of(
+                normalTextureInfo.getScale(),
+                normalTextureInfo.defaultScale());
+            values.put("normalScale", normalScale);
+        }
+
+        MaterialOcclusionTextureInfo occlusionTextureInfo = 
+            material.getOcclusionTexture();
+        if (occlusionTextureInfo != null)
+        {
+            values.put("hasOcclusionTexture", 1);
+            values.put("occlusionTexCoord",
+                "TEXCOORD_" + occlusionTextureInfo.getTexCoord());
+            values.put("occlusionTexture", 
+                occlusionTextureInfo.getIndex());
+            
+            float occlusionStrength = Optionals.of(
+                occlusionTextureInfo.getStrength(),
+                occlusionTextureInfo.defaultStrength());
+            values.put("occlusionStrength", occlusionStrength);
+        }
+
+        TextureInfo emissiveTextureInfo = 
+            material.getEmissiveTexture();
+        if (emissiveTextureInfo != null)
+        {
+            values.put("hasEmissiveTexture", 1);
+            values.put("emissiveTexCoord",
+                "TEXCOORD_" + emissiveTextureInfo.getTexCoord());
+            values.put("emissiveTexture", 
+                emissiveTextureInfo.getIndex());
+        }
+        float[] emissiveFactor = Optionals.of(
+            material.getEmissiveFactor(),
+            material.defaultEmissiveFactor());
+        values.put("emissiveFactor", emissiveFactor);
+        
+        materialModel.setValues(values);
     }
 
 

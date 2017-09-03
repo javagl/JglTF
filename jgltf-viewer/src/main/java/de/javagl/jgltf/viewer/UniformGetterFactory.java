@@ -27,9 +27,11 @@
 package de.javagl.jgltf.viewer;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -70,6 +72,12 @@ class UniformGetterFactory
     private final Supplier<float[]> viewportSupplier;
     
     /**
+     * The set of uniform names for which a <code>null</code> value 
+     * was already reported. This is mainly intended for debugging.
+     */
+    private final Set<String> reportedNullUniformNames;
+    
+    /**
      * Creates a new instance
      * 
      * @param viewportSupplier A supplier that supplies the viewport, 
@@ -92,6 +100,7 @@ class UniformGetterFactory
         this.projectionMatrixSupplier = 
             Objects.requireNonNull(projectionMatrixSupplier, 
                 "The projectionMatrixSupplier may not be null");
+        this.reportedNullUniformNames = new LinkedHashSet<String>();
     }
     
     /**
@@ -122,14 +131,41 @@ class UniformGetterFactory
         String semantic = techniqueParametersModel.getSemantic();
         if (semantic == null)
         {
-            return UniformGetters.createGenericSupplier(
+            Supplier<?> supplier = UniformGetters.createGenericSupplier(
                 uniformName, materialModel);
+            return createNullLoggingSupplier(uniformName, supplier);
         }
         return createSemanticBasedSupplier(
             uniformName, techniqueModel, nodeModel);
     }
     
-    
+    /**
+     * Create a supplier that wraps the given one, and prints a log message
+     * once when the given supplier returns <code>null</code>. This is 
+     * mainly intended for debugging.
+     * 
+     * @param uniformName The uniform name
+     * @param supplier The delegate supplier
+     * @return The new supplier
+     */
+    private Supplier<?> createNullLoggingSupplier(
+        String uniformName, Supplier<?> supplier)
+    {
+        return () -> 
+        {
+            Object result = supplier.get();
+            if (result == null)
+            {
+                if (!reportedNullUniformNames.contains(uniformName))
+                {
+                    logger.warning("Uniform value is null for " + uniformName);
+                    reportedNullUniformNames.add(uniformName);
+                }
+            }
+            return result;
+        };
+    }
+
     /**
      * Creates a supplier for the value of the uniform with the given name,
      * based on the {@link TechniqueParametersModel#getSemantic() semantic of

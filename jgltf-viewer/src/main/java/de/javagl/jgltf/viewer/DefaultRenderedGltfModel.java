@@ -479,6 +479,16 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
                 {
                     Object value[] = (Object[])uniformValueSupplier.get();
                     Object textureIdOrIndex = value[0];
+                    
+                    // TODO Should this handled by a return here?
+                    // What about the texture counter etc?
+                    //System.out.println("Look up "+textureIdOrIndex);
+                    if (textureIdOrIndex == null)
+                    {
+                        return;
+                    }
+
+                    
                     TextureModel textureModel = 
                         textureModelLookup.apply(textureIdOrIndex);
                     
@@ -663,6 +673,11 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
             String semantic = attributeTechniqueParametersModel.getSemantic();
             AccessorModel accessorModel = meshPrimitiveAttributes.get(semantic);
 
+            if (accessorModel == null)
+            {
+                continue;
+            }
+            
             BufferViewModel bufferViewModel = 
                 accessorModel.getBufferViewModel();
             
