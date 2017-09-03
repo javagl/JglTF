@@ -120,8 +120,8 @@ void main()
     {
         metallicRoughness = texture2D(u_metallicRoughnessTexture, v_metallicRoughnessTexCoord);
     }
-    float metallic = metallicRoughness.x * u_metallicFactor;
-    float roughness = metallicRoughness.y * u_roughnessFactor;
+    float metallic = metallicRoughness.b * u_metallicFactor;
+    float roughness = metallicRoughness.g * u_roughnessFactor;
 
     vec3 N = normalize(v_normal);
 
@@ -152,7 +152,7 @@ void main()
     vec3 H = normalize(L + V);
 
 
-    // Copute the microfacet distribution (D)
+    // Compute the microfacet distribution (D)
     float microfacetDistribution =
         microfacetDistribution(H, N, roughness);
 
@@ -205,6 +205,8 @@ void main()
     //finalColor = vec4(0.0, 0.0, 0.0, 1.0);
     //finalColor.r = u_metallicFactor;
     //finalColor.g = u_roughnessFactor;
+    //finalColor = vec4(1,1,0,1);
+    //finalColor = diffuse;
 
     gl_FragColor = finalColor;
 }

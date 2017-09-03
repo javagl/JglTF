@@ -32,7 +32,7 @@ void main()
     v_normal = u_normalMatrix * vec3(a_normal);
     v_tangent = u_normalMatrix * vec3(a_tangent);
 
-    vec3 lightPosition = vec3(10,10,-10);
+    vec3 lightPosition = vec3(5,5,5);
     v_lightPosition = vec3(u_modelViewMatrix * vec4(lightPosition, 1.0));
 
     v_baseColorTexCoord = a_baseColorTexCoord;
