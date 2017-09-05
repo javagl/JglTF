@@ -335,7 +335,7 @@ public final class GltfModelV2 implements GltfModel
     private static DefaultBufferViewModel createBufferViewModel(
         BufferView bufferView)
     {
-        int byteOffset = bufferView.getByteOffset();
+        int byteOffset = Optionals.of(bufferView.getByteOffset(), 0);
         int byteLength = bufferView.getByteLength();
         Integer byteStride = bufferView.getByteStride();
         Integer target = bufferView.getTarget();
@@ -435,15 +435,23 @@ public final class GltfModelV2 implements GltfModel
         for (int i = 0; i < textures.size(); i++)
         {
             Texture texture = textures.get(i);
-            int samplerIndex = texture.getSampler();
-            Sampler sampler = samplers.get(samplerIndex);
+            Integer samplerIndex = texture.getSampler();
             
-            Integer magFilter = sampler.getMagFilter();
-            Integer minFilter = sampler.getMinFilter();
-            int wrapS = Optionals.of(
-                sampler.getWrapS(), sampler.defaultWrapS());
-            int wrapT = Optionals.of(
-                sampler.getWrapT(), sampler.defaultWrapT());
+            Integer magFilter = GltfConstants.GL_LINEAR;
+            Integer minFilter = GltfConstants.GL_LINEAR;
+            int wrapS = GltfConstants.GL_REPEAT;
+            int wrapT = GltfConstants.GL_REPEAT;
+            
+            if (samplerIndex != null)
+            {
+                Sampler sampler = samplers.get(samplerIndex);
+                magFilter = sampler.getMagFilter();
+                minFilter = sampler.getMinFilter();
+                wrapS = Optionals.of(
+                    sampler.getWrapS(), sampler.defaultWrapS());
+                wrapT = Optionals.of(
+                    sampler.getWrapT(), sampler.defaultWrapT());
+            }
             
             textureModels.add(new DefaultTextureModel(
                 magFilter, minFilter, wrapS, wrapT));
@@ -461,7 +469,7 @@ public final class GltfModelV2 implements GltfModel
             Accessor accessor = accessors.get(i);
             DefaultAccessorModel accessorModel = accessorModels.get(i);
             
-            Integer byteOffset = accessor.getByteOffset();
+            int byteOffset = Optionals.of(accessor.getByteOffset(), 0);
             accessorModel.setByteOffset(byteOffset);
 
             AccessorSparse accessorSparse = accessor.getSparse();
