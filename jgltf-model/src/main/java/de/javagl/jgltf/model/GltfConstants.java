@@ -464,6 +464,29 @@ public class GltfConstants
      */
     public static final int GL_LINEAR_MIPMAP_LINEAR = 9987;
 
+    // glSamplerParameter 
+    
+    /**
+     * The GL_REPEAT constant (10497)
+     */
+    public static final int GL_REPEAT = 10497;
+
+    /**
+     * The GL_MIRRORED_REPEAT constant (33648)
+     */
+    public static final int GL_MIRRORED_REPEAT = 33648;
+
+    /**
+     * The GL_CLAMP_TO_EDGE constant (33071)
+     */
+    public static final int GL_CLAMP_TO_EDGE = 33071;
+
+    /**
+     * The GL_CLAMP_TO_BORDER constant (33069)
+     */
+    public static final int GL_CLAMP_TO_BORDER = 33069;
+
+    
     
     /**
      * Returns the String representation of the given constant
@@ -577,6 +600,12 @@ public class GltfConstants
             case GL_LINEAR_MIPMAP_NEAREST : return "GL_LINEAR_MIPMAP_NEAREST";
             case GL_NEAREST_MIPMAP_LINEAR : return "GL_NEAREST_MIPMAP_LINEAR";
             case GL_LINEAR_MIPMAP_LINEAR : return "GL_LINEAR_MIPMAP_LINEAR";
+            
+            // glSamplerParameter
+            case GL_REPEAT : return "GL_REPEAT";
+            case GL_MIRRORED_REPEAT : return "GL_MIRRORED_REPEAT";
+            case GL_CLAMP_TO_EDGE : return "GL_CLAMP_TO_EDGE";
+            case GL_CLAMP_TO_BORDER : return "GL_CLAMP_TO_BORDER";
             
             default:
                 return "UNKNOWN_GL_CONSTANT["+constant+"]";
