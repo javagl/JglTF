@@ -205,6 +205,27 @@ final class GltfLoadingWorker extends SwingTask<GltfAsset, Object>
                 JOptionPane.ERROR_MESSAGE);
             return;
         }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+
+            JTextArea textArea = new JTextArea();
+            textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
+            textArea.setEditable(false);
+            textArea.append("Loading error: " + e.getMessage() + 
+                "\n" + sw.toString());
+            JScrollPane scrollPane = new JScrollPane(textArea);
+            scrollPane.setPreferredSize(new Dimension(800, 600));
+
+            JOptionPane.showMessageDialog(frame,
+                scrollPane, "Undhandled Error",
+                JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
     }
 
 }
