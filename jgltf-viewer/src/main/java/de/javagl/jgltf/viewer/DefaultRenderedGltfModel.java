@@ -482,16 +482,15 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
                     
                     // TODO Should this handled by a return here?
                     // What about the texture counter etc?
-                    //System.out.println("Look up "+textureIdOrIndex);
                     if (textureIdOrIndex == null)
                     {
                         return;
                     }
-
                     
                     TextureModel textureModel = 
                         textureModelLookup.apply(textureIdOrIndex);
                     
+                    // TODO Handle the case that the textureModel is not found
                     if (textureIdOrIndex == null)
                     {
                         logger.warning("No texture ID or index found "

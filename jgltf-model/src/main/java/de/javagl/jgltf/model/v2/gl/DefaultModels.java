@@ -221,6 +221,9 @@ public class DefaultModels
         addUniformParameters(techniqueModel, "u_normalMatrix", 
             "normalMatrix", GltfConstants.GL_FLOAT_MAT3, 1, 
             "MODELVIEWINVERSETRANSPOSE");
+
+        addUniformParameters(techniqueModel, "u_isDoubleSided", 
+            "isDoubleSided", GltfConstants.GL_INT, 1, null);
         
         addUniformParameters(techniqueModel, "u_baseColorTexture", 
             "baseColorTexture", GltfConstants.GL_SAMPLER_2D, 1, null);

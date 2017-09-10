@@ -33,6 +33,8 @@ uniform float u_normalScale;
 uniform float u_occlusionStrength;
 uniform vec3 u_emissiveFactor;
 
+uniform int u_isDoubleSided;
+
 varying vec3 v_lightPosition;
 
 varying vec2 v_baseColorTexCoord;
@@ -141,7 +143,7 @@ void main()
 
         N = normalize(TBN * scaledTextureNormal);
     }
-
+    
     // Compute the vector from the surface point to the light (L),
     // the vector from the surface point to the viewer (V),
     // and the half-vector between both (H)
@@ -150,7 +152,6 @@ void main()
     vec3 L = normalize(v_lightPosition - v_position);
     vec3 V = normalize(cameraPosition - v_position);
     vec3 H = normalize(L + V);
-
 
     // Compute the microfacet distribution (D)
     float microfacetDistribution =
@@ -207,6 +208,31 @@ void main()
     //finalColor.g = u_roughnessFactor;
     //finalColor = vec4(1,1,0,1);
     //finalColor = diffuse;
+    
+    /* TODO gl_FrontFacing seems to always be "true"
+    if (gl_FrontFacing) 
+    {
+        if (u_isDoubleSided != 0) 
+        {
+            finalColor = vec4(1,0,0,1);
+        }
+        else
+        {
+            finalColor = vec4(1,0,1,1);
+        }
+    } 
+    else
+    {
+        if (u_isDoubleSided != 0) 
+        {
+            finalColor = vec4(0,1,0,1);
+        }
+        else
+        {
+            finalColor = vec4(0,1,1,1);
+        }
+    }
+    //*/
 
     gl_FragColor = finalColor;
 }

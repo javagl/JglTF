@@ -29,7 +29,6 @@ package de.javagl.jgltf.model.v2;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -53,9 +52,6 @@ import de.javagl.jgltf.impl.v2.Camera;
 import de.javagl.jgltf.impl.v2.GlTF;
 import de.javagl.jgltf.impl.v2.Image;
 import de.javagl.jgltf.impl.v2.Material;
-import de.javagl.jgltf.impl.v2.MaterialNormalTextureInfo;
-import de.javagl.jgltf.impl.v2.MaterialOcclusionTextureInfo;
-import de.javagl.jgltf.impl.v2.MaterialPbrMetallicRoughness;
 import de.javagl.jgltf.impl.v2.Mesh;
 import de.javagl.jgltf.impl.v2.MeshPrimitive;
 import de.javagl.jgltf.impl.v2.Node;
@@ -63,7 +59,6 @@ import de.javagl.jgltf.impl.v2.Sampler;
 import de.javagl.jgltf.impl.v2.Scene;
 import de.javagl.jgltf.impl.v2.Skin;
 import de.javagl.jgltf.impl.v2.Texture;
-import de.javagl.jgltf.impl.v2.TextureInfo;
 import de.javagl.jgltf.model.AccessorByteData;
 import de.javagl.jgltf.model.AccessorData;
 import de.javagl.jgltf.model.AccessorDatas;
@@ -109,7 +104,6 @@ import de.javagl.jgltf.model.impl.DefaultTextureModel;
 import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.model.io.v2.GltfAssetV2;
 import de.javagl.jgltf.model.v2.gl.DefaultModels;
-import de.javagl.jgltf.model.v2.gl.Materials;
 
 /**
  * Implementation of a {@link GltfModel}, based on a {@link GlTF glTF 2.0}.<br>
@@ -475,11 +469,11 @@ public final class GltfModelV2 implements GltfModel
             AccessorSparse accessorSparse = accessor.getSparse();
             if (accessorSparse == null)
             {
-                initDenseAccessorModel(accessor, accessorModel);
+                initDenseAccessorModel(i, accessor, accessorModel);
             }
             else
             {
-                initSparseAccessorModel(accessor, accessorModel);
+                initSparseAccessorModel(i, accessor, accessorModel);
             }
         }
     }
@@ -490,10 +484,12 @@ public final class GltfModelV2 implements GltfModel
      * {@link AccessorModel#getBufferViewModel() buffer view model}
      * for the case that the accessor is dense (i.e. not sparse)
      * 
+     * @param accessorIndex The accessor index. Only used for constructing
+     * the URI string of buffers that may have to be created internally 
      * @param accessor The {@link Accessor}
      * @param accessorModel The {@link AccessorModel}
      */
-    private void initDenseAccessorModel(
+    private void initDenseAccessorModel(int accessorIndex,
         Accessor accessor, DefaultAccessorModel accessorModel)
     {
         Integer bufferViewIndex = accessor.getBufferView();
@@ -513,8 +509,9 @@ public final class GltfModelV2 implements GltfModel
             int elementSizeInBytes = accessorModel.getElementSizeInBytes();
             int byteLength = elementSizeInBytes * count;
             ByteBuffer bufferData = Buffers.create(byteLength);
+            String uriString = "buffer_for_accessor" + accessorIndex + ".bin";
             DefaultBufferViewModel bufferViewModel = 
-                createBufferViewModel(bufferData);
+                createBufferViewModel(uriString, bufferData);
             accessorModel.setBufferViewModel(bufferViewModel);
         }
         
@@ -538,10 +535,12 @@ public final class GltfModelV2 implements GltfModel
      * {@link AccessorModel#getBufferViewModel() buffer view model}
      * for the case that the accessor is sparse. 
      * 
+     * @param accessorIndex The accessor index. Only used for constructing
+     * the URI string of buffers that may have to be created internally 
      * @param accessor The {@link Accessor}
      * @param accessorModel The {@link AccessorModel}
      */
-    private void initSparseAccessorModel(
+    private void initSparseAccessorModel(int accessorIndex,
         Accessor accessor, DefaultAccessorModel accessorModel)
     {
         // When the (sparse!) Accessor already refers to a BufferView,
@@ -551,8 +550,9 @@ public final class GltfModelV2 implements GltfModel
         int elementSizeInBytes = accessorModel.getElementSizeInBytes();
         int byteLength = elementSizeInBytes * count;
         ByteBuffer bufferData = Buffers.create(byteLength);
+        String uriString = "buffer_for_accessor" + accessorIndex + ".bin";
         DefaultBufferViewModel denseBufferViewModel = 
-            createBufferViewModel(bufferData);
+            createBufferViewModel(uriString, bufferData);
         accessorModel.setBufferViewModel(denseBufferViewModel);
         accessorModel.setByteOffset(0);
         
@@ -605,16 +605,16 @@ public final class GltfModelV2 implements GltfModel
      * {@link BufferModel} that serves as the basis for a sparse accessor, or 
      * an accessor that does not refer to a {@link BufferView})
      * 
+     * @param uriString The URI string that will be assigned to the 
+     * {@link BufferModel} that is created internally
      * @param bufferData The buffer data
      * @return The new {@link BufferViewModel}
      */
     private DefaultBufferViewModel createBufferViewModel(
-        ByteBuffer bufferData)
+        String uriString, ByteBuffer bufferData)
     {
-        int XXX; // URI string?!
-        //String uriString = UriStrings.createBufferUriString(bufferModels);
         DefaultBufferModel bufferModel = new DefaultBufferModel();
-        //bufferModel.setUri(uriString);
+        bufferModel.setUri(uriString);
         bufferModel.setBufferData(bufferData);
 
         DefaultBufferViewModel bufferViewModel = 
@@ -1120,143 +1120,9 @@ public final class GltfModelV2 implements GltfModel
         {
             Material material = materials.get(i);
             DefaultMaterialModel materialModel = materialModels.get(i);
-            materialModel.setTechniqueModel(
-                DefaultModels.getPbrTechniqueModel());
-            initMaterialModel(materialModel, material);
+            MaterialModels.initMaterialModel(materialModel, material);
         }
     }
-
-    /**
-     * Initialize the given {@link MaterialModel} from the values of the
-     * given {@link Material}
-     * 
-     * @param materialModel The {@link MaterialModel}
-     * @param material The {@link Material}
-     */
-    private void initMaterialModel(DefaultMaterialModel materialModel,
-        Material material)
-    {
-        MaterialPbrMetallicRoughness pbrMetallicRoughness = 
-            material.getPbrMetallicRoughness();
-        if (pbrMetallicRoughness == null)
-        {
-            pbrMetallicRoughness = 
-                Materials.createDefaultMaterialPbrMetallicRoughness();
-        }
-        
-        Map<String, Object> values = new LinkedHashMap<String, Object>();
-        
-        TextureInfo baseColorTextureInfo = 
-            pbrMetallicRoughness.getBaseColorTexture();
-        if (baseColorTextureInfo != null)
-        {
-            values.put("hasBaseColorTexture", 1);
-            values.put("baseColorTexCoord",
-                "TEXCOORD_" + baseColorTextureInfo.getTexCoord());
-            values.put("baseColorTexture", baseColorTextureInfo.getIndex());
-        }
-        else
-        {
-            values.put("hasBaseColorTexture", 0);
-        }
-        float[] baseColorFactor = Optionals.of(
-            pbrMetallicRoughness.getBaseColorFactor(),
-            pbrMetallicRoughness.defaultBaseColorFactor());
-        values.put("baseColorFactor", baseColorFactor);
-        
-        
-        TextureInfo metallicRoughnessTextureInfo = 
-            pbrMetallicRoughness.getMetallicRoughnessTexture();
-        if (metallicRoughnessTextureInfo != null)
-        {
-            values.put("hasMetallicRoughnessTexture", 1);
-            values.put("metallicRoughnessTexCoord",
-                "TEXCOORD_" + metallicRoughnessTextureInfo.getTexCoord());
-            values.put("metallicRoughnessTexture", 
-                metallicRoughnessTextureInfo.getIndex());
-        }
-        else
-        {
-            values.put("hasMetallicRoughnessTexture", 0);
-        }
-        float metallicFactor = Optionals.of(
-            pbrMetallicRoughness.getMetallicFactor(),
-            pbrMetallicRoughness.defaultMetallicFactor());
-        values.put("metallicFactor", metallicFactor);
-        
-        float roughnessFactor = Optionals.of(
-            pbrMetallicRoughness.getRoughnessFactor(),
-            pbrMetallicRoughness.defaultRoughnessFactor());
-        values.put("roughnessFactor", roughnessFactor);
-        
-        
-        MaterialNormalTextureInfo normalTextureInfo = 
-            material.getNormalTexture();
-        if (normalTextureInfo != null)
-        {
-            values.put("hasNormalTexture", 1);
-            values.put("normalTexCoord",
-                "TEXCOORD_" + normalTextureInfo.getTexCoord());
-            values.put("normalTexture", 
-                normalTextureInfo.getIndex());
-            
-            float normalScale = Optionals.of(
-                normalTextureInfo.getScale(),
-                normalTextureInfo.defaultScale());
-            values.put("normalScale", normalScale);
-        }
-        else
-        {
-            values.put("hasNormalTexture", 0);
-            values.put("normalScale", 1.0);
-        }
-
-        MaterialOcclusionTextureInfo occlusionTextureInfo = 
-            material.getOcclusionTexture();
-        if (occlusionTextureInfo != null)
-        {
-            values.put("hasOcclusionTexture", 1);
-            values.put("occlusionTexCoord",
-                "TEXCOORD_" + occlusionTextureInfo.getTexCoord());
-            values.put("occlusionTexture", 
-                occlusionTextureInfo.getIndex());
-            
-            float occlusionStrength = Optionals.of(
-                occlusionTextureInfo.getStrength(),
-                occlusionTextureInfo.defaultStrength());
-            values.put("occlusionStrength", occlusionStrength);
-        }
-        else
-        {
-            values.put("hasOcclusionTexture", 0);
-            
-            // TODO Should this really be 1.0?
-            values.put("occlusionStrength", 1.0); 
-        }
-
-        TextureInfo emissiveTextureInfo = 
-            material.getEmissiveTexture();
-        if (emissiveTextureInfo != null)
-        {
-            values.put("hasEmissiveTexture", 1);
-            values.put("emissiveTexCoord",
-                "TEXCOORD_" + emissiveTextureInfo.getTexCoord());
-            values.put("emissiveTexture", 
-                emissiveTextureInfo.getIndex());
-        }
-        else
-        {
-            values.put("hasEmissiveTexture", 0);
-        }
-        
-        float[] emissiveFactor = Optionals.of(
-            material.getEmissiveFactor(),
-            material.defaultEmissiveFactor());
-        values.put("emissiveFactor", emissiveFactor);
-        
-        materialModel.setValues(values);
-    }
-
 
 
     /**
