@@ -27,6 +27,8 @@
 package de.javagl.jgltf.model;
 
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Mathematical utility methods. These methods are mainly related to 
@@ -47,9 +49,15 @@ import java.util.Arrays;
 public class MathUtils
 {
     /**
+     * The logger used in this class
+     */
+    private static final Logger logger = 
+        Logger.getLogger(MathUtils.class.getName());
+    
+    /**
      * Epsilon for floating point computations
      */
-    private static final float FLOAT_EPSILON = 1e-6f;
+    private static final float FLOAT_EPSILON = 1e-8f;
     
     /**
      * Creates a 4x4 identity matrix
@@ -383,6 +391,11 @@ public class MathUtils
         float det = m0 * inv[0] + m1 * inv[4] + m2 * inv[8] + m3 * inv[12];
         if (Math.abs(det) <= FLOAT_EPSILON)
         {
+            if (logger.isLoggable(Level.FINE)) 
+            {
+                logger.fine("Matrix is not invertible, determinant is " + det
+                    + ", returning identity");
+            }
             setIdentity4x4(inv);
             return;
         }
@@ -418,6 +431,11 @@ public class MathUtils
                     m6 * (m1 * m5 - m4 * m2);
         if (Math.abs(det) <= FLOAT_EPSILON)
         {
+            if (logger.isLoggable(Level.FINE)) 
+            {
+                logger.fine("Matrix is not invertible, determinant is " + det
+                    + ", returning identity");
+            }
             setIdentity3x3(inv);
             return;
         }

@@ -27,6 +27,7 @@
 package de.javagl.jgltf.viewer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -125,11 +126,11 @@ class MatrixOps
     MatrixOps multiply4x4(Supplier<float[]> operandSupplier)
     {
         float result[] = new float[16];
-        functions.add(input -> 
+        functions.add(named("multiply4x4", input -> 
         {
             MathUtils.mul4x4(input, operandSupplier.get(), result);
             return result;
-        });
+        }));
         return this;
     }
     
@@ -141,11 +142,11 @@ class MatrixOps
     MatrixOps invert4x4()
     {
         float result[] = new float[16];
-        functions.add(input -> 
+        functions.add(named("invert4x4", input -> 
         {
             MathUtils.invert4x4(input, result);
             return result;
-        });
+        }));
         return this;
     }
 
@@ -157,11 +158,11 @@ class MatrixOps
     MatrixOps invert3x3()
     {
         float result[] = new float[9];
-        functions.add(input -> 
+        functions.add(named("invert3x4", input -> 
         {
             MathUtils.invert3x3(input, result);
             return result;
-        });
+        }));
         return this;
     }
     
@@ -173,11 +174,11 @@ class MatrixOps
     MatrixOps transpose4x4()
     {
         float result[] = new float[16];
-        functions.add(input -> 
+        functions.add(named("transpose4x4", input -> 
         {
             MathUtils.transpose4x4(input, result);
             return result;
-        });
+        }));
         return this;
     }
     
@@ -190,11 +191,11 @@ class MatrixOps
     MatrixOps getRotationScale()
     {
         float result[] = new float[9];
-        functions.add(input -> 
+        functions.add(named("getRotationScale", input -> 
         {
             MathUtils.getRotationScale(input, result);
             return result;
-        });
+        }));
         return this;
     }
     
@@ -207,7 +208,7 @@ class MatrixOps
      */
     MatrixOps log(String name, Level level)
     {
-        functions.add(input -> 
+        functions.add(named("log "+name, input -> 
         {
             if (logger.isLoggable(level))
             {
@@ -215,8 +216,38 @@ class MatrixOps
                     name + ":\n" + MathUtils.createMatrixString(input));
             }
             return input;
-        });
+        }));
         return this;
+    }
+    
+    /**
+     * Returns a function that wraps the given function, but returns the
+     * given name as its <code>toString</code> representation
+     * 
+     * @param <S> The domain type
+     * @param <T> The codomain type
+     * 
+     * @param name The name
+     * @param function The delegate function
+     * @return The named function
+     */
+    private static <S, T> Function<S, T> named(
+        String name, Function<S, T> function) 
+    {
+        return new Function<S, T>()
+        {
+            @Override
+            public T apply(S s)
+            {
+                return function.apply(s);
+            }
+            
+            @Override
+            public String toString()
+            {
+                return name;
+            }
+        };
     }
     
     /**
@@ -232,6 +263,11 @@ class MatrixOps
             for (Function<float[], float[]> function : functions)
             {
                 current = function.apply(current);
+                if (logger.isLoggable(Level.FINEST))
+                {
+                    logger.finest("current is " + Arrays.toString(current)
+                        + " after " + function);
+                }
             }
             return current;
         };  
