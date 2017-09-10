@@ -139,7 +139,7 @@ public final class GltfAssetV1 implements GltfAsset
             Buffer buffer = buffers.get(bufferId);
             String uri = buffer.getUri();
             Consumer<ByteBuffer> target = 
-                byteBuffer -> referenceDatas.put(uri, byteBuffer);
+                byteBuffer -> putReferenceData(uri, byteBuffer);
             GltfReference reference = 
                 new GltfReference(bufferId, uri, target);
             references.add(reference);
@@ -167,7 +167,7 @@ public final class GltfAssetV1 implements GltfAsset
             }
             String uri = image.getUri();
             Consumer<ByteBuffer> target = 
-                byteBuffer -> referenceDatas.put(uri, byteBuffer);
+                byteBuffer -> putReferenceData(uri, byteBuffer);
             GltfReference reference = 
                 new GltfReference(imageId, uri, target);
             references.add(reference);
@@ -195,7 +195,7 @@ public final class GltfAssetV1 implements GltfAsset
             }
             String uri = shader.getUri();
             Consumer<ByteBuffer> target = 
-                byteBuffer -> referenceDatas.put(uri, byteBuffer);
+                byteBuffer -> putReferenceData(uri, byteBuffer);
             GltfReference reference = 
                 new GltfReference(shaderId, uri, target);
             references.add(reference);
