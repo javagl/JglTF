@@ -27,9 +27,9 @@
 package de.javagl.jgltf.obj;
 
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.IntBuffer;
-import java.nio.ShortBuffer;
+
+import de.javagl.jgltf.model.io.Buffers;
 
 /**
  * Utility methods related to <code>IntBuffer</code> instances 
@@ -56,74 +56,14 @@ public class IntBuffers
     {
         switch (elementSize)
         {
-            case 1: return createConvertedByteByteBuffer(inputBuffer);
-            case 2: return createConvertedShortByteBuffer(inputBuffer);
-            case 4: return createIntByteBuffer(inputBuffer);
+            case 1: return Buffers.castToByteBuffer(inputBuffer);
+            case 2: return Buffers.castToShortByteBuffer(inputBuffer);
+            case 4: return Buffers.createByteBufferFrom(inputBuffer);
             default:
                 break;
         }
         throw new IllegalArgumentException(
             "The elementSize must be 1, 2 or 4, but is " + elementSize);
-    }
-    
-    /**
-     * Create a direct byte buffer with native byte order that contains the 
-     * bytes of the elements of the given input buffer, casted to 
-     * <code>byte</code>.
-     *  
-     * @param inputBuffer The input buffer
-     * @return The byte buffer
-     */
-    private static ByteBuffer createConvertedByteByteBuffer(
-        IntBuffer inputBuffer)
-    {
-        ByteBuffer byteBuffer = 
-            ByteBuffer.allocateDirect(inputBuffer.capacity() * Byte.BYTES)
-            .order(ByteOrder.nativeOrder());
-        for (int i=0; i<inputBuffer.capacity(); i++)
-        {
-            byteBuffer.put(i, (byte)inputBuffer.get(i));
-        }
-        return byteBuffer;
-    }
-    
-    /**
-     * Create a direct byte buffer with native byte order that contains the 
-     * bytes of the elements of the given input buffer, casted to 
-     * <code>short</code>.
-     *  
-     * @param inputBuffer The input buffer
-     * @return The byte buffer
-     */
-    private static ByteBuffer createConvertedShortByteBuffer(
-        IntBuffer inputBuffer)
-    {
-        ByteBuffer byteBuffer = 
-            ByteBuffer.allocateDirect(inputBuffer.capacity() * Short.BYTES)
-            .order(ByteOrder.nativeOrder());
-        ShortBuffer shortBuffer = byteBuffer.asShortBuffer();
-        for (int i=0; i<inputBuffer.capacity(); i++)
-        {
-            shortBuffer.put(i, (short)inputBuffer.get(i));
-        }
-        return byteBuffer;
-    }
-    
-    /**
-     * Create a direct byte buffer with native byte order that contains the 
-     * bytes of the elements of the given input buffer
-     *  
-     * @param inputBuffer The input buffer
-     * @return The byte buffer
-     */
-    private static ByteBuffer createIntByteBuffer(IntBuffer inputBuffer)
-    {
-        ByteBuffer byteBuffer = 
-            ByteBuffer.allocateDirect(inputBuffer.capacity() * Integer.BYTES)
-            .order(ByteOrder.nativeOrder());
-        IntBuffer intBuffer = byteBuffer.asIntBuffer();
-        intBuffer.put(inputBuffer.slice());
-        return byteBuffer;
     }
     
     /**

@@ -262,6 +262,47 @@ public class Buffers
         shortBuffer.put(buffer.slice());
         return byteBuffer;
     }
+    
+    /**
+     * Convert the given input buffer into a direct byte buffer with native
+     * byte order, by casting all elements to <code>byte</code>.
+     * 
+     * @param buffer The input buffer
+     * @return The byte buffer
+     */
+    public static ByteBuffer castToByteBuffer(IntBuffer buffer)
+    {
+        ByteBuffer byteBuffer = 
+            ByteBuffer.allocateDirect(buffer.capacity())
+            .order(ByteOrder.nativeOrder());
+        for (int i = 0; i < buffer.capacity(); i++)
+        {
+            byteBuffer.put(i, (byte) buffer.get(i));
+        }
+        return byteBuffer;
+    }    
+    
+    /**
+     * Convert the given input buffer into a direct byte buffer with native
+     * byte order that contains the elements of the given input buffer,
+     * casted to <code>short</code>.
+     * 
+     * @param buffer The input buffer
+     * @return The short buffer
+     */
+    public static ByteBuffer castToShortByteBuffer(IntBuffer buffer)
+    {
+        ByteBuffer byteBuffer = 
+            ByteBuffer.allocateDirect(buffer.capacity() * Short.BYTES);
+        ShortBuffer shortBuffer = 
+            byteBuffer.order(ByteOrder.nativeOrder()).asShortBuffer();
+        for (int i = 0; i < buffer.capacity(); i++)
+        {
+            shortBuffer.put(i, (short) buffer.get(i));
+        }
+        return byteBuffer;
+    }
+    
 
     /**
      * Creates a copy of the given buffer, as a direct buffer with the 

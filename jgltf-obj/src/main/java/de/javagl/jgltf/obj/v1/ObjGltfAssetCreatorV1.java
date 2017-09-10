@@ -39,7 +39,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -55,11 +54,11 @@ import de.javagl.jgltf.impl.v1.MeshPrimitive;
 import de.javagl.jgltf.impl.v1.Node;
 import de.javagl.jgltf.impl.v1.Scene;
 import de.javagl.jgltf.model.Accessors;
-import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.impl.creation.BufferStructure;
 import de.javagl.jgltf.model.impl.creation.BufferStructureBuilder;
 import de.javagl.jgltf.model.impl.creation.BufferStructureGltfV1;
+import de.javagl.jgltf.model.impl.creation.BufferStructures;
 import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.model.io.GltfReference;
 import de.javagl.jgltf.model.io.GltfReferenceLoader;
@@ -354,24 +353,9 @@ public class ObjGltfAssetCreatorV1
         // For each Buffer reference in the GltfAsset, obtain the data from the 
         // BufferModel instance that has been created by the 
         // BufferStructureBuilder.
-        List<BufferModel> bufferModels = bufferStructure.getBufferModels();
-        Map<String, BufferModel> uriToBufferModel = 
-            new LinkedHashMap<String, BufferModel>();
-        for (BufferModel bufferModel : bufferModels)
-        {
-            String uri = bufferModel.getUri();
-            uriToBufferModel.put(uri, bufferModel);
-        }
-        List<GltfReference> bufferReferences = 
-            gltfAsset.getBufferReferences();
-        for (GltfReference bufferReference : bufferReferences)
-        {
-            String uri = bufferReference.getUri();
-            BufferModel bufferModel = uriToBufferModel.get(uri);
-            Consumer<ByteBuffer> target = bufferReference.getTarget();
-            target.accept(bufferModel.getBufferData());
-        }
-
+        List<GltfReference> bufferReferences = gltfAsset.getBufferReferences();
+        BufferStructures.resolve(bufferReferences, bufferStructure);
+        
         if (baseUri != null)
         {
             // Resolve the image data, by reading the data from the URIs in
