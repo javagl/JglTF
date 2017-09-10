@@ -112,6 +112,11 @@ public abstract class AbstractGltfViewer<C> implements GltfViewer<C>
     private final Map<GltfModel, RenderedGltfModel> renderedGltfModels;
     
     /**
+     * The list of {@link GltfModel} instances that have been added.
+     */
+    private final List<GltfModel> gltfModels;
+    
+    /**
      * The {@link AnimationManager}
      */
     private AnimationManager animationManager;
@@ -137,6 +142,7 @@ public abstract class AbstractGltfViewer<C> implements GltfViewer<C>
             new ArrayList<Runnable>());
         this.renderedGltfModels = 
             new LinkedHashMap<GltfModel, RenderedGltfModel>();
+        this.gltfModels = new ArrayList<GltfModel>();
         this.animationManager = 
             GltfAnimations.createAnimationManager(AnimationPolicy.LOOP);
         this.animationManager.addAnimationManagerListener(a ->
@@ -182,7 +188,7 @@ public abstract class AbstractGltfViewer<C> implements GltfViewer<C>
     public final void addGltfModel(GltfModel gltfModel)
     {
         Objects.requireNonNull(gltfModel, "The gltfModel may not be null");
-        
+        gltfModels.add(gltfModel);
         addBeforeRenderTask(() -> createRenderedGltf(gltfModel));
         triggerRendering();
     }
@@ -257,6 +263,7 @@ public abstract class AbstractGltfViewer<C> implements GltfViewer<C>
     public void removeGltfModel(GltfModel gltfModel)
     {
         Objects.requireNonNull(gltfModel, "The gltfModel may not be null");
+        gltfModels.remove(gltfModel);
         addBeforeRenderTask(() -> deleteRenderedGltfModel(gltfModel));
         List<Animation> currentModelAnimations = modelAnimations.get(gltfModel);
         if (currentModelAnimations != null)
@@ -293,7 +300,7 @@ public abstract class AbstractGltfViewer<C> implements GltfViewer<C>
     public List<CameraModel> getCameraModels()
     {
         List<CameraModel> cameraModels = new ArrayList<CameraModel>();
-        for (GltfModel gltfModel : renderedGltfModels.keySet())
+        for (GltfModel gltfModel : gltfModels)
         {
             cameraModels.addAll(gltfModel.getCameraModels());
         }
