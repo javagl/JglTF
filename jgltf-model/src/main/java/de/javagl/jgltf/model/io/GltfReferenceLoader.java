@@ -123,7 +123,7 @@ public class GltfReferenceLoader
             }
             else
             {
-                load(reference, inputStream);
+                loadOptional(reference, inputStream);
             }
         }
         catch (IOException e)
@@ -140,7 +140,8 @@ public class GltfReferenceLoader
      * @param reference The {@link GltfReference}
      * @param inputStream The input stream
      */
-    public static void load(GltfReference reference, InputStream inputStream)
+    private static void loadOptional(
+        GltfReference reference, InputStream inputStream)
     {
         String name = reference.getName();
         Consumer<ByteBuffer> target = reference.getTarget();
@@ -156,8 +157,28 @@ public class GltfReferenceLoader
         {
             logger.warning("Reading " + name + " FAILED: " + e.getMessage());
         }
-        
     }
+    
+    /**
+     * Load the data of the given {@link GltfReference} from the given 
+     * input stream. 
+     * 
+     * @param reference The {@link GltfReference}
+     * @param inputStream The input stream
+     * @throws IOException If an IO error occurs 
+     */
+    public static void load(GltfReference reference, InputStream inputStream) 
+        throws IOException
+    {
+        String name = reference.getName();
+        Consumer<ByteBuffer> target = reference.getTarget();
+        logger.log(level, "Reading " + name);
+        byte data[] = IO.readStream(inputStream);
+        ByteBuffer byteBuffer = Buffers.create(data);
+        logger.log(level, "Reading " + name + " DONE");
+        target.accept(byteBuffer);
+    }
+    
     
     /**
      * Private constructor to prevent instantiation
