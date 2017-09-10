@@ -283,7 +283,7 @@ public abstract class AbstractGltfViewer<C> implements GltfViewer<C>
     private void deleteRenderedGltfModel(GltfModel gltfModel)
     {
         RenderedGltfModel renderedGltfModel = renderedGltfModels.get(gltfModel);
-        if (renderedGltfModels == null)
+        if (renderedGltfModel == null)
         {
             logger.warning(
                 "No renderedGltfModel found for gltfModel " + gltfModel);
