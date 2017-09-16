@@ -61,7 +61,7 @@ import de.javagl.jgltf.model.impl.creation.BufferStructureGltfV1;
 import de.javagl.jgltf.model.impl.creation.BufferStructures;
 import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.model.io.GltfReference;
-import de.javagl.jgltf.model.io.GltfReferenceLoader;
+import de.javagl.jgltf.model.io.GltfReferenceResolver;
 import de.javagl.jgltf.model.io.IO;
 import de.javagl.jgltf.model.io.UriResolvers;
 import de.javagl.jgltf.model.io.v1.GltfAssetV1;
@@ -361,21 +361,23 @@ public class ObjGltfAssetCreatorV1
             // Resolve the image data, by reading the data from the URIs in
             // the Images, resolved against the root path of the input OBJ
             logger.log(level, "Resolving Image data");
-            Function<String, InputStream> externalUriResolver = 
+            Function<String, ByteBuffer> externalUriResolver = 
                 UriResolvers.createBaseUriResolver(baseUri);
             List<GltfReference> imageReferences = 
                 gltfAsset.getImageReferences();
-            GltfReferenceLoader.loadAll(imageReferences, externalUriResolver);
+            GltfReferenceResolver.resolveAll(
+                imageReferences, externalUriResolver);
             
             // Resolve the shader data, by reading the resources that are
             // referenced via the Shader URIs
             logger.log(level, "Resolving Shader data");
-            Function<String, InputStream> internalUriResolver = 
+            Function<String, ByteBuffer> internalUriResolver = 
                 UriResolvers.createResourceUriResolver(
                     ObjGltfAssetCreatorV1.class);
             List<GltfReference> shaderReferences = 
                 gltfAsset.getShaderReferences();
-            GltfReferenceLoader.loadAll(shaderReferences, internalUriResolver);
+            GltfReferenceResolver.resolveAll(
+                shaderReferences, internalUriResolver);
         }
         
         return gltfAsset;

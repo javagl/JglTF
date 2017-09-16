@@ -62,7 +62,7 @@ import de.javagl.jgltf.model.impl.creation.BufferStructureGltfV2;
 import de.javagl.jgltf.model.impl.creation.BufferStructures;
 import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.model.io.GltfReference;
-import de.javagl.jgltf.model.io.GltfReferenceLoader;
+import de.javagl.jgltf.model.io.GltfReferenceResolver;
 import de.javagl.jgltf.model.io.IO;
 import de.javagl.jgltf.model.io.UriResolvers;
 import de.javagl.jgltf.model.io.v2.GltfAssetV2;
@@ -361,11 +361,12 @@ public class ObjGltfAssetCreatorV2
             // Resolve the image data, by reading the data from the URIs in
             // the Images, resolved against the root path of the input OBJ
             logger.log(level, "Resolving Image data");
-            Function<String, InputStream> externalUriResolver = 
+            Function<String, ByteBuffer> externalUriResolver = 
                 UriResolvers.createBaseUriResolver(baseUri);
             List<GltfReference> imageReferences = 
                 gltfAsset.getImageReferences();
-            GltfReferenceLoader.loadAll(imageReferences, externalUriResolver);
+            GltfReferenceResolver.resolveAll(
+                imageReferences, externalUriResolver);
         }
         
         return gltfAsset;

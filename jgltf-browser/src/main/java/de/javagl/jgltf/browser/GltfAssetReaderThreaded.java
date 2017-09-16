@@ -26,9 +26,11 @@
  */
 package de.javagl.jgltf.browser;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.ByteBuffer;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,10 +43,10 @@ import java.util.function.Consumer;
 import java.util.function.LongConsumer;
 import java.util.logging.Logger;
 
+import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.model.io.GltfAsset;
 import de.javagl.jgltf.model.io.GltfAssetReader;
 import de.javagl.jgltf.model.io.GltfReference;
-import de.javagl.jgltf.model.io.GltfReferenceLoader;
 import de.javagl.jgltf.model.io.IO;
 import de.javagl.jgltf.model.io.JsonError;
 import de.javagl.jgltf.model.io.ProgressInputStream;
@@ -350,14 +352,7 @@ public class GltfAssetReaderThreaded
             GltfAsset loadedGltfAsset = 
                 gltfAssetReader.readWithoutReferences(progressInputStream);
             setGltfAsset(loadedGltfAsset);
-            try
-            {
-                progressInputStream.close();
-            }
-            catch (IOException e)
-            {
-                logger.warning("Could not close stream: " + e.getMessage());
-            }
+            tryClose(progressInputStream);
             return null;
         }; 
         
@@ -387,19 +382,17 @@ public class GltfAssetReaderThreaded
         URI baseUri = IO.getParent(uri);
         URI absoluteUri = IO.makeAbsolute(baseUri, uriString);
         InputStream inputStream = IO.createInputStream(absoluteUri);
-        
         ProgressInputStream progressInputStream = 
             new ProgressInputStream(inputStream);
         Callable<Void> basicTask = () -> 
         {
-            GltfReferenceLoader.load(reference, progressInputStream);
-            try
+            try 
             {
-                progressInputStream.close();
+                load(reference, progressInputStream);
             }
-            catch (IOException e)
+            finally
             {
-                logger.warning("Could not close stream: " + e.getMessage());
+                tryClose(progressInputStream);
             }
             return null;
         };
@@ -418,6 +411,45 @@ public class GltfAssetReaderThreaded
         loadingTask.setCallable(basicTask);
         attach(progressInputStream, loadingTask);
         return loadingTask;
+    }
+    
+    /**
+     * Load the data of the given {@link GltfReference} from the given 
+     * input stream. The caller is responsible for closing the stream.
+     * 
+     * @param reference The {@link GltfReference}
+     * @param inputStream The input stream
+     * @throws IOException If an IO error occurs 
+     */
+    private static void load(GltfReference reference, InputStream inputStream) 
+        throws IOException
+    {
+        String name = reference.getName();
+        Consumer<ByteBuffer> target = reference.getTarget();
+        logger.fine("Reading " + name);
+        byte data[] = IO.readStream(inputStream);
+        ByteBuffer byteBuffer = Buffers.create(data);
+        logger.fine("Reading " + name + " DONE");
+        target.accept(byteBuffer);
+    }
+    
+    /**
+     * Try to close the given closeable, and print a warning if this should
+     * ever cause an exception.
+     * 
+     * @param closeable The closeable
+     */
+    private static void tryClose(Closeable closeable)
+    {
+        try
+        {
+            closeable.close();
+        }
+        catch (IOException e)
+        {
+            logger.warning(
+                "Could not close " + closeable + " : "+ e.getMessage());
+        }
     }
     
     

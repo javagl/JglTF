@@ -106,7 +106,8 @@ public final class GltfAssetReader
         {
             readWithoutReferences(inputStream);
             URI baseUri = IO.getParent(uri);
-            GltfReferenceLoader.loadAll(gltfAsset.getReferences(), baseUri);
+            GltfReferenceResolver.resolveAll(
+                gltfAsset.getReferences(), baseUri);
             return gltfAsset;
         }
     }

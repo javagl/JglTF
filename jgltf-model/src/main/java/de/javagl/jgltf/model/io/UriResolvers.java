@@ -29,12 +29,13 @@ package de.javagl.jgltf.model.io;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.ByteBuffer;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.logging.Logger;
 
 /**
- * Methods for creating functions that resolve URI to input streams
+ * Methods for creating functions that resolve URI to byte buffers
  */
 public class UriResolvers
 {
@@ -46,22 +47,23 @@ public class UriResolvers
 
     /**
      * Creates a function that resolves URI strings against the given 
-     * base URI, and returns an input stream for reading the data from 
+     * base URI, and returns a byte buffer containing the data from 
      * the resulting URI.<br>
      * <br>
      * The given URI strings may either be standard URI or data URI.<br>
      * <br>
-     * If the returned function cannot open a stream, then it will print a
+     * If the returned function cannot read the data, then it will print a
      * warning and return <code>null</code>.
      * 
      * @param baseUri The base URI to resolve against
      * @return The function
      */
-    public static Function<String, InputStream> createBaseUriResolver(
+    public static Function<String, ByteBuffer> createBaseUriResolver(
         URI baseUri)
     {
         Objects.requireNonNull(baseUri, "The baseUri may not be null");
-        return new Function<String, InputStream>()
+        Function<String, InputStream> inputStreamFunction = 
+            new Function<String, InputStream>()
         {
             @Override
             public InputStream apply(String uriString)
@@ -79,6 +81,7 @@ public class UriResolvers
                 }
             }
         };
+        return reading(inputStreamFunction);
     }
     
     /**
@@ -88,11 +91,12 @@ public class UriResolvers
      * @param c The class
      * @return The resolving function
      */
-    public static Function<String, InputStream> createResourceUriResolver(
+    public static Function<String, ByteBuffer> createResourceUriResolver(
         Class<?> c)
     {
         Objects.requireNonNull(c, "The class may not be null");
-        return new Function<String, InputStream>()
+        Function<String, InputStream> inputStreamFunction =
+            new Function<String, InputStream>()
         {
             @Override
             public InputStream apply(String uriString)
@@ -108,8 +112,49 @@ public class UriResolvers
                 return inputStream;
             }
         };
+        return reading(inputStreamFunction);
     }
     
+    /**
+     * Returns a function that reads the data from the input stream that is
+     * provided by the given delegate, and returns this data as a direct
+     * byte buffer.<br>
+     * <br>
+     * If the delegate returns <code>null</code>, or an input stream that
+     * cannot be read, then the function will print a warning and return
+     * <code>null</code>.
+     * 
+     * @param inputStreamFunction The input stream function
+     * @return The function for reading the input stream data
+     */
+    private static <T> Function<T, ByteBuffer> reading(
+        Function<? super T, ? extends InputStream> inputStreamFunction)
+    {
+        return new Function<T, ByteBuffer>()
+        {
+            @Override
+            public ByteBuffer apply(T t)
+            {
+                try (InputStream inputStream = inputStreamFunction.apply(t))
+                {
+                    if (inputStream == null)
+                    {
+                        logger.warning("The input stream was null");
+                        return null;
+                    }
+                    byte data[] = IO.readStream(inputStream);
+                    return Buffers.create(data);
+                }
+                catch (IOException e)
+                {
+                    logger.warning("Could not read from input stream: "
+                        + e.getMessage());
+                    return null;
+                }
+            }
+            
+        };
+    }
 
     /**
      * Private constructor to prevent instantiation
