@@ -27,6 +27,7 @@
 package de.javagl.jgltf.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
@@ -288,7 +289,7 @@ public class GltfAnimations
     /**
      * Creates an {@link AnimationListener} that writes the animation data
      * into the {@link NodeModel#getTranslation() translation} of the 
-     * {@link NodeModel}
+     * {@link NodeModel}.
      * 
      * @param nodeModel The {@link NodeModel}
      * @return The {@link AnimationListener}
@@ -298,15 +299,23 @@ public class GltfAnimations
     {
         return (animation, timeS, values) ->
         {
-            float t[] = nodeModel.getTranslation();
-            System.arraycopy(values, 0, t, 0, values.length);
+            float translation[] = nodeModel.getTranslation();
+            if (translation == null)
+            {
+                translation = values.clone();
+                nodeModel.setTranslation(translation);
+            }
+            else
+            {
+                System.arraycopy(values, 0, translation, 0, values.length);
+            }
         };
     }
     
     /**
      * Creates an {@link AnimationListener} that writes the animation data
      * into the {@link NodeModel#getRotation() rotation} of the 
-     * {@link NodeModel}
+     * {@link NodeModel}.
      * 
      * @param nodeModel The {@link NodeModel}
      * @return The {@link AnimationListener}
@@ -316,15 +325,23 @@ public class GltfAnimations
     {
         return (animation, timeS, values) ->
         {
-            float t[] = nodeModel.getRotation();
-            System.arraycopy(values, 0, t, 0, values.length);
+            float rotation[] = nodeModel.getRotation();
+            if (rotation == null)
+            {
+                rotation = values.clone();
+                nodeModel.setRotation(rotation);
+            }
+            else
+            {
+                System.arraycopy(values, 0, rotation, 0, values.length);
+            }
         };
     }
     
     /**
      * Creates an {@link AnimationListener} that writes the animation data
      * into the {@link NodeModel#getScale() scale} of the 
-     * {@link NodeModel}
+     * {@link NodeModel}.
      * 
      * @param nodeModel The {@link NodeModel}
      * @return The {@link AnimationListener}
@@ -334,15 +351,23 @@ public class GltfAnimations
     {
         return (animation, timeS, values) ->
         {
-            float t[] = nodeModel.getScale();
-            System.arraycopy(values, 0, t, 0, values.length);
+            float scale[] = nodeModel.getScale();
+            if (scale == null)
+            {
+                scale = values.clone();
+                nodeModel.setScale(scale);
+            }
+            else
+            {
+                System.arraycopy(values, 0, scale, 0, values.length);
+            }
         };
     }
     
     /**
      * Creates an {@link AnimationListener} that writes the animation data
      * into the {@link NodeModel#getWeights() weights} of the 
-     * {@link NodeModel}
+     * {@link NodeModel}.
      * 
      * @param nodeModel The {@link NodeModel}
      * @return The {@link AnimationListener}
@@ -352,8 +377,16 @@ public class GltfAnimations
     {
         return (animation, timeS, values) ->
         {
-            float t[] = nodeModel.getWeights();
-            System.arraycopy(values, 0, t, 0, values.length);
+            float weights[] = nodeModel.getWeights();
+            if (weights == null)
+            {
+                weights = values.clone();
+                nodeModel.setWeights(weights);
+            }
+            else
+            {
+                System.arraycopy(values, 0, weights, 0, values.length);
+            }
         };
     }
     
