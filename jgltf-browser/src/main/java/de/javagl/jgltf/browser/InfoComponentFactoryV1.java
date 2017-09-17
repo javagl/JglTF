@@ -317,7 +317,7 @@ class InfoComponentFactoryV1
         {
             return parent.createMessageInfoPanel(
                 "Could not find image data for " + selectedValue + 
-                "with ID " + key);
+                " with ID " + key);
         }
         return parent.createImageInfoPanel(bufferedImage);
     }
