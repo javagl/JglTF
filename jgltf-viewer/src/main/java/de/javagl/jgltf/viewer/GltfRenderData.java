@@ -236,6 +236,11 @@ public class GltfRenderData
         ImageModel imageModel = textureModel.getImageModel();
         ByteBuffer imageData = imageModel.getImageData();
         PixelData pixelData = PixelDatas.create(imageData);
+        if (pixelData == null)
+        {
+            logger.warning("Could not extract pixel data from image");
+            pixelData = PixelDatas.createErrorPixelData();
+        }
         int width = pixelData.getWidth();
         int height = pixelData.getHeight();
         ByteBuffer pixelsRGBA = pixelData.getPixelsRGBA();
