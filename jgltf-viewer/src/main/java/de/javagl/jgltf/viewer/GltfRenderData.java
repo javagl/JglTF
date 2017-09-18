@@ -213,9 +213,9 @@ public class GltfRenderData
     
     /**
      * Internal method to create the GL texture for the given 
-     * {@link TextureModel}. If the GL texture can not be created for any 
-     * reason, then a warning will be printed and <code>null</code> will 
-     * be returned.
+     * {@link TextureModel}. If the image data for the texture cannot
+     * be read, then a warning will be printed, and an unspecified 
+     * placeholder texture will be returned.
      * 
      * @param textureModel The {@link TextureModel} key
      * @return The GL texture
@@ -254,7 +254,8 @@ public class GltfRenderData
         glContext.setGlTextureParameters(
             glTexture, minFilter, magFilter, wrapS, wrapT);
         
-        logger.fine("Creating GL texture for texture " + textureModel + " DONE");
+        logger.fine(
+            "Creating GL texture for texture " + textureModel + " DONE");
         return glTexture;
     }
 
