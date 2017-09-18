@@ -190,8 +190,9 @@ public class GltfRenderData
      * Otherwise, the GL texture will be created, stored for later 
      * retrieval, and returned.<br>
      * <br>
-     * If the GL program can not be created (e.g. due to missing data), then 
-     * a warning will be printed and <code>null</code> will be returned.
+     * If the GL texture can not be created (e.g. due to missing or invalid
+     * image data), then a warning will be printed and an unspecified 
+     * placeholder texture will be returned.
      *  
      * @param textureModel The {@link TextureModel}
      * @return The GL texture
