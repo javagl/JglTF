@@ -14,7 +14,7 @@ uniform mat3 u_normalMatrix;
 
 varying vec3 v_position;
 varying vec3 v_normal;
-varying vec3 v_tangent;
+varying vec4 v_tangent;
 
 varying vec3 v_lightPosition;
 
@@ -43,7 +43,7 @@ void main()
     vec4 pos = u_modelViewMatrix * a_position;
     v_position = vec3(pos.xyz) / pos.w;
     v_normal = u_normalMatrix * vec3(a_normal);
-    v_tangent = u_normalMatrix * vec3(a_tangent);
+    v_tangent = vec4(u_normalMatrix * vec3(a_tangent), a_tangent.w);
 
     vec3 lightPosition = vec3(-800,500,-500);
     v_lightPosition = vec3(u_modelViewMatrix * vec4(lightPosition, 1.0));

@@ -45,7 +45,7 @@ varying vec2 v_emissiveTexCoord;
 
 varying vec3 v_position;
 varying vec3 v_normal;
-varying vec3 v_tangent;
+varying vec4 v_tangent;
 
 const float M_PI = 3.141592653589793;
 
@@ -188,9 +188,11 @@ vec3 computeNormal()
 
         // Compute the TBN (tangent, bitangent, normal) matrix
         // that maps the normal of the normal texture from the
-        // surface coordinate system into view space
-        vec3 T = normalize(v_tangent);
-        vec3 B = cross(N, T);
+        // surface coordinate system into view space. 
+        // The w-component of the tangent attribute value indicates
+        // the handedness of the tangent space (+1 or -1)
+        vec3 T = normalize(v_tangent.xyz);
+        vec3 B = cross(N, T) * v_tangent.w;
         mat3 TBN = mat3(T, B, N);
 
         N = normalize(TBN * scaledTextureNormal);
