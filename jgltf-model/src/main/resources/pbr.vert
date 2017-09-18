@@ -24,15 +24,28 @@ varying vec2 v_normalTexCoord;
 varying vec2 v_occlusionTexCoord;
 varying vec2 v_emissiveTexCoord;
 
+// TODO Only for basic tests
+//attribute vec4 a_joint;
+//attribute vec4 a_weight;
+//uniform mat4 u_jointMat[16];
+
+
 void main()
 {
-
+/*
+    // TODO Only for basic tests
+    mat4 skinMat = a_weight.x * u_jointMat[int(a_joint.x)];
+    skinMat += a_weight.y * u_jointMat[int(a_joint.y)];
+    skinMat += a_weight.z * u_jointMat[int(a_joint.z)];
+    skinMat += a_weight.w * u_jointMat[int(a_joint.w)];
+    vec4 pos = u_modelViewMatrix * skinMat * a_position;
+*/
     vec4 pos = u_modelViewMatrix * a_position;
     v_position = vec3(pos.xyz) / pos.w;
     v_normal = u_normalMatrix * vec3(a_normal);
     v_tangent = u_normalMatrix * vec3(a_tangent);
 
-    vec3 lightPosition = vec3(8,1,5);
+    vec3 lightPosition = vec3(-800,500,-500);
     v_lightPosition = vec3(u_modelViewMatrix * vec4(lightPosition, 1.0));
 
     v_baseColorTexCoord = a_baseColorTexCoord;
