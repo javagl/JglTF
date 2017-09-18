@@ -29,6 +29,7 @@ package de.javagl.jgltf.model.v2;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -86,6 +87,7 @@ import de.javagl.jgltf.model.SceneModel;
 import de.javagl.jgltf.model.SkinModel;
 import de.javagl.jgltf.model.TextureModel;
 import de.javagl.jgltf.model.Utils;
+import de.javagl.jgltf.model.gl.TechniqueModel;
 import de.javagl.jgltf.model.impl.DefaultAccessorModel;
 import de.javagl.jgltf.model.impl.DefaultAnimationModel;
 import de.javagl.jgltf.model.impl.DefaultAnimationModel.DefaultChannel;
@@ -103,7 +105,7 @@ import de.javagl.jgltf.model.impl.DefaultSkinModel;
 import de.javagl.jgltf.model.impl.DefaultTextureModel;
 import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.model.io.v2.GltfAssetV2;
-import de.javagl.jgltf.model.v2.gl.DefaultModels;
+import de.javagl.jgltf.model.v2.gl.Materials;
 
 /**
  * Implementation of a {@link GltfModel}, based on a {@link GlTF glTF 2.0}.<br>
@@ -204,6 +206,11 @@ public final class GltfModelV2 implements GltfModel
      */
     private final List<DefaultTextureModel> textureModels;
 
+    /**
+     * The {@link MaterialModelHandler} that will manage the 
+     * {@link MaterialModel} instances that have to be created
+     */
+    private final MaterialModelHandler materialModelHandler;
 
     /**
      * Creates a new model for the given glTF
@@ -230,12 +237,13 @@ public final class GltfModelV2 implements GltfModel
         this.skinModels = new ArrayList<DefaultSkinModel>();
         this.textureModels = new ArrayList<DefaultTextureModel>();
         
+        this.materialModelHandler = new MaterialModelHandler();
+        
         createAccessorModels();
         createAnimationModels();
         createBufferModels();
         createBufferViewModels();
         createImageModels();
-        createMaterialModels();
         createMeshModels();
         createNodeModels();
         createSceneModels();
@@ -248,7 +256,6 @@ public final class GltfModelV2 implements GltfModel
         initAccessorModels();
         initAnimationModels();
         initImageModels();
-        initMaterialModels();
         initMeshModels();
         initNodeModels();
         initSceneModels();
@@ -256,6 +263,7 @@ public final class GltfModelV2 implements GltfModel
         initTextureModels();
         
         instantiateCameraModels();
+        instantiateMaterialModels();
     }
     
     
@@ -356,18 +364,6 @@ public final class GltfModelV2 implements GltfModel
             String uri = image.getUri();
             imageModel.setUri(uri);
             imageModels.add(imageModel);
-        }
-    }
-    
-    /**
-     * Create the {@link MaterialModel} instances
-     */
-    private void createMaterialModels()
-    {
-        List<Material> materials = Optionals.of(gltf.getMaterials());
-        for (int i = 0; i < materials.size(); i++)
-        {
-            materialModels.add(new DefaultMaterialModel());
         }
     }
     
@@ -920,7 +916,13 @@ public final class GltfModelV2 implements GltfModel
     }
     
     /**
-     * Create a {@link MeshPrimitiveModel} for the given {@link MeshPrimitive}
+     * Create a {@link MeshPrimitiveModel} for the given 
+     * {@link MeshPrimitive}.<br>
+     * <br>
+     * Note: The resulting {@link MeshPrimitiveModel} will not have any
+     * {@link MaterialModel} assigned. The material model may have to
+     * be instantiated multiple times, with different {@link TechniqueModel}
+     * instances. This is done in {@link #instantiateMaterialModels()}
      * 
      * @param meshPrimitive The {@link MeshPrimitive}
      * @return The {@link MeshPrimitiveModel}
@@ -928,11 +930,9 @@ public final class GltfModelV2 implements GltfModel
     private DefaultMeshPrimitiveModel createMeshPrimitiveModel(
         MeshPrimitive meshPrimitive)
     {
-        Integer mode = meshPrimitive.getMode();
-        if (mode == null)
-        {
-            mode = meshPrimitive.defaultMode();
-        }
+        Integer mode = Optionals.of(
+            meshPrimitive.getMode(), 
+            meshPrimitive.defaultMode());
         DefaultMeshPrimitiveModel meshPrimitiveModel = 
             new DefaultMeshPrimitiveModel(mode);
         
@@ -952,16 +952,22 @@ public final class GltfModelV2 implements GltfModel
             meshPrimitiveModel.putAttribute(attributeName, attribute);
         }
         
-        Integer materialIndex = meshPrimitive.getMaterial();
-        if (materialIndex == null)
+        List<Map<String, Integer>> morphTargets =
+            Optionals.of(meshPrimitive.getTargets());
+        for (Map<String, Integer> morphTarget : morphTargets)
         {
-            meshPrimitiveModel.setMaterialModel(
-                DefaultModels.getPbrMaterialModel());
-        }
-        else
-        {
-            MaterialModel materialModel = materialModels.get(materialIndex);
-            meshPrimitiveModel.setMaterialModel(materialModel);
+            Map<String, AccessorModel> morphTargetModel = 
+                new LinkedHashMap<String, AccessorModel>();
+            for (Entry<String, Integer> entry : morphTarget.entrySet())
+            {
+                String attribute = entry.getKey();
+                Integer accessorIndex = entry.getValue();
+                DefaultAccessorModel accessorModel = 
+                    accessorModels.get(accessorIndex);
+                morphTargetModel.put(attribute, accessorModel);
+            }
+            meshPrimitiveModel.addTarget(
+                Collections.unmodifiableMap(morphTargetModel));
         }
         
         return meshPrimitiveModel;
@@ -984,12 +990,14 @@ public final class GltfModelV2 implements GltfModel
                 DefaultNodeModel child = nodeModels.get(childIndex);
                 nodeModel.addChild(child);
             }
+            
             Integer meshIndex = node.getMesh();
             if (meshIndex != null)
             {
                 MeshModel meshModel = meshModels.get(meshIndex);
                 nodeModel.addMeshModel(meshModel);
             }
+            
             Integer skinIndex = node.getSkin();
             if (skinIndex != null)
             {
@@ -1023,6 +1031,7 @@ public final class GltfModelV2 implements GltfModel
         }
     }
     
+
     /**
      * Initialize the {@link SceneModel} instances
      */
@@ -1110,20 +1119,6 @@ public final class GltfModelV2 implements GltfModel
         }
     }
     
-    /**
-     * Initialize the {@link MaterialModel} instances
-     */
-    private void initMaterialModels()
-    {
-        List<Material> materials = Optionals.of(gltf.getMaterials());
-        for (int i = 0; i < materials.size(); i++)
-        {
-            Material material = materials.get(i);
-            DefaultMaterialModel materialModel = materialModels.get(i);
-            MaterialModels.initMaterialModel(materialModel, material);
-        }
-    }
-
 
     /**
      * Create the {@link CameraModel} instances. This has to be be called
@@ -1168,6 +1163,78 @@ public final class GltfModelV2 implements GltfModel
             }
         }
     }
+    
+    /**
+     * For each mesh that is instantiated in a node, call
+     * {@link #instantiateMaterialModels(Mesh, MeshModel, int)} 
+     */
+    private void instantiateMaterialModels()
+    {
+        List<Node> nodes = Optionals.of(gltf.getNodes());
+        List<Mesh> meshes = Optionals.of(gltf.getMeshes());
+        for (int i = 0; i < nodes.size(); i++)
+        {
+            Node node = nodes.get(i);
+            
+            Integer meshIndex = node.getMesh();
+            
+            if (meshIndex != null)
+            {
+                MeshModel meshModel = meshModels.get(meshIndex);
+                
+                int numJoints = 0;
+                Integer skinIndex = node.getSkin();
+                if (skinIndex != null)
+                {
+                    SkinModel skinModel = skinModels.get(skinIndex);
+                    numJoints = skinModel.getJoints().size();
+                }
+                Mesh mesh = meshes.get(meshIndex);
+                instantiateMaterialModels(mesh, meshModel, numJoints);
+            }
+        }
+    }
+    
+    /**
+     * Create the {@link MaterialModel} instances that are required for
+     * rendering the {@link MeshPrimitiveModel} instances of the given 
+     * {@link MeshModel}, based on the corresponding {@link MeshPrimitive} 
+     * and the given number of joints.
+     *  
+     * @param mesh The {@link Mesh}
+     * @param meshModel The {@link MeshModel}
+     * @param numJoints The number of joints
+     */
+    private void instantiateMaterialModels(
+        Mesh mesh, MeshModel meshModel, int numJoints)
+    {
+        List<MeshPrimitive> meshPrimitives = mesh.getPrimitives();
+        List<MeshPrimitiveModel> meshPrimitiveModels = 
+            meshModel.getMeshPrimitiveModels();
+        
+        for (int i = 0; i < meshPrimitives.size(); i++)
+        {
+            MeshPrimitive meshPrimitive = meshPrimitives.get(i);
+            DefaultMeshPrimitiveModel meshPrimitiveModel = 
+                (DefaultMeshPrimitiveModel)meshPrimitiveModels.get(i);
+
+            Material material = null;
+            Integer materialIndex = meshPrimitive.getMaterial();
+            if (materialIndex == null)
+            {
+                material = Materials.createDefaultMaterial();
+            }
+            else
+            {
+                material = gltf.getMaterials().get(materialIndex);
+            }
+            DefaultMaterialModel materialModel = 
+                materialModelHandler.createMaterialModel(material, numJoints);
+            meshPrimitiveModel.setMaterialModel(materialModel);
+            materialModels.add(materialModel);
+        }
+    }
+    
     
     @Override
     public List<AccessorModel> getAccessorModels()

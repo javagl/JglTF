@@ -64,7 +64,7 @@ float computeMicrofacetDistribution(
     float NdotH = clamp(dot(N, H), 0.0, 1.0);
     float NdotH_squared = NdotH * NdotH;
 
-    float x = (NdotH * NdotH) * (alpha_squared - 1.0) + 1.0;
+    float x = NdotH_squared * (alpha_squared - 1.0) + 1.0;
     return alpha_squared / (M_PI * x * x);
 }
 
@@ -199,7 +199,7 @@ vec3 computeNormal()
     }
     
     // TODO gl_FrontFacing seems to always be "true"
-    if (gl_FrontFacing == false) 
+    if (!gl_FrontFacing) 
     {
         if (u_isDoubleSided != 0) 
         {
