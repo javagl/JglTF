@@ -35,10 +35,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
 
-//import de.javagl.jgltf.impl.v1.BufferView;
-//import de.javagl.jgltf.impl.v1.GlTF;
-//import de.javagl.jgltf.impl.v1.Program;
-//import de.javagl.jgltf.impl.v1.Texture;
 import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.ImageModel;
@@ -46,7 +42,6 @@ import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.TextureModel;
 import de.javagl.jgltf.model.gl.ProgramModel;
 import de.javagl.jgltf.model.gl.ShaderModel;
-//import de.javagl.jgltf.model.v1.gl.GltfTechniqueModel;
 
 /**
  * A class maintaining the data for rendering a glTF with OpenGL.<br>
