@@ -35,6 +35,26 @@ import de.javagl.jgltf.impl.v2.MaterialPbrMetallicRoughness;
 public class Materials
 {
     /**
+     * Create a {@link Material} with all default values
+     * 
+     * @return The {@link Material}
+     */
+    public static Material createDefaultMaterial()
+    {
+        Material material = new Material();
+        material.setPbrMetallicRoughness(
+            createDefaultMaterialPbrMetallicRoughness());
+        material.setNormalTexture(null);
+        material.setOcclusionTexture(null);
+        material.setEmissiveTexture(null);
+        material.setEmissiveFactor(material.defaultEmissiveFactor());
+        material.setAlphaMode(material.defaultAlphaMode());
+        material.setAlphaCutoff(material.defaultAlphaCutoff());
+        material.setDoubleSided(material.defaultDoubleSided());
+        return material;
+    }
+    
+    /**
      * Create a {@link MaterialPbrMetallicRoughness} with all default values
      * 
      * @return The {@link MaterialPbrMetallicRoughness}
