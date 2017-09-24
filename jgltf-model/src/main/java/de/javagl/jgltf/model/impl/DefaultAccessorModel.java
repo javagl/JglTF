@@ -131,16 +131,6 @@ public final class DefaultAccessorModel implements AccessorModel
         this.byteStride = byteStride;
     }
 
-    /**
-     * Set the {@link AccessorData} for this model
-     * 
-     * @param accessorData The {@link AccessorData}
-     */
-    public void setAccessorData(AccessorData accessorData)
-    {
-        this.accessorData = accessorData;
-    }
-    
     @Override
     public BufferViewModel getBufferViewModel()
     {
