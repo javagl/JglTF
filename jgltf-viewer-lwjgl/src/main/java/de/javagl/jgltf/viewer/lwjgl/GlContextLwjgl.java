@@ -25,7 +25,6 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 package de.javagl.jgltf.viewer.lwjgl;
-
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_MAG_FILTER;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_MIN_FILTER;
@@ -60,6 +59,7 @@ import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
 import static org.lwjgl.opengl.GL15.glBindBuffer;
 import static org.lwjgl.opengl.GL15.glBufferData;
+import static org.lwjgl.opengl.GL15.glBufferSubData;
 import static org.lwjgl.opengl.GL15.glDeleteBuffers;
 import static org.lwjgl.opengl.GL15.glGenBuffers;
 import static org.lwjgl.opengl.GL20.GL_COMPILE_STATUS;
@@ -482,6 +482,15 @@ class GlContextLwjgl implements GlContext
         glEnableVertexAttribArray(attributeLocation);
     }
 
+    @Override
+    public void updateVertexAttribute(int glVertexArray, 
+        int target, int glBufferView, int offset, int size, ByteBuffer data)
+    {
+        glBindVertexArray(glVertexArray);
+        glBindBuffer(target, glBufferView);
+        glBufferSubData(target, offset, data);
+    }
+    
     @Override
     public void deleteGlBufferView(int glBufferView)
     {

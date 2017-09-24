@@ -409,6 +409,16 @@ class GlContextJogl implements GlContext
     }
     
     @Override
+    public void updateVertexAttribute(int glVertexArray, 
+        int target, int glBufferView, int offset, int size, ByteBuffer data)
+    {
+        gl.glBindVertexArray(glVertexArray);
+        gl.glBindBuffer(target, glBufferView);
+        gl.glBufferSubData(target, offset, size, data);
+    }
+    
+    
+    @Override
     public void deleteGlBufferView(int glBufferView)
     {
         gl.glDeleteBuffers(1, new int[] { glBufferView }, 0);

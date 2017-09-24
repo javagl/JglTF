@@ -179,6 +179,21 @@ public interface GlContext
     void createVertexAttribute(int glVertexArray, int target, int glBufferView,
         int attributeLocation, int size, int type, int stride, int offset);
 
+    
+    /**
+     * Update the vertex attribute data in the given GL vertex array
+     * with the given data
+     * 
+     * @param glVertexArray The GL vertex array object
+     * @param target The target, GL_ARRAY_BUFFER or GL_ELEMENT_ARRAY_BUFFER
+     * @param glBufferView The GL buffer view (vertex buffer object)
+     * @param offset The offset of the attribute data, in bytes
+     * @param size The size of the attribute data, in bytes
+     * @param data The actual buffer data
+     */
+    void updateVertexAttribute(int glVertexArray, 
+        int target, int glBufferView, int offset, int size, ByteBuffer data);
+    
     /**
      * Delete the given GL buffer
      * 
