@@ -26,6 +26,7 @@
 package de.javagl.jgltf.model;
 
 import java.nio.ByteBuffer;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 /**
@@ -684,6 +685,62 @@ public class AccessorDatas
         }
         throw new IllegalArgumentException(
             "Invalid data type: " + accessorData);
+    }
+    
+    /**
+     * Creates a (possibly large!) string representation of the given
+     * {@link AccessorData}, by calling 
+     * {@link AccessorByteData#createString(Locale, String, int)},
+     * {@link AccessorShortData#createString(Locale, String, int)},
+     * {@link AccessorIntData#createString(Locale, String, int)} or
+     * {@link AccessorFloatData#createString(Locale, String, int)},
+     * depending on the type of the given data, with an unspecified
+     * format string.
+     * 
+     * @param accessorData The {@link AccessorData}
+     * @param elementsPerRow The number of elements per row
+     * @return The string
+     */
+    public static String createString(
+        AccessorData accessorData, int elementsPerRow)
+    {
+        if (accessorData instanceof AccessorByteData) 
+        {
+            AccessorByteData accessorByteData = 
+                (AccessorByteData) accessorData;
+            String accessorDataString = 
+                accessorByteData.createString(
+                    Locale.ENGLISH, "%4d", elementsPerRow);
+            return accessorDataString;
+        }
+        if (accessorData instanceof AccessorShortData) 
+        {
+            AccessorShortData accessorShortData = 
+                (AccessorShortData) accessorData;
+            String accessorDataString = 
+                accessorShortData.createString(
+                    Locale.ENGLISH, "%6d", elementsPerRow);
+            return accessorDataString;
+        }
+        if (accessorData instanceof AccessorIntData) 
+        {
+            AccessorIntData accessorIntData = 
+                (AccessorIntData) accessorData;
+            String accessorDataString = 
+                accessorIntData.createString(
+                    Locale.ENGLISH, "%11d", elementsPerRow);
+            return accessorDataString;
+        }
+        if (accessorData instanceof AccessorFloatData) 
+        {
+            AccessorFloatData accessorFloatData = 
+                (AccessorFloatData) accessorData;
+            String accessorDataString = 
+                accessorFloatData.createString(
+                    Locale.ENGLISH, "%10.5f", elementsPerRow);
+            return accessorDataString;
+        }
+        return "Unknown accessor data type: " + accessorData;
     }
     
     

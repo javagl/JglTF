@@ -33,7 +33,6 @@ import java.awt.image.BufferedImage;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.ByteBuffer;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -50,12 +49,9 @@ import de.javagl.jgltf.impl.v1.Accessor;
 import de.javagl.jgltf.impl.v1.GlTF;
 import de.javagl.jgltf.impl.v1.Image;
 import de.javagl.jgltf.impl.v1.Shader;
-import de.javagl.jgltf.model.AccessorByteData;
 import de.javagl.jgltf.model.AccessorData;
-import de.javagl.jgltf.model.AccessorFloatData;
-import de.javagl.jgltf.model.AccessorIntData;
+import de.javagl.jgltf.model.AccessorDatas;
 import de.javagl.jgltf.model.AccessorModel;
-import de.javagl.jgltf.model.AccessorShortData;
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.gl.ShaderModel;
@@ -224,43 +220,7 @@ class InfoComponentFactoryV1
         AccessorModel accessorModel = 
             gltfModel.getAccessorModelById(accessorId);
         AccessorData accessorData = accessorModel.getAccessorData();
-        if (accessorData instanceof AccessorByteData) 
-        {
-            AccessorByteData accessorByteData = 
-                (AccessorByteData) accessorData;
-            String accessorDataString = 
-                accessorByteData.createString(
-                    Locale.ENGLISH, "%4d", elementsPerRow);
-            return accessorDataString;
-        }
-        if (accessorData instanceof AccessorShortData) 
-        {
-            AccessorShortData accessorShortData = 
-                (AccessorShortData) accessorData;
-            String accessorDataString = 
-                accessorShortData.createString(
-                    Locale.ENGLISH, "%6d", elementsPerRow);
-            return accessorDataString;
-        }
-        if (accessorData instanceof AccessorIntData) 
-        {
-            AccessorIntData accessorIntData = 
-                (AccessorIntData) accessorData;
-            String accessorDataString = 
-                accessorIntData.createString(
-                    Locale.ENGLISH, "%11d", elementsPerRow);
-            return accessorDataString;
-        }
-        if (accessorData instanceof AccessorFloatData) 
-        {
-            AccessorFloatData accessorFloatData = 
-                (AccessorFloatData) accessorData;
-            String accessorDataString = 
-                accessorFloatData.createString(
-                    Locale.ENGLISH, "%10.5f", elementsPerRow);
-            return accessorDataString;
-        }
-        return "Invalid data type: " + accessorData;
+        return AccessorDatas.createString(accessorData, elementsPerRow);
     }
 
     /**
