@@ -60,13 +60,9 @@ import de.javagl.jgltf.impl.v2.Sampler;
 import de.javagl.jgltf.impl.v2.Scene;
 import de.javagl.jgltf.impl.v2.Skin;
 import de.javagl.jgltf.impl.v2.Texture;
-import de.javagl.jgltf.model.AccessorByteData;
 import de.javagl.jgltf.model.AccessorData;
 import de.javagl.jgltf.model.AccessorDatas;
-import de.javagl.jgltf.model.AccessorFloatData;
-import de.javagl.jgltf.model.AccessorIntData;
 import de.javagl.jgltf.model.AccessorModel;
-import de.javagl.jgltf.model.AccessorShortData;
 import de.javagl.jgltf.model.AnimationModel;
 import de.javagl.jgltf.model.AnimationModel.Channel;
 import de.javagl.jgltf.model.AnimationModel.Interpolation;
@@ -602,11 +598,12 @@ public final class GltfModelV2 implements GltfModel
      * an accessor that does not refer to a {@link BufferView})
      * 
      * @param uriString The URI string that will be assigned to the 
-     * {@link BufferModel} that is created internally
+     * {@link BufferModel} that is created internally. This string 
+     * is not strictly required, but helpful for debugging, at least
      * @param bufferData The buffer data
      * @return The new {@link BufferViewModel}
      */
-    private DefaultBufferViewModel createBufferViewModel(
+    private static DefaultBufferViewModel createBufferViewModel(
         String uriString, ByteBuffer bufferData)
     {
         DefaultBufferModel bufferModel = new DefaultBufferModel();
@@ -621,8 +618,7 @@ public final class GltfModelV2 implements GltfModel
         
         return bufferViewModel;
     }
-
-
+    
     /**
      * Substitute the sparse accessor data in the given dense 
      * {@link AccessorData} for the given {@link AccessorModel}
@@ -646,7 +642,7 @@ public final class GltfModelV2 implements GltfModel
         
         AccessorSparseIndices accessorSparseIndices = 
             accessorSparse.getIndices();
-        AccessorData sparseIndicesAcessorData = 
+        AccessorData sparseIndicesAccessorData = 
             createSparseIndicesAccessorData(accessorSparseIndices, count);
         
         AccessorSparseValues accessorSparseValues = accessorSparse.getValues();
@@ -655,74 +651,12 @@ public final class GltfModelV2 implements GltfModel
             createSparseValuesAccessorData(accessorSparseValues, 
                 accessorModel.getComponentType(),
                 elementType.getNumComponents(), count);
-        
-        int componentType = accessor.getComponentType();
-
-        if (componentType == GltfConstants.GL_BYTE ||
-            componentType == GltfConstants.GL_UNSIGNED_BYTE)
-        {
-            AccessorByteData sparseValuesAccessorByteData = 
-                (AccessorByteData)sparseValuesAccessorData;
-            AccessorByteData baseAccessorByteData =
-                (AccessorByteData)baseAccessorData;
-            AccessorByteData denseAccessorByteData =
-                (AccessorByteData)denseAccessorData;
-            AccessorSparseUtils.substituteByteAccessorData(
-                denseAccessorByteData, 
-                baseAccessorByteData, 
-                sparseIndicesAcessorData, 
-                sparseValuesAccessorByteData);
-        }
-        else if (componentType == GltfConstants.GL_SHORT ||
-            componentType == GltfConstants.GL_UNSIGNED_SHORT)
-        {
-            AccessorShortData sparseValuesAccessorShortData = 
-                (AccessorShortData)sparseValuesAccessorData;
-            AccessorShortData baseAccessorShortData =
-                (AccessorShortData)baseAccessorData;
-            AccessorShortData denseAccessorShortData =
-                (AccessorShortData)denseAccessorData;
-            AccessorSparseUtils.substituteShortAccessorData(
-                denseAccessorShortData,
-                baseAccessorShortData,
-                sparseIndicesAcessorData,
-                sparseValuesAccessorShortData);
-        }
-        else if (componentType == GltfConstants.GL_INT ||
-            componentType == GltfConstants.GL_UNSIGNED_INT)
-        {
-            AccessorIntData sparseValuesAccessorIntData = 
-                (AccessorIntData)sparseValuesAccessorData;
-            AccessorIntData baseAccessorIntData =
-                (AccessorIntData)baseAccessorData;
-            AccessorIntData denseAccessorIntData =
-                (AccessorIntData)denseAccessorData;
-            AccessorSparseUtils.substituteIntAccessorData(
-                denseAccessorIntData, 
-                baseAccessorIntData,
-                sparseIndicesAcessorData,
-                sparseValuesAccessorIntData);
-        }
-        else if (componentType == GltfConstants.GL_FLOAT)
-        {
-            AccessorFloatData sparseValuesAccessorFloatData = 
-                (AccessorFloatData)sparseValuesAccessorData;
-            AccessorFloatData baseAccessorFloatData =
-                (AccessorFloatData)baseAccessorData;
-            AccessorFloatData denseAccessorFloatData =
-                (AccessorFloatData)denseAccessorData;
-            
-            AccessorSparseUtils.substituteFloatAccessorData(
-                denseAccessorFloatData, 
-                baseAccessorFloatData,
-                sparseIndicesAcessorData,
-                sparseValuesAccessorFloatData);
-        }
-        else 
-        {
-            logger.warning("Invalid component type for accessor: "
-                + GltfConstants.stringFor(componentType));
-        }
+     
+        AccessorSparseUtils.substituteAccessorData(
+            denseAccessorData, 
+            baseAccessorData, 
+            sparseIndicesAccessorData, 
+            sparseValuesAccessorData);
     }
     
     

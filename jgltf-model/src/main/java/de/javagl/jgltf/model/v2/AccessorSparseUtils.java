@@ -26,6 +26,8 @@
  */
 package de.javagl.jgltf.model.v2;
 
+import java.util.logging.Logger;
+
 import de.javagl.jgltf.model.AccessorByteData;
 import de.javagl.jgltf.model.AccessorData;
 import de.javagl.jgltf.model.AccessorFloatData;
@@ -43,6 +45,12 @@ import de.javagl.jgltf.model.AccessorShortData;
  */
 class AccessorSparseUtils
 {
+    /**
+     * The logger used in this class
+     */
+    private static final Logger logger = 
+        Logger.getLogger(AccessorSparseUtils.class.getName());
+    
     /**
      * Extract indices from the given {@link AccessorData}. The given 
      * {@link AccessorData} must contain an integral type. That is,
@@ -125,7 +133,89 @@ class AccessorSparseUtils
      * @throws IllegalArgumentException If the sparseIndicesAccessorData does
      * not contain data with an integral type (byte, short, int). 
      */
-    static void substituteByteAccessorData(
+    static void substituteAccessorData(
+        AccessorData denseAccessorData, 
+        AccessorData baseAccessorData,
+        AccessorData sparseIndicesAccessorData,
+        AccessorData sparseValuesAccessorData)
+    {
+        Class<?> componentType = denseAccessorData.getComponentType();
+        if (componentType == byte.class)
+        {
+            AccessorByteData sparseValuesAccessorByteData = 
+                (AccessorByteData)sparseValuesAccessorData;
+            AccessorByteData baseAccessorByteData =
+                (AccessorByteData)baseAccessorData;
+            AccessorByteData denseAccessorByteData =
+                (AccessorByteData)denseAccessorData;
+            substituteByteAccessorData(
+                denseAccessorByteData, 
+                baseAccessorByteData, 
+                sparseIndicesAccessorData, 
+                sparseValuesAccessorByteData);
+        }
+        else if (componentType == short.class)
+        {
+            AccessorShortData sparseValuesAccessorShortData = 
+                (AccessorShortData)sparseValuesAccessorData;
+            AccessorShortData baseAccessorShortData =
+                (AccessorShortData)baseAccessorData;
+            AccessorShortData denseAccessorShortData =
+                (AccessorShortData)denseAccessorData;
+            substituteShortAccessorData(
+                denseAccessorShortData,
+                baseAccessorShortData,
+                sparseIndicesAccessorData,
+                sparseValuesAccessorShortData);
+        }
+        else if (componentType == int.class)
+        {
+            AccessorIntData sparseValuesAccessorIntData = 
+                (AccessorIntData)sparseValuesAccessorData;
+            AccessorIntData baseAccessorIntData =
+                (AccessorIntData)baseAccessorData;
+            AccessorIntData denseAccessorIntData =
+                (AccessorIntData)denseAccessorData;
+            substituteIntAccessorData(
+                denseAccessorIntData, 
+                baseAccessorIntData,
+                sparseIndicesAccessorData,
+                sparseValuesAccessorIntData);
+        }
+        else if (componentType == float.class)
+        {
+            AccessorFloatData sparseValuesAccessorFloatData = 
+                (AccessorFloatData)sparseValuesAccessorData;
+            AccessorFloatData baseAccessorFloatData =
+                (AccessorFloatData)baseAccessorData;
+            AccessorFloatData denseAccessorFloatData =
+                (AccessorFloatData)denseAccessorData;
+            
+            substituteFloatAccessorData(
+                denseAccessorFloatData, 
+                baseAccessorFloatData,
+                sparseIndicesAccessorData,
+                sparseValuesAccessorFloatData);
+        }
+        else 
+        {
+            logger.warning("Invalid component type for accessor: "
+                + componentType);
+        }
+    }
+    
+    
+    /**
+     * See {@link #substituteAccessorData}
+     * 
+     * @param denseAccessorData The dense {@link AccessorData} to be filled
+     * @param baseAccessorData The optional "base" {@link AccessorData}
+     * @param sparseIndicesAccessorData The sparse indices {@link AccessorData}
+     * @param sparseValuesAccessorData The sparse values {@link AccessorData}
+     * @throws IllegalArgumentException If the sparseIndicesAccessorData does
+     * not contain data with an integral type (byte, short, int). 
+     */
+    private static void substituteByteAccessorData(
         AccessorByteData denseAccessorData, 
         AccessorByteData baseAccessorData,
         AccessorData sparseIndicesAccessorData,
@@ -162,7 +252,7 @@ class AccessorSparseUtils
     }
 
     /**
-     * See {@link #substituteByteAccessorData}
+     * See {@link #substituteAccessorData}
      * 
      * @param denseAccessorData The dense {@link AccessorData} to be filled
      * @param baseAccessorData The optional "base" {@link AccessorData}
@@ -171,7 +261,7 @@ class AccessorSparseUtils
      * @throws IllegalArgumentException If the sparseIndicesAccessorData does
      * not contain data with an integral type (byte, short, int). 
      */
-    static void substituteShortAccessorData(
+    private static void substituteShortAccessorData(
         AccessorShortData denseAccessorData, 
         AccessorShortData baseAccessorData,
         AccessorData sparseIndicesAccessorData,
@@ -208,7 +298,7 @@ class AccessorSparseUtils
     }
 
     /**
-     * See {@link #substituteByteAccessorData}
+     * See {@link #substituteAccessorData}
      * 
      * @param denseAccessorData The dense {@link AccessorData} to be filled
      * @param baseAccessorData The optional "base" {@link AccessorData}
@@ -217,7 +307,7 @@ class AccessorSparseUtils
      * @throws IllegalArgumentException If the sparseIndicesAccessorData does
      * not contain data with an integral type (byte, short, int). 
      */
-    static void substituteIntAccessorData(
+    private static void substituteIntAccessorData(
         AccessorIntData denseAccessorData, 
         AccessorIntData baseAccessorData,
         AccessorData sparseIndicesAccessorData,
@@ -254,7 +344,7 @@ class AccessorSparseUtils
     }
     
     /**
-     * See {@link #substituteByteAccessorData}
+     * See {@link #substituteAccessorData}
      * 
      * @param denseAccessorData The dense {@link AccessorData} to be filled
      * @param baseAccessorData The optional "base" {@link AccessorData}
@@ -263,7 +353,7 @@ class AccessorSparseUtils
      * @throws IllegalArgumentException If the sparseIndicesAccessorData does
      * not contain data with an integral type (byte, short, int). 
      */
-    static void substituteFloatAccessorData(
+    private static void substituteFloatAccessorData(
         AccessorFloatData denseAccessorData, 
         AccessorFloatData baseAccessorData,
         AccessorData sparseIndicesAccessorData,
