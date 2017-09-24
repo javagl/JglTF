@@ -14,13 +14,14 @@ from the [Khronos glTF samples repository](https://github.com/KhronosGroup/glTF-
 and displays it in a frame:
 
 ```Java
+import java.awt.Component;
 import java.net.URI;
 
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
-import de.javagl.jgltf.model.GltfData;
-import de.javagl.jgltf.model.io.GltfDataReader;
+import de.javagl.jgltf.model.GltfModel;
+import de.javagl.jgltf.model.io.GltfModelReader;
 import de.javagl.jgltf.viewer.GltfViewer;
 import de.javagl.jgltf.viewer.jogl.GltfViewerJogl;
 import de.javagl.jgltf.viewer.lwjgl.GltfViewerLwjgl;
@@ -31,22 +32,22 @@ public class GltfViewerMiniDemo
     {
         String uriString = 
             "https://raw.githubusercontent.com/KhronosGroup/" + 
-            "glTF-Sample-Models/master/1.0/Duck/glTF/Duck.gltf";
-        GltfDataReader r = new GltfDataReader();
-        GltfData gltfData = r.readGltfData(new URI(uriString));
-        SwingUtilities.invokeLater(() -> createAndShowGui(gltfData));
+            "glTF-Sample-Models/master/2.0/Duck/glTF/Duck.gltf";
+        GltfModelReader r = new GltfModelReader();
+        GltfModel gltfModel = r.read(new URI(uriString));
+        SwingUtilities.invokeLater(() -> createAndShowGui(gltfModel));
     }
     
-    private static void createAndShowGui(GltfData gltfData)
+    private static void createAndShowGui(GltfModel gltfModel)
     {
         JFrame f = new JFrame();
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         // Create a viewer based on JOGL or LWJGL:
-        GltfViewer gltfViewer = new GltfViewerJogl();
-        //GltfViewer gltfViewer = new GltfViewerLwjgl();
+        GltfViewer<Component> gltfViewer = new GltfViewerJogl();
+        //GltfViewer<Component> gltfViewer = new GltfViewerLwjgl();
         
-        gltfViewer.addGltfData(gltfData);
+        gltfViewer.addGltfModel(gltfModel);
         f.getContentPane().add(gltfViewer.getRenderComponent());
         f.setSize(500,500);
         f.setLocationRelativeTo(null);

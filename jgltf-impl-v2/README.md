@@ -4,7 +4,7 @@ An implementation of [glTF](https://github.com/KhronosGroup/glTF/),
 the GL Transmission Format.
 
 **Note:** These classes are automatically generated from the 
-[glTF JSON schema](https://github.com/KhronosGroup/glTF/tree/master/specification/schema), 
+glTF JSON schema of the [glTF specification](https://github.com/KhronosGroup/glTF/tree/master/specification/)
 using [JsonModelGen](https://github.com/javagl/JsonModelGen). Details of the 
 implementation of these classes may change in future versions.
 
