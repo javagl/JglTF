@@ -250,10 +250,6 @@ class UniformGetterFactory
             "The techniqueModel may not be null");
         Objects.requireNonNull(currentNodeModel, 
             "The currentNodeModel may not be null");
-        Objects.requireNonNull(viewMatrixSupplier, 
-            "The viewMatrixSupplier may not be null");
-        Objects.requireNonNull(projectionMatrixSupplier, 
-            "The projectionMatrixSupplier may not be null");
         
         TechniqueParametersModel techniqueParameters =
             techniqueModel.getUniformParameters(uniformName);
