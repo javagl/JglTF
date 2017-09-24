@@ -191,6 +191,18 @@ public abstract class AbstractGltfViewer<C> implements GltfViewer<C>
         gltfModels.add(gltfModel);
         addBeforeRenderTask(() -> createRenderedGltf(gltfModel));
         triggerRendering();
+        
+        // If no external camera has been defined, set the current camera
+        // to be the first camera of the given model.
+        if (externalCamera == null)
+        {
+            List<CameraModel> cameraModels = gltfModel.getCameraModels(); 
+            if (!cameraModels.isEmpty())
+            {
+                CameraModel cameraModel = cameraModels.get(0);
+                setCurrentCameraModel(gltfModel, cameraModel);
+            }
+        }
     }
     
     /**
@@ -311,6 +323,26 @@ public abstract class AbstractGltfViewer<C> implements GltfViewer<C>
     public void setCurrentCameraModel(
         GltfModel gltfModel, CameraModel cameraModel)
     {
+        if (gltfModel != null && !gltfModels.contains(gltfModel))
+        {
+            throw new IllegalArgumentException(
+                "The given gltfModel is not contained in this viewer");
+        }
+        addBeforeRenderTask(
+            () -> setCurrentCameraModelInternal(gltfModel, cameraModel));
+        triggerRendering();
+    }
+    
+    /**
+     * Implementation of {@link #setCurrentCameraModel(GltfModel, CameraModel)},
+     * to be called before a rendering pass
+     * 
+     * @param gltfModel The {@link GltfModel}
+     * @param cameraModel The {@link CameraModel}
+     */
+    private void setCurrentCameraModelInternal(
+        GltfModel gltfModel, CameraModel cameraModel)
+    {
         if (gltfModel == null)
         {
             for (RenderedGltfModel renderedGltf : renderedGltfModels.values())
@@ -323,14 +355,13 @@ public abstract class AbstractGltfViewer<C> implements GltfViewer<C>
             RenderedGltfModel renderedGltf = renderedGltfModels.get(gltfModel);
             if (renderedGltf == null)
             {
-                throw new IllegalArgumentException(
-                    "The given gltfModel is not contained in this viewer");
+                logger.warning("Rendered glTF model has been removed");
+                return;
             }
             renderedGltf.setCurrentCameraModel(cameraModel);
         }
-        triggerRendering();
     }
-    
+
     /**
      * Add a task to be executed once, before the next rendering pass,
      * on the rendering thread
