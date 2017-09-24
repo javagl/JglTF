@@ -58,7 +58,7 @@ class GltfTransferHandler extends TransferHandler
         DataFlavor flavor = null;
         try
         {
-            flavor =new DataFlavor(
+            flavor = new DataFlavor(
                 "application/x-java-url; class=java.net.URL");
         }
         catch (ClassNotFoundException e)

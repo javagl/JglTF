@@ -26,8 +26,8 @@
  */
 package de.javagl.jgltf.validator;
 
-import de.javagl.jgltf.impl.GlTF;
-import de.javagl.jgltf.impl.Texture;
+import de.javagl.jgltf.impl.v1.GlTF;
+import de.javagl.jgltf.impl.v1.Texture;
 
 /**
  * A class for validating {@link Texture} objects

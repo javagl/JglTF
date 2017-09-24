@@ -28,13 +28,13 @@ package de.javagl.jgltf.model;
 
 import java.util.Objects;
 
-import de.javagl.jgltf.impl.Asset;
-import de.javagl.jgltf.impl.GlTF;
+import de.javagl.jgltf.impl.v1.Asset;
+import de.javagl.jgltf.impl.v1.GlTF;
 
 /**
- * Package-private utility methods related to {@link GlTF} instances
+ * Utility methods related to {@link GlTF} instances
  */
-class GltfUtils
+public class GltfUtils
 {
     /**
      * Returns the version string that is reported by the {@link Asset} in
@@ -45,115 +45,29 @@ class GltfUtils
      * @param gltf The {@link GlTF}
      * @return The version string
      */
-    static String getVersion(GlTF gltf)
+    public static String getVersion(GlTF gltf)
     {
         Objects.requireNonNull(gltf, "The gltf is null");
         Asset asset = gltf.getAsset();
         if (asset == null)
         {
-            return "1.0.0";
+            return "1.0";
         }
         String version = asset.getVersion();
         if (version == null)
         {
-            return "1.0.0";
+            return "1.0";
         }
         return version;
     }
     
     /**
-     * Compare the given semantic version numbers.
-     * 
-     * @param v0 The first version number
-     * @param v1 The second version number
-     * @return A value that is smaller than, equal to or greater than 0,
-     * indicating whether the first version is smaller than, equal to
-     * or greater than the second version.
+     * Private constructor to prevent instantiation
      */
-    static int compareVersions(String v0, String v1)
+    private GltfUtils()
     {
-        int[] sv0 = computeMajorMinorPatch(v0);
-        int[] sv1 = computeMajorMinorPatch(v1);
-        for (int i = 0; i < 3; i++)
-        {
-            int c = Integer.compare(sv0[i], sv1[i]);
-            if (c != 0)
-            {
-                return c;
-            }
-        }
-        return 0;
+        // Private constructor to prevent instantiation    
     }
-    
-    /**
-     * Compute the semantic version numbers from the given string. The
-     * string is assumed to be a semantic version number, consisting
-     * of integer values <i>major.minor.patch</i>. The <i>patch</i> part
-     * is allowed to have a non-numeric suffix, which will be ignored
-     * here. Any element of this pattern that is not present or cannot
-     * be parsed will be assumed to be 0.
-     * 
-     * @param v The version string
-     * @return An array containing 3 values: The major, minor and patch version
-     */
-    private static int[] computeMajorMinorPatch(String v)
-    {
-        int result[] = new int[3];
-        String tokens[] = v.split("\\.");
-        int n = Math.min(tokens.length, 3);
-        for (int i = 0; i < n; i++)
-        {
-            String token = tokens[i];
-            result[i] = parseIntPrefix(token);
-        }
-        return result;
-    }
-    
-    /**
-     * Try to parse an integer value from the start of the given string.
-     * For example, for the string <code>"23a-beta"</code>, this will
-     * return <code>23</code>. If no valid number can be parsed, then
-     * 0 is returned.
-     * 
-     * @param s The input string
-     * @return The integer 
-     */
-    private static int parseIntPrefix(String s)
-    {
-        String number = "";
-        for (int j = 0; j < s.length(); j++)
-        {
-            char c = s.charAt(j);
-            if (Character.isDigit(c))
-            {
-                number += c;
-            }
-            else
-            {
-                break;
-            }
-        }
-        try
-        {
-            return Integer.parseInt(number);
-        }
-        catch (NumberFormatException e)
-        {
-            return 0;
-        }
-    }
-    
-    
-//    public static void main(String[] args)
-//    {
-//        String s = "1.2.0";
-//        String s1 = "1.12.1c-beta";
-//        String s2 = "1";
-//        String s3 = "1.2";
-//        System.out.println(compareVersions(s, s1));
-//        System.out.println(compareVersions(s, s2));
-//        System.out.println(compareVersions(s, s3));
-//    }
 }
 
 

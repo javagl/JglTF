@@ -33,10 +33,8 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
-import de.javagl.jgltf.impl.GlTF;
-
 /**
- * A class for writing a {@link GlTF} as JSON
+ * A class for writing a glTF as JSON
  */
 public final class GltfWriter
 {
@@ -75,14 +73,14 @@ public final class GltfWriter
     }
     
     /**
-     * Write the given {@link GlTF} to the given output stream. The caller
+     * Write the given glTF to the given output stream. The caller
      * is responsible for closing the stream.
      * 
-     * @param gltf The {@link GlTF}
+     * @param gltf The glTF
      * @param outputStream The output stream
      * @throws IOException If an IO error occurred
      */
-    public void writeGltf(GlTF gltf, OutputStream outputStream) 
+    public void write(Object gltf, OutputStream outputStream) 
         throws IOException 
     {
         ObjectMapper objectMapper = new ObjectMapper();

@@ -138,7 +138,7 @@ class ExternalCameraRendering implements ExternalCamera
      * @param a The array
      * @param offset The offset where to start writing into the array
      */
-    static void writeMatrixToArrayColumnMajor4f(
+    private static void writeMatrixToArrayColumnMajor4f(
         Matrix4f m, float a[], int offset)
     {
         int i = offset;

@@ -31,9 +31,9 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
-import de.javagl.jgltf.impl.GlTF;
-import de.javagl.jgltf.impl.Technique;
-import de.javagl.jgltf.impl.TechniqueParameters;
+import de.javagl.jgltf.impl.v1.GlTF;
+import de.javagl.jgltf.impl.v1.Technique;
+import de.javagl.jgltf.impl.v1.TechniqueParameters;
 import de.javagl.jgltf.model.GltfConstants;
 
 /**

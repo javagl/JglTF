@@ -26,7 +26,6 @@
  */
 package de.javagl.jgltf.viewer;
 
-import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -34,24 +33,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.DoubleSupplier;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
-import de.javagl.jgltf.impl.Camera;
-import de.javagl.jgltf.impl.TechniqueParameters;
+import de.javagl.jgltf.model.CameraModel;
 import de.javagl.jgltf.model.GltfAnimations;
-import de.javagl.jgltf.model.GltfData;
 import de.javagl.jgltf.model.GltfModel;
+import de.javagl.jgltf.model.TextureModel;
 import de.javagl.jgltf.model.animation.Animation;
 import de.javagl.jgltf.model.animation.AnimationManager;
 import de.javagl.jgltf.model.animation.AnimationManager.AnimationPolicy;
 import de.javagl.jgltf.model.animation.AnimationRunner;
-import de.javagl.jgltf.validator.Validator;
+import de.javagl.jgltf.model.v1.GltfModelV1;
+import de.javagl.jgltf.model.v2.GltfModelV2;
 
 /**
  * Abstract base implementation of a {@link GltfViewer}
+ * 
+ * @param <C> The type of the render component of this viewer
  */
-public abstract class AbstractGltfViewer implements GltfViewer
+public abstract class AbstractGltfViewer<C> implements GltfViewer<C>
 {
     /**
      * The logger used in this class
@@ -61,9 +63,8 @@ public abstract class AbstractGltfViewer implements GltfViewer
     
     /**
      * A supplier of the viewport size. This will be passed to the
-     * {@link GltfModel} constructor, and eventually provide the data for the 
-     * uniforms that have {@link TechniqueParameters#getSemantic()
-     * semantic} <code>VIEWPORT</code>
+     * {@link RenderedGltfModel} constructor, and eventually provide the data for 
+     * the uniforms that have the <code>VIEWPORT</code> semantic.
      */
     private final Supplier<float[]> viewportSupplier = new Supplier<float[]>()
     {
@@ -72,27 +73,24 @@ public abstract class AbstractGltfViewer implements GltfViewer
         @Override
         public float[] get()
         {
-            Component c = getRenderComponent();
             viewport[0] = 0;
             viewport[1] = 0;
-            viewport[2] = c.getWidth();
-            viewport[3] = c.getHeight();
+            viewport[2] = getWidth();
+            viewport[3] = getHeight();
             return viewport;
         }
     };
     
     /**
-     * A supplier for the aspect ratio. This will be passed to the 
-     * {@link GltfModel} constructor, and provide the aspect ratio
+     * A supplier for the aspect ratio. This will provide the aspect ratio
      * of the rendering window. (If this was <code>null</code>,
-     * then the aspect ratio of the glTF {@link Camera} would be
+     * then the aspect ratio of the glTF camera would be
      * used, but this would hardly ever match the actual aspect
      * ratio of the rendering component...)
      */
     private final DoubleSupplier aspectRatioSupplier = () -> 
     {
-        Component c = getRenderComponent();
-        return (double)c.getWidth() / c.getHeight();
+        return (double)getWidth() / getHeight();
     };
     
     /**
@@ -108,33 +106,32 @@ public abstract class AbstractGltfViewer implements GltfViewer
     private final List<Runnable> beforeRenderTasks;
     
     /**
-     * The map from {@link GltfData} instances to their {@link RenderedGltf}
-     * counterparts
+     * The map from {@link GltfModel} instances to their 
+     * {@link RenderedGltfModel} counterparts
      */
-    private final Map<GltfData, RenderedGltf> renderedGltfs;
+    private final Map<GltfModel, RenderedGltfModel> renderedGltfModels;
     
     /**
-     * The map from {@link GltfData} instances to the ID of the {@link Camera}
-     * that should be used for rendering the {@link GltfData}
+     * The list of {@link GltfModel} instances that have been added.
      */
-    private final Map<GltfData, String> currentCameraIds;
+    private final List<GltfModel> gltfModels;
     
     /**
      * The {@link AnimationManager}
      */
-    private AnimationManager animationManager;
+    private final AnimationManager animationManager;
     
     /**
      * The {@link AnimationRunner}
      */
-    private AnimationRunner animationRunner;
+    private final AnimationRunner animationRunner;
     
     /**
-     * The map from {@link GltfData} instances to the lists of 
+     * The map from {@link GltfModel} instances to the lists of 
      * model {@link Animation}s that have been created for the
      * glTF animations
      */
-    private final Map<GltfData, List<Animation>> modelAnimations;
+    private final Map<GltfModel, List<Animation>> modelAnimations;
     
     /**
      * Default constructor
@@ -143,8 +140,9 @@ public abstract class AbstractGltfViewer implements GltfViewer
     {
         this.beforeRenderTasks = Collections.synchronizedList(
             new ArrayList<Runnable>());
-        this.renderedGltfs = new LinkedHashMap<GltfData, RenderedGltf>();
-        this.currentCameraIds = new LinkedHashMap<GltfData, String>();
+        this.renderedGltfModels = 
+            new LinkedHashMap<GltfModel, RenderedGltfModel>();
+        this.gltfModels = new ArrayList<GltfModel>();
         this.animationManager = 
             GltfAnimations.createAnimationManager(AnimationPolicy.LOOP);
         this.animationManager.addAnimationManagerListener(a ->
@@ -152,7 +150,7 @@ public abstract class AbstractGltfViewer implements GltfViewer
             triggerRendering();
         });
         this.animationRunner = new AnimationRunner(animationManager);
-        this.modelAnimations = new LinkedHashMap<GltfData, List<Animation>>();
+        this.modelAnimations = new LinkedHashMap<GltfModel, List<Animation>>();
         
         setAnimationsRunning(true);
     }
@@ -177,7 +175,7 @@ public abstract class AbstractGltfViewer implements GltfViewer
     }
     
     @Override
-    public abstract Component getRenderComponent();
+    public abstract C getRenderComponent();
     
     /**
      * Returns the {@link GlContext} of this viewer
@@ -187,38 +185,21 @@ public abstract class AbstractGltfViewer implements GltfViewer
     protected abstract GlContext getGlContext();
     
     @Override
-    public final void triggerRendering()
+    public final void addGltfModel(GltfModel gltfModel)
     {
-        if (getRenderComponent() != null)
-        {
-            getRenderComponent().repaint();
-        }
-    }
-    
-    @Override
-    public final void addGltfData(GltfData gltfData)
-    {
-        Objects.requireNonNull(gltfData, "The gltfData may not be null");
-        
-        Validator validator = new Validator(gltfData.getGltf());
-        boolean isValid = validator.isValid();
-        if (!isValid)
-        {
-            logger.warning("The glTF is not valid");
-            return;
-        }
-        
-        addBeforeRenderTask(() -> createRenderedGltf(gltfData));
+        Objects.requireNonNull(gltfModel, "The gltfModel may not be null");
+        gltfModels.add(gltfModel);
+        addBeforeRenderTask(() -> createRenderedGltf(gltfModel));
         triggerRendering();
     }
     
     /**
-     * Create a {@link RenderedGltf} for the given {@link GltfData}, and
-     * store it in the {@link #renderedGltfs} map
+     * Create a {@link RenderedGltfModel} for the given {@link GltfModel}, and
+     * store it in the {@link #renderedGltfModels} map
      * 
-     * @param gltfData The {@link GltfData}
+     * @param gltfModel The {@link GltfModel}
      */
-    private void createRenderedGltf(GltfData gltfData)
+    private void createRenderedGltf(GltfModel gltfModel)
     {
         Supplier<float[]> viewMatrixSupplier = null;
         Supplier<float[]> projectionMatrixSupplier = null;
@@ -229,68 +210,123 @@ public abstract class AbstractGltfViewer implements GltfViewer
             projectionMatrixSupplier = () ->
                 externalCamera.getProjectionMatrix();
         }
-            
-        GltfModel gltfModel = new GltfModel(
-            gltfData, null, viewportSupplier, aspectRatioSupplier);
         
         logger.info("Creating rendered glTF");
         
-        RenderedGltf renderedGltf = new RenderedGltf(
-            gltfModel, getGlContext(), 
-            viewMatrixSupplier, 
-            projectionMatrixSupplier);
-        renderedGltfs.put(gltfData, renderedGltf);
+        ViewConfiguration viewConfiguration = 
+            new ViewConfiguration(
+                viewportSupplier, aspectRatioSupplier, 
+                viewMatrixSupplier, projectionMatrixSupplier);
+        
+        GlContext glContext = getGlContext();
+        RenderedGltfModel renderedGltfModel = null;
+        if (gltfModel instanceof GltfModelV1)
+        {
+            GltfModelV1 gltfModelV1 = (GltfModelV1)gltfModel;
+            
+            Function<Object, TextureModel> textureModelLookup = object -> 
+            {
+                String textureId = String.valueOf(object);
+                return gltfModelV1.getTextureModelById(textureId);  
+            };
+            renderedGltfModel = new DefaultRenderedGltfModel(
+                glContext, gltfModelV1, textureModelLookup, viewConfiguration);
+        }
+        else if (gltfModel instanceof GltfModelV2)
+        {
+            GltfModelV2 gltfModelV2 = (GltfModelV2)gltfModel;
+            
+            Function<Object, TextureModel> textureModelLookup = object -> 
+            {
+                Number number = (Number)object;
+                int index = number.intValue();
+                return gltfModelV2.getTextureModels().get(index);  
+            };
+            renderedGltfModel = new DefaultRenderedGltfModel(
+                glContext, gltfModelV2, textureModelLookup, viewConfiguration);
+        }
+        else
+        {
+            logger.severe("GltfModel version is not supported: " + gltfModel);
+            return;
+        }
+        
+        renderedGltfModels.put(gltfModel, renderedGltfModel);
         
         List<Animation> currentModelAnimations = 
-            GltfAnimations.createModelAnimations(gltfData);
-        modelAnimations.put(gltfData, currentModelAnimations);
+            GltfAnimations.createModelAnimations(gltfModel.getAnimationModels());
+        modelAnimations.put(gltfModel, currentModelAnimations);
         animationManager.addAnimations(currentModelAnimations);
     }
     
     @Override
-    public void removeGltfData(GltfData gltfData)
+    public void removeGltfModel(GltfModel gltfModel)
     {
-        Objects.requireNonNull(gltfData, "The gltfData may not be null");
-        addBeforeRenderTask(() -> deleteRenderedGltf(gltfData));
-        List<Animation> currentModelAnimations = modelAnimations.get(gltfData);
+        Objects.requireNonNull(gltfModel, "The gltfModel may not be null");
+        gltfModels.remove(gltfModel);
+        addBeforeRenderTask(() -> deleteRenderedGltfModel(gltfModel));
+        List<Animation> currentModelAnimations = modelAnimations.get(gltfModel);
         if (currentModelAnimations != null)
         {
             animationManager.removeAnimations(currentModelAnimations);
         }
-        modelAnimations.remove(gltfData);
+        modelAnimations.remove(gltfModel);
         triggerRendering();
     }
     
     /**
-     * Delete the {@link RenderedGltf} that is associated with the given
-     * {@link GltfData} 
+     * Delete the {@link RenderedGltfModel} that is associated with the given
+     * {@link GltfModel} 
      * 
-     * @param gltfData The {@link GltfData}
+     * @param gltfModel The {@link GltfModel}
      */
-    private void deleteRenderedGltf(GltfData gltfData)
+    private void deleteRenderedGltfModel(GltfModel gltfModel)
     {
-        RenderedGltf renderedGltf = renderedGltfs.get(gltfData);
-        if (renderedGltf == null)
+        RenderedGltfModel renderedGltfModel = renderedGltfModels.get(gltfModel);
+        if (renderedGltfModel == null)
         {
-            logger.warning("No renderedGltf found for gltfData");
+            logger.warning(
+                "No renderedGltfModel found for gltfModel " + gltfModel);
             return;
         }
 
         logger.info("Deleting rendered glTF");
         
-        renderedGltf.delete();
-        renderedGltfs.remove(gltfData);
-        currentCameraIds.remove(gltfData);
+        renderedGltfModel.delete();
+        renderedGltfModels.remove(gltfModel);
     }
     
     @Override
-    public void setCurrentCameraId(GltfData gltfData, String cameraId)
+    public List<CameraModel> getCameraModels()
     {
-        currentCameraIds.put(gltfData, cameraId);
-        RenderedGltf renderedGltf = renderedGltfs.get(gltfData);
-        if (renderedGltf != null)
+        List<CameraModel> cameraModels = new ArrayList<CameraModel>();
+        for (GltfModel gltfModel : gltfModels)
         {
-            renderedGltf.setCurrentCameraId(cameraId);
+            cameraModels.addAll(gltfModel.getCameraModels());
+        }
+        return Collections.unmodifiableList(cameraModels);
+    }
+    
+    @Override
+    public void setCurrentCameraModel(
+        GltfModel gltfModel, CameraModel cameraModel)
+    {
+        if (gltfModel == null)
+        {
+            for (RenderedGltfModel renderedGltf : renderedGltfModels.values())
+            {
+                renderedGltf.setCurrentCameraModel(cameraModel);
+            }
+        }
+        else
+        {
+            RenderedGltfModel renderedGltf = renderedGltfModels.get(gltfModel);
+            if (renderedGltf == null)
+            {
+                throw new IllegalArgumentException(
+                    "The given gltfModel is not contained in this viewer");
+            }
+            renderedGltf.setCurrentCameraModel(cameraModel);
         }
         triggerRendering();
     }
@@ -346,18 +382,19 @@ public abstract class AbstractGltfViewer implements GltfViewer
     
     /**
      * The actual rendering method. Subclasses implementing this method
-     * will usually call {@link #renderGltfs()}.
+     * will usually call {@link #renderGltfModels()}.
      */
     protected abstract void render();
 
     /**
-     * Render all glTFs that have been added via {@link #addGltfData(GltfData)}
+     * Render all glTF models that have been added via 
+     * {@link #addGltfModel(GltfModel)}
      */
-    protected final void renderGltfs()
+    protected final void renderGltfModels()
     {
-        for (RenderedGltf renderedGltf : renderedGltfs.values())
+        for (RenderedGltfModel renderedGltfModel : renderedGltfModels.values())
         {
-            renderedGltf.render();
+            renderedGltfModel.render();
         }
     }
 

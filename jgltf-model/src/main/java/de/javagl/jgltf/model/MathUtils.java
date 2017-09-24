@@ -27,6 +27,9 @@
 package de.javagl.jgltf.model;
 
 import java.util.Arrays;
+import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Mathematical utility methods. These methods are mainly related to 
@@ -41,20 +44,28 @@ import java.util.Arrays;
  * Unless otherwise noted, each 4x4 matrix is assumed to have a length of 
  * at least 16, and each 3x3 matrix is assumed to have a length of 
  * at least 9. Points in 3D are assumed to have a length of at least 3.
+ * 
+ * TODO This class should not be considered as part of the public API!
  */
-class MathUtils
+public class MathUtils
 {
+    /**
+     * The logger used in this class
+     */
+    private static final Logger logger = 
+        Logger.getLogger(MathUtils.class.getName());
+    
     /**
      * Epsilon for floating point computations
      */
-    private static final float FLOAT_EPSILON = 1e-6f;
+    private static final float FLOAT_EPSILON = 1e-8f;
     
     /**
      * Creates a 4x4 identity matrix
      * 
      * @return The matrix
      */
-    static float[] createIdentity4x4()
+    public static float[] createIdentity4x4()
     {
         float m[] = new float[16];
         setIdentity4x4(m);
@@ -66,7 +77,7 @@ class MathUtils
      * 
      * @param m The matrix
      */
-    static void setIdentity4x4(float m[])
+    public static void setIdentity4x4(float m[])
     {
         Arrays.fill(m, 0.0f);
         m[0] = 1.0f;
@@ -110,7 +121,7 @@ class MathUtils
      * @param sourceMatrix4x4 The source matrix
      * @param targetMatrix3x3 The target matrix
      */
-    static void getRotationScale(
+    public static void getRotationScale(
         float sourceMatrix4x4[], float targetMatrix3x3[])
     {
         targetMatrix3x3[0] = sourceMatrix4x4[ 0];
@@ -161,7 +172,7 @@ class MathUtils
      * @param m The input matrix
      * @param t The target matrix
      */
-    static void transpose4x4(float m[], float t[])
+    public static void transpose4x4(float m[], float t[])
     {
         float m0 = m[ 0];
         float m1 = m[ 1];
@@ -204,7 +215,7 @@ class MathUtils
      * @param b The second matrix
      * @param m The result matrix
      */
-    static void mul4x4(float a[], float b[], float m[])
+    public static void mul4x4(float a[], float b[], float m[])
     {
         float a00 = a[ 0];
         float a10 = a[ 1];
@@ -287,7 +298,7 @@ class MathUtils
      * @param q The quaternion
      * @param m The matrix
      */
-    static void quaternionToMatrix4x4(float q[], float m[])
+    public static void quaternionToMatrix4x4(float q[], float m[])
     {
         float invLength = 1.0f / (float)Math.sqrt(dot(q, q));
 
@@ -322,7 +333,7 @@ class MathUtils
      * @param m The input matrix
      * @param inv The inverse matrix
      */
-    static void invert4x4(float m[], float inv[])
+    public static void invert4x4(float m[], float inv[])
     {
         // Adapted from The Mesa 3-D graphics library. 
         // Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
@@ -381,6 +392,11 @@ class MathUtils
         float det = m0 * inv[0] + m1 * inv[4] + m2 * inv[8] + m3 * inv[12];
         if (Math.abs(det) <= FLOAT_EPSILON)
         {
+            if (logger.isLoggable(Level.FINE)) 
+            {
+                logger.fine("Matrix is not invertible, determinant is " + det
+                    + ", returning identity");
+            }
             setIdentity4x4(inv);
             return;
         }
@@ -399,7 +415,7 @@ class MathUtils
      * @param m The input matrix
      * @param inv The inverse matrix
      */
-    static void invert3x3(float m[], float inv[])
+    public static void invert3x3(float m[], float inv[])
     {
         // Adapted from http://stackoverflow.com/a/18504573
         float m0 = m[0];
@@ -416,6 +432,11 @@ class MathUtils
                     m6 * (m1 * m5 - m4 * m2);
         if (Math.abs(det) <= FLOAT_EPSILON)
         {
+            if (logger.isLoggable(Level.FINE)) 
+            {
+                logger.fine("Matrix is not invertible, determinant is " + det
+                    + ", returning identity");
+            }
             setIdentity3x3(inv);
             return;
         }
@@ -432,6 +453,29 @@ class MathUtils
     }
     
     /**
+     * Fill the given matrix to describe an infinite perspective projection 
+     * with the given parameters. 
+     * 
+     * @param fovyDeg The Field-Of-View, in y-direction, in degrees
+     * @param aspect The aspect ratio
+     * @param zNear The z-value of the near clipping plane
+     * @param m The matrix to fill
+     */
+    public static void infinitePerspective4x4(
+        float fovyDeg, float aspect, float zNear, float m[])
+    {
+        setIdentity4x4(m);
+        float fovyRad = (float)Math.toRadians(fovyDeg);
+        float t = (float)Math.tan(0.5 * fovyRad);
+        m[0] = 1.0f / (aspect * t);
+        m[5] = 1.0f / t;
+        m[10] = -1.0f;
+        m[11] = -1.0f;
+        m[14] = 2.0f * zNear;
+        m[15] = 0.0f;
+    }
+    
+    /**
      * Fill the given matrix to describe a perspective projection with the
      * given parameters. 
      * 
@@ -441,27 +485,17 @@ class MathUtils
      * @param zFar The z-value of the far clipping plane
      * @param m The matrix to fill
      */
-    static void perspective4x4(
+    public static void perspective4x4(
         float fovyDeg, float aspect, float zNear, float zFar, float m[])
     {
-        // Adapted from The Mesa 3-D graphics library. 
-        // Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
-        // Published under the MIT license (see the header of this file)
-        float radians = (float)Math.toRadians(fovyDeg / 2);
-        float deltaZ = zFar - zNear;
-        float sine = (float)Math.sin(radians);
-        if ((deltaZ == 0) || (sine == 0) || (aspect == 0)) 
-        {
-            return;
-        }
-        float cotangent = (float)Math.cos(radians) / sine;
-
         setIdentity4x4(m);
-        m[0] = cotangent / aspect;
-        m[5] = cotangent;
-        m[10] = -(zFar + zNear) / deltaZ;
-        m[11] = -1;
-        m[14] = -2 * zNear * zFar / deltaZ;
+        float fovyRad = (float)Math.toRadians(fovyDeg);
+        float t = (float)Math.tan(0.5 * fovyRad);
+        m[0] = 1.0f / (aspect * t);
+        m[5] = 1.0f / t;
+        m[10] = (zFar + zNear) / (zNear - zFar);
+        m[11] = -1.0f;
+        m[14] = 2.0f * zFar * zNear / (zNear - zFar);
         m[15] = 0.0f;
     }
     
@@ -494,7 +528,7 @@ class MathUtils
      * @param point3D The input point
      * @param result3D The result point
      */
-    static void transformPoint3D(
+    public static void transformPoint3D(
         float matrix4x4[], float point3D[], float result3D[])
     {
         Arrays.fill(result3D, 0.0f);
@@ -521,7 +555,7 @@ class MathUtils
      * @param array The array
      * @return The string representation
      */
-    static String createMatrixString(float array[])
+    public static String createMatrixString(float array[])
     {
         if (array == null)
         {
@@ -561,6 +595,64 @@ class MathUtils
         }
         return sb.toString();
     }
+    
+    /**
+     * Create a string representation of the given array, as a matrix, 
+     * interpreting it as a matrix that is stored in column-major order. The 
+     * given array may be <code>null</code>. If it is not <code>null</code>,
+     * then it must either have 3x3 elements or 4x4 elements. <br>
+     * <br>
+     * The individual elements of the matrix will be formatted (in an 
+     * unspecified way) so that the matrix entries are aligned.
+     * 
+     * @param array The array
+     * @return The string representation
+     */
+    public static String createFormattedMatrixString(float array[])
+    {
+        if (array == null)
+        {
+            return "null";
+        }
+        String format = "%10.5f ";
+        if (array.length == 9)
+        {
+            return createFormattedMatrixString(array, 3, 3, format);
+        }
+        if (array.length == 16)
+        {
+            return createFormattedMatrixString(array, 4, 4, format);
+        }
+        return "WARNING: Not a matrix: "+Arrays.toString(array);
+    }
+    
+    /**
+     * Creates a string representation of the given matrix, which is given
+     * in column-major order. The elements of the matrix will be formatted
+     * with the given string.
+     * 
+     * @param array The array storing the matrix
+     * @param rows The number of rows
+     * @param cols The number of columns
+     * @param format The format string
+     * @return The string representation
+     */
+    private static String createFormattedMatrixString(
+        float array[], int rows, int cols, String format)
+    {
+        StringBuilder sb = new StringBuilder();
+        for (int r = 0; r < rows; r++)
+        {
+            for (int c = 0; c < cols; c++)
+            {
+                sb.append(String.format(
+                    Locale.ENGLISH, format, array[r + c * cols]));
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+    
 
     /**
      * Private constructor to prevent instantiation

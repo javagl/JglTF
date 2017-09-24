@@ -26,8 +26,8 @@
  */
 package de.javagl.jgltf.validator;
 
-import de.javagl.jgltf.impl.GlTF;
-import de.javagl.jgltf.impl.Material;
+import de.javagl.jgltf.impl.v1.GlTF;
+import de.javagl.jgltf.impl.v1.Material;
 
 /**
  * A class for validating {@link Material} objects

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<metadata modelVersion="1.1.0">
+<metadata>
   <groupId>de.javagl</groupId>
   <artifactId>rendering-interaction</artifactId>
   <version>0.0.0-SNAPSHOT</version>
@@ -7,18 +7,6 @@
     <snapshot>
       <localCopy>true</localCopy>
     </snapshot>
-    <lastUpdated>20160829161742</lastUpdated>
-    <snapshotVersions>
-      <snapshotVersion>
-        <extension>jar</extension>
-        <value>0.0.0-SNAPSHOT</value>
-        <updated>20160829161742</updated>
-      </snapshotVersion>
-      <snapshotVersion>
-        <extension>pom</extension>
-        <value>0.0.0-SNAPSHOT</value>
-        <updated>20160829161345</updated>
-      </snapshotVersion>
-    </snapshotVersions>
+    <lastUpdated>20170211190455</lastUpdated>
   </versioning>
 </metadata>

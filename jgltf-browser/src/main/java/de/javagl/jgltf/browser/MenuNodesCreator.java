@@ -55,7 +55,8 @@ class MenuNodesCreator
         samplesNode.label = "Samples";
         samplesNode.children = new ArrayList<MenuNode>();
         samplesNode.children.add(createKhronosNode10());
-        samplesNode.children.add(createTutorialNode());
+        samplesNode.children.add(createKhronosNode20());
+        //samplesNode.children.add(createTutorialNode());
         write(Arrays.asList(samplesNode), System.out);
     }
     
@@ -71,24 +72,27 @@ class MenuNodesCreator
             "glTF-Sample-Models/master/1.0";
         
         List<String> names = Arrays.asList(
-            "2CylinderEngine",
             "Box",
-            "BoxAnimated",
-            "BoxSemantics",
-            "BoxTextured",
             "BoxWithoutIndices",
-            "BrainStem",
-            "Buggy",
-            "CesiumMan",
-            "CesiumMilkTruck",
+            "BoxTextured",
+            "BoxSemantics",
             "Duck",
-            "GearboxAssy",
-            "Monster",
+            "Avocado",
+            "BarramundiFish",
+            "SmilingFace",
+            "2CylinderEngine",
             "ReciprocatingSaw",
-            "RiggedFigure",
+            "GearboxAssy",
+            "Buggy",
+            "BoxAnimated",
+            "CesiumMilkTruck",
             "RiggedSimple",
-            "VC",
-            "WalkingLady"
+            "RiggedFigure",
+            "WalkingLady",
+            "CesiumMan",
+            "Monster",
+            "BrainStem",
+            "VC"
         );
         
         List<String> types = Arrays.asList(
@@ -127,6 +131,95 @@ class MenuNodesCreator
         
         return root;
     }
+
+    
+    /**
+     * Create the {@link MenuNode} structure for the Khronos sample models,
+     * version 2.0
+     * 
+     * @return The root {@link MenuNode}
+     */
+    private static MenuNode createKhronosNode20()
+    {
+        String basePath = "https://raw.githubusercontent.com/KhronosGroup/" + 
+            "glTF-Sample-Models/master/2.0";
+        
+        List<String> names = Arrays.asList(
+            "TriangleWithoutIndices",
+            "Triangle",
+            "AnimatedTriangle",
+            "AnimatedMorphCube",
+            "AnimatedMorphSphere",
+            "SimpleMeshes",
+            "Cameras",
+            "Box",
+            "BoxTextured",
+            "Duck",
+            "SmilingFace",
+            "2CylinderEngine",
+            "ReciprocatingSaw",
+            "GearboxAssy",
+            "Buggy",
+            "BoxAnimated",
+            "CesiumMilkTruck",
+            "RiggedSimple",
+            "RiggedFigure",
+            "WalkingLady",
+            "CesiumMan",
+            "Monster",
+            "BrainStem",
+            "VC",
+            "Avocado",
+            "BarramundiFish",
+            "BoomBox",
+            "Corset",
+            "Lantern",
+            "WaterBottle",
+            "MetalRoughSpheres",
+            "NormalTangentTest",
+            "TwoSidedPlane",
+            "Cube",
+            "AnimatedCube",
+            "Suzanne",
+            "SciFiHelmet"
+        );
+        
+        List<String> types = Arrays.asList(
+            "glTF",
+            "glTF-Embedded",
+            "glTF-Binary",
+            "glTF-MaterialsCommon"
+        );
+
+        MenuNode root = new MenuNode();
+        root.label = "Khronos Samples, v2.0";
+        root.children = new ArrayList<MenuNode>();
+        
+        for (String name : names)
+        {
+            MenuNode modelNode = new MenuNode();
+            modelNode.label = name;
+            modelNode.children = new ArrayList<MenuNode>();
+            
+            for (String type : types)
+            {
+                MenuNode typeNode = new MenuNode();
+                typeNode.label = type;
+                
+                String extensionWithoutDot = "gltf";
+                if (type.equals("glTF-Binary"))
+                {
+                    extensionWithoutDot = "glb";
+                }
+                typeNode.command = basePath + "/" + name + "/" + type + "/" + 
+                    name + "." + extensionWithoutDot;
+                modelNode.children.add(typeNode);
+            }
+            root.children.add(modelNode);
+        }
+        
+        return root;
+    }
     
     
     /**
@@ -134,6 +227,7 @@ class MenuNodesCreator
      * 
      * @return The root {@link MenuNode}
      */
+    /*
     private static MenuNode createTutorialNode()
     {
         String basePath = "https://raw.githubusercontent.com/" + 
@@ -166,6 +260,7 @@ class MenuNodesCreator
         
         return root;
     }
+    */
     
     /**
      * Create a {@link MenuNode} with the given name as a label and children
@@ -176,6 +271,7 @@ class MenuNodesCreator
      * @param types The types
      * @return The {@link MenuNode}
      */
+    /*
     private static MenuNode createTutorialNode(
         String basePath, String name, String ... types)
     {
@@ -200,7 +296,7 @@ class MenuNodesCreator
         
         return modelNode;
     }
-
+    */
     
     /**
      * Write the given list of {@link MenuNode} objects as JSON to the

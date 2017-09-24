@@ -26,23 +26,34 @@
  */
 package de.javagl.jgltf.browser;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.AbstractMap;
+import java.util.AbstractSet;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.logging.Logger;
 
-import de.javagl.jgltf.impl.Animation;
-import de.javagl.jgltf.impl.AnimationSampler;
-import de.javagl.jgltf.impl.GlTF;
-import de.javagl.jgltf.impl.Technique;
-import de.javagl.jgltf.impl.TechniqueParameters;
-import de.javagl.jgltf.impl.Texture;
+import de.javagl.jgltf.model.Optionals;
 
 /**
- * Utility class for resolving entities inside a {@link GlTF} based on
+ * Utility class for resolving entities inside a glTF based on
  * a JSON path description
  */
 class Resolver
 {
+    /**
+     * The logger used in this class
+     */
+    private static final Logger logger = 
+        Logger.getLogger(Resolver.class.getName());
+    
     /**
      * A class encapsulating a resolved entity
      */
@@ -142,16 +153,16 @@ class Resolver
     }
     
     /**
-     * The {@link GlTF}
+     * The glTF
      */
-    private final GlTF gltf;
+    private final Object gltf;
     
     /**
-     * Creates a new resolver for the given {@link GlTF}
+     * Creates a new resolver for the given glTF
      * 
-     * @param gltf The {@link GlTF}
+     * @param gltf The glTF
      */
-    Resolver(GlTF gltf)
+    Resolver(Object gltf)
     {
         this.gltf = gltf;
     }
@@ -176,31 +187,44 @@ class Resolver
         // map the selected element to a glTF entity 
         Map<String, Map<?, ?>> m = 
             new LinkedHashMap<String, Map<?,?>>();
-        m.put("glTF.scene", gltf.getScenes());
-        m.put("glTF.scenes.*.nodes.*", gltf.getNodes());
-        m.put("glTF.bufferViews.*.buffer", gltf.getBuffers());
-        m.put("glTF.nodes.*.camera", gltf.getCameras());
-        m.put("glTF.nodes.*.meshes.*", gltf.getMeshes());
-        m.put("glTF.nodes.*.children.*", gltf.getNodes());
-        m.put("glTF.nodes.*.skeletons.*", gltf.getNodes());
-        m.put("glTF.nodes.*.skin", gltf.getSkins());
-        m.put("glTF.meshes.*.primitives.*.material", gltf.getMaterials());
-        m.put("glTF.meshes.*.primitives.*.attributes.*", gltf.getAccessors());
-        m.put("glTF.meshes.*.primitives.*.indices", gltf.getAccessors());
-        m.put("glTF.accessors.*.bufferView", gltf.getBufferViews());
-        m.put("glTF.programs.*.fragmentShader", gltf.getShaders());
-        m.put("glTF.programs.*.vertexShader", gltf.getShaders());
-        m.put("glTF.materials.*.technique", gltf.getTechniques());
-        m.put("glTF.techniques.*.program", gltf.getPrograms());
-        m.put("glTF.techniques.*.parameters.*.node", gltf.getNodes());
-        m.put("glTF.animations.*.channels.*.target.id", gltf.getNodes());
-        m.put("glTF.animations.*.parameters.*", gltf.getAccessors());
-        m.put("glTF.textures.*.sampler", gltf.getSamplers());
-        m.put("glTF.textures.*.source", gltf.getImages());
-        m.put("glTF.skins.*.jointNames.*", gltf.getNodes());
-        m.put("glTF.skins.*.inverseBindMatrices", gltf.getAccessors());
+        m.put("glTF.scene", getMap(gltf, "scenes"));
+        m.put("glTF.scenes.*.nodes.*", getMap(gltf, "nodes"));
+        m.put("glTF.bufferViews.*.buffer", getMap(gltf, "buffers"));
+        m.put("glTF.images.*.bufferView", getMap(gltf, "bufferViews"));
+        m.put("glTF.nodes.*.camera", getMap(gltf, "cameras"));
+        m.put("glTF.nodes.*.meshes.*", getMap(gltf, "meshes"));
+        m.put("glTF.nodes.*.children.*", getMap(gltf, "nodes"));
+        m.put("glTF.nodes.*.skeletons.*", getMap(gltf, "nodes"));
+        m.put("glTF.nodes.*.skin", getMap(gltf, "skins"));
+        m.put("glTF.meshes.*.primitives.*.material", getMap(gltf, "materials"));
+        m.put("glTF.meshes.*.primitives.*.attributes.*", 
+            getMap(gltf, "accessors"));
+        m.put("glTF.meshes.*.primitives.*.targets.*.*", 
+            getMap(gltf, "accessors"));
+        m.put("glTF.accessors.*.bufferView", getMap(gltf, "bufferViews"));
+        m.put("glTF.programs.*.fragmentShader", getMap(gltf, "shaders"));
+        m.put("glTF.programs.*.vertexShader", getMap(gltf, "shaders"));
+        m.put("glTF.materials.*.technique", getMap(gltf, "techniques"));
+        m.put("glTF.materials.*.pbrMetallicRoughness.baseColorTexture.index", 
+            getMap(gltf, "textures"));
+        m.put("glTF.materials.*.emissiveTexture.index", 
+            getMap(gltf, "textures"));
+        m.put("glTF.materials.*.normalTexture.index", 
+            getMap(gltf, "textures"));
+        m.put("glTF.materials.*.occlusionTexture.index", 
+            getMap(gltf, "textures"));
+        m.put("glTF.techniques.*.program", getMap(gltf, "programs"));
+        m.put("glTF.techniques.*.parameters.*.node", getMap(gltf, "nodes"));
+        m.put("glTF.animations.*.channels.*.target.id", getMap(gltf, "nodes"));
+        m.put("glTF.animations.*.samplers.*.input", getMap(gltf, "accessors"));
+        m.put("glTF.animations.*.samplers.*.output", getMap(gltf, "accessors"));
+        m.put("glTF.animations.*.parameters.*", getMap(gltf, "accessors"));
+        m.put("glTF.textures.*.sampler", getMap(gltf, "samplers"));
+        m.put("glTF.textures.*.source", getMap(gltf, "images"));
+        m.put("glTF.skins.*.jointNames.*", getMap(gltf, "nodes"));
+        m.put("glTF.skins.*.inverseBindMatrices", getMap(gltf, "accessors"));
         m.put("glTF.*.*.extensions.KHR_binary_glTF.bufferView", 
-            gltf.getBufferViews());
+            getMap(gltf, "bufferViews"));
         
         // Try to resolve the top level glTF entities 
         // based on the path string
@@ -219,12 +243,11 @@ class Resolver
         if (RegEx.matches(pathString, "glTF.animations.*.channels.*.sampler"))
         {
             String animationId = extractId(pathString, "glTF.animations.");
-            Animation animation = 
-                getOptional(animationId, gltf.getAnimations());
+            Object animation = 
+                Optionals.get(animationId, getMap(gltf, "animations"));
             if (animation != null)
             {  
-                Map<String, AnimationSampler> samplers = 
-                    animation.getSamplers();
+                Map<?, ?> samplers = getMap(animation, "samplers");
                 return new ResolvedEntity(
                     "animation samplers", pathString, 
                     key, samplers);
@@ -236,12 +259,12 @@ class Resolver
             RegEx.matches(pathString, "glTF.animations.*.samplers.*.output"))
         {
             String animationId = extractId(pathString, "glTF.animations.");
-            Animation animation = 
-                getOptional(animationId, gltf.getAnimations());
+            Object animation = 
+                Optionals.get(animationId, getMap(gltf, "animations"));
             if (animation != null)
             {
-                Map<String, String> parameters = 
-                    animation.getParameters();
+                Map<?, ?> parameters = 
+                    getMap(animation, "parameters"); 
                 return new ResolvedEntity(
                     "animation parameters", pathString, 
                     key, parameters);
@@ -254,10 +277,10 @@ class Resolver
         if (RegEx.matches(pathString, "glTF.materials.*.values.*"))
         {
             String valueString = String.valueOf(key);
-            Map<String, Texture> textures = gltf.getTextures();
+            Map<?, ?> textures = getMap(gltf, "textures");
             if (textures != null)
             {
-                Texture texture = textures.get(valueString);
+                Object texture = textures.get(valueString);
                 if (texture != null)
                 {
                     return new ResolvedEntity(
@@ -271,42 +294,17 @@ class Resolver
         if (RegEx.matches(pathString, "glTF.techniques.*.attributes.*"))
         {
             String techniqueId = extractId(pathString, "glTF.techniques.");
-            Technique technique = 
-                getOptional(techniqueId, gltf.getTechniques());
+            Object technique = 
+                Optionals.get(techniqueId, getMap(gltf, "techniques"));
             if (technique != null)
             {
-                Map<String, TechniqueParameters> parameters = 
-                    technique.getParameters();
+                Map<?, ?> parameters = getMap(technique, "parameters");
                 return new ResolvedEntity(
                     "technique parameters", pathString, 
                     key, parameters);
             }
         }
         return null;
-    }
-    
-    /**
-     * Returns the value that is associated with the given key in the
-     * given map, or <code>null</code> if either the key or the map
-     * is <code>null</code>.
-     *  
-     * @param <T> The value type
-     * 
-     * @param key The key
-     * @param map The map
-     * @return The value
-     */
-    private static <T> T getOptional(String key, Map<String, T> map)
-    {
-        if (key == null)
-        {
-            return null;
-        }
-        if (map == null)
-        {
-            return null;
-        }
-        return map.get(key);
     }
     
     /**
@@ -334,4 +332,139 @@ class Resolver
         return id;
     }
 
+    /**
+     * Returns the map that is obtained by calling a getter method for the
+     * property with the given name. For example, when the name is 
+     * <code>"property"</code>, then the method <code>"getProperty"</code>
+     * is called. If no such method exists, or it cannot be invoked,
+     * then an empty map will be returned.<br>
+     * <br>
+     * If the method returns a List, then this method will return a Map
+     * that is a read-only view on the list. 
+     *  
+     * @param object The object
+     * @param name The property name
+     * @return The map
+     */
+    private static Map<?, ?> getMap(Object object, String name) 
+    {
+        Class<?> c = object.getClass();
+        try
+        {
+            Method method = c.getMethod("get" + capitalizeFirstLetter(name));
+            Object result = method.invoke(object);
+            if (result == null)
+            {
+                return null;
+            }
+            if (result instanceof List<?>)
+            {
+                List<?> list = (List<?>)result;
+                return listAsMap(list);
+            }
+            if (!(result instanceof Map<?,?>))
+            {
+                logger.info("Result is not a map: " + result.getClass());
+                return Collections.emptyMap();
+            }
+            Map<?, ?> map = (Map<?, ?>)result;
+            return map;
+        }
+        catch (NoSuchMethodException | 
+               SecurityException | 
+               IllegalAccessException | 
+               IllegalArgumentException | 
+               InvocationTargetException e)
+        {
+            logger.fine("Could not access " + name + ": " + e.getMessage());
+            return Collections.emptyMap();
+        }
+    }
+    
+    
+    /**
+     * Returns a map that is a read-only view on the given list
+     * 
+     * @param list The list
+     * @return The map
+     */
+    private static <V> Map<Integer, V> listAsMap(List<? extends V> list)
+    {
+        return new AbstractMap<Integer, V>()
+        {
+            @Override
+            public V get(Object key)
+            {
+                if (!(key instanceof Integer))
+                {
+                    return null;
+                }
+                Integer index = (Integer)key;
+                if (index < 0 || index >= list.size())
+                {
+                    return null;
+                }
+                return list.get(index);
+            }
+            
+            @Override
+            public Set<Entry<Integer, V>> entrySet()
+            {
+                return new AbstractSet<Entry<Integer,V>>()
+                {
+                    @Override
+                    public Iterator<Entry<Integer, V>> iterator()
+                    {
+                        return new Iterator<Entry<Integer,V>>()
+                        {
+                            int index = 0;
+                            
+                            @Override
+                            public boolean hasNext()
+                            {
+                                return index < list.size();
+                            }
+
+                            @Override
+                            public Entry<Integer, V> next()
+                            {
+                                if (index >= list.size())
+                                {
+                                    throw new NoSuchElementException(
+                                        "No more elements");
+                                }
+                                Entry<Integer, V> result =
+                                    new SimpleEntry<Integer, V>(
+                                        index, list.get(index));
+                                index++;
+                                return result;
+                            }
+                        };
+                    }
+
+                    @Override
+                    public int size()
+                    {
+                        return list.size();
+                    }
+                };
+            }
+        };
+    }
+    
+    /**
+     * Capitalize the first letter of the given string
+     * 
+     * @param s The string
+     * @return The capitalized string
+     */
+    private static String capitalizeFirstLetter(String s)
+    {
+        if (s == null || s.length() == 0)
+        {
+            return s;
+        }
+        return Character.toUpperCase(s.charAt(0)) + s.substring(1);
+    }
+    
 }

@@ -70,12 +70,13 @@ import de.javagl.common.ui.tree.filtered.FilteredTree;
 import de.javagl.common.ui.tree.filtered.TreeModelFilter;
 import de.javagl.jgltf.browser.ObjectTrees.NodeEntry;
 import de.javagl.jgltf.browser.Resolver.ResolvedEntity;
-import de.javagl.jgltf.impl.GlTF;
-import de.javagl.jgltf.model.GltfData;
+import de.javagl.jgltf.model.GltfModel;
+import de.javagl.jgltf.model.v1.GltfModelV1;
+import de.javagl.jgltf.model.v2.GltfModelV2;
 import de.javagl.jgltf.viewer.GltfViewer;
 
 /**
- * A panel for browsing through the {@link GlTF} of a {@link GltfData}
+ * A panel for browsing through the glTF of a {@link GltfModel}
  * and displaying information about the glTF entities. 
  */
 class GltfBrowserPanel extends JPanel
@@ -92,9 +93,9 @@ class GltfBrowserPanel extends JPanel
     private static final long serialVersionUID = 8959452050508861357L;
 
     /**
-     * The {@link GltfData} that is displayed in this panel
+     * The {@link GltfModel} that is displayed in this panel
      */
-    private final GltfData gltfData;
+    private final GltfModel gltfModel;
     
     /**
      * The tree that displays the glTF structure
@@ -169,23 +170,21 @@ class GltfBrowserPanel extends JPanel
     private final JPanel infoPanelContainer;
     
     /**
-     * Creates a new browser panel for the given {@link GltfData}
+     * Creates a new browser panel for the given {@link GltfModel}
      * 
-     * @param gltfData The {@link GltfData}
-     * @param jsonString The JSON string that the glTF was read from.
-     * This may be <code>null</code> if the given {@link GltfData} was
-     * not read, but created programmatically.
+     * @param gltfModel The {@link GltfModel}
      */
-    GltfBrowserPanel(GltfData gltfData, String jsonString)
+    GltfBrowserPanel(GltfModel gltfModel)
     {
         super(new BorderLayout());
-        Objects.requireNonNull(gltfData, "The gltfData may not be null");
         
-        this.gltfData = gltfData;
+        this.gltfModel = Objects.requireNonNull(
+            gltfModel, "The gltfModel may not be null");
         this.selectionPathHistory = new LinkedList<TreePath>();
-        this.infoComponentFactory = 
-            new InfoComponentFactory(gltfData, jsonString);
-        this.resolver = new Resolver(gltfData.getGltf());
+        this.infoComponentFactory = new InfoComponentFactory(gltfModel);
+        
+        Object gltf = getGltf(gltfModel);
+        this.resolver = new Resolver(gltf);
         
         add(createControlPanel(), BorderLayout.NORTH);
         
@@ -201,7 +200,7 @@ class GltfBrowserPanel extends JPanel
         });
         
         mainSplitPane.setLeftComponent(
-            createTreePanel(gltfData.getGltf()));
+            createTreePanel(gltf));
         
         mainTabbedPane = new JTabbedPane();
         mainSplitPane.setRightComponent(mainTabbedPane);
@@ -209,13 +208,38 @@ class GltfBrowserPanel extends JPanel
         infoPanelContainer = new JPanel(new GridLayout(1,1));
         mainTabbedPane.addTab("Info", infoPanelContainer);
         
-        gltfViewerPanel = new GltfViewerPanel(gltfData);
+        gltfViewerPanel = new GltfViewerPanel(gltfModel);
         mainTabbedPane.addTab("View", gltfViewerPanel);
     }
     
     /**
+     * Returns the raw glTF object. Depending on the version of the model,
+     * this may be a 
+     * {@link de.javagl.jgltf.impl.v1.GlTF version 1.0 glTF} or a
+     * {@link de.javagl.jgltf.impl.v1.GlTF version 2.0 glTF}.<br>
+     * 
+     * @param gltfModel The {@link GltfModel}
+     * @return The glTF object
+     */
+    static Object getGltf(GltfModel gltfModel)
+    {
+        if (gltfModel instanceof GltfModelV1)
+        {
+            GltfModelV1 gltfModelV1 = (GltfModelV1)gltfModel;
+            return gltfModelV1.getGltf();
+        }
+        if (gltfModel instanceof GltfModelV2)
+        {
+            GltfModelV2 gltfModelV2 = (GltfModelV2)gltfModel;
+            return gltfModelV2.getGltf();
+        }
+        logger.warning("Unknown glTF model type: " + gltfModel);
+        return null;
+    }
+    
+    /**
      * Dispose the current {@link GltfViewer}. This will stop all animations,
-     * remove the {@link GltfData} from the viewer, and set the viewer to
+     * remove the {@link GltfModel} from the viewer, and set the viewer to
      * <code>null</code>
      */
     void disposeGltfViewer()
@@ -224,23 +248,23 @@ class GltfBrowserPanel extends JPanel
     }
     
     /**
-     * Returns the {@link GltfData} that is displayed in this panel
+     * Returns the {@link GltfModel} that is displayed in this panel
      * 
-     * @return The {@link GltfData}
+     * @return The {@link GltfModel}
      */
-    GltfData getGltfData()
+    GltfModel getGltfModel()
     {
-        return gltfData;
+        return gltfModel;
     }
     
     /**
      * Create the panel containing the (filterable, browsable) tree 
-     * showing the structure of the given {@link GlTF}
+     * showing the structure of the given glTF
      *  
-     * @param gltf The {@link GlTF}
+     * @param gltf The glTF
      * @return The tree panel
      */
-    private JPanel createTreePanel(GlTF gltf)
+    private JPanel createTreePanel(Object gltf)
     {
         JPanel treePanel = new JPanel(new BorderLayout());
 
@@ -263,8 +287,12 @@ class GltfBrowserPanel extends JPanel
                 tree.setSelectionPath(currentSelectionPath);
                 if (SwingUtilities.isRightMouseButton(e))
                 {
-                    preparePopupMenu(popupMenu, currentSelectionPath);
-                    popupMenu.show(e.getComponent(), e.getX(), e.getY());
+                    boolean menuContainsEntries = 
+                        preparePopupMenu(popupMenu, currentSelectionPath);
+                    if (menuContainsEntries)
+                    {
+                        popupMenu.show(e.getComponent(), e.getX(), e.getY());
+                    }
                 }
             }
         };
@@ -430,22 +458,24 @@ class GltfBrowserPanel extends JPanel
      *  
      * @param popupMenu The popup menu
      * @param treePath The selection path
+     * @return Whether the menu contains entries
      */
-    private void preparePopupMenu(
+    private boolean preparePopupMenu(
         JPopupMenu popupMenu, TreePath treePath)
     {
         popupMenu.removeAll();
         Object nodeEntryValue = ObjectTrees.getNodeEntryValue(treePath);
         if (nodeEntryValue == null)
         {
-            return;
+            return false;
         }
+        
         String pathString = ObjectTrees.createPathString(treePath);
         ResolvedEntity resolvedEntity = 
             resolver.resolve(pathString, nodeEntryValue);
         if (resolvedEntity == null)
         {
-            return;
+            return false;
         }
         if (resolvedEntity.getMessage() != null)
         {
@@ -456,9 +486,10 @@ class GltfBrowserPanel extends JPanel
             popupMenu.add(createTreeNodeSelectionMenuItem(
                 resolvedEntity.getKey(), resolvedEntity.getValue()));
         }
+        return true;
     }
     
-    
+
     /**
      * Create a disabled menu item with the given text
      *  
@@ -583,7 +614,7 @@ class GltfBrowserPanel extends JPanel
      * @param oldPath The old tree path
      * @return The new tree path
      */
-    public static TreePath translatePathPartial(
+    private static TreePath translatePathPartial(
         TreeModel newTreeModel, TreePath oldPath)
     {
         Object newRoot = newTreeModel.getRoot();

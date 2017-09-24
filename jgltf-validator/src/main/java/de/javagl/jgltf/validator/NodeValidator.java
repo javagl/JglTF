@@ -28,8 +28,8 @@ package de.javagl.jgltf.validator;
 
 import java.util.List;
 
-import de.javagl.jgltf.impl.GlTF;
-import de.javagl.jgltf.impl.Node;
+import de.javagl.jgltf.impl.v1.GlTF;
+import de.javagl.jgltf.impl.v1.Node;
 
 /**
  * A class for validating {@link Node} objects

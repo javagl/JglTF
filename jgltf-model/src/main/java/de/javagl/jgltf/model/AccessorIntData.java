@@ -30,53 +30,19 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.Locale;
-import java.util.Objects;
-
-import de.javagl.jgltf.impl.Accessor;
-import de.javagl.jgltf.impl.BufferView;
 
 /**
- * A class for accessing the data that is described by an {@link Accessor}.
- * It allows accessing the byte buffer of the {@link BufferView} of the
- * {@link Accessor}, depending on the {@link Accessor} parameters.<br>
+ * A class for accessing the data that is described by an accessor.
+ * It allows accessing the byte buffer of the buffer view of the
+ * accessor, depending on the accessor parameters.<br>
  * <br> 
  * This data consists of several elements (for example, 3D int vectors),
  * which consist of several components (for example, the 3 int values).  
  */
-public final class AccessorIntData
+public final class AccessorIntData 
+    extends AbstractAccessorData
+    implements AccessorData
 {
-    /**
-     * The number of bytes that each component of this data consists of
-     */
-    private static final int NUM_BYTES_PER_COMPONENT = Integer.BYTES;
-    
-    /**
-     * The byte buffer of the {@link BufferView} that the {@link Accessor}
-     * refers to
-     */
-    private final ByteBuffer bufferViewByteBuffer;
-
-    /**
-     * The number of elements
-     */
-    private final int numElements;
-    
-    /**
-     * The number of components per element
-     */
-    private final int numComponentsPerElement;
-    
-    /**
-     * The offset for the {@link Accessor} inside the byte buffer of
-     * the {@link BufferView}
-     */
-    private final int byteOffset;
-    
-    /**
-     * The stride, in number of bytes, between two consecutive elements 
-     */
-    private final int byteStridePerElement;
-    
     /**
      * Whether the data should be interpreted as unsigned values
      */
@@ -84,50 +50,35 @@ public final class AccessorIntData
     
     /**
      * Creates a new instance for accessing the data in the given 
-     * {@link BufferView} byte buffer, according to the rules 
-     * described by the given {@link Accessor}
+     * byte buffer, according to the rules described by the given
+     * accessor parameters.
+     * @param componentType The component type
+     * @param bufferViewByteBuffer The byte buffer of the buffer view
+     * @param byteOffset The byte offset in the buffer view 
+     * @param numElements The number of elements
+     * @param numComponentsPerElement The number of components per element
+     * @param byteStride The byte stride between two elements. If this
+     * is <code>null</code> or <code>0</code>, then the stride will
+     * be the size of one element.
      * 
-     * @param accessor The {@link Accessor}
-     * @param bufferViewByteBuffer The byte buffer of the {@link BufferView}
-     * @param unsigned Whether the data should be interpreted as unsigned
-     * @throws NullPointerException If any argument is <code>null</code>
-     * @throws IllegalArgumentException If the 
-     * {@link Accessor#getComponentType() component type} of the given
-     * accessor is not <code>GL_INT</code> or <code>GL_UNSIGEND_INT</code>
+     * @throws NullPointerException If the bufferViewByteBuffer is 
+     * <code>null</code>
+     * @throws IllegalArgumentException If the component type is not 
+     * <code>GL_INT</code> or <code>GL_UNSIGEND_INT</code>
      * @throws IllegalArgumentException If the given byte buffer does not
-     * have a sufficient capacity to provide the data for the given 
-     * {@link Accessor}
+     * have a sufficient capacity to provide the data for the accessor 
      */
-    AccessorIntData(Accessor accessor,
-        ByteBuffer bufferViewByteBuffer, boolean unsigned)
+    public AccessorIntData(int componentType,
+        ByteBuffer bufferViewByteBuffer, int byteOffset, int numElements,
+        int numComponentsPerElement, Integer byteStride)
     {
-        Objects.requireNonNull(accessor, "The accessor is null");
-        Objects.requireNonNull(bufferViewByteBuffer, 
-            "The bufferViewByteBuffer is null");
-        AccessorDatas.validateIntComponents(accessor);
+        super(int.class, bufferViewByteBuffer, byteOffset, numElements, 
+            numComponentsPerElement, Integer.BYTES, byteStride);
+        AccessorDatas.validateIntType(componentType);
 
-        this.bufferViewByteBuffer = bufferViewByteBuffer;
-        this.unsigned = unsigned;
-
-        // Obtain the basic size information for the accessor
-        this.numElements = accessor.getCount();
-        this.numComponentsPerElement = 
-            Accessors.getNumComponentsForAccessorType(accessor.getType());
-
-        // Obtain the byte offset and stride
-        this.byteOffset = accessor.getByteOffset();
-        Integer byteStride = accessor.getByteStride();
-        if (byteStride == null || byteStride == 0)
-        {
-            this.byteStridePerElement = 
-                numComponentsPerElement * NUM_BYTES_PER_COMPONENT;
-        }
-        else
-        {
-            this.byteStridePerElement = byteStride;
-        }
-        AccessorDatas.validateCapacity(byteOffset, numElements, 
-            byteStridePerElement, bufferViewByteBuffer.capacity());
+        this.unsigned = AccessorDatas.isUnsignedType(componentType);
+        AccessorDatas.validateCapacity(byteOffset, getNumElements(), 
+            getByteStridePerElement(), bufferViewByteBuffer.capacity());
     }
     
     /**
@@ -141,39 +92,6 @@ public final class AccessorIntData
     }
     
     /**
-     * Returns the number of elements in this data (for example, the number
-     * of 3D vectors)
-     * 
-     * @return The number of elements
-     */
-    public int getNumElements()
-    {
-        return numElements;
-    }
-    
-    /**
-     * Returns the number of components per element (for example, 3 if the
-     * elements are 3D vectors)
-     * 
-     * @return The number of components per element
-     */
-    public int getNumComponentsPerElement()
-    {
-        return numComponentsPerElement;
-    }
-    
-    /**
-     * Returns the total number of components (that is, the number of elements
-     * multiplied with the number of components per element)
-     * 
-     * @return The total number of components
-     */
-    public int getTotalNumComponents()
-    {
-        return numElements * numComponentsPerElement;
-    }
-    
-    /**
      * Returns the value of the specified component of the specified element
      * 
      * @param elementIndex The element index
@@ -184,10 +102,8 @@ public final class AccessorIntData
      */
     public int get(int elementIndex, int componentIndex)
     {
-        int byteIndex = byteOffset + 
-            elementIndex * byteStridePerElement + 
-            componentIndex * NUM_BYTES_PER_COMPONENT;
-        return bufferViewByteBuffer.getInt(byteIndex);
+        int byteIndex = getByteIndex(elementIndex, componentIndex);
+        return getBufferViewByteBuffer().getInt(byteIndex);
     }
     
     /**
@@ -200,11 +116,44 @@ public final class AccessorIntData
      */
     public int get(int globalComponentIndex)
     {
-        int elementIndex = globalComponentIndex / numComponentsPerElement;
-        int componentIndex = globalComponentIndex % numComponentsPerElement;
+        int elementIndex = 
+            globalComponentIndex / getNumComponentsPerElement();
+        int componentIndex = 
+            globalComponentIndex % getNumComponentsPerElement();
         return get(elementIndex, componentIndex);
     }
 
+    /**
+     * Set the value of the specified component of the specified element
+     * 
+     * @param elementIndex The element index
+     * @param componentIndex The component index
+     * @param value The value
+     * @throws IndexOutOfBoundsException If the given indices cause the
+     * underlying buffer to be accessed out of bounds
+     */
+    public void set(int elementIndex, int componentIndex, int value)
+    {
+        int byteIndex = getByteIndex(elementIndex, componentIndex);
+        getBufferViewByteBuffer().putInt(byteIndex, value);
+    }
+    
+    /**
+     * Set the value of the specified component
+     * 
+     * @param globalComponentIndex The global component index
+     * @param value The value
+     * @throws IndexOutOfBoundsException If the given index causes the
+     * underlying buffer to be accessed out of bounds
+     */
+    public void set(int globalComponentIndex, int value)
+    {
+        int elementIndex = 
+            globalComponentIndex / getNumComponentsPerElement();
+        int componentIndex = 
+            globalComponentIndex % getNumComponentsPerElement();
+        set(elementIndex, componentIndex, value);
+    }
     
     /**
      * Returns the value of the specified component of the specified element, 
@@ -248,7 +197,7 @@ public final class AccessorIntData
      * 
      * @return The minimum values
      */
-    public int[] getMin()
+    public int[] computeMin()
     {
         int result[] = new int[getNumComponentsPerElement()];
         Arrays.fill(result, Integer.MAX_VALUE);
@@ -269,7 +218,7 @@ public final class AccessorIntData
      * 
      * @return The minimum values
      */
-    public int[] getMax()
+    public int[] computeMax()
     {
         int result[] = new int[getNumComponentsPerElement()];
         Arrays.fill(result, Integer.MIN_VALUE);
@@ -291,7 +240,7 @@ public final class AccessorIntData
      * 
      * @return The minimum values
      */
-    public long[] getMinLong()
+    public long[] computeMinLong()
     {
         long result[] = new long[getNumComponentsPerElement()];
         Arrays.fill(result, Long.MAX_VALUE);
@@ -313,7 +262,7 @@ public final class AccessorIntData
      * 
      * @return The minimum values
      */
-    public long[] getMaxLong()
+    public long[] computeMaxLong()
     {
         long result[] = new long[getNumComponentsPerElement()];
         Arrays.fill(result, Long.MIN_VALUE);
@@ -327,18 +276,11 @@ public final class AccessorIntData
         return result;
     }
     
-    /**
-     * Creates a new, direct byte buffer (with native byte order) that
-     * contains the data for the {@link Accessor}, in a compact form,
-     * without any offset, and without any additional stride (that is,
-     * all elements will be tightly packed).  
-     * 
-     * @return The byte buffer
-     */
+    @Override
     public ByteBuffer createByteBuffer()
     {
         int totalNumComponents = getTotalNumComponents();
-        int totalBytes = totalNumComponents * NUM_BYTES_PER_COMPONENT;
+        int totalBytes = totalNumComponents * getNumBytesPerComponent();
         ByteBuffer result = ByteBuffer.allocateDirect(totalBytes)
             .order(ByteOrder.nativeOrder());
         for (int i=0; i<totalNumComponents; i++)

@@ -40,7 +40,8 @@ public interface GlContext
     /**
      * Create an OpenGL program with a vertex- and fragment shader created
      * from the given sources. If it is not possible to create the GL
-     * program (due to compile- or link errors), then an error message
+     * program (due to compile- or link errors, or because one of the 
+     * shader sources is <code>null</code>), then an error message
      * may be printed, and <code>null</code> will be returned.
      * 
      * @param vertexShaderSource The vertex shader source code
@@ -178,6 +179,21 @@ public interface GlContext
     void createVertexAttribute(int glVertexArray, int target, int glBufferView,
         int attributeLocation, int size, int type, int stride, int offset);
 
+    
+    /**
+     * Update the vertex attribute data in the given GL vertex array
+     * with the given data
+     * 
+     * @param glVertexArray The GL vertex array object
+     * @param target The target, GL_ARRAY_BUFFER or GL_ELEMENT_ARRAY_BUFFER
+     * @param glBufferView The GL buffer view (vertex buffer object)
+     * @param offset The offset of the attribute data, in bytes
+     * @param size The size of the attribute data, in bytes
+     * @param data The actual buffer data
+     */
+    void updateVertexAttribute(int glVertexArray, 
+        int target, int glBufferView, int offset, int size, ByteBuffer data);
+    
     /**
      * Delete the given GL buffer
      * 
@@ -188,8 +204,7 @@ public interface GlContext
     /**
      * Create an OpenGL texture from the given texture parameters
      * 
-     * @param pixelDataARGB The pixel data, as an array containing the
-     * pixels as integers in the ARGB format (as obtained from a BufferedImage)
+     * @param pixelData The pixel data,
      * @param internalFormat The internal format
      * @param width The width
      * @param height The height
@@ -197,7 +212,7 @@ public interface GlContext
      * @param type The type
      * @return The GL texture
      */
-    int createGlTexture(ByteBuffer pixelDataARGB, 
+    int createGlTexture(ByteBuffer pixelData, 
         int internalFormat, int width, int height, int format, int type);
 
     /**

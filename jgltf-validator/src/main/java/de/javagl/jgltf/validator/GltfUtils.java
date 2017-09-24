@@ -28,8 +28,8 @@ package de.javagl.jgltf.validator;
 
 import java.util.Objects;
 
-import de.javagl.jgltf.impl.Asset;
-import de.javagl.jgltf.impl.GlTF;
+import de.javagl.jgltf.impl.v1.Asset;
+import de.javagl.jgltf.impl.v1.GlTF;
 
 /**
  * Package-private utility methods related to {@link GlTF} instances

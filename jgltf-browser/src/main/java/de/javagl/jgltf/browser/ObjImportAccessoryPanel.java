@@ -39,7 +39,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 
 import de.javagl.jgltf.model.GltfConstants;
-import de.javagl.jgltf.obj.ObjGltfDataCreator.BufferStrategy;
+import de.javagl.jgltf.obj.BufferStrategy;
 
 /**
  * A panel that will be used as the accessory component for the file chooser
@@ -56,18 +56,18 @@ class ObjImportAccessoryPanel extends JPanel
     /**
      * The combo box for the {@link BufferStrategy} for the OBJ import
      */
-    private JComboBox<BufferStrategy> bufferStrategyComboBox;
+    private final JComboBox<BufferStrategy> bufferStrategyComboBox;
     
     /**
      * The combo box for the component type of the indices
      */
-    private JComboBox<Integer> indicesComponentTypeComboBox;
+    private final JComboBox<Integer> indicesComponentTypeComboBox;
     
     /**
      * The checkbox indicating whether random colors should be assigned
      * to the parts that are created by the OBJ importer
      */
-    private JCheckBox assigningRandomColorsToPartsCheckBox;
+    private final JCheckBox assigningRandomColorsToPartsCheckBox;
     
     /**
      * Default constructor

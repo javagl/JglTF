@@ -29,8 +29,8 @@ package de.javagl.jgltf.validator;
 import java.util.Arrays;
 import java.util.List;
 
-import de.javagl.jgltf.impl.GlTF;
-import de.javagl.jgltf.impl.Shader;
+import de.javagl.jgltf.impl.v1.GlTF;
+import de.javagl.jgltf.impl.v1.Shader;
 
 /**
  * A class for validating {@link Shader} objects

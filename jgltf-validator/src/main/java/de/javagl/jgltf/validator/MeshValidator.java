@@ -28,9 +28,9 @@ package de.javagl.jgltf.validator;
 
 import java.util.List;
 
-import de.javagl.jgltf.impl.GlTF;
-import de.javagl.jgltf.impl.Mesh;
-import de.javagl.jgltf.impl.MeshPrimitive;
+import de.javagl.jgltf.impl.v1.GlTF;
+import de.javagl.jgltf.impl.v1.Mesh;
+import de.javagl.jgltf.impl.v1.MeshPrimitive;
 
 /**
  * A class for validating {@link Mesh}es

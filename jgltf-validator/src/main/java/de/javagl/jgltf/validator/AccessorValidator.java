@@ -26,9 +26,9 @@
  */
 package de.javagl.jgltf.validator;
 
-import de.javagl.jgltf.impl.Accessor;
-import de.javagl.jgltf.impl.BufferView;
-import de.javagl.jgltf.impl.GlTF;
+import de.javagl.jgltf.impl.v1.Accessor;
+import de.javagl.jgltf.impl.v1.BufferView;
+import de.javagl.jgltf.impl.v1.GlTF;
 import de.javagl.jgltf.model.Accessors;
 import de.javagl.jgltf.model.GltfConstants;
 

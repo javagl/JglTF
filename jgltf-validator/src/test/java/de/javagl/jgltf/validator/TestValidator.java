@@ -5,8 +5,8 @@ import static org.junit.Assert.assertFalse;
 
 import org.junit.Test;
 
-import de.javagl.jgltf.impl.GlTF;
-import de.javagl.jgltf.impl.Scene;
+import de.javagl.jgltf.impl.v1.GlTF;
+import de.javagl.jgltf.impl.v1.Scene;
 
 @SuppressWarnings("javadoc")
 public class TestValidator

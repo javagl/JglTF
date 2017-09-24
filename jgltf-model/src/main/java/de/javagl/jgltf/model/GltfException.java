@@ -26,10 +26,8 @@
  */
 package de.javagl.jgltf.model;
 
-import de.javagl.jgltf.impl.GlTF;
-
 /**
- * An exception that may be thrown to indicate an error inside a {@link GlTF}.
+ * An exception that may be thrown to indicate an error inside a glTF asset.
  */
 public class GltfException extends RuntimeException
 {

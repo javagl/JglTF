@@ -61,18 +61,18 @@ class UniformSetterFactory
      * matches the required type for the uniform. That is, the return
      * type is assumed to be the one described in this table:  
      * <pre><code>
-     *  GL_INT          : Integer or int[1] if count==1, or int[count]
-     *  GL_UNSIGNED_INT : Integer or int[1] if count==1, or int[count]
-     *  GL_FLOAT        : Float or float[1] if count==1, or float[count]
-     *  GL_FLOAT_MAT2   : float[2*2*count]
-     *  GL_FLOAT_MAT3   : float[3*3*count]
-     *  GL_FLOAT_MAT3   : float[4*4*count]
-     *  GL_FLOAT_VEC2   : float[2*count]
-     *  GL_FLOAT_VEC3   : float[3*count]
-     *  GL_FLOAT_VEC4   : float[4*count]
+     *  GL_INT          : int[count]
+     *  GL_UNSIGNED_INT : int[count]
      *  GL_INT_VEC2     : int[2*count]
      *  GL_INT_VEC3     : int[3*count]
      *  GL_INT_VEC4     : int[4*count]
+     *  GL_FLOAT        : float[count]
+     *  GL_FLOAT_VEC2   : float[2*count]
+     *  GL_FLOAT_VEC3   : float[3*count]
+     *  GL_FLOAT_VEC4   : float[4*count]
+     *  GL_FLOAT_MAT2   : float[2*2*count]
+     *  GL_FLOAT_MAT3   : float[3*3*count]
+     *  GL_FLOAT_MAT3   : float[4*4*count]
      * </code></pre>
      * <br>
      * Note that this does <b>not</b> support the <code>GL_SAMPLER_2D</code>
@@ -101,25 +101,6 @@ class UniformSetterFactory
         {
             case GltfConstants.GL_INT:
             case GltfConstants.GL_UNSIGNED_INT:
-            {
-                if (count == 1)
-                {
-                    Supplier<int[]> supplier =
-                        toIntArray(uniformValueSupplier);
-                    return () ->
-                    {
-                        int value[] = supplier.get();
-                        glContext.setUniformiv(type, location, count, value);
-                    };
-                }
-                Supplier<int[]> supplier =
-                    cast(uniformValueSupplier, int[].class);
-                return () ->
-                {
-                    int value[] = supplier.get();
-                    glContext.setUniformiv(type, location, count, value);
-                };
-            }
             case GltfConstants.GL_INT_VEC2:
             case GltfConstants.GL_INT_VEC3:
             case GltfConstants.GL_INT_VEC4:   
@@ -129,30 +110,14 @@ class UniformSetterFactory
                 return () ->
                 {
                     int value[] = supplier.get();
-                    glContext.setUniformiv(type, location, count, value);
+                    if (value != null)
+                    {
+                        glContext.setUniformiv(type, location, count, value);
+                    }
                 };
             }
 
             case GltfConstants.GL_FLOAT:
-            {
-                if (count == 1)
-                {
-                    Supplier<float[]> supplier =
-                        toFloatArray(uniformValueSupplier);
-                    return () ->
-                    {
-                        float value[] = supplier.get();
-                        glContext.setUniformfv(type, location, count, value);
-                    };
-                }
-                Supplier<float[]> supplier =
-                    cast(uniformValueSupplier, float[].class);
-                return () ->
-                {
-                    float value[] = supplier.get();
-                    glContext.setUniformfv(type, location, count, value);
-                };
-            }
             case GltfConstants.GL_FLOAT_VEC2:   
             case GltfConstants.GL_FLOAT_VEC3:
             case GltfConstants.GL_FLOAT_VEC4:
@@ -162,10 +127,13 @@ class UniformSetterFactory
                 return () ->
                 {
                     float value[] = supplier.get();
-                    glContext.setUniformfv(type, location, count, value);
+                    if (value != null)
+                    {
+                        glContext.setUniformfv(type, location, count, value);
+                    }
                 };
             }
-
+                
             case GltfConstants.GL_FLOAT_MAT2:   
             case GltfConstants.GL_FLOAT_MAT3:   
             case GltfConstants.GL_FLOAT_MAT4:   
@@ -175,7 +143,11 @@ class UniformSetterFactory
                 return () ->
                 {
                     float value[] = supplier.get();
-                    glContext.setUniformMatrixfv(type, location, count, value);
+                    if (value != null)
+                    {
+                        glContext.setUniformMatrixfv(
+                            type, location, count, value);
+                    }
                 };
             }
             
@@ -216,45 +188,4 @@ class UniformSetterFactory
             return type.cast(object);
         };
     }
-    
-    /**
-     * Create a supplier that assumes the values returned by the given 
-     * supplier to be numbers, places them as ints into an array, and
-     * returns the array.
-     * 
-     * @param supplier The delegate supplier
-     * @return The converting supplier
-     */
-    private static Supplier<int[]> toIntArray(Supplier<?> supplier)
-    {
-        int array[] = new int[1];
-        return () ->
-        {
-            Object object = supplier.get();
-            Number number = (Number)object;
-            array[0] = number.intValue();
-            return array; 
-        };
-    }
-    
-    /**
-     * Create a supplier that assumes the values returned by the given 
-     * supplier to be numbers, places them as floats into an array, and
-     * returns the array.
-     * 
-     * @param supplier The delegate supplier
-     * @return The converting supplier
-     */
-    private static Supplier<float[]> toFloatArray(Supplier<?> supplier)
-    {
-        float array[] = new float[1];
-        return () ->
-        {
-            Object object = supplier.get();
-            Number number = (Number)object;
-            array[0] = number.floatValue();
-            return array; 
-        };
-    }
-
 }

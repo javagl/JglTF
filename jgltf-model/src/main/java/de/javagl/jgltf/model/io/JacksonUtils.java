@@ -46,9 +46,11 @@ import com.fasterxml.jackson.databind.deser.SettableBeanProperty;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
 /**
- * Utility methods related to Jackson JSON parsing
+ * Utility methods related to Jackson JSON parsing.<br>
+ * <br>
+ * This class should not be considered as part of the API.
  */
-class JacksonUtils
+public class JacksonUtils
 {
     /**
      * The logger used in this class
@@ -148,7 +150,7 @@ class JacksonUtils
      *  
      * @return The consumer
      */
-    static Consumer<JsonError> loggingJsonErrorConsumer()
+    public static Consumer<JsonError> loggingJsonErrorConsumer()
     {
         return LOG_JSON_ERROR_CONSUMER;
     }
@@ -160,10 +162,10 @@ class JacksonUtils
      * @param objectMapper The object mapper
      * @param jsonErrorConsumer The consumer for {@link JsonError}s. If this 
      * is <code>null</code>, then the errors will not be handled.
-     * <code>null</code>, then log outputs will be created for the errors
      */
-    static void configure(
-        ObjectMapper objectMapper, Consumer<? super JsonError> jsonErrorConsumer)
+    public static void configure(
+        ObjectMapper objectMapper, 
+        Consumer<? super JsonError> jsonErrorConsumer)
     {
         // Some glTF files have single values instead of arrays,
         // so accept this for compatibility reasons

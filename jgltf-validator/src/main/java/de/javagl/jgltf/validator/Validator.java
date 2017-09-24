@@ -31,8 +31,8 @@ import java.util.function.BiFunction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.javagl.jgltf.impl.Asset;
-import de.javagl.jgltf.impl.GlTF;
+import de.javagl.jgltf.impl.v1.Asset;
+import de.javagl.jgltf.impl.v1.GlTF;
 
 /**
  * A basic validator for glTF data. Note that this class is only intended 

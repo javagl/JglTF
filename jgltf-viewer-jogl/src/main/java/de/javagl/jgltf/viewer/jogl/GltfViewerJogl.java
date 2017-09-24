@@ -47,7 +47,7 @@ import de.javagl.jgltf.viewer.GlContext;
 /**
  * Implementation of a glTF viewer based on JOGL
  */
-public class GltfViewerJogl extends AbstractGltfViewer
+public class GltfViewerJogl extends AbstractGltfViewer<Component>
 {
     /**
      * The logger used in this class
@@ -191,6 +191,27 @@ public class GltfViewerJogl extends AbstractGltfViewer
     }
     
     @Override
+    public int getWidth()
+    {
+        return glComponent.getWidth();
+    }
+    
+    @Override
+    public int getHeight()
+    {
+        return glComponent.getHeight();
+    }
+    
+    @Override
+    public void triggerRendering()
+    {
+        if (getRenderComponent() != null)
+        {
+            getRenderComponent().repaint();
+        }
+    }
+
+    @Override
     protected void prepareRender()
     {
         //gl = new TraceGL3(glComponent.getGL().getGL3(), System.out);
@@ -210,7 +231,7 @@ public class GltfViewerJogl extends AbstractGltfViewer
         gl.glDepthMask(true); 
         gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
-        renderGltfs();
+        renderGltfModels();
     }
 
     

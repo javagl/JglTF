@@ -9,15 +9,15 @@ import java.nio.file.Paths;
 
 import org.junit.Test;
 
-import de.javagl.jgltf.model.GltfData;
+import de.javagl.jgltf.model.GltfModel;
 
 @SuppressWarnings("javadoc")
 public class TestIO
 {
     @Test
-    public void testGltfToGltf() throws IOException 
+    public void testGltfToGltfV1() throws IOException 
     {
-        String basePath = "./src/test/resources/testModels/"; 
+        String basePath = "./src/test/resources/testModels/v1/"; 
 
         Path inputPath = Paths.get(basePath, "testBox/glTF");
         Path outputPath = Paths.get(basePath, 
@@ -30,10 +30,11 @@ public class TestIO
         Path inputFile = Paths.get(inputPath.toString(), inputFileName);
         Path outputFile = Paths.get(outputPath.toString(), outputFileName);
         
-        GltfDataReader r = new GltfDataReader();
-        GltfData gltfData = r.readGltfData(inputFile.toUri());
-        GltfDataWriter w = new GltfDataWriter();
-        w.writeGltfData(gltfData, outputFile.toString());
+        GltfModelReader gltfModelReader = new GltfModelReader();
+        GltfModel gltfModel = gltfModelReader.read(inputFile.toUri());
+        
+        GltfModelWriter gltfModelWriter = new GltfModelWriter();
+        gltfModelWriter.write(gltfModel, outputFile.toFile());
         
         assertFileEquals(
             inputPath.toString(), "Box.gltf", 
@@ -53,9 +54,41 @@ public class TestIO
     }
     
     @Test
-    public void testGltfToGltfEmbedded() throws IOException 
+    public void testGltfToGltfV2() throws IOException 
     {
-        String basePath = "./src/test/resources/testModels/"; 
+        String basePath = "./src/test/resources/testModels/v2/"; 
+
+        Path inputPath = Paths.get(basePath, "testBox/glTF");
+        Path outputPath = Paths.get(basePath, 
+            "testBox/output-glTF-to-glTF");
+        Files.createDirectories(outputPath);
+
+        String inputFileName = "Box.gltf";
+        String outputFileName = "Box.gltf";
+
+        Path inputFile = Paths.get(inputPath.toString(), inputFileName);
+        Path outputFile = Paths.get(outputPath.toString(), outputFileName);
+        
+        GltfModelReader gltfModelReader = new GltfModelReader();
+        GltfModel gltfModel = gltfModelReader.read(inputFile.toUri());
+        
+        GltfModelWriter gltfModelWriter = new GltfModelWriter();
+        gltfModelWriter.write(gltfModel, outputFile.toFile());
+        
+        assertFileEquals(
+            inputPath.toString(), "Box.gltf", 
+            outputPath.toString(), "Box.gltf");
+        
+        assertFileEquals(
+            inputPath.toString(), "Box0.bin", 
+            outputPath.toString(), "Box0.bin");
+    }
+    
+    
+    @Test
+    public void testGltfToGltfEmbeddedV1() throws IOException 
+    {
+        String basePath = "./src/test/resources/testModels/v1/"; 
 
         Path inputPath = Paths.get(basePath, "testBox/glTF");
         Path outputPath = Paths.get(basePath, 
@@ -69,24 +102,53 @@ public class TestIO
 
         Path inputFile = Paths.get(inputPath.toString(), inputFileName);
         Path outputFile = Paths.get(outputPath.toString(), outputFileName);
+
+        GltfModelReader gltfModelReader = new GltfModelReader();
+        GltfModel gltfModel = gltfModelReader.read(inputFile.toUri());
         
-        GltfDataReader r = new GltfDataReader();
-        GltfData gltfData = r.readGltfData(inputFile.toUri());
+        GltfModelWriter gltfModelWriter = new GltfModelWriter();
+        gltfModelWriter.writeEmbedded(gltfModel, outputFile.toFile());
         
-        gltfData = new GltfDataToEmbeddedConverter().convert(gltfData);
+        assertFileEquals(
+            referencePath.toString(), referenceFileName, 
+            outputPath.toString(), outputFileName);
+    }
+
+    
+    @Test
+    public void testGltfToGltfEmbeddedV2() throws IOException 
+    {
+        String basePath = "./src/test/resources/testModels/v2/"; 
+
+        Path inputPath = Paths.get(basePath, "testBox/glTF");
+        Path outputPath = Paths.get(basePath, 
+            "testBox/output-glTF-to-glTF-Embedded");
+        Files.createDirectories(outputPath);
+        Path referencePath = Paths.get(basePath, "testBox/glTF-Embedded");
+
+        String inputFileName = "Box.gltf";
+        String outputFileName = "Box.gltf";
+        String referenceFileName = "Box.gltf";
+
+        Path inputFile = Paths.get(inputPath.toString(), inputFileName);
+        Path outputFile = Paths.get(outputPath.toString(), outputFileName);
+
+        GltfModelReader gltfModelReader = new GltfModelReader();
+        GltfModel gltfModel = gltfModelReader.read(inputFile.toUri());
         
-        GltfDataWriter w = new GltfDataWriter();
-        w.writeGltfData(gltfData, outputFile.toString());
+        GltfModelWriter gltfModelWriter = new GltfModelWriter();
+        gltfModelWriter.writeEmbedded(gltfModel, outputFile.toFile());
         
         assertFileEquals(
             referencePath.toString(), referenceFileName, 
             outputPath.toString(), outputFileName);
     }
     
+    
     @Test
-    public void testGltfToGltfBinary() throws IOException 
+    public void testGltfToGltfBinaryV1() throws IOException 
     {
-        String basePath = "./src/test/resources/testModels/"; 
+        String basePath = "./src/test/resources/testModels/v1/"; 
 
         Path inputPath = Paths.get(basePath, "testBox/glTF");
         Path outputPath = Paths.get(basePath, 
@@ -101,20 +163,45 @@ public class TestIO
         Path inputFile = Paths.get(inputPath.toString(), inputFileName);
         Path outputFile = Paths.get(outputPath.toString(), outputFileName);
         
-        GltfDataReader r = new GltfDataReader();
-        GltfData gltfData = r.readGltfData(inputFile.toUri());
+        GltfModelReader gltfModelReader = new GltfModelReader();
+        GltfModel gltfModel = gltfModelReader.read(inputFile.toUri());
         
-        gltfData = new GltfDataToBinaryConverter().convert(gltfData);
-        
-        BinaryGltfDataWriter w = new BinaryGltfDataWriter();
-        w.writeBinaryGltfData(gltfData, outputFile.toString());
+        GltfModelWriter gltfModelWriter = new GltfModelWriter();
+        gltfModelWriter.writeBinary(gltfModel, outputFile.toFile());
         
         assertFileEquals(
             referencePath.toString(), referenceFileName, 
             outputPath.toString(), outputFileName);
     }
     
-    
+    @Test
+    public void testGltfToGltfBinaryV2() throws IOException 
+    {
+        String basePath = "./src/test/resources/testModels/v2/"; 
+
+        Path inputPath = Paths.get(basePath, "testBox/glTF");
+        Path outputPath = Paths.get(basePath, 
+            "testBox/output-glTF-to-glTF-Binary");
+        Files.createDirectories(outputPath);
+        Path referencePath = Paths.get(basePath, "testBox/glTF-Binary");
+
+        String inputFileName = "Box.gltf";
+        String outputFileName = "Box.glb";
+        String referenceFileName = "Box.glb";
+
+        Path inputFile = Paths.get(inputPath.toString(), inputFileName);
+        Path outputFile = Paths.get(outputPath.toString(), outputFileName);
+        
+        GltfModelReader gltfModelReader = new GltfModelReader();
+        GltfModel gltfModel = gltfModelReader.read(inputFile.toUri());
+        
+        GltfModelWriter gltfModelWriter = new GltfModelWriter();
+        gltfModelWriter.writeBinary(gltfModel, outputFile.toFile());
+        
+        assertFileEquals(
+            referencePath.toString(), referenceFileName, 
+            outputPath.toString(), outputFileName);
+    }
     
     private static void assertFileEquals(
         String directoryExpected, String fileNameExpected, 
@@ -148,3 +235,4 @@ public class TestIO
     
     
 }
+

@@ -144,6 +144,12 @@ class NodeEntryTreeCellRenderer
             Boolean array[] = (Boolean[])value;
             return name + " : " + Arrays.toString(array);
         }
+        if (value instanceof Number[])
+        {
+            Number array[] = (Number[])value;
+            return name + " : " + Arrays.toString(array);
+        }
+        
         if (value instanceof Map<?, ?>)
         {
             return name;

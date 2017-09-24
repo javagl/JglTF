@@ -30,15 +30,46 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferInt;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
+
+import javax.imageio.ImageIO;
+
+import de.javagl.jgltf.model.io.Buffers;
 
 /**
  * Utility methods related to images
  */
 class ImageUtils
 {
+    /**
+     * Returns the contents of the given buffer as a <code>BufferedImage</code>,
+     * or <code>null</code> if the given buffer is <code>null</code>, or
+     * the data can not be converted into a buffered image.
+     * 
+     * @param byteBuffer The byte buffer
+     * @return The buffered image
+     */
+    static BufferedImage readAsBufferedImage(ByteBuffer byteBuffer)
+    {
+        if (byteBuffer == null)
+        {
+            return null;
+        }
+        try (InputStream inputStream = 
+            Buffers.createByteBufferInputStream(byteBuffer.slice()))
+        {
+            return ImageIO.read(inputStream);
+        }
+        catch (IOException e)
+        {
+            return null;
+        }
+    }
+
     /**
      * Returns a direct byte buffer that contains the ARGB pixel values of
      * the given image. <br>
@@ -63,13 +94,76 @@ class ImageUtils
             image = convertToARGB(image);
         }
         IntBuffer imageBuffer = getBuffer(image);
-        int numBytes = image.getWidth() * image.getHeight() * 4;
-        ByteBuffer byteBuffer = ByteBuffer
-            .allocateDirect(numBytes)
-            .order(ByteOrder.nativeOrder());
-        IntBuffer intBuffer = byteBuffer.asIntBuffer();
-        intBuffer.put(imageBuffer);
-        return byteBuffer;
+        
+        // Note: The byte order is BIG_ENDIAN by default. This order
+        // is kept here, to keep the ARGB order, and not convert them
+        // to BGRA implicitly.
+        ByteBuffer outputByteBuffer = ByteBuffer
+            .allocateDirect(imageBuffer.remaining() * Integer.BYTES)
+            .order(ByteOrder.BIG_ENDIAN);
+        IntBuffer output = outputByteBuffer.asIntBuffer();
+        output.put(imageBuffer.slice());
+        return outputByteBuffer;
+    }
+
+    /**
+     * Interpret the given byte buffer as ARGB pixels, and convert it into
+     * a direct byte buffer containing the corresponding RGBA pixels
+     * 
+     * @param pixels The input pixels
+     * @return The output pixels
+     */
+    static ByteBuffer swizzleARGBtoRGBA(ByteBuffer pixels)
+    {
+        return swizzle(pixels, 16, 8, 0, 24);
+    }
+    
+    /**
+     * Interpret the given byte buffer as pixels, swizzle the bytes
+     * of these pixels according to the given shifts, and return a 
+     * a direct byte buffer containing the corresponding new pixels
+     * 
+     * @param pixels The input pixels
+     * @param s0 The right-shift for byte 0 
+     * @param s1 The right-shift for byte 1 
+     * @param s2 The right-shift for byte 2
+     * @param s3 The right-shift for byte 3
+     * @return The output pixels
+     */
+    private static ByteBuffer swizzle(ByteBuffer pixels,
+        int s0, int s1, int s2, int s3)
+    {
+        IntBuffer iBuffer = pixels.asIntBuffer();
+        ByteBuffer oByteBuffer = ByteBuffer
+            .allocateDirect(iBuffer.capacity() * Integer.BYTES)
+            .order(pixels.order());
+        IntBuffer oBuffer = oByteBuffer.asIntBuffer();
+        for (int i = 0; i < iBuffer.capacity(); i++)
+        {
+            int input = iBuffer.get(i);
+            int output = swizzle(input, s0, s1, s2, s3);
+            oBuffer.put(i, output);
+        }
+        return oByteBuffer;
+    }
+    
+    /**
+     * Swizzle the bytes of the given input according to the given shifts
+     * 
+     * @param input The input 
+     * @param s0 The right-shift for byte 0 
+     * @param s1 The right-shift for byte 1 
+     * @param s2 The right-shift for byte 2
+     * @param s3 The right-shift for byte 3
+     * @return The output
+     */
+    private static int swizzle(int input, int s0, int s1, int s2, int s3)
+    {
+        int b0 = (input >> s0) & 0xFF; 
+        int b1 = (input >> s1) & 0xFF; 
+        int b2 = (input >> s2) & 0xFF; 
+        int b3 = (input >> s3) & 0xFF;
+        return (b0 << 24) | (b1 << 16) | (b2 << 8) | b3;
     }
     
     /**

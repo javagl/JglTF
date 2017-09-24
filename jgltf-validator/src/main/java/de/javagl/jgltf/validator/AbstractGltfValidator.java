@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import de.javagl.jgltf.impl.GlTF;
+import de.javagl.jgltf.impl.v1.GlTF;
 
 /**
  * Abstract base class for classes that can validate glTF elements

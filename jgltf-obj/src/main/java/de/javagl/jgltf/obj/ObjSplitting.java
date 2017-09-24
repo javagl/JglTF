@@ -42,17 +42,17 @@ import de.javagl.obj.ObjUtils;
 import de.javagl.obj.ReadableObj;
 
 /**
- * Methods for splitting an OBJ into multiple parts. This class is package
- * private and only used internally. Many details about the behavior of
+ * Methods for splitting an OBJ into multiple parts. This class is 
+ * only used internally. Many details about the behavior of
  * this class are intentionally not specified.
  */
-class ObjSplitting
+public class ObjSplitting
 {
     /**
      * The logger used in this class
      */
     private static final Logger logger = 
-        Logger.getLogger(ObjGltfDataCreator.class.getName());
+        Logger.getLogger(ObjSplitting.class.getName());
     
     /**
      * The log level
@@ -67,7 +67,7 @@ class ObjSplitting
     /**
      * The predicate that says whether an OBJ has to be split
      */
-    private static Predicate<? super ReadableObj> OBJ_SPLIT_PREDICATE =
+    private static final Predicate<? super ReadableObj> OBJ_SPLIT_PREDICATE =
         obj -> obj.getNumVertices() > MAX_NUM_VERTICES;
 
     /**
@@ -76,7 +76,7 @@ class ObjSplitting
      * @param obj The input OBJ
      * @return The list of resulting OBJs
      */
-    static List<? extends ReadableObj> split(ReadableObj obj)
+    public static List<? extends ReadableObj> split(ReadableObj obj)
     {
         List<ReadableObj> currentObjs = Collections.singletonList(obj);
         List<ReadableObj> nextObjs = new ArrayList<ReadableObj>();

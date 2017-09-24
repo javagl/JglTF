@@ -26,16 +26,17 @@
  */
 package de.javagl.jgltf.viewer;
 
-import java.awt.Component;
+import java.util.List;
 
-import de.javagl.jgltf.impl.Camera;
-import de.javagl.jgltf.impl.GlTF;
-import de.javagl.jgltf.model.GltfData;
+import de.javagl.jgltf.model.CameraModel;
+import de.javagl.jgltf.model.GltfModel;
 
 /**
  * Interface describing a simple glTF viewer
+ * 
+ * @param <C> The type of the rendering component of this viewer
  */
-public interface GltfViewer
+public interface GltfViewer<C>
 {
     /**
      * Set an optional {@link ExternalCamera}. <br>
@@ -43,10 +44,10 @@ public interface GltfViewer
      * If the given {@link ExternalCamera} is not <code>null</code>, then it 
      * may supply a view- and projection matrix from an external camera that 
      * will be used as an alternative to the camera information that is 
-     * found in the {@link GlTF}.<br>
+     * found in the {@link GltfModel}.<br>
      * <br>
-     * Note: This has to be set <b>before</b> any {@link GltfData} is added
-     * with {@link #addGltfData(GltfData)}. Otherwise, the external camera
+     * Note: This has to be set <b>before</b> any {@link GltfModel} is added
+     * with {@link #addGltfModel(GltfModel)}. Otherwise, the external camera
      * will not affect the rendered glTF.
      * 
      * @param externalCamera The optional {@link ExternalCamera}
@@ -65,7 +66,21 @@ public interface GltfViewer
      * 
      * @return The rendering component of this viewer
      */
-    Component getRenderComponent();
+    C getRenderComponent();
+    
+    /**
+     * Returns the width of the render component
+     * 
+     * @return The width of the render component
+     */
+    int getWidth();
+    
+    /**
+     * Returns the height of the render component
+     * 
+     * @return The height of the render component
+     */
+    int getHeight();
 
     /**
      * Trigger a rendering pass
@@ -73,40 +88,46 @@ public interface GltfViewer
     void triggerRendering();
 
     /**
-     * Add the given {@link GltfData} to this viewer. This will prepare
+     * Add the given {@link GltfModel} to this viewer. This will prepare
      * the internal data structures that are required for rendering, and 
      * trigger a new rendering pass. At the beginning of the rendering 
      * pass, the initialization of the rendering structures will be 
      * performed, on the rendering thread.<br>
-     * <br>
-     * If the {@link GlTF} in the given {@link GltfData} is not valid,
-     * then an error message will be printed instead.
      * 
-     * @param gltfData The {@link GltfData}
+     * @param gltfModel The {@link GltfModel}
      */
-    void addGltfData(GltfData gltfData);
+    void addGltfModel(GltfModel gltfModel);
 
     /**
-     * Remove the given {@link GltfData} from this viewer. This will trigger
+     * Remove the given {@link GltfModel} from this viewer. This will trigger
      * a new rendering pass, and at the beginning of the rendering pass, the
      * internal data structures will be deleted.
      * 
-     * @param gltfData The {@link GltfData} to remove
+     * @param gltfModel The {@link GltfModel} to remove
      */
-    void removeGltfData(GltfData gltfData);
+    void removeGltfModel(GltfModel gltfModel);
 
     /**
-     * Set the ID of the {@link Camera} that should be used for rendering
-     * the given {@link GltfData}. If the given ID is <code>null</code>,
-     * then the external camera will be used. See
-     * {@link #setExternalCamera(ExternalCamera)}.
-     *  
-     * @param gltfData The {@link GltfData}
-     * @param cameraId The {@link Camera} ID
-     * @throws IllegalArgumentException If the given {@link GltfData} is
-     * not contained in this viewer
-     * @throws IllegalArgumentException If the given ID is not a valid
-     * camera ID for the given {@link GltfData}
+     * Returns an unmodifiable list containing all {@link CameraModel}
+     * instances that are contained in the {@link GltfModel} instances
+     * that have been added to this viewer.
+     * 
+     * @return The {@link CameraModel} instances
      */
-    void setCurrentCameraId(GltfData gltfData, String cameraId);
+    List<CameraModel> getCameraModels();
+    
+    /**
+     * Set {@link CameraModel} that should be used for rendering the 
+     * given {@link GltfModel}. If the given {@link GltfModel} is 
+     * <code>null</code>, then the {@link CameraModel} will be used
+     * for rendering all {@link GltfModel} instances.
+     * If the {@link CameraModel} is <code>null</code>, then the external 
+     * camera will be used. See {@link #setExternalCamera(ExternalCamera)}.
+     * 
+     * @param gltfModel The optional {@link GltfModel}
+     * @param cameraModel The {@link CameraModel}
+     * @throws IllegalArgumentException If the given {@link GltfModel} is
+     * not <code>null</code> and not contained in this viewer
+     */
+    void setCurrentCameraModel(GltfModel gltfModel, CameraModel cameraModel);
 }

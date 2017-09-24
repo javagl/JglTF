@@ -26,9 +26,9 @@
  */
 package de.javagl.jgltf.validator;
 
-import de.javagl.jgltf.impl.GlTF;
-import de.javagl.jgltf.impl.Program;
-import de.javagl.jgltf.impl.Shader;
+import de.javagl.jgltf.impl.v1.GlTF;
+import de.javagl.jgltf.impl.v1.Program;
+import de.javagl.jgltf.impl.v1.Shader;
 import de.javagl.jgltf.model.GltfConstants;
 
 /**

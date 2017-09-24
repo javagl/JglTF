@@ -68,7 +68,7 @@ public class IO
         }
         catch (URISyntaxException e)
         {
-            throw new IOException("Invalid URI string: "+uriString, e);
+            throw new IOException("Invalid URI string: " + uriString, e);
         }
     }
     
@@ -102,13 +102,18 @@ public class IO
     }
     
     /**
-     * Returns whether the given string is a data URI. 
+     * Returns whether the given string is a data URI. If the given string
+     * is <code>null</code>, then <code>false</code> will be returned. 
      * 
      * @param uriString The URI string
      * @return Whether the string is a data URI
      */
     public static boolean isDataUriString(String uriString)
     {
+        if (uriString == null)
+        {
+            return false;
+        }
         try
         {
             URI uri = new URI(uriString);
@@ -136,7 +141,7 @@ public class IO
         int lastSlashIndex = s.lastIndexOf('/');
         if (lastSlashIndex != -1)
         {
-            return s.substring(lastSlashIndex+1);
+            return s.substring(lastSlashIndex + 1);
         }
         return s;
     }
@@ -239,7 +244,7 @@ public class IO
      * @return The byte array
      * @throws IOException If an IO error occurs
      */
-    static byte[] read(URI uri) 
+    public static byte[] read(URI uri) 
         throws IOException
     {
         try (InputStream inputStream = createInputStream(uri))
@@ -268,8 +273,8 @@ public class IO
         if (encodingIndex < 0)
         {
             throw new IllegalArgumentException(
-                "The given URI string is not a base64 encoded " + 
-                "data URI string: " + uriString);
+                "The given URI string is not a base64 encoded "
+                + "data URI string: " + uriString);
         }
         int contentStartIndex = encodingIndex + encoding.length();
         byte data[] = Base64.getDecoder().decode(
@@ -323,9 +328,8 @@ public class IO
      * the sum of the given offset and the number of bytes to read is larger
      * than the length of the given array
      */
-    static void read(
-        InputStream inputStream, byte data[], int offset, int numBytesToRead) 
-            throws IOException
+    static void read(InputStream inputStream, byte data[], int offset, 
+        int numBytesToRead) throws IOException
     {
         if (offset < 0)
         {
@@ -335,9 +339,9 @@ public class IO
         if (offset + numBytesToRead > data.length)
         {
             throw new IllegalArgumentException(
-                "Cannot write " + numBytesToRead + 
-                " bytes into an array of length " + data.length + 
-                " with an offset of " + offset);
+                "Cannot write " + numBytesToRead
+                + " bytes into an array of length " + data.length
+                + " with an offset of " + offset);
         }
         int totalNumBytesRead = 0;
         while (true)

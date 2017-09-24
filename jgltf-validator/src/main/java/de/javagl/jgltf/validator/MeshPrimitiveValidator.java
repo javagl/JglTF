@@ -30,12 +30,11 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
-import de.javagl.jgltf.impl.GlTF;
-import de.javagl.jgltf.impl.Material;
-import de.javagl.jgltf.impl.MeshPrimitive;
-import de.javagl.jgltf.impl.Technique;
-import de.javagl.jgltf.impl.TechniqueParameters;
-import de.javagl.jgltf.model.Techniques;
+import de.javagl.jgltf.impl.v1.GlTF;
+import de.javagl.jgltf.impl.v1.Material;
+import de.javagl.jgltf.impl.v1.MeshPrimitive;
+import de.javagl.jgltf.impl.v1.Technique;
+import de.javagl.jgltf.impl.v1.TechniqueParameters;
 
 /**
  * A class for validating {@link MeshPrimitive}es
@@ -98,13 +97,12 @@ class MeshPrimitiveValidator extends AbstractGltfValidator
             Technique technique = null;
             if (techniqueId == null)
             {
-                String dummyProgramId = "de.javagl.jgltf.validator.DUMMY_ID";
-                technique = Techniques.createDefaultTechnique(dummyProgramId);
+                // TODO Check how this will be handled in glTF 2.0!
+                validatorResult.addWarning("No technique ID found in material",
+                    context.with("material " + materialId));
+                return validatorResult;
             }
-            else
-            {
-                technique = getGltf().getTechniques().get(techniqueId);
-            }
+            technique = getGltf().getTechniques().get(techniqueId);
             
             // Check that the attributes of the technique are mapped to valid
             // accessors via the meshPrimitive.attributes map

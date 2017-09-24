@@ -29,31 +29,8 @@ package de.javagl.jgltf.model.animation;
 /**
  * Methods to create {@link Interpolator} instances
  */
-public class Interpolators
+class Interpolators
 {
-    /**
-     * Enumeration of interpolator types
-     */
-    public enum InterpolatorType
-    {
-        /**
-         * A linear interpolator
-         */
-        LINEAR,
-        
-        /**
-         * A spherical linear interpolation (SLERP). The input values will 
-         * be assumed to consist of 4 elements, which are interpreted as 
-         * quaternions for the interpolation
-         */
-        SLERP,
-        
-        /**
-         * A stepwise interpolation
-         */
-        STEP
-    }
-    
     /**
      * Creates an {@link Interpolator} for the given {@link InterpolatorType}.
      * If the given {@link InterpolatorType} is <code>null</code>, then 

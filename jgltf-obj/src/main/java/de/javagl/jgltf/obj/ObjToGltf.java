@@ -26,6 +26,7 @@
  */
 package de.javagl.jgltf.obj;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Paths;
@@ -33,12 +34,12 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.logging.Logger;
 
-import de.javagl.jgltf.model.GltfData;
-import de.javagl.jgltf.model.io.BinaryGltfDataWriter;
-import de.javagl.jgltf.model.io.GltfDataToBinaryConverter;
-import de.javagl.jgltf.model.io.GltfDataToEmbeddedConverter;
-import de.javagl.jgltf.model.io.GltfDataWriter;
-import de.javagl.jgltf.obj.ObjGltfDataCreator.BufferStrategy;
+import de.javagl.jgltf.model.GltfModel;
+import de.javagl.jgltf.model.GltfModels;
+import de.javagl.jgltf.model.io.GltfAsset;
+import de.javagl.jgltf.model.io.GltfModelWriter;
+import de.javagl.jgltf.obj.v1.ObjGltfAssetCreatorV1;
+import de.javagl.jgltf.obj.v2.ObjGltfAssetCreatorV2;
 
 /**
  * A class for converting OBJ files to glTF
@@ -75,6 +76,7 @@ public class ObjToGltf
         boolean embedded = false;
         boolean binary = false;
         BufferStrategy bufferStrategy = BufferStrategy.BUFFER_PER_FILE;
+        int version = 2;
         for (String arg : args)
         {
             if (arg.startsWith("-i="))
@@ -115,6 +117,20 @@ public class ObjToGltf
                     return;
                 }
             }
+            else if (arg.startsWith("-v="))
+            {
+                String s = arg.substring(3);
+                try
+                {
+                    version = Integer.parseInt(s);
+                }
+                catch (NumberFormatException e)
+                {
+                    System.err.println("Invalid argument: " + arg);
+                    displayHelp();
+                    return;
+                }
+            }
             else
             {
                 System.err.println("Invalid argument: " + arg);
@@ -138,31 +154,47 @@ public class ObjToGltf
         logger.info("Reading input file " + inputFileName);
         
         long beforeNs = System.nanoTime();
-        
-        URI objUri = Paths.get(inputFileName).toUri();
-        GltfData gltfData = 
-            new ObjGltfDataCreator(bufferStrategy).create(objUri);
 
-        if (binary)
+        URI objUri = Paths.get(inputFileName).toUri();
+
+        GltfAsset gltfAsset = null;
+        if (version == 1)
         {
-            logger.info("Converting to binary glTF");
-            gltfData = new GltfDataToBinaryConverter().convert(gltfData);
-            
-            logger.info("Writing binary glTF to " + outputFileName);
-            new BinaryGltfDataWriter().writeBinaryGltfData(
-                gltfData, outputFileName);
+            ObjGltfAssetCreatorV1 gltfAssetCreator = 
+                new ObjGltfAssetCreatorV1(bufferStrategy);
+            gltfAsset = gltfAssetCreator.create(objUri);
         }
         else
         {
-            if (embedded)
-            {
-                logger.info("Converting to embedded glTF");
-                gltfData = new GltfDataToEmbeddedConverter().convert(gltfData);
-            }
-    
-            logger.info("Writing glTF to " + outputFileName);
-            new GltfDataWriter().writeGltfData(gltfData, outputFileName);
+            ObjGltfAssetCreatorV2 gltfAssetCreator = 
+                new ObjGltfAssetCreatorV2(bufferStrategy);
+            gltfAsset = gltfAssetCreator.create(objUri);
         }
+        GltfModel gltfModel = GltfModels.create(gltfAsset);
+
+        GltfModelWriter gltfModelWriter = new GltfModelWriter();
+        File outputFile = new File(outputFileName);
+        File parentFile = outputFile.getParentFile();
+        if (parentFile != null)
+        {
+            parentFile.mkdirs();
+        }
+        if (binary)
+        {
+            logger.info("Writing binary glTF to " + outputFileName);
+            gltfModelWriter.writeBinary(gltfModel, outputFile);
+        }
+        else if (embedded)
+        {
+            logger.info("Writing embedded glTF to " + outputFileName);
+            gltfModelWriter.writeEmbedded(gltfModel, outputFile);
+        }
+        else
+        {
+            logger.info("Writing glTF to " + outputFileName);
+            gltfModelWriter.write(gltfModel, outputFile);
+        }
+    
         
         long afterNs = System.nanoTime();
         double durationS = (afterNs - beforeNs) * 1e-9;
@@ -179,20 +211,21 @@ public class ObjToGltf
         System.out.println("Usage: ");
         System.out.println("======");
         System.out.println("");
-        System.out.println("  -i=<file> : The input file name");
-        System.out.println("  -o=<file> : The output file name");
-        System.out.println("  -e        : Write the output as embedded glTF");
-        System.out.println("  -b        : Write the output as binary glTF");
-        System.out.println("  -s=       : The buffer strategy:");
-        System.out.println("     file   : Create one buffer for the whole file");
-        System.out.println("     group  : Create one buffer for each material group");
-        System.out.println("     part   : Create one buffer for each part");
-        System.out.println("  -h        : Print this message.");
+        System.out.println("  -i=<file>   : The input file name");
+        System.out.println("  -o=<file>   : The output file name");
+        System.out.println("  -e          : Write the output as embedded glTF");
+        System.out.println("  -b          : Write the output as binary glTF");
+        System.out.println("  -s=         : The buffer strategy:");
+        System.out.println("     file     : Create one buffer for the whole file");
+        System.out.println("     group    : Create one buffer for each material group");
+        System.out.println("     part     : Create one buffer for each part");
+        System.out.println("  -h          : Print this message.");
+        System.out.println("  -v=<number> : The target glTF version. The number may be 1 or 2. The default is 2.");
         System.out.println("");
         System.out.println("Example: ");
         System.out.println("========");
         System.out.println("");
         System.out.println("  ObjToGltf -b -s=part -i=C:/Input/Example.obj " + 
-            "-o=C:/Output/Example/");
+            "-o=C:/Output/Example.glb");
     }
 }
