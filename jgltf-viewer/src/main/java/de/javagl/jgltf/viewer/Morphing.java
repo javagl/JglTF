@@ -96,7 +96,7 @@ class Morphing
          * @param targetAccessorFloatDatas The {@link AccessorFloatData} 
          * elements that have been obtained from the morph target accessors
          */
-        MorphableAttribute(AccessorModel morphedAccessorModel,
+        private MorphableAttribute(AccessorModel morphedAccessorModel,
             AccessorModel baseAccessorModel,
             Collection<? extends AccessorFloatData> targetAccessorFloatDatas)
         {
@@ -254,7 +254,8 @@ class Morphing
         }
         
         AccessorModel instantiatedAccessorModel =
-            instantiate(baseAccessorModel, "");
+            instantiate(baseAccessorModel, 
+                "buffer_for_morphed_attribute_" + semantic + ".bin");
         return new MorphableAttribute(instantiatedAccessorModel,
             baseAccessorModel, targetAccessorFloatDatas);
     }
@@ -278,10 +279,10 @@ class Morphing
         List<? extends AccessorFloatData> targets, float weights[])
     {
         // The number of components is fixed to be 3 here: Accessors that 
-        // refer to tangents may have 4 components, but the targets for 
-        // the values that are stored in the morph targets only have 3 
-        // components. The fourth component of tangents indicates the 
-        // handedness, which cannot be morphed.
+        // refer to tangents may have 4 components, but the values that 
+        // are stored in the morph targets only have 3 components. The 
+        // fourth component of tangents indicates the handedness, 
+        // which cannot be morphed.
         int numComponents = 3;
         int numElements = morphed.getNumElements();
         for (int e = 0; e < numElements; e++)
@@ -348,7 +349,7 @@ class Morphing
      * @param bufferUriString The URI string for the {@link BufferModel}
      * @return The {@link AccessorModel}
      */
-    public static AccessorModel createAccessorModel(int componentType,
+    private static AccessorModel createAccessorModel(int componentType,
         int count, ElementType elementType, String bufferUriString)
     {
         DefaultAccessorModel accessorModel =
@@ -373,7 +374,7 @@ class Morphing
      * @param bufferData The buffer data
      * @return The new {@link BufferViewModel}
      */
-    public static DefaultBufferViewModel createBufferViewModel(
+    private static DefaultBufferViewModel createBufferViewModel(
         String uriString, ByteBuffer bufferData)
     {
         DefaultBufferModel bufferModel = new DefaultBufferModel();

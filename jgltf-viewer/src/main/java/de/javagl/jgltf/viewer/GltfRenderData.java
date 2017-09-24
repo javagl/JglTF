@@ -58,7 +58,7 @@ import de.javagl.jgltf.model.gl.ShaderModel;
  * may only be called from the OpenGL thread (when the GL context
  * is current). 
  */
-public class GltfRenderData
+class GltfRenderData
 {
     /**
      * The logger used in this class
@@ -96,7 +96,7 @@ public class GltfRenderData
      * 
      * @param glContext The {@link GlContext}
      */
-    public GltfRenderData(GlContext glContext)
+    GltfRenderData(GlContext glContext)
     {
         this.glContext = Objects.requireNonNull(glContext,
             "The glContext may not be null");
@@ -115,7 +115,7 @@ public class GltfRenderData
      * 
      * @param glVertexArray The GL vertex array
      */
-    public void addGlVertexArray(int glVertexArray)
+    void addGlVertexArray(int glVertexArray)
     {
         glVertexArrays.add(glVertexArray);
     }
@@ -135,7 +135,7 @@ public class GltfRenderData
      * @param programModel The {@link ProgramModel}
      * @return The GL program
      */
-    public Integer obtainGlProgram(ProgramModel programModel)
+    Integer obtainGlProgram(ProgramModel programModel)
     {
         Integer glProgram = programModelToGlProgram.get(programModel);
         if (glProgram == null)
@@ -197,7 +197,7 @@ public class GltfRenderData
      * @param textureModel The {@link TextureModel}
      * @return The GL texture
      */
-    public Integer obtainGlTexture(TextureModel textureModel)
+    Integer obtainGlTexture(TextureModel textureModel)
     {
         Integer glTexture = textureModelToGlTexture.get(textureModel);
         if (glTexture == null)
@@ -274,7 +274,7 @@ public class GltfRenderData
      * @param bufferViewModel The {@link BufferViewModel}
      * @return The GL buffer
      */
-    public Integer obtainGlBufferView(BufferViewModel bufferViewModel)
+    Integer obtainGlBufferView(BufferViewModel bufferViewModel)
     {
         Objects.requireNonNull(bufferViewModel, 
             "The bufferViewModel may not be null");
@@ -320,7 +320,7 @@ public class GltfRenderData
     /**
      * Delete all GL resources that have been created internally.
      */
-    public void delete()
+    void delete()
     {
         Collection<Integer> glTextures = 
             textureModelToGlTexture.values();

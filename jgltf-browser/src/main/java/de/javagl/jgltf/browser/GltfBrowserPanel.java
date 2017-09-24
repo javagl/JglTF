@@ -614,7 +614,7 @@ class GltfBrowserPanel extends JPanel
      * @param oldPath The old tree path
      * @return The new tree path
      */
-    public static TreePath translatePathPartial(
+    private static TreePath translatePathPartial(
         TreeModel newTreeModel, TreePath oldPath)
     {
         Object newRoot = newTreeModel.getRoot();

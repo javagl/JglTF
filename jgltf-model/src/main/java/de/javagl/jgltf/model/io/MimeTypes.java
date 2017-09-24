@@ -58,7 +58,7 @@ public class MimeTypes
      * @return The image format string, or <code>null</code> if it can not
      * be detected.
      */
-    public static String guessImageMimeTypeString(String uriString)
+    private static String guessImageMimeTypeString(String uriString)
     {
         try
         {
@@ -128,7 +128,7 @@ public class MimeTypes
      * @return The image format string
      * @throws IOException If the image format can not be detected
      */
-    public static String guessImageMimeTypeString(ByteBuffer imageData) 
+    private static String guessImageMimeTypeString(ByteBuffer imageData) 
         throws IOException
     {
         ImageReader imageReader = null;

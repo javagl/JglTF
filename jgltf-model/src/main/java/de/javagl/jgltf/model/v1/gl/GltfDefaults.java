@@ -105,39 +105,6 @@ public class GltfDefaults
      * @param id The ID
      * @return Whether the given ID is the default ID
      */
-    static boolean isDefaultVertexShaderId(String id)
-    {
-        return DEFAULT_VERTEX_SHADER_ID.equals(id);
-    }
-    
-    /**
-     * Returns whether the given ID is the default ID as defined in this class
-     * 
-     * @param id The ID
-     * @return Whether the given ID is the default ID
-     */
-    static boolean isDefaultFragmentShaderId(String id)
-    {
-        return DEFAULT_FRAGMENT_SHADER_ID.equals(id);
-    }
-    
-    /**
-     * Returns whether the given ID is the default ID as defined in this class
-     * 
-     * @param id The ID
-     * @return Whether the given ID is the default ID
-     */
-    static boolean isDefaultProgramId(String id)
-    {
-        return DEFAULT_PROGRAM_ID.equals(id);
-    }
-    
-    /**
-     * Returns whether the given ID is the default ID as defined in this class
-     * 
-     * @param id The ID
-     * @return Whether the given ID is the default ID
-     */
     public static boolean isDefaultTechniqueId(String id)
     {
         return DEFAULT_TECHNIQUE_ID.equals(id);
@@ -172,16 +139,6 @@ public class GltfDefaults
     static Shader getDefaultFragmentShader()
     {
         return DEFAULT_FRAGMENT_SHADER;
-    }
-    
-    /**
-     * Returns the default {@link Program}
-     * 
-     * @return The {@link Program}
-     */
-    static Program getDefaultProgram()
-    {
-        return DEFAULT_PROGRAM;
     }
     
     /**

@@ -82,7 +82,7 @@ public class BinaryGltfV1
      * @param gltfProperty The {@link GlTFProperty}
      * @return The property value
      */
-    public static String getBinaryGltfBufferViewId(GlTFProperty gltfProperty)
+    static String getBinaryGltfBufferViewId(GlTFProperty gltfProperty)
     {
         return GltfExtensionsV1.getExtensionPropertyValueAsString(
             gltfProperty, KHRONOS_BINARY_GLTF_EXTENSION_NAME, "bufferView");

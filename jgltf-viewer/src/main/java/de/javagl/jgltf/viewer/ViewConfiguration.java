@@ -39,14 +39,14 @@ import de.javagl.jgltf.model.MathUtils;
  * that should be used for rendering, and offers the viewport, view matrix
  * and projection matrix. 
  */
-public final class ViewConfiguration
+final class ViewConfiguration
 {
     /**
      * A {@link SettableSupplier} that provides the {@link CameraModel}
      * that should be used for rendering.  
      * See {@link #setCurrentCameraModel(CameraModel)}
      */
-    private SettableSupplier<CameraModel> currentCameraModelSupplier;
+    private final SettableSupplier<CameraModel> currentCameraModelSupplier;
 
     /**
      * The supplier for the viewport, as an array [x, y, width, height]

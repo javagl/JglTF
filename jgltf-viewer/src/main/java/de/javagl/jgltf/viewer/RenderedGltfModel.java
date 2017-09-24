@@ -32,7 +32,7 @@ import de.javagl.jgltf.model.GltfModel;
 /**
  * Interface for a rendered {@link GltfModel}
  */
-public interface RenderedGltfModel
+interface RenderedGltfModel
 {
     /**
      * Render this instance. This is assumed to be called on the GL thread.

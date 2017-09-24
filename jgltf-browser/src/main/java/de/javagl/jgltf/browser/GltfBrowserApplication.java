@@ -320,7 +320,7 @@ class GltfBrowserApplication
     /**
      * The {@link ObjImportAccessoryPanel}
      */
-    private ObjImportAccessoryPanel objImportAccessoryPanel;
+    private final ObjImportAccessoryPanel objImportAccessoryPanel;
     
     /**
      * The property change listener that will be added to all internal frames, 
@@ -709,7 +709,7 @@ class GltfBrowserApplication
      * 
      * @param fileConsumer The consumer for the selected file
      */
-    void saveAs(Consumer<? super File> fileConsumer)
+    private void saveAs(Consumer<? super File> fileConsumer)
     {
         int returnState = saveFileChooser.showSaveDialog(frame);
         if (returnState == JFileChooser.APPROVE_OPTION) 

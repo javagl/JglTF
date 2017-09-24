@@ -114,35 +114,25 @@ public class AccessorDatas
         int componentType, ByteBuffer bufferViewData, int byteOffset, 
         int count, int numComponentsPerElement, Integer byteStride)
     {
-        if (componentType == GltfConstants.GL_BYTE ||
-            componentType == GltfConstants.GL_UNSIGNED_BYTE)
+        if (isByteType(componentType))
         {
             return new AccessorByteData(
                 componentType, bufferViewData, byteOffset, count, 
                 numComponentsPerElement, byteStride);
         }
-        if (componentType == GltfConstants.GL_SHORT ||
-            componentType == GltfConstants.GL_UNSIGNED_SHORT)
+        if (isShortType(componentType))
         {
             return new AccessorShortData(
                 componentType, bufferViewData, byteOffset, count, 
                 numComponentsPerElement, byteStride);
         }
-        if (componentType == GltfConstants.GL_INT ||
-            componentType == GltfConstants.GL_UNSIGNED_INT)
+        if (isIntType(componentType))
         {
             return new AccessorIntData(
                 componentType, bufferViewData, byteOffset, count, 
                 numComponentsPerElement, byteStride);
         }
-        if (componentType == GltfConstants.GL_INT ||
-            componentType == GltfConstants.GL_UNSIGNED_INT)
-        {
-            return new AccessorIntData(
-                componentType, bufferViewData, byteOffset, count, 
-                numComponentsPerElement, byteStride);
-        }
-        if (componentType == GltfConstants.GL_FLOAT)
+        if (isFloatType(componentType))
         {
             return new AccessorFloatData(
                 componentType, bufferViewData, byteOffset, count, 
@@ -299,36 +289,6 @@ public class AccessorDatas
     }
     
     
-    /**
-     * Returns whether the {@link AccessorModel#getComponentType() component 
-     * type} of the given {@link AccessorModel} is <code>GL_BYTE</code> or
-     * <code>GL_UNSIGNED_BYTE</code>. 
-     * 
-     * 
-     * @param accessorModel The {@link AccessorModel}
-     * @return Whether the {@link AccessorModel} has <code>byte</code> 
-     * components
-     */
-    static boolean hasByteComponents(AccessorModel accessorModel)
-    {
-        return isByteType(accessorModel.getComponentType());
-    }
-
-    /**
-     * Make sure that the {@link AccessorModel#getComponentType() component 
-     * type} of the given {@link AccessorModel} is <code>GL_BYTE</code> or 
-     * <code>GL_UNSIGNED_BYTE</code>, and throw an 
-     * <code>IllegalArgumentException</code> if this is not the case.
-     * 
-     * @param accessorModel The {@link AccessorModel}
-     * @throws IllegalArgumentException If the given accessorModel has a 
-     * {@link AccessorModel#getComponentType() component type} type that is 
-     * not <code>GL_BYTE</code> or <code>GL_UNSIGNED_BYTE</code>
-     */
-    static void validateByteComponents(AccessorModel accessorModel)
-    {
-        validateByteType(accessorModel.getComponentType());
-    }
     
     /**
      * Creates an {@link AccessorByteData} for the given {@link AccessorModel}
@@ -367,38 +327,6 @@ public class AccessorDatas
             accessorModel.getCount(),
             accessorModel.getElementType().getNumComponents(),
             accessorModel.getByteStride());
-    }
-    
-    
-    /**
-     * Returns whether the {@link AccessorModel#getComponentType() component 
-     * type} of the given {@link AccessorModel} is <code>GL_SHORT</code> or
-     * <code>GL_UNSIGNED_SHORT</code>. 
-     * 
-     * 
-     * @param accessorModel The {@link AccessorModel}
-     * @return Whether the {@link AccessorModel} has <code>short</code> 
-     * components
-     */
-    static boolean hasShortComponents(AccessorModel accessorModel)
-    {
-        return isShortType(accessorModel.getComponentType());
-    }
-
-    /**
-     * Make sure that the {@link AccessorModel#getComponentType() component 
-     * type} of the given {@link AccessorModel} is <code>GL_SHORT</code> or 
-     * <code>GL_UNSIGNED_SHORT</code>, and throw an 
-     * <code>IllegalArgumentException</code> if this is not the case.
-     * 
-     * @param accessorModel The {@link AccessorModel}
-     * @throws IllegalArgumentException If the given accessorModel has a 
-     * {@link AccessorModel#getComponentType() component type} type that is not 
-     * <code>GL_SHORT</code> or <code>GL_UNSIGNED_SHORT</code>
-     */
-    static void validateShortComponents(AccessorModel accessorModel)
-    {
-        validateShortType(accessorModel.getComponentType());
     }
     
     /**
@@ -443,36 +371,6 @@ public class AccessorDatas
     
 
     /**
-     * Returns whether the {@link AccessorModel#getComponentType() component 
-     * type} of the given {@link AccessorModel} is <code>GL_INT</code> or
-     * <code>GL_UNSIGNED_INT</code>. 
-     * 
-     * 
-     * @param accessorModel The {@link AccessorModel}
-     * @return Whether the {@link AccessorModel} has <code>int</code> components
-     */
-    static boolean hasIntComponents(AccessorModel accessorModel)
-    {
-        return isIntType(accessorModel.getComponentType());
-    }
-
-    /**
-     * Make sure that the {@link AccessorModel#getComponentType() component 
-     * type} of the given {@link AccessorModel} is <code>GL_INT</code> or 
-     * <code>GL_UNSIGNED_INT</code>, and throw an 
-     * <code>IllegalArgumentException</code> if this is not the case.
-     * 
-     * @param accessorModel The {@link AccessorModel}
-     * @throws IllegalArgumentException If the given accessorModel has a 
-     * {@link AccessorModel#getComponentType() component type} type that is not 
-     * <code>GL_INT</code> or <code>GL_UNSIGNED_INT</code>
-     */
-    static void validateIntComponents(AccessorModel accessorModel)
-    {
-        validateIntType(accessorModel.getComponentType());
-    }
-    
-    /**
      * Creates an {@link AccessorIntData} for the given {@link AccessorModel}
      * 
      * @param accessorModel The {@link AccessorModel}
@@ -508,36 +406,6 @@ public class AccessorDatas
             accessorModel.getCount(),
             accessorModel.getElementType().getNumComponents(),
             accessorModel.getByteStride());
-    }
-    
-    
-    /**
-     * Returns whether the {@link AccessorModel#getComponentType() component 
-     * type} of the given {@link AccessorModel} is <code>GL_FLOAT</code>
-     * 
-     * @param accessorModel The {@link AccessorModel}
-     * @return Whether the {@link AccessorModel} has <code>float</code> 
-     * components
-     */
-    static boolean hasFloatComponents(AccessorModel accessorModel)
-    {
-        return isFloatType(accessorModel.getComponentType());
-    }
-
-    /**
-     * Make sure that the {@link AccessorModel#getComponentType() component 
-     * type} of the given {@link AccessorModel} is <code>GL_FLOAT</code>, 
-     * and throw an <code>IllegalArgumentException</code> if this is not the 
-     * case.
-     * 
-     * @param accessorModel The {@link AccessorModel}
-     * @throws IllegalArgumentException If the given accessorModel has a 
-     * {@link AccessorModel#getComponentType() component type} type that is not 
-     * <code>GL_FLOAT</code>
-     */
-    static void validateFloatComponents(AccessorModel accessorModel)
-    {
-        validateFloatType(accessorModel.getComponentType());
     }
     
     /**

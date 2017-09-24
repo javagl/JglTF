@@ -36,7 +36,7 @@ import java.nio.ByteBuffer;
 /**
  * An interface describing (RGBA) pixel data for an image 
  */
-public interface PixelData
+interface PixelData
 {
     /**
      * Returns the width of the image

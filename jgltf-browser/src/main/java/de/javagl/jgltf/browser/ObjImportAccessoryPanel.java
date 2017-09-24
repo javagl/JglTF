@@ -56,18 +56,18 @@ class ObjImportAccessoryPanel extends JPanel
     /**
      * The combo box for the {@link BufferStrategy} for the OBJ import
      */
-    private JComboBox<BufferStrategy> bufferStrategyComboBox;
+    private final JComboBox<BufferStrategy> bufferStrategyComboBox;
     
     /**
      * The combo box for the component type of the indices
      */
-    private JComboBox<Integer> indicesComponentTypeComboBox;
+    private final JComboBox<Integer> indicesComponentTypeComboBox;
     
     /**
      * The checkbox indicating whether random colors should be assigned
      * to the parts that are created by the OBJ importer
      */
-    private JCheckBox assigningRandomColorsToPartsCheckBox;
+    private final JCheckBox assigningRandomColorsToPartsCheckBox;
     
     /**
      * Default constructor

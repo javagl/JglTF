@@ -700,7 +700,7 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
 
             if (accessorModel == null)
             {
-                logger.warning(
+                logger.fine(
                     "No accessor model found for semantic " + semantic);
                 continue;
             }

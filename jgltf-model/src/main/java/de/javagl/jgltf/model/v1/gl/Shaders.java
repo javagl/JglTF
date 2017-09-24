@@ -114,26 +114,6 @@ class Shaders
     }
     
     /**
-     * Returns the source code of the default vertex shader, as a string
-     * 
-     * @return The default vertex shader source code
-     */
-    static String getDefaultVertexShaderCode()
-    {
-        return DEFAULT_VERTEX_SHADER_CODE;
-    }
-    
-    /**
-     * Returns the source code of the default fragment shader, as a string
-     * 
-     * @return The default fragment shader source code
-     */
-    static String getDefaultFragmentShaderCode()
-    {
-        return DEFAULT_FRAGMENT_SHADER_CODE;
-    }
-    
-    /**
      * Private constructor to prevent instantiation
      */
     private Shaders()

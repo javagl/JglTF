@@ -120,9 +120,9 @@ public class ObjGltfAssetCreatorV2
     private BufferStructureBuilder bufferStructureBuilder;
     
     /**
-     * The {@link MtlMaterialHandler}
+     * The {@link MtlMaterialHandlerV2}
      */
-    private MtlMaterialHandler mtlMaterialHandler;
+    private MtlMaterialHandlerV2 mtlMaterialHandler;
     
     /**
      * The component type for the indices of the resulting glTF. 
@@ -295,7 +295,7 @@ public class ObjGltfAssetCreatorV2
         // Basic setup 
         gltf = new GlTF();
         gltf.setAsset(createAsset());
-        mtlMaterialHandler = new MtlMaterialHandler(gltf);
+        mtlMaterialHandler = new MtlMaterialHandlerV2(gltf);
         bufferStructureBuilder = new BufferStructureBuilder();
         
         // Create the MeshPrimitives from the OBJ and MTL data

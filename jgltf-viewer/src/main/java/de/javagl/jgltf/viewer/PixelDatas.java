@@ -35,7 +35,7 @@ import java.util.logging.Logger;
 /**
  * Methods to create {@link PixelData} objects from raw image data
  */
-public class PixelDatas
+class PixelDatas
 {
     /**
      * The logger used in this class
@@ -53,7 +53,7 @@ public class PixelDatas
      * @param imageData The image data
      * @return The {@link PixelData}
      */
-    public static PixelData create(ByteBuffer imageData)
+    static PixelData create(ByteBuffer imageData)
     {
         BufferedImage textureImage = ImageUtils.readAsBufferedImage(imageData);
         if (textureImage == null)

@@ -59,7 +59,7 @@ import de.javagl.swing.tasks.executors.ObservableExecutors;
  * A reader that loads {@link GltfAsset} using multiple threads,
  * and publishes progress information. 
  */
-public class GltfAssetReaderThreaded
+class GltfAssetReaderThreaded
 {
     /**
      * The logger used in this class

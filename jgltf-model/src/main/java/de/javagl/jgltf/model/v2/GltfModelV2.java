@@ -522,8 +522,7 @@ public final class GltfModelV2 implements GltfModel
     
     
     /**
-     * Initialize the {@link AccessorModel} by setting its 
-     * {@link AccessorModel#getAccessorData() accessor data} and
+     * Initialize the given {@link AccessorModel} by setting its 
      * {@link AccessorModel#getBufferViewModel() buffer view model}
      * for the case that the accessor is sparse. 
      * 
@@ -1234,7 +1233,8 @@ public final class GltfModelV2 implements GltfModel
      * Returns the raw glTF object, which is a
      * {@link de.javagl.jgltf.impl.v1.GlTF version 2.0 glTF}.<br>
      * <br>
-     * This method should usually not be called by clients.
+     * This method should usually not be called by clients. It may be
+     * omitted in future versions.
      * 
      * @return The glTF object
      */

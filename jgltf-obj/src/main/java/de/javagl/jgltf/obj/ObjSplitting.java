@@ -67,7 +67,7 @@ public class ObjSplitting
     /**
      * The predicate that says whether an OBJ has to be split
      */
-    private static Predicate<? super ReadableObj> OBJ_SPLIT_PREDICATE =
+    private static final Predicate<? super ReadableObj> OBJ_SPLIT_PREDICATE =
         obj -> obj.getNumVertices() > MAX_NUM_VERTICES;
 
     /**

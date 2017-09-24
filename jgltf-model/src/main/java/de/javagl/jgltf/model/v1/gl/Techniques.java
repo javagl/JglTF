@@ -87,7 +87,7 @@ public class Techniques
      * 
      * @return The default {@link TechniqueStates}
      */
-    public static TechniqueStates createDefaultTechniqueStates()
+    private static TechniqueStates createDefaultTechniqueStates()
     {
         TechniqueStates techniqueStates = new TechniqueStates();
         techniqueStates.setEnable(
@@ -180,7 +180,7 @@ public class Techniques
      * @param technique The {@link Technique}
      * @return The {@link TechniqueStates}
      */
-    public static TechniqueStates obtainTechniqueStates(Technique technique)
+    private static TechniqueStates obtainTechniqueStates(Technique technique)
     {
         TechniqueStates states = technique.getStates();
         if (states == null)

@@ -119,12 +119,12 @@ public abstract class AbstractGltfViewer<C> implements GltfViewer<C>
     /**
      * The {@link AnimationManager}
      */
-    private AnimationManager animationManager;
+    private final AnimationManager animationManager;
     
     /**
      * The {@link AnimationRunner}
      */
-    private AnimationRunner animationRunner;
+    private final AnimationRunner animationRunner;
     
     /**
      * The map from {@link GltfModel} instances to the lists of 

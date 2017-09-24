@@ -24,14 +24,15 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.obj.v2;
+package de.javagl.jgltf.obj.v1;
 
-import de.javagl.jgltf.impl.v2.GlTF;
-import de.javagl.jgltf.impl.v2.Image;
-import de.javagl.jgltf.impl.v2.Material;
-import de.javagl.jgltf.impl.v2.MaterialPbrMetallicRoughness;
-import de.javagl.jgltf.impl.v2.Texture;
-import de.javagl.jgltf.impl.v2.TextureInfo;
+import java.util.Map;
+
+import de.javagl.jgltf.impl.v1.GlTF;
+import de.javagl.jgltf.impl.v1.Image;
+import de.javagl.jgltf.impl.v1.Material;
+import de.javagl.jgltf.impl.v1.Technique;
+import de.javagl.jgltf.impl.v1.Texture;
 import de.javagl.obj.Mtl;
 import de.javagl.obj.ReadableObj;
 
@@ -39,22 +40,29 @@ import de.javagl.obj.ReadableObj;
  * A class for providing {@link Material} instances that are used when
  * converting an OBJ into a glTF asset.
  */
-public class MtlMaterialHandler
+class MtlMaterialHandlerV1
 {
     /**
-     * The {@link TextureHandler} that maintains the {@link Image}s and
+     * The {@link TechniqueHandler} that maintains the {@link Technique}s
+     * that are required for the {@link GlTF}
+     */
+    private final TechniqueHandler techniqueHandler;
+    
+    /**
+     * The {@link TextureHandlerV1} that maintains the {@link Image}s and
      * {@link Texture}s that are required for the {@link GlTF}
      */
-    private final TextureHandler textureHandler;
+    private final TextureHandlerV1 textureHandler;
 
     /**
      * Default constructor 
      * 
      * @param gltf The {@link GlTF}
      */
-    public MtlMaterialHandler(GlTF gltf)
+    MtlMaterialHandlerV1(GlTF gltf)
     {
-        this.textureHandler = new TextureHandler(gltf);
+        this.techniqueHandler = new TechniqueHandler(gltf);
+        this.textureHandler = new TextureHandlerV1(gltf);
     }
     
     /**
@@ -65,7 +73,7 @@ public class MtlMaterialHandler
      * @param mtl The {@link Mtl}
      * @return The {@link Material}
      */
-    public Material createMaterial(ReadableObj obj, Mtl mtl)
+    Material createMaterial(ReadableObj obj, Mtl mtl)
     {
         boolean withTexture = obj.getNumTexCoords() > 0 && 
             mtl != null && mtl.getMapKd() != null;
@@ -91,20 +99,17 @@ public class MtlMaterialHandler
     private Material createMaterialWithTexture(
         boolean withNormals, Mtl mtl)
     {
-        String imageUri = mtl.getMapKd();
-
-        int textureIndex = textureHandler.getTextureIndex(imageUri);
-        TextureInfo baseColorTexture = new TextureInfo();
-        baseColorTexture.setIndex(textureIndex);
+        boolean withTexture = true;
+        String techniqueId =
+            techniqueHandler.getTechniqueId(withTexture, withNormals);
         
-        MaterialPbrMetallicRoughness pbrMetallicRoughness = 
-            new MaterialPbrMetallicRoughness();
-        pbrMetallicRoughness.setBaseColorTexture(baseColorTexture);
-        pbrMetallicRoughness.setMetallicFactor(0.0f);
-
         Material material = new Material();
-        material.setPbrMetallicRoughness(pbrMetallicRoughness);
-        
+        material.setTechnique(techniqueId);
+        String imageUri = mtl.getMapKd();
+        String textureId = textureHandler.getTextureId(imageUri);
+        Map<String, Object> materialValues = 
+            MtlMaterialValues.createMaterialValues(mtl, textureId);
+        material.setValues(materialValues);
         return material;
     }
     
@@ -120,15 +125,15 @@ public class MtlMaterialHandler
     Material createMaterialWithColor(
         boolean withNormals, float r, float g, float b)
     {
-        MaterialPbrMetallicRoughness pbrMetallicRoughness = 
-            new MaterialPbrMetallicRoughness();
-        float[] baseColorFactor = new float[] { r, g, b, 1.0f };
-        pbrMetallicRoughness.setBaseColorFactor(baseColorFactor);
-        pbrMetallicRoughness.setMetallicFactor(0.0f);
-        
-        Material material = new Material();
-        material.setPbrMetallicRoughness(pbrMetallicRoughness);
+        boolean withTexture = false;
+        String techniqueId = 
+            techniqueHandler.getTechniqueId(withTexture, withNormals);
 
+        Material material = new Material();
+        material.setTechnique(techniqueId);
+        Map<String, Object> materialValues = 
+            MtlMaterialValues.createDefaultMaterialValues(r, g, b);
+        material.setValues(materialValues);
         return material;
     }
     

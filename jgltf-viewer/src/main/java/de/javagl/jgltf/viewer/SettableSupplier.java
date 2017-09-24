@@ -53,7 +53,7 @@ class SettableSupplier<T> implements Supplier<T>
      * 
      * @param value The value
      */
-    SettableSupplier(T value)
+    private SettableSupplier(T value)
     {
         this.value = value;
     }

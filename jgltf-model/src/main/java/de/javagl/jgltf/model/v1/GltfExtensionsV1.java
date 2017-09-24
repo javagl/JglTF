@@ -89,7 +89,7 @@ public class GltfExtensionsV1
      * @param extensionName The extension name
      * @return The extension property mapping, or <code>null</code>
      */
-    static Map<String, Object> getExtensionMap(
+    private static Map<String, Object> getExtensionMap(
         GlTFProperty gltfProperty, String extensionName)
     {
         Map<String, Object> extensions = gltfProperty.getExtensions();
@@ -122,7 +122,7 @@ public class GltfExtensionsV1
      * @param extensionName The extension name
      * @return Whether the specified extension mapping exists
      */
-    public static boolean hasExtension(
+    static boolean hasExtension(
         GlTFProperty gltfProperty, String extensionName)
     {
         return getExtensionMap(gltfProperty, extensionName) != null;
@@ -140,7 +140,7 @@ public class GltfExtensionsV1
      * @param propertyName The property name
      * @return The value, as a string.
      */
-    public static String getExtensionPropertyValueAsString(
+    static String getExtensionPropertyValueAsString(
         GlTFProperty gltfProperty, String extensionName, String propertyName)
     {
         Map<String, Object> extensionMap = 
@@ -170,7 +170,7 @@ public class GltfExtensionsV1
      * @param propertyName The property name
      * @param propertyValue The value
      */
-    public static void setExtensionPropertyValue(
+    static void setExtensionPropertyValue(
         GlTFProperty gltfProperty, String extensionName, 
         String propertyName, Object propertyValue)
     {

@@ -41,7 +41,7 @@ import de.javagl.jgltf.model.Optionals;
  * image URI}, creating the {@link Image} and the {@link Texture} if they 
  * do not exist yet. 
  */
-class TextureHandler
+class TextureHandlerV2
 {
     /**
      * The {@link GlTF} which contains the {@link Image}s and {@link Texture}s
@@ -67,7 +67,7 @@ class TextureHandler
      * 
      * @param gltf The {@link GlTF}
      */
-    TextureHandler(GlTF gltf)
+    TextureHandlerV2(GlTF gltf)
     {
         this.gltf = gltf;
         this.samplerIndex = -1;

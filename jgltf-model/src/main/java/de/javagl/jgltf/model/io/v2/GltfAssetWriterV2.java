@@ -44,7 +44,7 @@ import de.javagl.jgltf.model.io.GltfWriter;
 /**
  * A class for writing a glTF 2.0 asset in binary format to an output stream.
  * This class contains  implementations for the methods of the 
- * {@link GltfAssetWriter}, for glTF 1.0 assets. Clients should not use this 
+ * {@link GltfAssetWriter}, for glTF 2.0 assets. Clients should not use this 
  * class directly, but only the {@link GltfAssetWriter}.
  */
 public final class GltfAssetWriterV2

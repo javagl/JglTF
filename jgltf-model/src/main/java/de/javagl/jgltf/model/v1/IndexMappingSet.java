@@ -54,7 +54,7 @@ final class IndexMappingSet
      * @param name The name
      * @return The index mapping
      */
-    Map<String, Integer> get(Object name)
+    private Map<String, Integer> get(Object name)
     {
         Map<String, Integer> indexMapping = 
             indexMappings.computeIfAbsent(name, 

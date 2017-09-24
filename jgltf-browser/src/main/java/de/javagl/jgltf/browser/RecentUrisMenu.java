@@ -65,12 +65,12 @@ class RecentUrisMenu
     /**
      * The menu showing the most recently used URIs
      */
-    private JMenu recentUrisMenu;
+    private final JMenu recentUrisMenu;
     
     /**
      * The recent URIs
      */
-    private Deque<URI> recentUris;
+    private final Deque<URI> recentUris;
     
     /**
      * A prefix for the file storing the recent URIs, for disambiguation

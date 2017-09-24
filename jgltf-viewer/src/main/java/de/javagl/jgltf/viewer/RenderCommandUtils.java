@@ -43,7 +43,7 @@ import de.javagl.jgltf.model.io.IO;
  * Utility methods, solely intended for debugging and fine-grained logging
  * of rendering commands.
  */
-public class RenderCommandUtils
+class RenderCommandUtils
 {
     /**
      * The logger used in this class
