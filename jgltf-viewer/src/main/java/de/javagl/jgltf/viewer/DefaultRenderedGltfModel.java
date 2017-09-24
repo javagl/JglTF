@@ -167,17 +167,6 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
         Optionals.of(gltfModel.getSceneModels())
             .forEach(this::processSceneModel);
         logger.fine("Processing scenes DONE...");
-        
-        /* TODO Set the default camera?
-        if (externalViewMatrixSupplier == null)
-        {
-            List<CameraModel> cameraModels = gltfModel.getCameraModels();
-            if (!cameraModels.isEmpty())
-            {
-                setCurrentCameraModel(cameraModels.get(0));
-            }
-        }
-        */
     }
     
     
