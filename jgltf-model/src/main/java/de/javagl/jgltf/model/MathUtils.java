@@ -27,6 +27,7 @@
 package de.javagl.jgltf.model;
 
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -527,7 +528,7 @@ public class MathUtils
      * @param point3D The input point
      * @param result3D The result point
      */
-    static void transformPoint3D(
+    public static void transformPoint3D(
         float matrix4x4[], float point3D[], float result3D[])
     {
         Arrays.fill(result3D, 0.0f);
@@ -594,6 +595,64 @@ public class MathUtils
         }
         return sb.toString();
     }
+    
+    /**
+     * Create a string representation of the given array, as a matrix, 
+     * interpreting it as a matrix that is stored in column-major order. The 
+     * given array may be <code>null</code>. If it is not <code>null</code>,
+     * then it must either have 3x3 elements or 4x4 elements. <br>
+     * <br>
+     * The individual elements of the matrix will be formatted (in an 
+     * unspecified way) so that the matrix entries are aligned.
+     * 
+     * @param array The array
+     * @return The string representation
+     */
+    public static String createFormattedMatrixString(float array[])
+    {
+        if (array == null)
+        {
+            return "null";
+        }
+        String format = "%10.5f ";
+        if (array.length == 9)
+        {
+            return createFormattedMatrixString(array, 3, 3, format);
+        }
+        if (array.length == 16)
+        {
+            return createFormattedMatrixString(array, 4, 4, format);
+        }
+        return "WARNING: Not a matrix: "+Arrays.toString(array);
+    }
+    
+    /**
+     * Creates a string representation of the given matrix, which is given
+     * in column-major order. The elements of the matrix will be formatted
+     * with the given string.
+     * 
+     * @param array The array storing the matrix
+     * @param rows The number of rows
+     * @param cols The number of columns
+     * @param format The format string
+     * @return The string representation
+     */
+    private static String createFormattedMatrixString(
+        float array[], int rows, int cols, String format)
+    {
+        StringBuilder sb = new StringBuilder();
+        for (int r = 0; r < rows; r++)
+        {
+            for (int c = 0; c < cols; c++)
+            {
+                sb.append(String.format(
+                    Locale.ENGLISH, format, array[r + c * cols]));
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+    
 
     /**
      * Private constructor to prevent instantiation
