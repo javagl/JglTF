@@ -229,20 +229,34 @@ public class GltfAnimations
         AccessorFloatData outputData, 
         InterpolatorType interpolatorType)
     {
-        int numElements = timeData.getNumElements();
-        float keys[] = new float[numElements];
-        for (int e=0; e<numElements; e++)
+        int numKeyElements = timeData.getNumElements();
+        float keys[] = new float[numKeyElements];
+        for (int e=0; e<numKeyElements; e++)
         {
             keys[e] = timeData.get(e);
         }
         
-        int numComponents = outputData.getNumComponentsPerElement();
-        float values[][] = new float[numElements][numComponents];
-        for (int c=0; c<numComponents; c++)
+        // Note: The number of components per element that is used here
+        // is NOT outputData.getNumComponentsPerElement() !!!
+        // For morph target animations, the type of the output data will 
+        // always be SCALAR. The actual number of components per element
+        // has to be computed by dividing the total number of components
+        // in the output data by the number of time elements. 
+        // (For all animations except morph targets, the result will be 
+        // equal to outputData.getNumComponentsPerElement(), though...)
+        int totalNumValueComponents = 
+            outputData.getTotalNumComponents();
+        int numComponentsPerElement = 
+            totalNumValueComponents / numKeyElements;
+        float values[][] = new float[numKeyElements][numComponentsPerElement];
+        for (int c = 0; c < numComponentsPerElement; c++)
         {
-            for (int e=0; e<numElements; e++)
+            for (int e = 0; e < numKeyElements; e++)
             {
-                values[e][c] = outputData.get(e, c);
+                // Access the data using the global index, computed manually 
+                // based on the computed number of components per element
+                int globalIndex = e * numComponentsPerElement + c;
+                values[e][c] = outputData.get(globalIndex);
             }
         }
         return new Animation(

@@ -26,6 +26,7 @@
  */
 package de.javagl.jgltf.viewer;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +52,7 @@ import de.javagl.jgltf.model.gl.TechniqueModel;
 import de.javagl.jgltf.model.gl.TechniqueParametersModel;
 import de.javagl.jgltf.model.gl.TechniqueStatesFunctionsModel;
 import de.javagl.jgltf.model.gl.TechniqueStatesModel;
-
+import de.javagl.jgltf.viewer.Morphing.MorphableAttribute;
 
 /**
  * Default implementation of a {@link RenderedGltfModel}. This class builds 
@@ -229,59 +230,57 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
         logger.fine("Processing scene " + sceneModel + " DONE");
     }
     
-    
     /**
-     * Recursively process the given {@link NodeModel} and all its children,
-     * and generate the internal rendering structures for the data that 
-     * is found in these nodes. This mainly refers to the 
-     * {@link MeshPrimitiveModel} instances, which will be passed to the 
-     * {@link #processMeshPrimitiveModel(MeshPrimitiveModel, NodeModel)} 
+     * Recursively process the given {@link NodeModel} and all its children, and
+     * generate the internal rendering structures for the data that is found in
+     * these nodes. This mainly refers to the {@link MeshPrimitiveModel}
+     * instances, which will be passed to the
+     * {@link #processMeshPrimitiveModel( NodeModel, MeshModel, MeshPrimitiveModel)}
      * method.
      * 
      * @param nodeModel The {@link NodeModel}
      */
-    private void processNodeModel(NodeModel nodeModel) 
+    private void processNodeModel(NodeModel nodeModel)
     {
         logger.fine("Processing node " + nodeModel);
 
-        
         List<MeshModel> meshModels = nodeModel.getMeshModels();
         for (MeshModel meshModel : meshModels)
         {
-            List<MeshPrimitiveModel> primitives = 
+            List<MeshPrimitiveModel> primitives =
                 meshModel.getMeshPrimitiveModels();
             for (int i = 0; i < primitives.size(); i++)
             {
                 MeshPrimitiveModel meshPrimitiveModel = primitives.get(i);
-                processMeshPrimitiveModel(
-                    meshPrimitiveModel, nodeModel);
+                processMeshPrimitiveModel(nodeModel, meshModel,
+                    meshPrimitiveModel);
             }
         }
-        
+
         List<NodeModel> children = nodeModel.getChildren();
         for (NodeModel childNode : children)
         {
             processNodeModel(childNode);
         }
-        
+
         logger.fine("Processing node " + nodeModel + " DONE");
-        
+
     }
-    
-    
+
     /**
-     * Process the given {@link MeshPrimitiveModel} that was found in a 
-     * {@link MeshModel} in a {@link NodeModel} with the given ID. This 
-     * will create the rendering commands for rendering the mesh primitive.
-     *  
-     * @param meshPrimitiveModel The {@link MeshPrimitiveModel}
+     * Process the given {@link MeshPrimitiveModel} that was found in a
+     * {@link MeshModel} in the given {@link NodeModel}. This will create the
+     * rendering commands for rendering the mesh primitive.
+     * 
      * @param nodeModel The {@link NodeModel}
+     * @param meshModel The {@link MeshModel}
+     * @param meshPrimitiveModel The {@link MeshPrimitiveModel}
      */
-    private void processMeshPrimitiveModel(
-        MeshPrimitiveModel meshPrimitiveModel, NodeModel nodeModel)
+    private void processMeshPrimitiveModel(NodeModel nodeModel,
+        MeshModel meshModel, MeshPrimitiveModel meshPrimitiveModel)
     {
         logger.fine("Processing meshPrimitive...");
-        
+
         MaterialModel materialModel = meshPrimitiveModel.getMaterialModel();
         TechniqueModel techniqueModel = materialModel.getTechniqueModel();
         ProgramModel programModel = techniqueModel.getProgramModel();
@@ -290,17 +289,18 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
         Integer glProgram = gltfRenderData.obtainGlProgram(programModel);
         if (glProgram == null)
         {
-            logger.warning("No GL program found for program " + 
-                programModel + " in technique " + techniqueModel);
+            logger.warning("No GL program found for program " + programModel
+                + " in technique " + techniqueModel);
             return;
         }
-        
+
         // Create the vertex array and the attributes for the mesh primitive
         int glVertexArray = glContext.createGlVertexArray();
         gltfRenderData.addGlVertexArray(glVertexArray);
-        createAttributes(glVertexArray, meshPrimitiveModel);
-        
-        
+        List<Runnable> attributeUpdateCommands = 
+            createAttributes(glVertexArray,
+                nodeModel, meshModel, meshPrimitiveModel);
+
         // Create a list that contains all commands for rendering
         // the given mesh primitive
         List<Runnable> commands = new ArrayList<Runnable>();
@@ -330,6 +330,8 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
         commands.addAll(
             createTechniqueStatesFunctionsSettingCommands(
                 glContext, techniqueStatesFunctionsModel));
+        
+        commands.addAll(attributeUpdateCommands);
         
         // Create the command for the actual render call
         Runnable renderCommand = 
@@ -637,18 +639,29 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
         
         return commands;
     }
-    
+
     /**
-     * Walk through the {@link MeshPrimitiveModel#getAttributes() attributes} 
-     * of the given {@link MeshPrimitiveModel} and create the corresponding 
-     * OpenGL vertex attributes, bound to the given GL vertex array identifier.
+     * Walk through the {@link MeshPrimitiveModel#getAttributes() attributes} of
+     * the given {@link MeshPrimitiveModel} and create the corresponding OpenGL
+     * vertex attributes, bound to the given GL vertex array identifier. <br>
+     * <br>
+     * The returned list may contain commands that have to be executed before a
+     * rendering pass, in order to update the attribute values: For attributes
+     * that are interpolated with morph targets, these commands will update the
+     * attribute data accordingly.
      * 
      * @param glVertexArray The GL vertex array
+     * @param nodeModel The {@link NodeModel}
+     * @param meshModel The {@link MeshModel}
      * @param meshPrimitiveModel The {@link MeshPrimitiveModel}
+     * @return A (possibly) empty list of commands for updating the attributes
      */
-    private void createAttributes(int glVertexArray, 
+    private List<Runnable> createAttributes(int glVertexArray,
+        NodeModel nodeModel, MeshModel meshModel,
         MeshPrimitiveModel meshPrimitiveModel)
     {
+        List<Runnable> attributeUpdateCommands = new ArrayList<Runnable>();
+
         MaterialModel materialModel = meshPrimitiveModel.getMaterialModel();
         TechniqueModel techniqueModel = materialModel.getTechniqueModel();
         ProgramModel programModel = techniqueModel.getProgramModel();
@@ -659,34 +672,57 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
         {
             logger.warning("No GL program found for program " + 
                 programModel + " in technique " + techniqueModel);
-            return;
+            return attributeUpdateCommands;
         }
-        
-        Map<String, AccessorModel> meshPrimitiveAttributes = 
+
+        Map<String, AccessorModel> meshPrimitiveAttributes =
             meshPrimitiveModel.getAttributes();
         Map<String, String> attributes = techniqueModel.getAttributes();
         for (String attributeName : attributes.keySet())
         {
-            TechniqueParametersModel attributeTechniqueParametersModel = 
+            TechniqueParametersModel attributeTechniqueParametersModel =
                 techniqueModel.getAttributeParameters(attributeName);
             String semantic = attributeTechniqueParametersModel.getSemantic();
-            AccessorModel accessorModel = meshPrimitiveAttributes.get(semantic);
+
+            AccessorModel accessorModel = null;
+            MorphableAttribute morphableAttribute = null;
+            if (Morphing.isMorphableAttribute(meshPrimitiveModel, semantic))
+            {
+                morphableAttribute = Morphing.createMorphableAttribute(
+                    meshPrimitiveModel, semantic);
+                accessorModel = morphableAttribute.getMorphedAccessorModel();
+            }
+            else
+            {
+                accessorModel = meshPrimitiveAttributes.get(semantic);
+            }
+            
 
             if (accessorModel == null)
             {
+                logger.warning(
+                    "No accessor model found for semantic " + semantic);
                 continue;
             }
-            
-            BufferViewModel bufferViewModel = 
+
+            BufferViewModel bufferViewModel =
                 accessorModel.getBufferViewModel();
-            
-            Integer glBufferView = 
+
+            Integer glBufferView =
                 gltfRenderData.obtainGlBufferView(bufferViewModel);
             if (glBufferView == null)
             {
                 logger.warning("No GL bufferView found for " + 
                     "bufferView " + bufferViewModel);
                 continue;
+            }
+
+            if (morphableAttribute != null)
+            {
+                Runnable attributeUpdateCommand =
+                    createAttributeUpdateCommand(glVertexArray, glBufferView,
+                        nodeModel, meshModel, morphableAttribute);
+                attributeUpdateCommands.add(attributeUpdateCommand);
             }
 
             // Collect the parameters for the GL calls
@@ -710,7 +746,80 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
                 target, glBufferView, attributeLocation, size,
                 type, stride, offset);
         }
+        return attributeUpdateCommands;
     }
+
+    /**
+     * Create a command that updates the specified attribute data. <br>
+     * <br>
+     * This command is supposed to be called on the rendering thread
+     * prior to rendering a mesh primitive that contains the given
+     * morphable attribute.<br>
+     * <br>
+     * Upon execution of the command, the current weights for the morph 
+     * targets are obtained from the given {@link NodeModel} (or from
+     * the given {@link MeshModel}, if those of the node are <code>null</code>).
+     * These weights will be used to update the given {@link MorphableAttribute}
+     * by calling {@link MorphableAttribute#updateMorphedAccessorData(float[])}.
+     * The interpolated data will be written into the buffer that backs the
+     * morphed attribute, and this buffer will be passed to the GL context
+     * to be updated.
+     * 
+     * @param glVertexArray The GL vertex array
+     * @param glBufferView The GL buffer view 
+     * @param nodeModel The {@link NodeModel}
+     * @param meshModel The {@link MeshModel}
+     * @param morphableAttribute The {@link MorphableAttribute}
+     * @return The command
+     */
+    private Runnable createAttributeUpdateCommand(
+        int glVertexArray, int glBufferView,
+        NodeModel nodeModel, MeshModel meshModel,
+        MorphableAttribute morphableAttribute)
+    {
+        // Obtain the buffer view data from the morphed accessor model.
+        // This buffer will be filled with the morphed data when
+        // MorphableAttribute#updateMorphedAccessorData is called.
+        AccessorModel morphedAccessorModel = 
+            morphableAttribute.getMorphedAccessorModel();
+        BufferViewModel morphedBufferViewModel =
+            morphedAccessorModel.getBufferViewModel();
+        morphedBufferViewModel.getByteLength();
+        ByteBuffer morphedBufferViewData =
+            morphedBufferViewModel.getBufferViewData();
+        int bufferSize = morphedBufferViewData.capacity();
+
+        float weights[] = new float[morphableAttribute.getNumTargets()];
+        
+        // Create the actual command that is executed before rendering
+        Runnable attributeUpdateCommand = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                // Update the weights based on the weights from the node
+                // or the mesh 
+                if (nodeModel.getWeights() != null)
+                {
+                    System.arraycopy(
+                        nodeModel.getWeights(), 0, weights, 0, weights.length);
+                } 
+                else if (meshModel.getWeights() != null)
+                {
+                    System.arraycopy(
+                        meshModel.getWeights(), 0, weights, 0, weights.length);
+                }
+                
+                // Perform the update, and pass the updated buffer to GL
+                morphableAttribute.updateMorphedAccessorData(weights);
+                glContext.updateVertexAttribute(glVertexArray,
+                    GltfConstants.GL_ARRAY_BUFFER, glBufferView, 0, bufferSize,
+                    morphedBufferViewData);
+            }
+        }; 
+        return attributeUpdateCommand;
+    }
+
 
     /**
      * Return an empty runnable, as a last resort for errors
@@ -724,17 +833,5 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
             // Empty
         };
     }
-        
-        
-    
-    
-    
 
-    
-
-    
-    
-
-    
-    
 }
