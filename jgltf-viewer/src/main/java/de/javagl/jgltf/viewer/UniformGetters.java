@@ -223,7 +223,7 @@ class UniformGetters
 
     /**
      * Returns a supplier for the specified uniform value, which is assumed
-     * to be a an integer array or a single number.  
+     * to be a single number, an integer array, or a list of numbers  
      * 
      * @param uniformName The uniform name
      * @param materialModel The {@link MaterialModel}
@@ -271,7 +271,7 @@ class UniformGetters
     
     /**
      * Returns a supplier for the specified uniform value, which is assumed
-     * to be a float array or a single number. 
+     * to be a single number, an float array, or a list of numbers  
      * 
      * @param uniformName The uniform name
      * @param materialModel The {@link MaterialModel}
