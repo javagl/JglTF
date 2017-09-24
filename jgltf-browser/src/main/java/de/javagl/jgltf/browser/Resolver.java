@@ -199,7 +199,8 @@ class Resolver
         m.put("glTF.meshes.*.primitives.*.material", getMap(gltf, "materials"));
         m.put("glTF.meshes.*.primitives.*.attributes.*", 
             getMap(gltf, "accessors"));
-        m.put("glTF.meshes.*.primitives.*.indices", getMap(gltf, "accessors"));
+        m.put("glTF.meshes.*.primitives.*.targets.*.*", 
+            getMap(gltf, "accessors"));
         m.put("glTF.accessors.*.bufferView", getMap(gltf, "bufferViews"));
         m.put("glTF.programs.*.fragmentShader", getMap(gltf, "shaders"));
         m.put("glTF.programs.*.vertexShader", getMap(gltf, "shaders"));
@@ -215,6 +216,8 @@ class Resolver
         m.put("glTF.techniques.*.program", getMap(gltf, "programs"));
         m.put("glTF.techniques.*.parameters.*.node", getMap(gltf, "nodes"));
         m.put("glTF.animations.*.channels.*.target.id", getMap(gltf, "nodes"));
+        m.put("glTF.animations.*.samplers.*.input", getMap(gltf, "accessors"));
+        m.put("glTF.animations.*.samplers.*.output", getMap(gltf, "accessors"));
         m.put("glTF.animations.*.parameters.*", getMap(gltf, "accessors"));
         m.put("glTF.textures.*.sampler", getMap(gltf, "samplers"));
         m.put("glTF.textures.*.source", getMap(gltf, "images"));
