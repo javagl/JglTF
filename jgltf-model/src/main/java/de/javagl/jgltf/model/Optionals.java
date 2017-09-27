@@ -41,6 +41,8 @@ public class Optionals
      * Returns the given list, or an unmodifiable empty list if the
      * given list is <code>null</code>.
      * 
+     * @param <T> The element type
+     * 
      * @param list The list
      * @return The result
      */
@@ -52,6 +54,8 @@ public class Optionals
     /**
      * Returns the specified element from the given list, or <code>null</code>
      * if the list is <code>null</code> or the index is not valid.
+     * 
+     * @param <T> The element type
      * 
      * @param list The list
      * @param index The index
@@ -78,6 +82,9 @@ public class Optionals
      * Returns the given map, or an unmodifiable empty map if the
      * given map is <code>null</code>.
      * 
+     * @param <K> The key type
+     * @param <V> The value type
+     * 
      * @param map The map
      * @return The result
      */
@@ -89,6 +96,8 @@ public class Optionals
     /**
      * Returns the given value, or the default value if the given value
      * is <code>null</code>.
+     * 
+     * @param <T> The value type
      * 
      * @param value The value
      * @param defaultValue The default value

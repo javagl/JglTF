@@ -42,7 +42,9 @@ public class Suppliers
      * matrix will be supplied.<br>
      * <br>
      * Note: The supplier MAY always return the same array instance.
-     * Callers MUST NOT store or modify the returned array. 
+     * Callers MUST NOT store or modify the returned array.
+     * 
+     * @param <T> The object type
      * 
      * @param object The object
      * @param computer The computer function
