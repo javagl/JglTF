@@ -28,7 +28,9 @@
   </properties>
 
   <modules>
-    <module>jgltf-impl</module>
+    <module>jgltf-impl-v1</module>
+    <module>jgltf-impl-v2</module>
+    <module>jgltf-impl-v2-technique-webgl</module>
     <module>jgltf-model</module>
     <module>jgltf-browser</module>
     <module>jgltf-obj</module>
