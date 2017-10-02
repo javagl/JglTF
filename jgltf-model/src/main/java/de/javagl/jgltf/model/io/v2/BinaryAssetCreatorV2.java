@@ -42,6 +42,7 @@ import de.javagl.jgltf.impl.v2.Image;
 import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.ImageModel;
+import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.model.io.MimeTypes;
 import de.javagl.jgltf.model.v2.GltfModelV2;
@@ -125,7 +126,7 @@ final class BinaryAssetCreatorV2
 
             newBufferView.setBuffer(0);
             Integer oldBufferIndex = oldBufferView.getBuffer();
-            int oldByteOffset = oldBufferView.getByteOffset();
+            int oldByteOffset = Optionals.of(oldBufferView.getByteOffset(), 0);
             int bufferOffset = bufferOffsets.get(oldBufferIndex);
             int newByteOffset = oldByteOffset + bufferOffset;
             newBufferView.setByteOffset(newByteOffset);
@@ -154,6 +155,7 @@ final class BinaryAssetCreatorV2
 
             int newBufferViewIndex = newBufferViews.size();
             newImage.setBufferView(newBufferViewIndex);
+            newImage.setUri(null);
             
             String imageMimeTypeString =
                 MimeTypes.guessImageMimeTypeString(

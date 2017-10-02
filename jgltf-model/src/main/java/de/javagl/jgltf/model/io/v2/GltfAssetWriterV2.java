@@ -105,8 +105,13 @@ public final class GltfAssetWriterV2
         // Ensure 4-byte-alignment for the jsonData
         if (jsonData.length % 4 != 0)
         {
-            int padding = 4 - (jsonData.length % 4);
-            jsonData = Arrays.copyOf(jsonData, jsonData.length + padding);
+            int oldLength = jsonData.length;
+            int padding = 4 - (oldLength % 4);
+            jsonData = Arrays.copyOf(jsonData, oldLength + padding);
+            for (int i = 0; i < padding; i++)
+            {
+                jsonData[oldLength + i] = ' ';
+            }
         }
         
         // Obtain the binary data, and ensure it's 4-byte aligned
