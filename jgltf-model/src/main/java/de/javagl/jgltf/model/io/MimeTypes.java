@@ -171,7 +171,7 @@ public class MimeTypes
     
     /**
      * Tries to detect the format of the given image URI and its data and 
-     * return the corresponding string of the MIME type string.<br> 
+     * return the corresponding MIME type string.<br> 
      * <br>
      * This may,  for example, be <code>"image/png"</code> or 
      * <code>"image/gif"</code> or <code>"image/jpeg"</code> (<b>not</b> 
