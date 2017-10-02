@@ -124,15 +124,15 @@ public final class GltfAssetWriterV2
 
         // Create the JSON chunk data
         ChunkData jsonChunkData = new ChunkData();
-        jsonChunkData.append(jsonData.length + 8);
+        jsonChunkData.append(jsonData.length);
         jsonChunkData.append(CHUNK_TYPE_JSON);
         jsonChunkData.append(ByteBuffer.wrap(jsonData));
         
         // Create the BIN chunk data
         ChunkData binChunkData = new ChunkData();
-        binChunkData.append(binaryData.capacity() + 8);
+        binChunkData.append(binaryData.capacity());
         binChunkData.append(CHUNK_TYPE_BIN);
-        jsonChunkData.append(binaryData);
+        binChunkData.append(binaryData);
         
         // Create the header data
         ChunkData headerData = new ChunkData();

@@ -156,7 +156,7 @@ public final class GltfAssetV2 implements GltfAsset
         for (int i = 0; i < images.size(); i++)
         {
             Image image = images.get(i);
-            if (image.getUri() == null)
+            if (image.getBufferView() != null)
             {
                 // This is an image that refers to a buffer view
                 continue;
