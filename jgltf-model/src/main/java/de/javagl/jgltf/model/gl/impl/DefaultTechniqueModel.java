@@ -35,11 +35,13 @@ import de.javagl.jgltf.model.gl.ProgramModel;
 import de.javagl.jgltf.model.gl.TechniqueModel;
 import de.javagl.jgltf.model.gl.TechniqueParametersModel;
 import de.javagl.jgltf.model.gl.TechniqueStatesModel;
+import de.javagl.jgltf.model.impl.AbstractNamedModelElement;
 
 /**
  * Implementation of a {@link TechniqueModel}
  */
-public class DefaultTechniqueModel implements TechniqueModel 
+public class DefaultTechniqueModel extends AbstractNamedModelElement
+    implements TechniqueModel 
 {
     /**
      * The {@link ProgramModel}

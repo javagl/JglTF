@@ -42,7 +42,8 @@ import de.javagl.jgltf.model.Utils;
 /**
  * Implementation of a {@link SkinModel}
  */
-public final class DefaultSkinModel implements SkinModel
+public final class DefaultSkinModel extends AbstractNamedModelElement
+    implements SkinModel
 {
     /**
      * The bind shape matrix

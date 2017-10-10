@@ -793,14 +793,15 @@ public final class GltfModelV2 implements GltfModel
 
         for (int i = 0; i < buffers.size(); i++)
         {
+            Buffer buffer = buffers.get(i);
             DefaultBufferModel bufferModel = bufferModels.get(i);
+            bufferModel.setName(buffer.getName());
             if (i == 0 && binaryData != null)
             {
                 bufferModel.setBufferData(binaryData);
             }
             else
             {
-                Buffer buffer = buffers.get(i);
                 String uri = buffer.getUri();
                 ByteBuffer bufferData = gltfAsset.getReferenceData(uri);
                 bufferModel.setBufferData(bufferData);
@@ -819,9 +820,11 @@ public final class GltfModelV2 implements GltfModel
         {
             BufferView bufferView = bufferViews.get(i);
             
+            DefaultBufferViewModel bufferViewModel = bufferViewModels.get(i);
+            bufferViewModel.setName(bufferView.getName());
+            
             int bufferIndex = bufferView.getBuffer();
             BufferModel bufferModel = bufferModels.get(bufferIndex);
-            DefaultBufferViewModel bufferViewModel = bufferViewModels.get(i);
             bufferViewModel.setBufferModel(bufferModel);
         }
     }
@@ -836,9 +839,11 @@ public final class GltfModelV2 implements GltfModel
         for (int i = 0; i < meshes.size(); i++)
         {
             Mesh mesh = meshes.get(i);
+            DefaultMeshModel meshModel = meshModels.get(i);
+            meshModel.setName(mesh.getName());
+            
             List<MeshPrimitive> primitives = 
                 Optionals.of(mesh.getPrimitives());
-            DefaultMeshModel meshModel = meshModels.get(i);
             for (MeshPrimitive meshPrimitive : primitives)
             {
                 MeshPrimitiveModel meshPrimitiveModel = 
@@ -917,6 +922,8 @@ public final class GltfModelV2 implements GltfModel
             Node node = nodes.get(i);
             
             DefaultNodeModel nodeModel = nodeModels.get(i);
+            nodeModel.setName(node.getName());
+            
             List<Integer> childIndices = Optionals.of(node.getChildren());
             for (Integer childIndex : childIndices)
             {
@@ -976,6 +983,8 @@ public final class GltfModelV2 implements GltfModel
             Scene scene = scenes.get(i);
 
             DefaultSceneModel sceneModel = sceneModels.get(i);
+            sceneModel.setName(scene.getName());
+            
             List<Integer> nodeIndices = Optionals.of(scene.getNodes());
             for (Integer nodeIndex : nodeIndices)
             {
@@ -995,6 +1004,7 @@ public final class GltfModelV2 implements GltfModel
         {
             Skin skin = skins.get(i);
             DefaultSkinModel skinModel = skinModels.get(i);
+            skinModel.setName(skin.getName());
             
             List<Integer> jointIndices = skin.getJoints();
             for (Integer jointIndex : jointIndices)
@@ -1020,6 +1030,8 @@ public final class GltfModelV2 implements GltfModel
         {
             Texture texture = textures.get(i);
             DefaultTextureModel textureModel = textureModels.get(i);
+            textureModel.setName(texture.getName());
+            
             Integer imageIndex = texture.getSource();
             DefaultImageModel imageModel = imageModels.get(imageIndex);
             textureModel.setImageModel(imageModel);
@@ -1036,6 +1048,8 @@ public final class GltfModelV2 implements GltfModel
         {
             Image image = images.get(i);
             DefaultImageModel imageModel = imageModels.get(i);
+            imageModel.setName(image.getName());
+            
             Integer bufferViewIndex = image.getBufferView();
             if (bufferViewIndex != null)
             {
@@ -1072,7 +1086,7 @@ public final class GltfModelV2 implements GltfModel
             {
                 Camera camera = cameras.get(cameraIndex);
                 NodeModel nodeModel = nodeModels.get(i);
-                String name = "node" + i + "." + "camera" + cameraIndex;
+                
                 Function<float[], float[]> viewMatrixComputer = result -> 
                 {
                     float localResult[] = Utils.validate(result, 16);
@@ -1090,8 +1104,16 @@ public final class GltfModelV2 implements GltfModel
                 };
                 DefaultCameraModel cameraModel = new DefaultCameraModel(
                     viewMatrixComputer, projectionMatrixComputer);
-                cameraModel.setName(name);
+                cameraModel.setName(camera.getName());
+                
                 cameraModel.setNodeModel(nodeModel);
+
+                String nodeName = Optionals.of(node.getName(), "node" + i);
+                String cameraName = 
+                    Optionals.of(camera.getName(), "camera" + cameraIndex);
+                String instanceName = nodeName + "." + cameraName;
+                cameraModel.setInstanceName(instanceName);
+                
                 cameraModels.add(cameraModel);
             }
         }
@@ -1163,6 +1185,8 @@ public final class GltfModelV2 implements GltfModel
             }
             DefaultMaterialModel materialModel = 
                 materialModelHandler.createMaterialModel(material, numJoints);
+            materialModel.setName(material.getName());
+            
             meshPrimitiveModel.setMaterialModel(materialModel);
             materialModels.add(materialModel);
         }

@@ -29,7 +29,7 @@ package de.javagl.jgltf.model;
 /**
  * Interface for a texture in a glTF asset
  */
-public interface TextureModel
+public interface TextureModel extends NamedModelElement
 {
     /**
      * Return the magnification filter constant

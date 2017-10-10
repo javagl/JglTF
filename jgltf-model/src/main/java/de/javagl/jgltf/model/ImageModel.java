@@ -31,7 +31,7 @@ import java.nio.ByteBuffer;
 /**
  * Interface for an image in a glTF asset
  */
-public interface ImageModel
+public interface ImageModel extends NamedModelElement
 {
     /**
      * Returns the URI of the image data (optional)

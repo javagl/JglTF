@@ -33,14 +33,17 @@ import java.util.function.Supplier;
 /**
  * An interface for a camera that is attached to a {@link NodeModel}
  */
-public interface CameraModel
+public interface CameraModel extends NamedModelElement
 {
     /**
-     * Returns the name of this camera model, suitable to be shown to a user
+     * Returns the name of this camera model instance, suitable to be shown 
+     * to a user. In contrast to the pure {@link #getName() name}, this method
+     * will return a string that also contains information about the node
+     * that this camera instance is attached to.
      * 
-     * @return The name of this camera model
+     * @return The name of this camera model instance
      */
-    String getName();
+    String getInstanceName();
 
     /**
      * Returns the {@link NodeModel} that the camera is attached to

@@ -36,7 +36,8 @@ import de.javagl.jgltf.model.MeshPrimitiveModel;
 /**
  * Implementation of a {@link MeshModel}
  */
-public final class DefaultMeshModel implements MeshModel
+public final class DefaultMeshModel extends AbstractNamedModelElement
+    implements MeshModel
 {
     /**
      * The {@link MeshPrimitiveModel} instances 

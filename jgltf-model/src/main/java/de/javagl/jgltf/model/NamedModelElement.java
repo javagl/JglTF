@@ -26,27 +26,18 @@
  */
 package de.javagl.jgltf.model;
 
-import java.util.List;
-
 /**
- * Interface for a mesh that is part of a glTF asset
+ * Interface for all classes of the model package that have an optional name.
+ * This is the name that was given to the <code>GlTFChildOfRootProperty</code>
+ * of the original glTF asset.
  */
-public interface MeshModel extends NamedModelElement
+public interface NamedModelElement
 {
     /**
-     * Returns an unmodifiable view on the {@link MeshPrimitiveModel} objects
-     * that this mesh consists of
+     * Returns the name of this element, or <code>null</code> if this element
+     * does not have an associated name.
      * 
-     * @return The {@link MeshPrimitiveModel} objects
+     * @return The optional name
      */
-    List<MeshPrimitiveModel> getMeshPrimitiveModels();
-    
-    /**
-     * Returns a copy of the default morph target weights, or <code>null</code> 
-     * if no default morph target weights have been defined
-     * 
-     * @return A copy of the morph target weights
-     */
-    float[] getWeights();
+    String getName();
 }
-

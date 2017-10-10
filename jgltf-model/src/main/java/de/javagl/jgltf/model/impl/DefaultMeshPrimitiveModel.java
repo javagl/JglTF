@@ -38,7 +38,7 @@ import de.javagl.jgltf.model.MaterialModel;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
 
 /**
- * Implementation of a {@link MeshPrimitiveModel} based on glTF 1.0
+ * Implementation of a {@link MeshPrimitiveModel}
  */
 public final class DefaultMeshPrimitiveModel implements MeshPrimitiveModel
 {

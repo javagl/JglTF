@@ -204,7 +204,7 @@ class GltfViewerPanel extends JPanel
                 else
                 {
                     CameraModel cameraModel = (CameraModel)value;
-                    setText(cameraModel.getName());
+                    setText(cameraModel.getInstanceName());
                 }
                 return this;
             }

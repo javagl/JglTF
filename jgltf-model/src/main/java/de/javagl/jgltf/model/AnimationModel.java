@@ -31,7 +31,7 @@ import java.util.List;
 /**
  * Interface for an animation
  */
-public interface AnimationModel 
+public interface AnimationModel extends NamedModelElement
 {
     /**
      * Enumeration of the different interpolation methods for an animation

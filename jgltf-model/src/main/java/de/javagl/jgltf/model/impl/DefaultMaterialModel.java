@@ -36,7 +36,8 @@ import de.javagl.jgltf.model.gl.TechniqueModel;
 /**
  * Implementation of a {@link MaterialModel}
  */
-public final class DefaultMaterialModel implements MaterialModel
+public final class DefaultMaterialModel extends AbstractNamedModelElement
+    implements MaterialModel
 {
     /**
      * The {@link TechniqueModel}

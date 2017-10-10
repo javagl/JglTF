@@ -32,7 +32,8 @@ import de.javagl.jgltf.model.TextureModel;
 /**
  * Implementation of a {@link TextureModel}
  */
-public final class DefaultTextureModel implements TextureModel
+public final class DefaultTextureModel extends AbstractNamedModelElement
+    implements TextureModel
 {
     /**
      * The magnification filter constant

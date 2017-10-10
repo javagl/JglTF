@@ -249,7 +249,7 @@ class MaterialModelHandler
 
     
     /**
-     * Create a {@link MaterialModel} instances for the given {@link Material}
+     * Create a {@link MaterialModel} instance for the given {@link Material}
      * 
      * @param material The {@link Material}
      * @param numJoints The number of joints

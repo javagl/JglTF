@@ -36,7 +36,8 @@ import de.javagl.jgltf.model.SceneModel;
 /**
  * Implementation of a {@link SceneModel} 
  */
-public final class DefaultSceneModel implements SceneModel
+public final class DefaultSceneModel extends AbstractNamedModelElement
+    implements SceneModel
 {
     /**
      * The list of root nodes

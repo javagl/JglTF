@@ -30,11 +30,13 @@ import java.util.Objects;
 
 import de.javagl.jgltf.model.gl.ProgramModel;
 import de.javagl.jgltf.model.gl.ShaderModel;
+import de.javagl.jgltf.model.impl.AbstractNamedModelElement;
 
 /**
  * Implementation of a {@link ProgramModel}
  */
-public class DefaultProgramModel implements ProgramModel
+public class DefaultProgramModel extends AbstractNamedModelElement
+    implements ProgramModel
 {
     /**
      * The vertex shader model

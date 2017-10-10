@@ -32,7 +32,7 @@ import java.nio.ByteBuffer;
  * Interface for a buffer view, which represents a slice of a 
  * {@link BufferModel}
  */
-public interface BufferViewModel
+public interface BufferViewModel extends NamedModelElement
 {
     /**
      * Return the actual data that this view stands for. This will be a new

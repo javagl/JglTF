@@ -32,7 +32,7 @@ import java.util.function.Supplier;
 /**
  * Interface for a node that is part of a scene hierarchy
  */
-public interface NodeModel
+public interface NodeModel extends NamedModelElement
 {
     /**
      * Returns the parent of this node, or <code>null</code> if this is

@@ -28,12 +28,14 @@ package de.javagl.jgltf.model.gl;
 
 import java.util.Map;
 
+import de.javagl.jgltf.model.NamedModelElement;
+
 /**
  * Interface for a rendering technique. Such a technique may be part of a 
  * core glTF 1.0 asset, an extension of a glTF 2.0 asset, or a custom 
  * implementation that is used internally.
  */
-public interface TechniqueModel 
+public interface TechniqueModel extends NamedModelElement
 {
     /**
      * Returns the {@link ProgramModel} that is used for implementing this

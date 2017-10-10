@@ -31,7 +31,7 @@ import java.util.List;
 /**
  * Interface for a skin of a glTF asset
  */
-public interface SkinModel
+public interface SkinModel extends NamedModelElement
 {
     /**
      * Provides the bind shape matrix of the skin.<br>

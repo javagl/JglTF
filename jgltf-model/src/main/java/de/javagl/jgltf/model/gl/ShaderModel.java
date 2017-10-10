@@ -28,10 +28,12 @@ package de.javagl.jgltf.model.gl;
 
 import java.nio.ByteBuffer;
 
+import de.javagl.jgltf.model.NamedModelElement;
+
 /**
  * Interface for a shader 
  */
-public interface ShaderModel
+public interface ShaderModel extends NamedModelElement
 {
     /**
      * Enumeration of different shader types

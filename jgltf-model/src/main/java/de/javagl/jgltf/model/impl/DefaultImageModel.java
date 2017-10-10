@@ -35,7 +35,8 @@ import de.javagl.jgltf.model.io.Buffers;
 /**
  * Implementation of a {@link ImageModel}
  */
-public final class DefaultImageModel implements ImageModel
+public final class DefaultImageModel extends AbstractNamedModelElement
+    implements ImageModel
 {
     /**
      * The URI of the image

@@ -33,7 +33,7 @@ import de.javagl.jgltf.model.gl.TechniqueModel;
 /**
  * Interface for a material model
  */
-public interface MaterialModel
+public interface MaterialModel extends NamedModelElement
 {
     /**
      * Returns the {@link TechniqueModel}

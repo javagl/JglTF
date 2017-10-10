@@ -29,7 +29,7 @@ package de.javagl.jgltf.model;
 /**
  * Interface for a data accessor
  */
-public interface AccessorModel
+public interface AccessorModel extends NamedModelElement
 {
     /**
      * Returns the {@link BufferViewModel} for the data that this accessor

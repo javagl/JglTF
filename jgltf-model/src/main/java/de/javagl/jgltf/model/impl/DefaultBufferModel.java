@@ -34,7 +34,8 @@ import de.javagl.jgltf.model.io.Buffers;
 /**
  * Implementation of a {@link BufferModel}
  */
-public final class DefaultBufferModel implements BufferModel
+public final class DefaultBufferModel extends AbstractNamedModelElement
+    implements BufferModel
 {
     /**
      * The URI of the buffer data

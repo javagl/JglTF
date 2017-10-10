@@ -34,9 +34,10 @@ import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.ElementType;
 
 /**
- * Implementation of an {@link AccessorModel} based on glTF 1.0
+ * Implementation of an {@link AccessorModel}
  */
-public final class DefaultAccessorModel implements AccessorModel
+public final class DefaultAccessorModel extends AbstractNamedModelElement
+    implements AccessorModel
 {
     /**
      * The component type, as a GL constant

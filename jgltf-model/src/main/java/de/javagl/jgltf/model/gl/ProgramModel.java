@@ -26,11 +26,13 @@
  */
 package de.javagl.jgltf.model.gl;
 
+import de.javagl.jgltf.model.NamedModelElement;
+
 /**
  * Interface for a program that consists of a vertex- and fragment 
  * {@link ShaderModel}
  */
-public interface ProgramModel
+public interface ProgramModel extends NamedModelElement
 {
     /**
      * Return the {@link ShaderModel} for the vertex shader

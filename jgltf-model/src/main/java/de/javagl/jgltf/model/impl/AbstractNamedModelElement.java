@@ -24,29 +24,34 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.model;
+package de.javagl.jgltf.model.impl;
 
-import java.util.List;
+import de.javagl.jgltf.model.NamedModelElement;
 
 /**
- * Interface for a mesh that is part of a glTF asset
+ * Abstract base implementation of the {@link NamedModelElement} interface.
  */
-public interface MeshModel extends NamedModelElement
+public class AbstractNamedModelElement implements NamedModelElement
 {
     /**
-     * Returns an unmodifiable view on the {@link MeshPrimitiveModel} objects
-     * that this mesh consists of
-     * 
-     * @return The {@link MeshPrimitiveModel} objects
+     * The name
      */
-    List<MeshPrimitiveModel> getMeshPrimitiveModels();
+    private String name;
+    
+    @Override
+    public String getName()
+    {
+        return name;
+    }
     
     /**
-     * Returns a copy of the default morph target weights, or <code>null</code> 
-     * if no default morph target weights have been defined
+     * Set the name of this model element, or <code>null</code> if this 
+     * model element does not have a name.
      * 
-     * @return A copy of the morph target weights
+     * @param name The optional name
      */
-    float[] getWeights();
+    public void setName(String name)
+    {
+        this.name = name;
+    }
 }
-

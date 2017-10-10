@@ -41,12 +41,13 @@ import de.javagl.jgltf.model.Suppliers;
 /**
  * Implementation of a {@link CameraModel}  
  */
-public final class DefaultCameraModel implements CameraModel
+public final class DefaultCameraModel extends AbstractNamedModelElement
+    implements CameraModel
 {
     /**
      * The name of this camera model, suitable to be shown to a user 
      */
-    private String name;
+    private String instanceName;
     
     /**
      * The {@link NodeModel} of the {@link Node} that the {@link Camera} 
@@ -86,11 +87,11 @@ public final class DefaultCameraModel implements CameraModel
     /**
      * Set the name of this camera model, suitable to be shown to a user
      * 
-     * @param name The name
+     * @param instanceName The instance name
      */
-    public void setName(String name)
+    public void setInstanceName(String instanceName)
     {
-        this.name = name;
+        this.instanceName = instanceName;
     }
     
     /**
@@ -105,9 +106,9 @@ public final class DefaultCameraModel implements CameraModel
     
     
     @Override
-    public String getName()
+    public String getInstanceName()
     {
-        return name;
+        return instanceName;
     }
 
     @Override

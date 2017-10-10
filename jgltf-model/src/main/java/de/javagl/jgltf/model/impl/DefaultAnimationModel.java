@@ -38,7 +38,8 @@ import de.javagl.jgltf.model.NodeModel;
 /**
  * Implementation of an {@link AnimationModel}
  */
-public class DefaultAnimationModel implements AnimationModel
+public class DefaultAnimationModel extends AbstractNamedModelElement
+    implements AnimationModel
 {
     /**
      * Default implementation of a 

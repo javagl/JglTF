@@ -42,7 +42,8 @@ import de.javagl.jgltf.model.Utils;
 /**
  * Implementation of a {@link NodeModel} 
  */
-public final class DefaultNodeModel implements NodeModel
+public final class DefaultNodeModel extends AbstractNamedModelElement
+    implements NodeModel
 {
     /**
      * A thread-local, temporary 16-element matrix

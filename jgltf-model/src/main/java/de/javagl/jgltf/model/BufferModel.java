@@ -31,7 +31,7 @@ import java.nio.ByteBuffer;
 /**
  * Interface for a buffer of a glTF asset
  */
-public interface BufferModel
+public interface BufferModel extends NamedModelElement
 {
     /**
      * Returns the URI of the buffer data

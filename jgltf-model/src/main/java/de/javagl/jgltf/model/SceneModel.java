@@ -31,7 +31,7 @@ import java.util.List;
 /**
  * Interface for a scene that was read from a glTF asset
  */
-public interface SceneModel
+public interface SceneModel extends NamedModelElement
 {
     /**
      * Returns an unmodifiable view on the the list of all root 
