@@ -32,6 +32,7 @@ import de.javagl.jgltf.impl.v2.Material;
 import de.javagl.jgltf.impl.v2.MaterialPbrMetallicRoughness;
 import de.javagl.jgltf.impl.v2.Texture;
 import de.javagl.jgltf.impl.v2.TextureInfo;
+import de.javagl.obj.FloatTuple;
 import de.javagl.obj.Mtl;
 import de.javagl.obj.ReadableObj;
 
@@ -74,10 +75,35 @@ public class MtlMaterialHandlerV2
         {
             return createMaterialWithTexture(withNormals, mtl);
         }
-        return createMaterialWithColor(
+        Material material = createMaterialWithColor(
             withNormals, 0.75f, 0.75f, 0.75f);
+        if (mtl == null)
+        {
+            return material;
+        }
+
+        // If there is an MTL, try to translate some of the MTL
+        // information into reasonable PBR information
+
+        FloatTuple ambientColor = mtl.getKd();
+        float r = ambientColor.get(0);
+        float g = ambientColor.get(1);
+        float b = ambientColor.get(2);
+        float opacity = mtl.getD();
+        if (opacity < 1.0f)
+        {
+            material.setAlphaMode("BLEND");
+        }
+        MaterialPbrMetallicRoughness pbr = material.getPbrMetallicRoughness();
+        float[] baseColorFactor = new float[] { r, g, b, opacity };
+        pbr.setBaseColorFactor(baseColorFactor);
+
+        float shininess = mtl.getNs();
+        pbr.setMetallicFactor(shininess / 128f);
+
+        material.setDoubleSided(true);
+        return material;
     }
-    
 
     /**
      * Create a simple {@link Material} with a texture that will be taken from 
