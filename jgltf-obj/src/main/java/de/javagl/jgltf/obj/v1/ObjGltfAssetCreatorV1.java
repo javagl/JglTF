@@ -68,13 +68,13 @@ import de.javagl.jgltf.model.io.v1.GltfAssetV1;
 import de.javagl.jgltf.model.v1.GltfIds;
 import de.javagl.jgltf.obj.BufferStrategy;
 import de.javagl.jgltf.obj.IntBuffers;
-import de.javagl.jgltf.obj.ObjSplitting;
 import de.javagl.obj.Mtl;
 import de.javagl.obj.MtlReader;
 import de.javagl.obj.Obj;
 import de.javagl.obj.ObjData;
 import de.javagl.obj.ObjGroup;
 import de.javagl.obj.ObjReader;
+import de.javagl.obj.ObjSplitting;
 import de.javagl.obj.ObjUtils;
 import de.javagl.obj.ReadableObj;
 
@@ -83,13 +83,6 @@ import de.javagl.obj.ReadableObj;
  */
 public class ObjGltfAssetCreatorV1
 {
-    // TODO The configuration, consisting of the BufferStrategy,
-    // the indicesComponentType and the OBJ splitter, should be
-    // summarized in a dedicated class, to ensure consistency:
-    // Currently, the splitter does not consider the indices
-    // component type, but always splits assuming that the 
-    // component type should be GL_UNSIGNED_SHORT
-    
     // TODO Obviously, there's a lot of code duplication between
     // here and ObjGltfAssetCreatorV2. Try to refactor this.
     
@@ -134,7 +127,7 @@ public class ObjGltfAssetCreatorV1
      * A function that will receive all OBJ groups that should be processed,
      * and may (or may not) split them into multiple parts. 
      */
-    private final Function<? super ReadableObj, List<? extends ReadableObj>> 
+    private Function<? super ReadableObj, List<? extends ReadableObj>> 
         objSplitter;
     
     /**
@@ -159,7 +152,7 @@ public class ObjGltfAssetCreatorV1
     public ObjGltfAssetCreatorV1(BufferStrategy bufferStrategy)
     {
         this.bufferStrategy = bufferStrategy;
-        this.objSplitter = ObjSplitting::split;
+        setIndicesComponentType(GltfConstants.GL_UNSIGNED_SHORT);
     }
     
     /**
@@ -193,6 +186,23 @@ public class ObjGltfAssetCreatorV1
                 GltfConstants.stringFor(indicesComponentType));
         }
         this.indicesComponentType = indicesComponentType;
+
+        if (indicesComponentType == GltfConstants.GL_UNSIGNED_INT)
+        {
+            this.objSplitter = obj -> Collections.singletonList(obj);
+        }
+        else if (indicesComponentType == GltfConstants.GL_UNSIGNED_SHORT)
+        {
+            int maxNumVertices = 65536 - 3;
+            this.objSplitter = 
+                obj -> ObjSplitting.splitByMaxNumVertices(obj, maxNumVertices);
+        }
+        else if (indicesComponentType == GltfConstants.GL_UNSIGNED_BYTE)
+        {
+            int maxNumVertices = 256 - 3;
+            this.objSplitter = 
+                obj -> ObjSplitting.splitByMaxNumVertices(obj, maxNumVertices);
+        }
     }
     
     /**

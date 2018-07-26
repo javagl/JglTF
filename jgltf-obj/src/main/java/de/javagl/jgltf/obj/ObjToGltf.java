@@ -34,6 +34,7 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.logging.Logger;
 
+import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.GltfModels;
 import de.javagl.jgltf.model.io.GltfAsset;
@@ -46,9 +47,6 @@ import de.javagl.jgltf.obj.v2.ObjGltfAssetCreatorV2;
  */
 public class ObjToGltf
 {
-    // TODO Offer an option to set the indices component type,
-    // via ObjGltfDataCreator#setIndicesComponentType
-    
     /**
      * The logger used in this class
      */
@@ -76,6 +74,7 @@ public class ObjToGltf
         boolean embedded = false;
         boolean binary = false;
         BufferStrategy bufferStrategy = BufferStrategy.BUFFER_PER_FILE;
+        int indicesComponentType = GltfConstants.GL_UNSIGNED_SHORT;
         int version = 2;
         for (String arg : args)
         {
@@ -113,6 +112,28 @@ public class ObjToGltf
                 else
                 {
                     System.err.println("Invalid buffer strategy: " + s);
+                    displayHelp();
+                    return;
+                }
+            }
+            else if (arg.startsWith("-c"))
+            {
+                String s = arg.substring(3);
+                if (s.equals("GL_UNSIGNED_BYTE"))
+                {
+                    indicesComponentType = GltfConstants.GL_UNSIGNED_BYTE;
+                }
+                else if (s.equals("GL_UNSIGNED_SHORT"))
+                {
+                    indicesComponentType = GltfConstants.GL_UNSIGNED_SHORT;
+                }
+                else if (s.equals("GL_UNSIGNED_INT"))
+                {
+                    indicesComponentType = GltfConstants.GL_UNSIGNED_INT;
+                }
+                else
+                {
+                    System.err.println("Invalid indices component type: " + s);
                     displayHelp();
                     return;
                 }
@@ -162,12 +183,14 @@ public class ObjToGltf
         {
             ObjGltfAssetCreatorV1 gltfAssetCreator = 
                 new ObjGltfAssetCreatorV1(bufferStrategy);
+            gltfAssetCreator.setIndicesComponentType(indicesComponentType);
             gltfAsset = gltfAssetCreator.create(objUri);
         }
         else
         {
             ObjGltfAssetCreatorV2 gltfAssetCreator = 
                 new ObjGltfAssetCreatorV2(bufferStrategy);
+            gltfAssetCreator.setIndicesComponentType(indicesComponentType);
             gltfAsset = gltfAssetCreator.create(objUri);
         }
         GltfModel gltfModel = GltfModels.create(gltfAsset);
@@ -216,16 +239,23 @@ public class ObjToGltf
         System.out.println("  -e          : Write the output as embedded glTF");
         System.out.println("  -b          : Write the output as binary glTF");
         System.out.println("  -s=         : The buffer strategy:");
-        System.out.println("     file     : Create one buffer for the whole file");
-        System.out.println("     group    : Create one buffer for each material group");
-        System.out.println("     part     : Create one buffer for each part");
+        System.out.println("     file     : "
+            + "Create one buffer for the whole file");
+        System.out.println("     group    : "
+            + "Create one buffer for each material group");
+        System.out.println("     part     : "
+            + "Create one buffer for each part");
+        System.out.println("  -c=<type>   : The indices component type. "
+            + "The <type> may be GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT "
+            + "or GL_UNSIGNED_INT. The default is GL_UNSIGNED_SHORT");
         System.out.println("  -h          : Print this message.");
-        System.out.println("  -v=<number> : The target glTF version. The number may be 1 or 2. The default is 2.");
+        System.out.println("  -v=<number> : The target glTF version. "
+            + "The <number> may be 1 or 2. The default is 2.");
         System.out.println("");
         System.out.println("Example: ");
         System.out.println("========");
         System.out.println("");
-        System.out.println("  ObjToGltf -b -s=part -i=C:/Input/Example.obj " + 
-            "-o=C:/Output/Example.glb");
+        System.out.println("  ObjToGltf -b -s=part -i=C:/Input/Example.obj " 
+            + "-o=C:/Output/Example.glb");
     }
 }
