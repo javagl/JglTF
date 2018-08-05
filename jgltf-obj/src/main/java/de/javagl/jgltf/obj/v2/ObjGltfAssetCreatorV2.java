@@ -68,6 +68,7 @@ import de.javagl.jgltf.model.io.UriResolvers;
 import de.javagl.jgltf.model.io.v2.GltfAssetV2;
 import de.javagl.jgltf.obj.BufferStrategy;
 import de.javagl.jgltf.obj.IntBuffers;
+import de.javagl.jgltf.obj.ObjNormals;
 import de.javagl.obj.Mtl;
 import de.javagl.obj.MtlReader;
 import de.javagl.obj.Obj;
@@ -644,6 +645,7 @@ public class ObjGltfAssetCreatorV2
         FloatBuffer objNormals = ObjData.getNormals(part);
         if (objNormals.capacity() > 0)
         {
+            ObjNormals.normalize(objNormals);
             int normalsAccessorIndex = 
                 bufferStructureBuilder.getNumAccessorModels();
             bufferStructureBuilder.createAccessorModel(
