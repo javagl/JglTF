@@ -85,8 +85,12 @@ public class RawBinaryGltfDataReaderV1
             data, headerLength, contentLength);
         int bodyByteOffset = headerLength + contentLength;
         int bodyByteLength = length - bodyByteOffset;
-        ByteBuffer bodyData = Buffers.createSlice(
-            data, bodyByteOffset, bodyByteLength);
+        ByteBuffer bodyData = null;
+        if (bodyByteLength > 0)
+        {
+            bodyData = Buffers.createSlice(
+                data, bodyByteOffset, bodyByteLength);
+        }
         
         return new RawGltfData(contentData, bodyData);
     }

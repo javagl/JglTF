@@ -68,7 +68,7 @@ public class RawBinaryGltfDataReaderV2
                 + CHUNK_TYPE_JSON + "), but found " + jsonChunk.type);
         }
         ByteBuffer jsonData = jsonChunk.data;
-        ByteBuffer binData = ByteBuffer.allocateDirect(0);
+        ByteBuffer binData = null;
         if (chunks.size() > 1)
         {
             Chunk binChunk = chunks.get(1);
@@ -130,7 +130,10 @@ public class RawBinaryGltfDataReaderV2
                     + " is larger than capacity of the buffer, which is only "
                     + data.capacity());
             }
-            chunk.data = Buffers.createSlice(data, offset, chunk.length);
+            if (chunk.length > 0)
+            {
+                chunk.data = Buffers.createSlice(data, offset, chunk.length);
+            }
             offset += chunk.length;
             chunks.add(chunk);
         }

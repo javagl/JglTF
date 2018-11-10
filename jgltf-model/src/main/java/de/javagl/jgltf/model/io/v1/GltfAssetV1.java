@@ -44,6 +44,7 @@ import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.model.io.GltfAsset;
 import de.javagl.jgltf.model.io.GltfReference;
+import de.javagl.jgltf.model.io.IO;
 import de.javagl.jgltf.model.v1.BinaryGltfV1;
 
 /**
@@ -138,11 +139,14 @@ public final class GltfAssetV1 implements GltfAsset
             }
             Buffer buffer = buffers.get(bufferId);
             String uri = buffer.getUri();
-            Consumer<ByteBuffer> target = 
-                byteBuffer -> putReferenceData(uri, byteBuffer);
-            GltfReference reference = 
-                new GltfReference(bufferId, uri, target);
-            references.add(reference);
+            if (!IO.isDataUriString(uri))
+            {
+                Consumer<ByteBuffer> target = 
+                    byteBuffer -> putReferenceData(uri, byteBuffer);
+                GltfReference reference = 
+                    new GltfReference(bufferId, uri, target);
+                references.add(reference);
+            }
         }
         return references;
     }
@@ -166,11 +170,14 @@ public final class GltfAssetV1 implements GltfAsset
                 continue;
             }
             String uri = image.getUri();
-            Consumer<ByteBuffer> target = 
-                byteBuffer -> putReferenceData(uri, byteBuffer);
-            GltfReference reference = 
-                new GltfReference(imageId, uri, target);
-            references.add(reference);
+            if (!IO.isDataUriString(uri))
+            {
+                Consumer<ByteBuffer> target = 
+                    byteBuffer -> putReferenceData(uri, byteBuffer);
+                GltfReference reference = 
+                    new GltfReference(imageId, uri, target);
+                references.add(reference);
+            }
         }
         return references;
     }
@@ -194,11 +201,14 @@ public final class GltfAssetV1 implements GltfAsset
                 continue;
             }
             String uri = shader.getUri();
-            Consumer<ByteBuffer> target = 
-                byteBuffer -> putReferenceData(uri, byteBuffer);
-            GltfReference reference = 
-                new GltfReference(shaderId, uri, target);
-            references.add(reference);
+            if (!IO.isDataUriString(uri))
+            {
+                Consumer<ByteBuffer> target = 
+                    byteBuffer -> putReferenceData(uri, byteBuffer);
+                GltfReference reference = 
+                    new GltfReference(shaderId, uri, target);
+                references.add(reference);
+            }
         }
         return references;
     }

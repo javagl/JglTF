@@ -111,6 +111,8 @@ import de.javagl.jgltf.model.impl.DefaultNodeModel;
 import de.javagl.jgltf.model.impl.DefaultSceneModel;
 import de.javagl.jgltf.model.impl.DefaultSkinModel;
 import de.javagl.jgltf.model.impl.DefaultTextureModel;
+import de.javagl.jgltf.model.io.Buffers;
+import de.javagl.jgltf.model.io.IO;
 import de.javagl.jgltf.model.io.v1.GltfAssetV1;
 import de.javagl.jgltf.model.v1.gl.DefaultModels;
 import de.javagl.jgltf.model.v1.gl.GltfDefaults;
@@ -249,7 +251,16 @@ public final class GltfModelV1 implements GltfModel
         this.gltfAsset = Objects.requireNonNull(gltfAsset, 
             "The gltf may not be null");
         this.gltf = gltfAsset.getGltf();
-        this.binaryData = gltfAsset.getBinaryData();
+
+        ByteBuffer binaryData = gltfAsset.getBinaryData();
+        if (binaryData != null && binaryData.capacity() > 0)
+        {
+            this.binaryData = binaryData;
+        }
+        else
+        {
+            this.binaryData = null;
+        }
         
         this.indexMappingSet = IndexMappingSets.create(gltf);
         
@@ -717,8 +728,17 @@ public final class GltfModelV1 implements GltfModel
             else
             {
                 String uri = image.getUri();
-                ByteBuffer imageData = gltfAsset.getReferenceData(uri);
-                imageModel.setImageData(imageData);
+                if (IO.isDataUriString(uri))
+                {
+                    byte data[] = IO.readDataUri(uri);
+                    ByteBuffer imageData = Buffers.create(data);
+                    imageModel.setImageData(imageData);
+                }
+                else
+                {
+                    ByteBuffer imageData = gltfAsset.getReferenceData(uri);
+                    imageModel.setImageData(imageData);
+                }
             }
         }
     }
@@ -820,8 +840,17 @@ public final class GltfModelV1 implements GltfModel
             else
             {
                 String uri = buffer.getUri();
-                ByteBuffer bufferData = gltfAsset.getReferenceData(uri);
-                bufferModel.setBufferData(bufferData);
+                if (IO.isDataUriString(uri))
+                {
+                    byte data[] = IO.readDataUri(uri);
+                    ByteBuffer bufferData = Buffers.create(data);
+                    bufferModel.setBufferData(bufferData);
+                }
+                else
+                {
+                    ByteBuffer bufferData = gltfAsset.getReferenceData(uri);
+                    bufferModel.setBufferData(bufferData);
+                }
             }
         }
     }
@@ -1181,10 +1210,18 @@ public final class GltfModelV1 implements GltfModel
             else
             {
                 String uri = shader.getUri();
-                ByteBuffer shaderData = gltfAsset.getReferenceData(uri);
-                shaderModel.setShaderData(shaderData);
+                if (IO.isDataUriString(uri))
+                {
+                    byte data[] = IO.readDataUri(uri);
+                    ByteBuffer shaderData = Buffers.create(data);
+                    shaderModel.setShaderData(shaderData);
+                }
+                else
+                {
+                    ByteBuffer shaderData = gltfAsset.getReferenceData(uri);
+                    shaderModel.setShaderData(shaderData);
+                }
             }
-            
         }
     }
     
