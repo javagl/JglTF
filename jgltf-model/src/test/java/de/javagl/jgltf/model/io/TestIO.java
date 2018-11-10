@@ -217,6 +217,21 @@ public class TestIO
     }
     
     /**
+     * Normalize the line separators in the given string, by replacing 
+     * all <code>"\r\n"</code> and <code>"\r"</code> with <code>"\n"</code>
+     *   
+     * @param s The input string
+     * @return The normalized string
+     */
+    private static String normalizeLineSeparators(String s)
+    {
+        String result = s;
+        result = result.replaceAll("\\r\\n", "\n");
+        result = result.replaceAll("\\r", "\n");
+        return result;
+    }
+
+    /**
      * Convert the given bytes into a string, using the default charset,
      * and normalize the line separators, by replacing all <code>"\r\n"</code>
      * and <code>"\r"</code> with <code>"\n"</code>
@@ -226,11 +241,7 @@ public class TestIO
      */
     private static String normalizeLineSeparators(byte bytes[])
     {
-        String s = new String(bytes);
-        s = s.replaceAll("\\r\\n", "\n");
-        s = s.replaceAll("\\r", "\n");
-        return s;
-        
+        return normalizeLineSeparators(new String(bytes));
     }
     
     
