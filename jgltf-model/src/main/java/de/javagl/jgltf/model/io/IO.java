@@ -266,7 +266,7 @@ public class IO
      * @throws IllegalArgumentException If the given string is not a valid
      * Base64 encoded data URI string
      */
-    private static byte[] readDataUri(String uriString)
+    public static byte[] readDataUri(String uriString)
     {
         String encoding = "base64,";
         int encodingIndex = uriString.indexOf(encoding);
