@@ -52,11 +52,11 @@ import de.javagl.swing.tasks.SwingTaskExecutors;
 import de.javagl.swing.tasks.SwingTaskViews;
 
 /**
- * The worker class for loading a {@link GltfAsset} from a URI. This is a 
+ * The worker class for loading a {@link GltfModel} from a URI. This is a 
  * swing task that performs the loading in a background thread, while 
  * showing a modal dialog with progress information. 
  */
-final class GltfLoadingWorker extends SwingTask<GltfAsset, Object>
+final class GltfLoadingWorker extends SwingTask<GltfModel, Object>
 {
     /**
      * The logger used in this class
@@ -126,7 +126,7 @@ final class GltfLoadingWorker extends SwingTask<GltfAsset, Object>
     }
 
     @Override
-    protected GltfAsset doInBackground() throws IOException
+    protected GltfModel doInBackground() throws IOException
     {
         String message = "Loading glTF from " + IO.extractFileName(uri);
         long contentLength = IO.getContentLength(uri);
@@ -159,7 +159,9 @@ final class GltfLoadingWorker extends SwingTask<GltfAsset, Object>
                     jsonError.getJsonPathString() + "\n";
             gltfLoaderPanel.appendMessage(jsonErrorString);
         });
-        return gltfAssetReaderThreaded.readGltfAsset(uri);
+        GltfAsset gltfAsset = gltfAssetReaderThreaded.readGltfAsset(uri);
+        GltfModel gltfModel = GltfModels.create(gltfAsset);
+        return gltfModel;
     }
 
     @Override
@@ -167,9 +169,8 @@ final class GltfLoadingWorker extends SwingTask<GltfAsset, Object>
     {
         try
         {
-            GltfAsset gltfAsset = get();
+            GltfModel gltfModel = get();
             String fileName = IO.extractFileName(uri);
-            GltfModel gltfModel = GltfModels.create(gltfAsset);
             owner.createGltfBrowserPanel(fileName, gltfModel);
         } 
         catch (CancellationException e)
