@@ -3,10 +3,22 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>9</version>
+  </parent>
+
   <groupId>de.javagl</groupId>
   <artifactId>jgltf-parent</artifactId>
   <packaging>pom</packaging>
   <version>2.0.0-SNAPSHOT</version>
+
+  <scm>
+    <connection>scm:git:git@github.com:javagl/JglTF.git</connection>
+    <developerConnection>scm:git:git@github.com:javagl/JglTF.git</developerConnection>
+    <url>git@github.com:javagl/JglTF.git</url>
+  </scm>
 
   <developers>
     <developer>
@@ -32,7 +44,6 @@
     <module>jgltf-impl-v2</module>
     <module>jgltf-impl-v2-technique-webgl</module>
     <module>jgltf-model</module>
-    <module>jgltf-browser</module>
     <module>jgltf-obj</module>
     <module>jgltf-validator</module>
     <module>jgltf-viewer</module>
