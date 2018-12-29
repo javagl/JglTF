@@ -18,6 +18,8 @@
 /jgltf-model/src/test/resources/testModels/testBox/output-glTF-to-glTF-Embedded
 /jgltf-model/src/test/resources/testModels/testBox/output-glTF-to-glTF
 /jgltf-model/src/test/resources/testModels/testBox/output-glTF-to-glTF-Binary
+/jgltf-model-builder
+/jgltf-converter
 /target
 /jgltf-obj/.classpath
 /jgltf-obj/.project
