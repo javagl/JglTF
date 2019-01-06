@@ -968,14 +968,10 @@ public final class GltfModelV2 implements GltfModel
             float translation[] = node.getTranslation();
             float rotation[] = node.getRotation();
             float scale[] = node.getScale();
-            nodeModel.setMatrix(
-                matrix == null ? null : matrix.clone());
-            nodeModel.setTranslation(
-                translation == null ? null : translation.clone());
-            nodeModel.setRotation(
-                rotation == null ? null : rotation.clone());
-            nodeModel.setScale(
-                scale == null ? null : scale.clone());
+            nodeModel.setMatrix(Optionals.clone(matrix));
+            nodeModel.setTranslation(Optionals.clone(translation));
+            nodeModel.setRotation(Optionals.clone(rotation));
+            nodeModel.setScale(Optionals.clone(scale));
             
             List<Float> weights = node.getWeights();
             if (weights != null)

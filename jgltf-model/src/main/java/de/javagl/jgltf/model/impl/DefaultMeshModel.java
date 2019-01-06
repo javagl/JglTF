@@ -32,6 +32,7 @@ import java.util.List;
 
 import de.javagl.jgltf.model.MeshModel;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
+import de.javagl.jgltf.model.Optionals;
 
 /**
  * Implementation of a {@link MeshModel}
@@ -75,7 +76,7 @@ public final class DefaultMeshModel extends AbstractNamedModelElement
      */
     public void setWeights(float[] weights)
     {
-        this.weights = weights == null ? null : weights.clone();
+        this.weights = Optionals.clone(weights);
     }
     
     @Override
@@ -87,7 +88,7 @@ public final class DefaultMeshModel extends AbstractNamedModelElement
     @Override
     public float[] getWeights()
     {
-        return weights == null ? null : weights.clone();
+        return Optionals.clone(weights);
     }
 
 }

@@ -133,6 +133,22 @@ public class Optionals
     }
     
     /**
+     * Returns a clone of the given array, or <code>null</code> if the
+     * given array is <code>null</code>
+     * 
+     * @param array The array
+     * @return The result
+     */
+    public static float[] clone(float array[])
+    {
+        if (array == null)
+        {
+            return null;
+        }
+        return array.clone();
+    }
+    
+    /**
      * Private constructor to prevent instantiation
      */
     private Optionals()
