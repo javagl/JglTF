@@ -635,13 +635,10 @@ public class ObjGltfAssetCreatorV1
         meshPrimitive.addAttributes("POSITION", positionsAccessorId);
 
         // Add the texture coordinates from the OBJ to the buffer structure
-        FloatBuffer objTexCoords = ObjData.getTexCoords(part, 2);
+        boolean flipY = true;
+        FloatBuffer objTexCoords = ObjData.getTexCoords(part, 2, flipY);
         if (objTexCoords.capacity() > 0)
         {
-            for (int j = 1; j < objTexCoords.capacity(); j += 2)
-            {
-                objTexCoords.put(j, 1.0f - objTexCoords.get(j));
-            }
             String texCoordsAccessorId = partName + "_texcoords0";
             bufferStructureBuilder.createAccessorModel(
                 texCoordsAccessorId, GltfConstants.GL_FLOAT, "VEC2", 
