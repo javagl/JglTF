@@ -151,7 +151,6 @@ public interface NodeModel extends NamedModelElement
      * array. 
      * 
      * @param weights The weights
-     * @throws IllegalArgumentException If the given 
      */
     void setWeights(float weights[]);
     
