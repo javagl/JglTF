@@ -35,6 +35,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
+import de.javagl.jgltf.impl.v2.Material;
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.CameraModel;
@@ -46,12 +47,15 @@ import de.javagl.jgltf.model.MeshPrimitiveModel;
 import de.javagl.jgltf.model.NodeModel;
 import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.SceneModel;
+import de.javagl.jgltf.model.SkinModel;
 import de.javagl.jgltf.model.TextureModel;
 import de.javagl.jgltf.model.gl.ProgramModel;
 import de.javagl.jgltf.model.gl.TechniqueModel;
 import de.javagl.jgltf.model.gl.TechniqueParametersModel;
 import de.javagl.jgltf.model.gl.TechniqueStatesFunctionsModel;
 import de.javagl.jgltf.model.gl.TechniqueStatesModel;
+import de.javagl.jgltf.model.v1.MaterialModelV1;
+import de.javagl.jgltf.model.v2.MaterialModelV2;
 import de.javagl.jgltf.viewer.Morphing.MorphableAttribute;
 
 /**
@@ -101,9 +105,14 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
     private final UniformSetterFactory uniformSetterFactory;
     
     /**
+     * The {@link MaterialModelHandler}
+     */
+    private final MaterialModelHandler materialModelHandler;
+    
+    /**
      * A function that is used for looking up the {@link TextureModel} for
-     * a reference that is given in a {@link MaterialModel}. The 
-     * {@link MaterialModel#getValues() material values} may contain
+     * a reference that is given in a {@link RenderedMaterial}. The 
+     * {@link RenderedMaterial#getValues() material values} may contain
      * a reference to a texture for one of the uniform names. This
      * reference may be a texture ID (for glTF 1.0) or a texture index
      * (for glTF 2.0). 
@@ -122,7 +131,6 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
      */
     private final List<Runnable> transparentRenderCommands;
     
-    
     /**
      * Creates a new instance that renders the given {@link GltfModel} using 
      * the given {@link GlContext}.<br>
@@ -138,7 +146,7 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
      * @param glContext The {@link GlContext}
      * @param textureModelLookup A function that is used for looking up 
      * the {@link TextureModel} for a reference that is given in the 
-     * {@link MaterialModel#getValues() material values}
+     * {@link RenderedMaterial#getValues() material values}
      * @param viewConfiguration The {@link ViewConfiguration}
      */
     public DefaultRenderedGltfModel(
@@ -159,6 +167,8 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
             viewConfiguration::getViewMatrix,
             viewConfiguration::getProjectionMatrix);
         this.uniformSetterFactory = new UniformSetterFactory(glContext);
+        
+        this.materialModelHandler = new MaterialModelHandler();
 
         this.opaqueRenderCommands = new ArrayList<Runnable>();
         this.transparentRenderCommands = new ArrayList<Runnable>();
@@ -255,6 +265,43 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
         logger.fine("Processing node " + nodeModel + " DONE");
 
     }
+    
+    /**
+     * Obtain a {@link RenderedMaterial} instance that represents the 
+     * material for the given {@link MaterialModel}
+     * 
+     * @param nodeModel The {@link NodeModel} to which the currently 
+     * rendered object belongs
+     * @param materialModel The {@link MaterialModel}
+     * @return The {@link RenderedMaterial}
+     */
+    private RenderedMaterial obtainRenderedMaterial(
+        NodeModel nodeModel, MaterialModel materialModel)
+    {
+        if (materialModel instanceof MaterialModelV1)
+        {
+            MaterialModelV1 materialModelV1 = (MaterialModelV1)materialModel;
+            TechniqueModel techniqueModel = 
+                materialModelV1.getTechniqueModel();
+            Map<String, Object> values = materialModelV1.getValues();
+            return new RenderedMaterial(techniqueModel, values);
+        }
+        if (materialModel instanceof MaterialModelV2)
+        {
+            MaterialModelV2 materialModelV2 = (MaterialModelV2)materialModel;
+            Material material = materialModelV2.getMaterial();
+            SkinModel skinModel = nodeModel.getSkinModel();
+            int numJoints = 0;
+            if (skinModel != null)
+            {
+                numJoints = skinModel.getJoints().size();
+            }
+            return materialModelHandler.createRenderedMaterial(
+                material, numJoints);
+        }
+        logger.severe("Unknown material model type: " + materialModel);
+        return null;
+    }
 
     /**
      * Process the given {@link MeshPrimitiveModel} that was found in a
@@ -271,7 +318,9 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
         logger.fine("Processing meshPrimitive...");
 
         MaterialModel materialModel = meshPrimitiveModel.getMaterialModel();
-        TechniqueModel techniqueModel = materialModel.getTechniqueModel();
+        RenderedMaterial renderedMaterial = 
+            obtainRenderedMaterial(nodeModel, materialModel);
+        TechniqueModel techniqueModel = renderedMaterial.getTechniqueModel();
         ProgramModel programModel = techniqueModel.getProgramModel();
 
         // Obtain the GL program for the Program of the Technique
@@ -300,7 +349,7 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
         // Create the commands to set the uniforms
         List<Runnable> uniformSettingCommands = 
             createUniformSettingCommands(
-                materialModel, nodeModel, glProgram);
+                renderedMaterial, nodeModel, glProgram);
         commands.addAll(uniformSettingCommands);
 
         // Create the commands to set the technique.states and 
@@ -419,21 +468,22 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
     
     /**
      * Create a list of commands that set the values of the uniforms of the 
-     * given {@link MaterialModel} in the {@link GlContext}.
+     * given {@link RenderedMaterial} in the {@link GlContext}.
      * 
-     * @param materialModel The {@link MaterialModel}
+     * @param renderedMaterial The {@link RenderedMaterial}
      * @param nodeModel The {@link NodeModel} that contains the rendered
      * object
      * @param glProgram The OpenGL program
      * @return The list of commands
      */
     private List<Runnable> createUniformSettingCommands(
-        MaterialModel materialModel, NodeModel nodeModel, Integer glProgram)
+        RenderedMaterial renderedMaterial, 
+        NodeModel nodeModel, Integer glProgram)
     {
         List<Runnable> uniformSettingCommands =
             new ArrayList<Runnable>();
         
-        TechniqueModel techniqueModel = materialModel.getTechniqueModel();
+        TechniqueModel techniqueModel = renderedMaterial.getTechniqueModel();
         Map<String, String> uniforms = techniqueModel.getUniforms();
         int textureCounter = 0;
         for (String uniformName : uniforms.keySet())
@@ -446,7 +496,7 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
             // the the uniform
             Supplier<?> uniformValueSupplier = 
                 uniformGetterFactory.createUniformValueSupplier(
-                    uniformName, materialModel, nodeModel);
+                    uniformName, renderedMaterial, nodeModel);
             
             // Create the command for setting the uniform value
             // in the GL context
@@ -652,7 +702,9 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
         List<Runnable> attributeUpdateCommands = new ArrayList<Runnable>();
 
         MaterialModel materialModel = meshPrimitiveModel.getMaterialModel();
-        TechniqueModel techniqueModel = materialModel.getTechniqueModel();
+        RenderedMaterial renderedMaterial = 
+            obtainRenderedMaterial(nodeModel, materialModel);
+        TechniqueModel techniqueModel = renderedMaterial.getTechniqueModel();
         ProgramModel programModel = techniqueModel.getProgramModel();
 
         // Obtain the GL program for the Program of the Technique

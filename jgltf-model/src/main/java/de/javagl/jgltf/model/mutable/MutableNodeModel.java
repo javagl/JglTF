@@ -24,45 +24,42 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.model.impl;
+package de.javagl.jgltf.model.mutable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
+import de.javagl.jgltf.model.MeshModel;
 import de.javagl.jgltf.model.NodeModel;
-import de.javagl.jgltf.model.SceneModel;
-import de.javagl.jgltf.model.mutable.MutableSceneModel;
+import de.javagl.jgltf.model.SkinModel;
 
 /**
- * Implementation of a {@link SceneModel} 
+ * Interface for a {@link NodeModel} that can be modified
  */
-public class DefaultSceneModel extends AbstractNamedModelElement
-    implements MutableSceneModel
+public interface MutableNodeModel extends NodeModel
 {
     /**
-     * The list of root nodes
+     * Set the parent of this node
+     * 
+     * @param parent The parent
      */
-    private final List<NodeModel> nodeModels;
+    void setParent(MutableNodeModel parent);
     
     /**
-     * Creates a new instance
+     * Add the given child to this node
+     * 
+     * @param child The child
      */
-    public DefaultSceneModel()
-    {
-        this.nodeModels = new ArrayList<NodeModel>();
-    }
+    void addChild(MutableNodeModel child);
     
-    @Override
-    public void addNode(NodeModel node)
-    {
-       nodeModels.add(node); 
-    }
+    /**
+     * Add the given {@link MeshModel} to this node
+     * 
+     * @param meshModel The {@link MeshModel}
+     */
+    void addMeshModel(MeshModel meshModel);
     
-    @Override
-    public List<NodeModel> getNodeModels()
-    {
-        return Collections.unmodifiableList(nodeModels);
-    }
-
+    /**
+     * Set the {@link SkinModel}
+     * 
+     * @param skinModel The {@link SkinModel}
+     */
+    void setSkinModel(SkinModel skinModel);
 }

@@ -24,7 +24,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.model.v2;
+package de.javagl.jgltf.viewer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,9 +54,9 @@ import de.javagl.jgltf.model.gl.impl.DefaultShaderModel;
 import de.javagl.jgltf.model.gl.impl.DefaultTechniqueModel;
 import de.javagl.jgltf.model.gl.impl.DefaultTechniqueParametersModel;
 import de.javagl.jgltf.model.gl.impl.TechniqueStatesModels;
-import de.javagl.jgltf.model.impl.DefaultMaterialModel;
 import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.model.io.IO;
+import de.javagl.jgltf.model.v2.GltfModelV2;
 import de.javagl.jgltf.model.v2.gl.Materials;
 
 /**
@@ -249,21 +249,19 @@ class MaterialModelHandler
 
     
     /**
-     * Create a {@link MaterialModel} instance for the given {@link Material}
+     * Create a {@link RenderedMaterial} instance for the given {@link Material}
      * 
      * @param material The {@link Material}
      * @param numJoints The number of joints
-     * @return The {@link MaterialModel}
+     * @return The {@link RenderedMaterial}
      */
-    DefaultMaterialModel createMaterialModel(Material material, int numJoints)
+    RenderedMaterial createRenderedMaterial(Material material, int numJoints)
     {
-        DefaultMaterialModel materialModel = new DefaultMaterialModel();
 
         MaterialStructure materialStructure = 
             new MaterialStructure(material, numJoints);
         TechniqueModel techniqueModel = 
             obtainTechniqueModel(materialStructure);
-        materialModel.setTechniqueModel(techniqueModel);
         
         MaterialPbrMetallicRoughness pbrMetallicRoughness = 
             material.getPbrMetallicRoughness();
@@ -397,10 +395,9 @@ class MaterialModelHandler
         float lightPosition[] = { -800,500,500 };
         values.put("lightPosition", lightPosition);
         
-        
-        materialModel.setValues(values);
-        
-        return materialModel;
+        RenderedMaterial renderedMaterial = 
+            new RenderedMaterial(techniqueModel, values);
+        return renderedMaterial;
     }
     
     

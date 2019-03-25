@@ -249,8 +249,12 @@ class GltfRenderData
         int magFilter = Optionals.of(
             textureModel.getMagFilter(),
             GltfConstants.GL_LINEAR);
-        int wrapS = textureModel.getWrapS();
-        int wrapT = textureModel.getWrapT();
+        int wrapS = Optionals.of(
+            textureModel.getWrapS(),
+            GltfConstants.GL_REPEAT);
+        int wrapT = Optionals.of(
+            textureModel.getWrapT(),
+            GltfConstants.GL_REPEAT);
         
         glContext.setGlTextureParameters(
             glTexture, minFilter, magFilter, wrapS, wrapT);

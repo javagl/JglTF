@@ -28,15 +28,12 @@ package de.javagl.jgltf.viewer;
 
 import java.nio.ByteBuffer;
 
-// TODO: This interface is supposed to allow an abstraction of pixel
-// data for future implementations that are targeting Android. There,
-// the BufferedImage class is not available, so it should not appear
-// in the interfaces of the model- or viewer classes.
-
 /**
- * An interface describing (RGBA) pixel data for an image 
+ * An interface describing (RGBA) pixel data for an image.<br>
+ * <br>
+ * This class should not be considered to be part of the public API.
  */
-interface PixelData
+public interface PixelData
 {
     /**
      * Returns the width of the image

@@ -24,7 +24,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.model.v2;
+package de.javagl.jgltf.viewer;
 
 import java.util.Objects;
 
@@ -36,8 +36,9 @@ import de.javagl.jgltf.model.v2.gl.Materials;
 
 /**
  * A simple (package-private!) class describing the structure of a material.
- * It is mainly used as a key for map lookups, to decide whether for a 
- * certain structure of a material a new technique is required.
+ * It is only used as a key for map lookups in the {@link MaterialModelHandler},
+ * to decide whether for a certain structure of a material a new technique 
+ * is required.
  */
 class MaterialStructure
 {

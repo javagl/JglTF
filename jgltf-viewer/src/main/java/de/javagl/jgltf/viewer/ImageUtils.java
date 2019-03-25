@@ -41,9 +41,11 @@ import javax.imageio.ImageIO;
 import de.javagl.jgltf.model.io.Buffers;
 
 /**
- * Utility methods related to images
+ * Utility methods related to images.<br>
+ * <br>
+ * This class should not be considered to be part of the public API.
  */
-class ImageUtils
+public class ImageUtils
 {
     /**
      * Returns the contents of the given buffer as a <code>BufferedImage</code>,

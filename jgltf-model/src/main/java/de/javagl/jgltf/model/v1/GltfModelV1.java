@@ -104,7 +104,6 @@ import de.javagl.jgltf.model.impl.DefaultBufferModel;
 import de.javagl.jgltf.model.impl.DefaultBufferViewModel;
 import de.javagl.jgltf.model.impl.DefaultCameraModel;
 import de.javagl.jgltf.model.impl.DefaultImageModel;
-import de.javagl.jgltf.model.impl.DefaultMaterialModel;
 import de.javagl.jgltf.model.impl.DefaultMeshModel;
 import de.javagl.jgltf.model.impl.DefaultMeshPrimitiveModel;
 import de.javagl.jgltf.model.impl.DefaultNodeModel;
@@ -190,7 +189,7 @@ public final class GltfModelV1 implements GltfModel
      * The {@link MaterialModel} instances that have been created from
      * the {@link Material} instances
      */
-    private final List<DefaultMaterialModel> materialModels;
+    private final List<MaterialModelV1> materialModels;
     
     /**
      * The {@link MeshModel} instances that have been created from
@@ -270,7 +269,7 @@ public final class GltfModelV1 implements GltfModel
         this.bufferViewModels = new ArrayList<DefaultBufferViewModel>();
         this.cameraModels = new ArrayList<DefaultCameraModel>();
         this.imageModels = new ArrayList<DefaultImageModel>();
-        this.materialModels = new ArrayList<DefaultMaterialModel>();
+        this.materialModels = new ArrayList<MaterialModelV1>();
         this.meshModels = new ArrayList<DefaultMeshModel>();
         this.nodeModels = new ArrayList<DefaultNodeModel>();
         this.sceneModels = new ArrayList<DefaultSceneModel>();
@@ -513,7 +512,7 @@ public final class GltfModelV1 implements GltfModel
         for (Image image : images.values())
         {
             DefaultImageModel imageModel = 
-                new DefaultImageModel(null, null);
+                new DefaultImageModel();
             String uri = image.getUri();
             imageModel.setUri(uri);
             imageModels.add(imageModel);
@@ -526,9 +525,9 @@ public final class GltfModelV1 implements GltfModel
     private void createMaterialModels()
     {
         Map<String, Material> materials = Optionals.of(gltf.getMaterials());
-        for (int i = 0; i < materials.size(); i++)
+        for (Material material : materials.values())
         {
-            materialModels.add(new DefaultMaterialModel());
+            materialModels.add(new MaterialModelV1(material));
         }
     }
     
@@ -604,8 +603,12 @@ public final class GltfModelV1 implements GltfModel
             int wrapT = Optionals.of(
                 sampler.getWrapT(), sampler.defaultWrapT());
             
-            textureModels.add(new DefaultTextureModel(
-                magFilter, minFilter, wrapS, wrapT));
+            DefaultTextureModel textureModel = new DefaultTextureModel();
+            textureModel.setMagFilter(magFilter);
+            textureModel.setMinFilter(minFilter);
+            textureModel.setWrapS(wrapS);
+            textureModel.setWrapT(wrapT);
+            textureModels.add(textureModel);
         }
     }
     
@@ -1375,7 +1378,7 @@ public final class GltfModelV1 implements GltfModel
         {
             String materialId = entry.getKey();
             Material material = entry.getValue();
-            DefaultMaterialModel materialModel = 
+            MaterialModelV1 materialModel = 
                 get("materials", materialId, materialModels);
             
             materialModel.setValues(material.getValues());

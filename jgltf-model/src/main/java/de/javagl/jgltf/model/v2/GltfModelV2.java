@@ -53,6 +53,9 @@ import de.javagl.jgltf.impl.v2.Camera;
 import de.javagl.jgltf.impl.v2.GlTF;
 import de.javagl.jgltf.impl.v2.Image;
 import de.javagl.jgltf.impl.v2.Material;
+import de.javagl.jgltf.impl.v2.MaterialNormalTextureInfo;
+import de.javagl.jgltf.impl.v2.MaterialOcclusionTextureInfo;
+import de.javagl.jgltf.impl.v2.MaterialPbrMetallicRoughness;
 import de.javagl.jgltf.impl.v2.Mesh;
 import de.javagl.jgltf.impl.v2.MeshPrimitive;
 import de.javagl.jgltf.impl.v2.Node;
@@ -60,6 +63,7 @@ import de.javagl.jgltf.impl.v2.Sampler;
 import de.javagl.jgltf.impl.v2.Scene;
 import de.javagl.jgltf.impl.v2.Skin;
 import de.javagl.jgltf.impl.v2.Texture;
+import de.javagl.jgltf.impl.v2.TextureInfo;
 import de.javagl.jgltf.model.AccessorData;
 import de.javagl.jgltf.model.AccessorDatas;
 import de.javagl.jgltf.model.AccessorModel;
@@ -83,7 +87,6 @@ import de.javagl.jgltf.model.SceneModel;
 import de.javagl.jgltf.model.SkinModel;
 import de.javagl.jgltf.model.TextureModel;
 import de.javagl.jgltf.model.Utils;
-import de.javagl.jgltf.model.gl.TechniqueModel;
 import de.javagl.jgltf.model.impl.DefaultAccessorModel;
 import de.javagl.jgltf.model.impl.DefaultAnimationModel;
 import de.javagl.jgltf.model.impl.DefaultAnimationModel.DefaultChannel;
@@ -92,7 +95,6 @@ import de.javagl.jgltf.model.impl.DefaultBufferModel;
 import de.javagl.jgltf.model.impl.DefaultBufferViewModel;
 import de.javagl.jgltf.model.impl.DefaultCameraModel;
 import de.javagl.jgltf.model.impl.DefaultImageModel;
-import de.javagl.jgltf.model.impl.DefaultMaterialModel;
 import de.javagl.jgltf.model.impl.DefaultMeshModel;
 import de.javagl.jgltf.model.impl.DefaultMeshPrimitiveModel;
 import de.javagl.jgltf.model.impl.DefaultNodeModel;
@@ -171,7 +173,7 @@ public final class GltfModelV2 implements GltfModel
      * The {@link MaterialModel} instances that have been created from
      * the {@link Material} instances
      */
-    private final List<DefaultMaterialModel> materialModels;
+    private final List<MaterialModelV2> materialModels;
     
     /**
      * The {@link MeshModel} instances that have been created from
@@ -204,12 +206,6 @@ public final class GltfModelV2 implements GltfModel
     private final List<DefaultTextureModel> textureModels;
 
     /**
-     * The {@link MaterialModelHandler} that will manage the 
-     * {@link MaterialModel} instances that have to be created
-     */
-    private final MaterialModelHandler materialModelHandler;
-
-    /**
      * Creates a new model for the given glTF
      * 
      * @param gltfAsset The {@link GltfAssetV2}
@@ -236,20 +232,19 @@ public final class GltfModelV2 implements GltfModel
         this.bufferViewModels = new ArrayList<DefaultBufferViewModel>();
         this.cameraModels = new ArrayList<DefaultCameraModel>();
         this.imageModels = new ArrayList<DefaultImageModel>();
-        this.materialModels = new ArrayList<DefaultMaterialModel>();
+        this.materialModels = new ArrayList<MaterialModelV2>();
         this.meshModels = new ArrayList<DefaultMeshModel>();
         this.nodeModels = new ArrayList<DefaultNodeModel>();
         this.sceneModels = new ArrayList<DefaultSceneModel>();
         this.skinModels = new ArrayList<DefaultSkinModel>();
         this.textureModels = new ArrayList<DefaultTextureModel>();
         
-        this.materialModelHandler = new MaterialModelHandler();
-        
         createAccessorModels();
         createAnimationModels();
         createBufferModels();
         createBufferViewModels();
         createImageModels();
+        createMaterialModels();
         createMeshModels();
         createNodeModels();
         createSceneModels();
@@ -267,9 +262,9 @@ public final class GltfModelV2 implements GltfModel
         initSceneModels();
         initSkinModels();
         initTextureModels();
+        initMaterialModels();
         
         instantiateCameraModels();
-        instantiateMaterialModels();
     }
     
     
@@ -366,10 +361,24 @@ public final class GltfModelV2 implements GltfModel
             Image image = images.get(i);
             String mimeType = image.getMimeType();
             DefaultImageModel imageModel = 
-                new DefaultImageModel(mimeType, null);
+                new DefaultImageModel();
+            imageModel.setMimeType(mimeType);
             String uri = image.getUri();
             imageModel.setUri(uri);
             imageModels.add(imageModel);
+        }
+    }
+    
+    /**
+     * Create the {@link MaterialModel} instances
+     */
+    private void createMaterialModels()
+    {
+        List<Material> materials = Optionals.of(gltf.getMaterials());
+        for (int i = 0; i < materials.size(); i++)
+        {
+            Material material = materials.get(i);
+            materialModels.add(new MaterialModelV2(material));
         }
     }
     
@@ -435,8 +444,8 @@ public final class GltfModelV2 implements GltfModel
             
             Integer magFilter = GltfConstants.GL_LINEAR;
             Integer minFilter = GltfConstants.GL_LINEAR;
-            int wrapS = GltfConstants.GL_REPEAT;
-            int wrapT = GltfConstants.GL_REPEAT;
+            Integer wrapS = GltfConstants.GL_REPEAT;
+            Integer wrapT = GltfConstants.GL_REPEAT;
             
             if (samplerIndex != null)
             {
@@ -449,8 +458,12 @@ public final class GltfModelV2 implements GltfModel
                     sampler.getWrapT(), sampler.defaultWrapT());
             }
             
-            textureModels.add(new DefaultTextureModel(
-                magFilter, minFilter, wrapS, wrapT));
+            DefaultTextureModel textureModel = new DefaultTextureModel();
+            textureModel.setMagFilter(magFilter);
+            textureModel.setMinFilter(minFilter);
+            textureModel.setWrapS(wrapS);
+            textureModel.setWrapT(wrapT);
+            textureModels.add(textureModel);
         }
     }
     
@@ -875,11 +888,6 @@ public final class GltfModelV2 implements GltfModel
     /**
      * Create a {@link MeshPrimitiveModel} for the given 
      * {@link MeshPrimitive}.<br>
-     * <br>
-     * Note: The resulting {@link MeshPrimitiveModel} will not have any
-     * {@link MaterialModel} assigned. The material model may have to
-     * be instantiated multiple times, with different {@link TechniqueModel}
-     * instances. This is done in {@link #instantiateMaterialModels()}
      * 
      * @param meshPrimitive The {@link MeshPrimitive}
      * @return The {@link MeshPrimitiveModel}
@@ -925,6 +933,13 @@ public final class GltfModelV2 implements GltfModel
             }
             meshPrimitiveModel.addTarget(
                 Collections.unmodifiableMap(morphTargetModel));
+        }
+        
+        Integer materialIndex = meshPrimitive.getMaterial();
+        if (materialIndex != null)
+        {
+            MaterialModelV2 materialModel = materialModels.get(materialIndex);
+            meshPrimitiveModel.setMaterialModel(materialModel);
         }
         
         return meshPrimitiveModel;
@@ -1144,76 +1159,114 @@ public final class GltfModelV2 implements GltfModel
     }
     
     /**
-     * For each mesh that is instantiated in a node, call
-     * {@link #instantiateMaterialModels(Mesh, MeshModel, int)} 
+     * Initialize the {@link MaterialModel} instances
      */
-    private void instantiateMaterialModels()
+    private void initMaterialModels()
     {
-        List<Node> nodes = Optionals.of(gltf.getNodes());
-        List<Mesh> meshes = Optionals.of(gltf.getMeshes());
-        for (int i = 0; i < nodes.size(); i++)
+        List<Material> materials = Optionals.of(gltf.getMaterials());
+        for (int i = 0; i < materials.size(); i++)
         {
-            Node node = nodes.get(i);
+            Material material = materials.get(i);
+            MaterialModelV2 materialModel = materialModels.get(i);
             
-            Integer meshIndex = node.getMesh();
-            
-            if (meshIndex != null)
-            {
-                MeshModel meshModel = meshModels.get(meshIndex);
-                
-                int numJoints = 0;
-                Integer skinIndex = node.getSkin();
-                if (skinIndex != null)
-                {
-                    SkinModel skinModel = skinModels.get(skinIndex);
-                    numJoints = skinModel.getJoints().size();
-                }
-                Mesh mesh = meshes.get(meshIndex);
-                instantiateMaterialModels(mesh, meshModel, numJoints);
-            }
+            materialModel.setName(material.getName());
+            initMaterialModel(materialModel, material);
         }
     }
     
     /**
-     * Create the {@link MaterialModel} instances that are required for
-     * rendering the {@link MeshPrimitiveModel} instances of the given 
-     * {@link MeshModel}, based on the corresponding {@link MeshPrimitive} 
-     * and the given number of joints.
-     *  
-     * @param mesh The {@link Mesh}
-     * @param meshModel The {@link MeshModel}
-     * @param numJoints The number of joints
+     * Initialize the given {@link MaterialModelV2} based on the given
+     * {@link Material}
+     * 
+     * @param materialModel The {@link MaterialModelV2}
+     * @param material The {@link Material}
      */
-    private void instantiateMaterialModels(
-        Mesh mesh, MeshModel meshModel, int numJoints)
+    private void initMaterialModel(
+        MaterialModelV2 materialModel, Material material)
     {
-        List<MeshPrimitive> meshPrimitives = mesh.getPrimitives();
-        List<MeshPrimitiveModel> meshPrimitiveModels = 
-            meshModel.getMeshPrimitiveModels();
-        
-        for (int i = 0; i < meshPrimitives.size(); i++)
+        MaterialPbrMetallicRoughness pbrMetallicRoughness = 
+            material.getPbrMetallicRoughness();
+        if (pbrMetallicRoughness == null)
         {
-            MeshPrimitive meshPrimitive = meshPrimitives.get(i);
-            DefaultMeshPrimitiveModel meshPrimitiveModel = 
-                (DefaultMeshPrimitiveModel)meshPrimitiveModels.get(i);
-
-            Material material = null;
-            Integer materialIndex = meshPrimitive.getMaterial();
-            if (materialIndex == null)
-            {
-                material = Materials.createDefaultMaterial();
-            }
-            else
-            {
-                material = gltf.getMaterials().get(materialIndex);
-            }
-            DefaultMaterialModel materialModel = 
-                materialModelHandler.createMaterialModel(material, numJoints);
-            materialModel.setName(material.getName());
-            
-            meshPrimitiveModel.setMaterialModel(materialModel);
-            materialModels.add(materialModel);
+            pbrMetallicRoughness = 
+                Materials.createDefaultMaterialPbrMetallicRoughness();
         }
+        
+        materialModel.setDoubleSided(
+            Boolean.TRUE.equals(material.isDoubleSided()));
+        
+        TextureInfo baseColorTextureInfo = 
+            pbrMetallicRoughness.getBaseColorTexture();
+        if (baseColorTextureInfo != null)
+        {
+            int index = baseColorTextureInfo.getIndex();
+            TextureModel textureModel = textureModels.get(index);
+            materialModel.setBaseColorTexture(textureModel);
+        }
+        float[] baseColorFactor = Optionals.of(
+            pbrMetallicRoughness.getBaseColorFactor(),
+            pbrMetallicRoughness.defaultBaseColorFactor());
+        materialModel.setBaseColorFactor(baseColorFactor);
+        
+        TextureInfo metallicRoughnessTextureInfo = 
+            pbrMetallicRoughness.getMetallicRoughnessTexture();
+        if (metallicRoughnessTextureInfo != null)
+        {
+            int index = metallicRoughnessTextureInfo.getIndex();
+            TextureModel textureModel = textureModels.get(index);
+            materialModel.setMetallicRoughnessTexture(textureModel);
+        }
+        float metallicFactor = Optionals.of(
+            pbrMetallicRoughness.getMetallicFactor(),
+            pbrMetallicRoughness.defaultMetallicFactor());
+        materialModel.setMetallicFactor(metallicFactor);
+        
+        float roughnessFactor = Optionals.of(
+            pbrMetallicRoughness.getRoughnessFactor(),
+            pbrMetallicRoughness.defaultRoughnessFactor());
+        materialModel.setRoughnessFactor(roughnessFactor);
+        
+        MaterialNormalTextureInfo normalTextureInfo = 
+            material.getNormalTexture();
+        if (normalTextureInfo != null)
+        {
+            int index = normalTextureInfo.getIndex();
+            TextureModel textureModel = textureModels.get(index);
+            materialModel.setNormalTexture(textureModel);
+            
+            float normalScale = Optionals.of(
+                normalTextureInfo.getScale(),
+                normalTextureInfo.defaultScale());
+            materialModel.setNormalScale(normalScale);
+        }
+
+        MaterialOcclusionTextureInfo occlusionTextureInfo = 
+            material.getOcclusionTexture();
+        if (occlusionTextureInfo != null)
+        {
+            int index = occlusionTextureInfo.getIndex();
+            TextureModel textureModel = textureModels.get(index);
+            materialModel.setOcclusionTexture(textureModel);
+            
+            float occlusionStrength = Optionals.of(
+                occlusionTextureInfo.getStrength(),
+                occlusionTextureInfo.defaultStrength());
+            materialModel.setOcclusionStrength(occlusionStrength);
+        }
+
+        TextureInfo emissiveTextureInfo = 
+            material.getEmissiveTexture();
+        if (emissiveTextureInfo != null)
+        {
+            int index = emissiveTextureInfo.getIndex();
+            TextureModel textureModel = textureModels.get(index);
+            materialModel.setEmissiveTexture(textureModel);
+        }
+        
+        float[] emissiveFactor = Optionals.of(
+            material.getEmissiveFactor(),
+            material.defaultEmissiveFactor());
+        materialModel.setEmissiveFactor(emissiveFactor);
     }
     
     

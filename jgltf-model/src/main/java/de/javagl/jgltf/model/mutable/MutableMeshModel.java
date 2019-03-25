@@ -24,45 +24,29 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.model.impl;
+package de.javagl.jgltf.model.mutable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import de.javagl.jgltf.model.NodeModel;
-import de.javagl.jgltf.model.SceneModel;
-import de.javagl.jgltf.model.mutable.MutableSceneModel;
+import de.javagl.jgltf.model.MeshModel;
+import de.javagl.jgltf.model.MeshPrimitiveModel;
 
 /**
- * Implementation of a {@link SceneModel} 
+ * Interface for a {@link MeshModel} that can be modified
  */
-public class DefaultSceneModel extends AbstractNamedModelElement
-    implements MutableSceneModel
+public interface MutableMeshModel extends MeshModel
 {
     /**
-     * The list of root nodes
+     * Add a {@link MeshPrimitiveModel}
+     * 
+     * @param meshPrimitiveModel The {@link MeshPrimitiveModel} to add
      */
-    private final List<NodeModel> nodeModels;
+    public void addMeshPrimitiveModel(MeshPrimitiveModel meshPrimitiveModel);
     
     /**
-     * Creates a new instance
+     * Set the default morph target weights to be a copy of the given array,
+     * or <code>null</code> if the given array is <code>null</code>.
+     * 
+     * @param weights the default morph target weights
      */
-    public DefaultSceneModel()
-    {
-        this.nodeModels = new ArrayList<NodeModel>();
-    }
+    public void setWeights(float[] weights);
     
-    @Override
-    public void addNode(NodeModel node)
-    {
-       nodeModels.add(node); 
-    }
-    
-    @Override
-    public List<NodeModel> getNodeModels()
-    {
-        return Collections.unmodifiableList(nodeModels);
-    }
-
 }

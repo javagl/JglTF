@@ -24,45 +24,47 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.model.impl;
+package de.javagl.jgltf.model.mutable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.nio.ByteBuffer;
 
-import de.javagl.jgltf.model.NodeModel;
-import de.javagl.jgltf.model.SceneModel;
-import de.javagl.jgltf.model.mutable.MutableSceneModel;
+import de.javagl.jgltf.model.BufferViewModel;
+import de.javagl.jgltf.model.ImageModel;
 
 /**
- * Implementation of a {@link SceneModel} 
+ * Interface for an {@link ImageModel} that can be modified
  */
-public class DefaultSceneModel extends AbstractNamedModelElement
-    implements MutableSceneModel
+public interface MutableImageModel extends ImageModel
 {
     /**
-     * The list of root nodes
+     * Set the URI of the image data (optional)
+     * 
+     * @param uri The URI
      */
-    private final List<NodeModel> nodeModels;
+    void setUri(String uri);
     
     /**
-     * Creates a new instance
+     * Set the MIME type of the image data that is contained in 
+     * the buffer view
+     * 
+     * @param mimeType The MIME type
      */
-    public DefaultSceneModel()
-    {
-        this.nodeModels = new ArrayList<NodeModel>();
-    }
+    void setMimeType(String mimeType);
     
-    @Override
-    public void addNode(NodeModel node)
-    {
-       nodeModels.add(node); 
-    }
+    /**
+     * Set the (optional) {@link BufferViewModel} that contains
+     * the image data
+     * 
+     * @param bufferViewModel The {@link BufferViewModel}
+     */
+    void setBufferViewModel(BufferViewModel bufferViewModel);
     
-    @Override
-    public List<NodeModel> getNodeModels()
-    {
-        return Collections.unmodifiableList(nodeModels);
-    }
-
+    /**
+     * Set the actual image data. If the given data is <code>null</code>,
+     * then calls to {@link #getImageData()} will return the data of the
+     * {@link BufferViewModel} that was set with {@link #setBufferViewModel}
+     * 
+     * @param imageData The image data
+     */
+    void setImageData(ByteBuffer imageData);
 }

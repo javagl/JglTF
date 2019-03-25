@@ -50,14 +50,14 @@ public interface TextureModel extends NamedModelElement
      * 
      * @return The constant
      */
-    int getWrapS();
+    Integer getWrapS();
 
     /**
      * Return the wrapping constant for T-direction
      * 
      * @return The constant
      */
-    int getWrapT();
+    Integer getWrapT();
     
     /**
      * Returns the {@link ImageModel} that backs this texture

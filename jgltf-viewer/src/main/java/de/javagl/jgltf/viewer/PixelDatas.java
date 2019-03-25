@@ -33,9 +33,11 @@ import java.nio.IntBuffer;
 import java.util.logging.Logger;
 
 /**
- * Methods to create {@link PixelData} objects from raw image data
+ * Methods to create {@link PixelData} objects from raw image data.<br>
+ * <br>
+ * This class should not be considered to be part of the public API.
  */
-class PixelDatas
+public class PixelDatas
 {
     /**
      * The logger used in this class

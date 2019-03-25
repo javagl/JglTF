@@ -31,12 +31,13 @@ import java.nio.ByteBuffer;
 import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.io.Buffers;
+import de.javagl.jgltf.model.mutable.MutableImageModel;
 
 /**
  * Implementation of a {@link ImageModel}
  */
-public final class DefaultImageModel extends AbstractNamedModelElement
-    implements ImageModel
+public class DefaultImageModel extends AbstractNamedModelElement
+    implements MutableImageModel
 {
     /**
      * The URI of the image
@@ -46,7 +47,7 @@ public final class DefaultImageModel extends AbstractNamedModelElement
     /**
      * The MIME type of the image data in the buffer view model
      */
-    private final String mimeType;
+    private String mimeType;
     
     /**
      * The {@link BufferViewModel}
@@ -60,44 +61,31 @@ public final class DefaultImageModel extends AbstractNamedModelElement
     
     /**
      * Creates a new instance
-     * 
-     * @param mimeType The MIME type
-     * @param bufferViewModel The {@link BufferViewModel}
      */
-    public DefaultImageModel(
-        String mimeType, BufferViewModel bufferViewModel)
+    public DefaultImageModel()
     {
-        this.mimeType = mimeType;
-        this.bufferViewModel = bufferViewModel;
+        // Default constructor
     }
     
-    /**
-     * Set the URI string of this image
-     * 
-     * @param uri The URI
-     */
+    @Override
     public void setUri(String uri)
     {
         this.uri = uri;
     }
+    
+    @Override
+    public void setMimeType(String mimeType)
+    {
+        this.mimeType = mimeType;
+    }
 
-    /**
-     * Set the {@link BufferViewModel} that this image refers to
-     * 
-     * @param bufferViewModel The {@link BufferViewModel}
-     */
+    @Override
     public void setBufferViewModel(BufferViewModel bufferViewModel)
     {
         this.bufferViewModel = bufferViewModel;
     }
     
-    /**
-     * Set the data of this image. If the given data is <code>null</code>,
-     * then calls to {@link #getImageData()} will return the data of the
-     * {@link BufferViewModel} that was set with {@link #setBufferViewModel}
-     * 
-     * @param imageData The image data
-     */
+    @Override
     public void setImageData(ByteBuffer imageData)
     {
         this.imageData = imageData;

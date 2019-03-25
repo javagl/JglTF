@@ -24,79 +24,63 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.model.impl;
+package de.javagl.jgltf.viewer;
 
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
-import de.javagl.jgltf.model.MaterialModel;
 import de.javagl.jgltf.model.gl.TechniqueModel;
 
 /**
- * Implementation of a {@link MaterialModel}
+ * A class encapsulating the {@link TechniqueModel} and the parameter values
+ * of one material for rendering 
  */
-public final class DefaultMaterialModel extends AbstractNamedModelElement
-    implements MaterialModel
+class RenderedMaterial
 {
     /**
      * The {@link TechniqueModel}
      */
-    private TechniqueModel techniqueModel;
+    private final TechniqueModel techniqueModel;
     
     /**
-     * The material parameter values
+     * The parameter values for the technique
      */
-    private Map<String, Object> values;
+    private final Map<String, Object> values;
     
     /**
      * Creates a new instance
-     */
-    public DefaultMaterialModel()
-    {
-        this.values = Collections.emptyMap();
-    }
-    
-    /**
-     * Set the material parameter values to be an unmodifiable shallow
-     * copy of the given map (or the empty map if the given map is
-     * <code>null</code>)
-     * 
-     * @param values The material parameter values
-     */
-    public void setValues(Map<String, Object> values)
-    {
-        if (values == null)
-        {
-            this.values = Collections.emptyMap();
-        }
-        else
-        {
-            this.values = Collections.unmodifiableMap(
-                new LinkedHashMap<String, Object>(values));
-        }
-    }
-    
-    /**
-     * Set the {@link TechniqueModel} 
      * 
      * @param techniqueModel The {@link TechniqueModel}
+     * @param values The parameter values for the technique
      */
-    public void setTechniqueModel(TechniqueModel techniqueModel)
+    RenderedMaterial(TechniqueModel techniqueModel,
+        Map<String, Object> values)
     {
-        this.techniqueModel = techniqueModel;
+        this.techniqueModel = Objects.requireNonNull(
+            techniqueModel, "The techniqueModel may not be null");
+        this.values = Objects.requireNonNull(
+            values, "The values may not be null");
     }
-
-    @Override
-    public TechniqueModel getTechniqueModel()
+    
+    /**
+     * Returns the {@link TechniqueModel}
+     * 
+     * @return The {@link TechniqueModel}
+     */
+    TechniqueModel getTechniqueModel()
     {
         return techniqueModel;
     }
-
-    @Override
-    public Map<String, Object> getValues()
-    {
-        return values;
-    }
     
+    /**
+     * Returns an unmodifiable view on the parameter values
+     * 
+     * @return The parameter values
+     */
+    Map<String, Object> getValues()
+    {
+        return Collections.unmodifiableMap(values);
+    }
+
 }

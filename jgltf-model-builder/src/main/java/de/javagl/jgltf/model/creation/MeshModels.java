@@ -24,45 +24,33 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.model.impl;
+package de.javagl.jgltf.model.creation;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import de.javagl.jgltf.model.NodeModel;
-import de.javagl.jgltf.model.SceneModel;
-import de.javagl.jgltf.model.mutable.MutableSceneModel;
+import de.javagl.jgltf.model.MeshModel;
+import de.javagl.jgltf.model.impl.DefaultMeshModel;
+import de.javagl.jgltf.model.mutable.MutableMeshModel;
 
 /**
- * Implementation of a {@link SceneModel} 
+ * Methods to create {@link MeshModel} instances
  */
-public class DefaultSceneModel extends AbstractNamedModelElement
-    implements MutableSceneModel
+public class MeshModels 
 {
     /**
-     * The list of root nodes
+     * Create a new {@link MutableMeshModel}
+     * 
+     * @return The instance
      */
-    private final List<NodeModel> nodeModels;
+    public static MutableMeshModel create()
+    {
+        return new DefaultMeshModel();
+    }
     
     /**
-     * Creates a new instance
+     * Private constructor to prevent instantiation
      */
-    public DefaultSceneModel()
+    private MeshModels()
     {
-        this.nodeModels = new ArrayList<NodeModel>();
+        // Private constructor to prevent instantiation
     }
-    
-    @Override
-    public void addNode(NodeModel node)
-    {
-       nodeModels.add(node); 
-    }
-    
-    @Override
-    public List<NodeModel> getNodeModels()
-    {
-        return Collections.unmodifiableList(nodeModels);
-    }
-
 }
+

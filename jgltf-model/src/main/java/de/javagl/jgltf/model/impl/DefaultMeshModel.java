@@ -33,12 +33,13 @@ import java.util.List;
 import de.javagl.jgltf.model.MeshModel;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
 import de.javagl.jgltf.model.Optionals;
+import de.javagl.jgltf.model.mutable.MutableMeshModel;
 
 /**
  * Implementation of a {@link MeshModel}
  */
-public final class DefaultMeshModel extends AbstractNamedModelElement
-    implements MeshModel
+public class DefaultMeshModel extends AbstractNamedModelElement
+    implements MutableMeshModel
 {
     /**
      * The {@link MeshPrimitiveModel} instances 
@@ -58,22 +59,13 @@ public final class DefaultMeshModel extends AbstractNamedModelElement
         this.meshPrimitiveModels = new ArrayList<MeshPrimitiveModel>();
     }
 
-    /**
-     * Add a {@link MeshPrimitiveModel}
-     * 
-     * @param meshPrimitiveModel The {@link MeshPrimitiveModel} to add
-     */
+    @Override
     public void addMeshPrimitiveModel(MeshPrimitiveModel meshPrimitiveModel)
     {
         this.meshPrimitiveModels.add(meshPrimitiveModel);
     }
     
-    /**
-     * Set the default morph target weights to be a copy of the given array,
-     * or <code>null</code> if the given array is <code>null</code>.
-     * 
-     * @param weights the default morph target weights
-     */
+    @Override
     public void setWeights(float[] weights)
     {
         this.weights = Optionals.clone(weights);

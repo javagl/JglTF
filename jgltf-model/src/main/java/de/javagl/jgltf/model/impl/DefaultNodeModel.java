@@ -38,12 +38,13 @@ import de.javagl.jgltf.model.NodeModel;
 import de.javagl.jgltf.model.SkinModel;
 import de.javagl.jgltf.model.Suppliers;
 import de.javagl.jgltf.model.Utils;
+import de.javagl.jgltf.model.mutable.MutableNodeModel;
 
 /**
  * Implementation of a {@link NodeModel} 
  */
-public final class DefaultNodeModel extends AbstractNamedModelElement
-    implements NodeModel
+public class DefaultNodeModel extends AbstractNamedModelElement
+    implements MutableNodeModel
 {
     /**
      * A thread-local, temporary 16-element matrix
@@ -111,16 +112,18 @@ public final class DefaultNodeModel extends AbstractNamedModelElement
         this.meshModels = new ArrayList<MeshModel>();
     }
     
-    /**
-     * Add the given child to this node
-     * 
-     * @param child The child
-     */
-    public void addChild(DefaultNodeModel child)
+    @Override
+    public void setParent(MutableNodeModel parent)
+    {
+        this.parent = parent;
+    }
+    
+    @Override
+    public void addChild(MutableNodeModel child)
     {
         Objects.requireNonNull(child, "The child may not be null");
         children.add(child);
-        child.parent = this;
+        child.setParent(this);
     }
     
     /**
@@ -128,6 +131,7 @@ public final class DefaultNodeModel extends AbstractNamedModelElement
      * 
      * @param meshModel The {@link MeshModel}
      */
+    @Override
     public void addMeshModel(MeshModel meshModel)
     {
         Objects.requireNonNull(meshModel, "The meshModel may not be null");
@@ -139,6 +143,7 @@ public final class DefaultNodeModel extends AbstractNamedModelElement
      * 
      * @param skinModel The {@link SkinModel}
      */
+    @Override
     public void setSkinModel(SkinModel skinModel)
     {
         this.skinModel = skinModel;

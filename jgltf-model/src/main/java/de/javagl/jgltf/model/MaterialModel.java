@@ -26,26 +26,17 @@
  */
 package de.javagl.jgltf.model;
 
-import java.util.Map;
-
-import de.javagl.jgltf.model.gl.TechniqueModel;
-
 /**
  * Interface for a material model
  */
 public interface MaterialModel extends NamedModelElement
 {
     /**
-     * Returns the {@link TechniqueModel}
+     * Returns the actual material implementation. This may either be
+     * a {@link de.javagl.jgltf.impl.v1.Material} or a
+     * a {@link de.javagl.jgltf.impl.v2.Material}. 
      * 
-     * @return The {@link TechniqueModel}
+     * @return The material
      */
-    TechniqueModel getTechniqueModel();
-    
-    /**
-     * Returns an unmodifiable (possibly empty) map containing parameter values
-     * 
-     * @return The parameter values
-     */
-    Map<String, Object> getValues();
+    Object getMaterial();
 }

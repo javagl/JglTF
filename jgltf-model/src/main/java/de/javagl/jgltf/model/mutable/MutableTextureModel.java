@@ -24,45 +24,48 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.model.impl;
+package de.javagl.jgltf.model.mutable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import de.javagl.jgltf.model.NodeModel;
-import de.javagl.jgltf.model.SceneModel;
-import de.javagl.jgltf.model.mutable.MutableSceneModel;
+import de.javagl.jgltf.model.ImageModel;
+import de.javagl.jgltf.model.TextureModel;
 
 /**
- * Implementation of a {@link SceneModel} 
+ * Interface for a {@link TextureModel} that can be modified
  */
-public class DefaultSceneModel extends AbstractNamedModelElement
-    implements MutableSceneModel
+public interface MutableTextureModel extends TextureModel
 {
     /**
-     * The list of root nodes
+     * Set the magnification filter constant
+     * 
+     * @param magFilter The constant
      */
-    private final List<NodeModel> nodeModels;
+    void setMagFilter(Integer magFilter);
+
+    /**
+     * Set the minification filter constant
+     * 
+     * @param minFilter The constant
+     */
+    void setMinFilter(Integer minFilter);
+
+    /**
+     * Set the wrapping constant for S-direction
+     * 
+     * @param wrapS The constant
+     */
+    void setWrapS(Integer wrapS);
+
+    /**
+     * Set the wrapping constant for T-direction
+     * 
+     * @param wrapT The constant
+     */
+    void setWrapT(Integer wrapT);
     
     /**
-     * Creates a new instance
+     * Set the {@link ImageModel} that backs this texture
+     * 
+     * @param imageModel The {@link ImageModel}
      */
-    public DefaultSceneModel()
-    {
-        this.nodeModels = new ArrayList<NodeModel>();
-    }
-    
-    @Override
-    public void addNode(NodeModel node)
-    {
-       nodeModels.add(node); 
-    }
-    
-    @Override
-    public List<NodeModel> getNodeModels()
-    {
-        return Collections.unmodifiableList(nodeModels);
-    }
-
+    void setImageModel(ImageModel imageModel);
 }

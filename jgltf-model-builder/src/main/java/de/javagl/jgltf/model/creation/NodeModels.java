@@ -24,45 +24,33 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.model.impl;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+package de.javagl.jgltf.model.creation;
 
 import de.javagl.jgltf.model.NodeModel;
-import de.javagl.jgltf.model.SceneModel;
-import de.javagl.jgltf.model.mutable.MutableSceneModel;
+import de.javagl.jgltf.model.impl.DefaultNodeModel;
+import de.javagl.jgltf.model.mutable.MutableNodeModel;
 
 /**
- * Implementation of a {@link SceneModel} 
+ * Methods to create {@link NodeModel} instances
  */
-public class DefaultSceneModel extends AbstractNamedModelElement
-    implements MutableSceneModel
+public class NodeModels 
 {
     /**
-     * The list of root nodes
+     * Create a new {@link MutableNodeModel}
+     * 
+     * @return The instance
      */
-    private final List<NodeModel> nodeModels;
+    public static MutableNodeModel create()
+    {
+        return new DefaultNodeModel();
+    }
     
     /**
-     * Creates a new instance
+     * Private constructor to prevent instantiation
      */
-    public DefaultSceneModel()
+    private NodeModels()
     {
-        this.nodeModels = new ArrayList<NodeModel>();
+        // Private constructor to prevent instantiation
     }
-    
-    @Override
-    public void addNode(NodeModel node)
-    {
-       nodeModels.add(node); 
-    }
-    
-    @Override
-    public List<NodeModel> getNodeModels()
-    {
-        return Collections.unmodifiableList(nodeModels);
-    }
-
 }
+

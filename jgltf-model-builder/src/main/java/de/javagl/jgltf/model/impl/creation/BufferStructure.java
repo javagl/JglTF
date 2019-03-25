@@ -38,6 +38,9 @@ import java.util.Set;
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.BufferViewModel;
+import de.javagl.jgltf.model.impl.DefaultAccessorModel;
+import de.javagl.jgltf.model.impl.DefaultBufferModel;
+import de.javagl.jgltf.model.impl.DefaultBufferViewModel;
 
 /**
  * A class representing the structure of a set of {@link AccessorModel} 
@@ -54,117 +57,121 @@ public final class BufferStructure
     /**
      * The mapping from {@link AccessorModel} instances to their IDs
      */
-    private final Map<AccessorModel, String> accessorIds;
+    private final Map<DefaultAccessorModel, String> accessorIds;
     
     /**
      * The list of all {@link BufferViewModel} instances
      */
-    private final List<BufferViewModel> bufferViewModels;
+    private final List<DefaultBufferViewModel> bufferViewModels;
     
     /**
      * The mapping from {@link BufferViewModel} instances to their IDs
      */
-    private final Map<BufferViewModel, String> bufferViewIds;
+    private final Map<DefaultBufferViewModel, String> bufferViewIds;
     
     /**
      * The mapping from {@link BufferViewModel} instances to the list
      * of {@link AccessorModel} instances that refer to them
      */
-    private final Map<BufferViewModel, List<AccessorModel>> 
+    private final Map<DefaultBufferViewModel, List<DefaultAccessorModel>> 
         bufferViewAccessorModels;
 
     /**
      * The list of all {@link BufferModel} instances
      */
-    private final List<BufferModel> bufferModels;
+    private final List<DefaultBufferModel> bufferModels;
     
     /**
      * The mapping from {@link BufferModel} instances to their IDs
      */
-    private final Map<BufferModel, String> bufferIds;
+    private final Map<DefaultBufferModel, String> bufferIds;
     
     /**
      * The mapping from {@link BufferModel} instances to the list
      * of {@link BufferViewModel} instances that refer to them
      */
-    private final Map<BufferModel, List<BufferViewModel>> 
+    private final Map<DefaultBufferModel, List<DefaultBufferViewModel>> 
         bufferBufferViewModels;
 
     /**
      * A mapping from {@link BufferModel} instances to the sets of
      * byte indices that have been inserted for padding and alignment
      */
-    private final Map<BufferModel, Set<Integer>> paddingByteIndices;
+    private final Map<DefaultBufferModel, Set<Integer>> paddingByteIndices;
     
     /**
      * Default constructor
      */
     BufferStructure()
     {
-        this.accessorIds = new LinkedHashMap<AccessorModel, String>();
+        this.accessorIds = new LinkedHashMap<DefaultAccessorModel, String>();
 
-        this.bufferViewModels = new ArrayList<BufferViewModel>();
+        this.bufferViewModels = new ArrayList<DefaultBufferViewModel>();
         this.bufferViewIds = 
-            new LinkedHashMap<BufferViewModel, String>();
+            new LinkedHashMap<DefaultBufferViewModel, String>();
         this.bufferViewAccessorModels = 
-            new LinkedHashMap<BufferViewModel, 
-                List<AccessorModel>>();
+            new LinkedHashMap<DefaultBufferViewModel, 
+                List<DefaultAccessorModel>>();
         
-        this.bufferModels = new ArrayList<BufferModel>();
-        this.bufferIds = new LinkedHashMap<BufferModel, String>();
+        this.bufferModels = new ArrayList<DefaultBufferModel>();
+        this.bufferIds = new LinkedHashMap<DefaultBufferModel, String>();
         this.bufferBufferViewModels = 
-            new LinkedHashMap<BufferModel, List<BufferViewModel>>();
+            new LinkedHashMap<DefaultBufferModel, 
+                List<DefaultBufferViewModel>>();
         
         this.paddingByteIndices = 
-            new LinkedHashMap<BufferModel, Set<Integer>>();
+            new LinkedHashMap<DefaultBufferModel, Set<Integer>>();
     }
     
     /**
      * Add the specified {@link AccessorModel} to this structure
      * 
      * @param accessorModel The {@link AccessorModel}
-     * @param accessorId The ID
+     * @param idPrefix The ID prefix
      */
-    void addAccessorModel(AccessorModel accessorModel, String accessorId)
+    void addAccessorModel(DefaultAccessorModel accessorModel, String idPrefix)
     {
-        this.accessorIds.put(accessorModel, accessorId);
+        String id = createId(idPrefix, accessorIds.values());
+        this.accessorIds.put(accessorModel, id);
     }
     
     /**
      * Add the given {@link BufferViewModel} to this structure
      * 
      * @param bufferViewModel The {@link BufferViewModel} to add
-     * @param bufferViewId The ID
+     * @param idPrefix The ID prefix
      * @param accessorModels The {@link AccessorModel} instances that 
      * refer to the given {@link BufferViewModel}. A copy of the 
      * given collection will be stored internally.
      */
     void addBufferViewModel(
-        BufferViewModel bufferViewModel, String bufferViewId, 
-        Collection<? extends AccessorModel> accessorModels)
+        DefaultBufferViewModel bufferViewModel, String idPrefix, 
+        Collection<? extends DefaultAccessorModel> accessorModels)
     {
         this.bufferViewModels.add(bufferViewModel);
-        this.bufferViewIds.put(bufferViewModel, bufferViewId);
+        String id = createId(idPrefix, bufferViewIds.values());
+        this.bufferViewIds.put(bufferViewModel, id);
         this.bufferViewAccessorModels.put(bufferViewModel, 
-            new ArrayList<AccessorModel>(accessorModels));
+            new ArrayList<DefaultAccessorModel>(accessorModels));
     }
     
     /**
      * Add the given {@link BufferModel} to this structure
      * 
      * @param bufferModel The {@link BufferModel} to add
-     * @param bufferId The ID
+     * @param idPrefix The ID prefix
      * @param bufferViewModels The {@link BufferViewModel} instances
      * that refer to the given {@link BufferModel}.  A copy of the 
      * given collection will be stored internally.
      */
-    void addBufferModel(BufferModel bufferModel, String bufferId,
-        Collection<? extends BufferViewModel> bufferViewModels)
+    void addBufferModel(DefaultBufferModel bufferModel, String idPrefix,
+        Collection<? extends DefaultBufferViewModel> bufferViewModels)
     {
         this.bufferModels.add(bufferModel);
-        this.bufferIds.put(bufferModel, bufferId);
+        String id = createId(idPrefix, bufferIds.values());
+        this.bufferIds.put(bufferModel, id);
         this.bufferBufferViewModels.put(bufferModel, 
-            new ArrayList<BufferViewModel>(bufferViewModels));
+            new ArrayList<DefaultBufferViewModel>(bufferViewModels));
     }
     
     /**
@@ -174,7 +181,7 @@ public final class BufferStructure
      * @param bufferModel The {@link BufferModel}
      * @param index The index
      */
-    private void addPaddingByteIndex(BufferModel bufferModel, int index)
+    private void addPaddingByteIndex(DefaultBufferModel bufferModel, int index)
     {
         this.paddingByteIndices.computeIfAbsent(bufferModel, 
             bm -> new LinkedHashSet<Integer>()).add(index);
@@ -189,7 +196,7 @@ public final class BufferStructure
      * @param count The number of bytes
      */
     void addPaddingByteIndices(
-        BufferModel bufferModel, int startIndex, int count)
+        DefaultBufferModel bufferModel, int startIndex, int count)
     {
         for (int index = startIndex; index < startIndex + count; index++)
         {
@@ -204,6 +211,17 @@ public final class BufferStructure
      * @return The {@link BufferModel} instances
      */
     public List<BufferModel> getBufferModels()
+    {
+        return Collections.unmodifiableList(bufferModels);
+    }
+    
+    /**
+     * Returns an unmodifiable view on the list of all {@link BufferModel}
+     * instances that have been added to this structure
+     * 
+     * @return The {@link BufferModel} instances
+     */
+    List<DefaultBufferModel> getBufferModelsInternal()
     {
         return Collections.unmodifiableList(bufferModels);
     }
@@ -229,7 +247,26 @@ public final class BufferStructure
      */
     public List<BufferViewModel> getBufferViewModels(BufferModel bufferModel)
     {
-        List<BufferViewModel> bufferViewModels = 
+        List<DefaultBufferViewModel> bufferViewModels = 
+            bufferBufferViewModels.get(bufferModel);
+        if (bufferViewModels == null)
+        {
+            return Collections.emptyList();
+        }
+        return Collections.unmodifiableList(bufferViewModels);
+    }
+
+    /**
+     * Returns an unmodifiable list containing the {@link BufferViewModel}
+     * instances that refer to the given {@link BufferModel}
+     * 
+     * @param bufferModel The {@link BufferModel}
+     * @return The list
+     */
+    List<DefaultBufferViewModel> getBufferViewModelsInternal(
+        DefaultBufferModel bufferModel)
+    {
+        List<DefaultBufferViewModel> bufferViewModels = 
             bufferBufferViewModels.get(bufferModel);
         if (bufferViewModels == null)
         {
@@ -245,6 +282,17 @@ public final class BufferStructure
      * @return The {@link BufferViewModel} instances 
      */
     public List<BufferViewModel> getBufferViewModels()
+    {
+        return Collections.unmodifiableList(bufferViewModels);
+    }
+    
+    /**
+     * Returns an unmodifiable view on the {@link BufferViewModel} instances
+     * that have been added to this structure
+     * 
+     * @return The {@link BufferViewModel} instances 
+     */
+    List<DefaultBufferViewModel> getBufferViewModelsInternal()
     {
         return Collections.unmodifiableList(bufferViewModels);
     }
@@ -271,7 +319,26 @@ public final class BufferStructure
     public List<AccessorModel> getAccessorModels(
         BufferViewModel bufferViewModel)
     {
-        List<AccessorModel> accessorModels = 
+        List<DefaultAccessorModel> accessorModels = 
+            bufferViewAccessorModels.get(bufferViewModel);
+        if (accessorModels == null)
+        {
+            return Collections.emptyList();
+        }
+        return Collections.unmodifiableList(accessorModels);
+    }
+    
+    /**
+     * Returns an unmodifiable list containing the {@link AccessorModel}
+     * instances that refer to the given {@link BufferViewModel}
+     * 
+     * @param bufferViewModel The {@link BufferViewModel}
+     * @return The list
+     */
+    List<DefaultAccessorModel> getAccessorModelsInternal(
+        DefaultBufferViewModel bufferViewModel)
+    {
+        List<DefaultAccessorModel> accessorModels = 
             bufferViewAccessorModels.get(bufferViewModel);
         if (accessorModels == null)
         {
@@ -290,6 +357,19 @@ public final class BufferStructure
     {
         List<AccessorModel> allAccessorModels = 
             new ArrayList<AccessorModel>(accessorIds.keySet());
+        return Collections.unmodifiableList(allAccessorModels);
+    }
+    
+    /**
+     * Returns an unmodifiable list containing all {@link AccessorModel} 
+     * instances that have been added to this structure
+     * 
+     * @return The {@link AccessorModel} instances
+     */
+    List<DefaultAccessorModel> getAccessorModelsInternal()
+    {
+        List<DefaultAccessorModel> allAccessorModels = 
+            new ArrayList<DefaultAccessorModel>(accessorIds.keySet());
         return Collections.unmodifiableList(allAccessorModels);
     }
     
@@ -323,6 +403,27 @@ public final class BufferStructure
         return indices.contains(index);
     }
 
+    
+    /**
+     * Create an unspecified ID string with the given prefix, that is not 
+     * contained in the given collection
+     * 
+     * @param prefix The prefix for the ID
+     * @param existingIds The existing URI strings
+     * @return The new URI string
+     */
+    private static String createId(String prefix,
+        Collection<? extends String> existingIds)
+    {
+        int counter = 0;
+        String id = prefix;
+        while (existingIds.contains(id)) 
+        {
+            id = prefix + "_" + counter; 
+        }
+        return id;
+    }
+    
 
     
 }
