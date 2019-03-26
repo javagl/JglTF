@@ -55,7 +55,7 @@ public class PixelDatas
      * @param imageData The image data
      * @return The {@link PixelData}
      */
-    static PixelData create(ByteBuffer imageData)
+    public static PixelData create(ByteBuffer imageData)
     {
         BufferedImage textureImage = ImageUtils.readAsBufferedImage(imageData);
         if (textureImage == null)
