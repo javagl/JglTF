@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 import de.javagl.jgltf.model.AccessorModel;
@@ -383,8 +384,10 @@ public final class BufferStructureBuilder
 
             Integer commonByteStride = null;
             Integer target = bufferViewModel.getTarget();
-            if (target != null && 
-                target == GltfConstants.GL_ELEMENT_ARRAY_BUFFER)
+            
+            boolean targetIsElementArrayBuffer = 
+                Objects.equals(GltfConstants.GL_ELEMENT_ARRAY_BUFFER, target);
+            if (targetIsElementArrayBuffer || accessorModels.size() > 1)
             {
                 // Compute the byte stride based on the element sizes of
                 // all accessors, and assign it to the accessors as well
