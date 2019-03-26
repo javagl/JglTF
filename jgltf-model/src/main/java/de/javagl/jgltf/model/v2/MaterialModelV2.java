@@ -26,8 +26,6 @@
  */
 package de.javagl.jgltf.model.v2;
 
-import java.util.Objects;
-
 import de.javagl.jgltf.impl.v2.Material;
 import de.javagl.jgltf.model.MaterialModel;
 import de.javagl.jgltf.model.TextureModel;
@@ -42,7 +40,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
     /**
      * The actual material object
      */
-    private final Material material;
+    private Material material;
     
     /**
      * The base color factor
@@ -117,14 +115,9 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
     
     /**
      * Creates a new instance with default values
-     * 
-     * @param material The material
      */
-    public MaterialModelV2(Material material)
+    public MaterialModelV2()
     {
-        this.material = Objects.requireNonNull(
-            material, "The material may not be null");
-
         baseColorFactor = new float[]{ 1.0f, 1.0f, 1.0f, 1.0f };
         baseColorTexture = null;
         
@@ -147,6 +140,16 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
         doubleSided = false;
     }
     
+    /**
+     * Set the actual material object
+     * 
+     * @param material The material
+     */
+    public void setMaterial(Material material)
+    {
+        this.material = material;
+    }
+    
     @Override
     public Material getMaterial()
     {
@@ -158,7 +161,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @return The base color factor
      */
-    float[] getBaseColorFactor()
+    public float[] getBaseColorFactor()
     {
         return baseColorFactor;
     }
@@ -168,7 +171,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @param baseColorFactor The base color factor
      */
-    void setBaseColorFactor(float[] baseColorFactor)
+    public void setBaseColorFactor(float[] baseColorFactor)
     {
         this.baseColorFactor = baseColorFactor;
     }
@@ -178,7 +181,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @return The base color texture
      */
-    TextureModel getBaseColorTexture()
+    public TextureModel getBaseColorTexture()
     {
         return baseColorTexture;
     }
@@ -188,7 +191,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @param baseColorTexture The base color texture
      */
-    void setBaseColorTexture(TextureModel baseColorTexture)
+    public void setBaseColorTexture(TextureModel baseColorTexture)
     {
         this.baseColorTexture = baseColorTexture;
     }
@@ -198,7 +201,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @return The metallic factor
      */
-    float getMetallicFactor()
+    public float getMetallicFactor()
     {
         return metallicFactor;
     }
@@ -208,7 +211,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @param metallicFactor The metallic factor
      */
-    void setMetallicFactor(float metallicFactor)
+    public void setMetallicFactor(float metallicFactor)
     {
         this.metallicFactor = metallicFactor;
     }
@@ -218,7 +221,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @return The roughness factor
      */
-    float getRoughnessFactor()
+    public float getRoughnessFactor()
     {
         return roughnessFactor;
     }
@@ -228,7 +231,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @param roughnessFactor The roughness factor
      */
-    void setRoughnessFactor(float roughnessFactor)
+    public void setRoughnessFactor(float roughnessFactor)
     {
         this.roughnessFactor = roughnessFactor;
     }
@@ -238,7 +241,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @return The metallic-roughness texture
      */
-    TextureModel getMetallicRoughnessTexture()
+    public TextureModel getMetallicRoughnessTexture()
     {
         return metallicRoughnessTexture;
     }
@@ -248,7 +251,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @param metallicRoughnessTexture The metallic-roughness-texture
      */
-    void setMetallicRoughnessTexture(TextureModel metallicRoughnessTexture)
+    public void setMetallicRoughnessTexture(TextureModel metallicRoughnessTexture)
     {
         this.metallicRoughnessTexture = metallicRoughnessTexture;
     }
@@ -258,7 +261,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @return The normal texture
      */
-    TextureModel getNormalTexture()
+    public TextureModel getNormalTexture()
     {
         return normalTexture;
     }
@@ -268,7 +271,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @param normalTexture The normal texture
      */
-    void setNormalTexture(TextureModel normalTexture)
+    public void setNormalTexture(TextureModel normalTexture)
     {
         this.normalTexture = normalTexture;
     }
@@ -278,7 +281,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @return The normal scale
      */
-    float getNormalScale()
+    public float getNormalScale()
     {
         return normalScale;
     }
@@ -288,7 +291,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @param normalScale The normal scale
      */
-    void setNormalScale(float normalScale)
+    public void setNormalScale(float normalScale)
     {
         this.normalScale = normalScale;
     }
@@ -298,7 +301,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @return The occlusion texture
      */
-    TextureModel getOcclusionTexture()
+    public TextureModel getOcclusionTexture()
     {
         return occlusionTexture;
     }
@@ -308,7 +311,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @param occlusionTexture The occlusion texture
      */
-    void setOcclusionTexture(TextureModel occlusionTexture)
+    public void setOcclusionTexture(TextureModel occlusionTexture)
     {
         this.occlusionTexture = occlusionTexture;
     }
@@ -318,7 +321,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @return The occlusion strength
      */
-    float getOcclusionStrength()
+    public float getOcclusionStrength()
     {
         return occlusionStrength;
     }
@@ -328,7 +331,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @param occlusionStrength The occlusion strength
      */
-    void setOcclusionStrength(float occlusionStrength)
+    public void setOcclusionStrength(float occlusionStrength)
     {
         this.occlusionStrength = occlusionStrength;
     }
@@ -338,16 +341,17 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @return The emissive texture
      */
-    TextureModel getEmissiveTexture()
+    public TextureModel getEmissiveTexture()
     {
         return emissiveTexture;
     }
 
     /**
      * Set the emissive texture
+     * 
      * @param emissiveTexture The emissive texture
      */
-    void setEmissiveTexture(TextureModel emissiveTexture)
+    public void setEmissiveTexture(TextureModel emissiveTexture)
     {
         this.emissiveTexture = emissiveTexture;
     }
@@ -357,7 +361,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @return The emissive factor
      */
-    float[] getEmissiveFactor()
+    public float[] getEmissiveFactor()
     {
         return emissiveFactor;
     }
@@ -367,7 +371,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @param emissiveFactor The emissive factor
      */
-    void setEmissiveFactor(float[] emissiveFactor)
+    public void setEmissiveFactor(float[] emissiveFactor)
     {
         this.emissiveFactor = emissiveFactor;
     }
@@ -377,7 +381,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @return The alpha mode
      */
-    String getAlphaMode()
+    public String getAlphaMode()
     {
         return alphaMode;
     }
@@ -387,7 +391,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @param alphaMode The alpha mode
      */
-    void setAlphaMode(String alphaMode)
+    public void setAlphaMode(String alphaMode)
     {
         this.alphaMode = alphaMode;
     }
@@ -397,7 +401,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @return The alpha cutoff
      */
-    float getAlphaCutoff()
+    public float getAlphaCutoff()
     {
         return alphaCutoff;
     }
@@ -407,7 +411,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @param alphaCutoff The alpha cutoff
      */
-    void setAlphaCutoff(float alphaCutoff)
+    public void setAlphaCutoff(float alphaCutoff)
     {
         this.alphaCutoff = alphaCutoff;
     }
@@ -417,7 +421,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @return Whether the material is double sided
      */
-    boolean isDoubleSided()
+    public boolean isDoubleSided()
     {
         return doubleSided;
     }
@@ -427,7 +431,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @param doubleSided Whether the material is double sided
      */
-    void setDoubleSided(boolean doubleSided)
+    public void setDoubleSided(boolean doubleSided)
     {
         this.doubleSided = doubleSided;
     }

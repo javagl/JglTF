@@ -378,7 +378,9 @@ public final class GltfModelV2 implements GltfModel
         for (int i = 0; i < materials.size(); i++)
         {
             Material material = materials.get(i);
-            materialModels.add(new MaterialModelV2(material));
+            MaterialModelV2 materialModel = new MaterialModelV2();
+            materialModel.setMaterial(material);
+            materialModels.add(materialModel);
         }
     }
     

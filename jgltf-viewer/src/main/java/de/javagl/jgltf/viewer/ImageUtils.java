@@ -30,11 +30,13 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferInt;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
@@ -48,9 +50,16 @@ import de.javagl.jgltf.model.io.Buffers;
 public class ImageUtils
 {
     /**
-     * Returns the contents of the given buffer as a <code>BufferedImage</code>,
-     * or <code>null</code> if the given buffer is <code>null</code>, or
-     * the data can not be converted into a buffered image.
+     * The logger used in this class
+     */
+    private static final Logger logger = 
+        Logger.getLogger(ImageUtils.class.getName());
+    
+    /**
+     * Returns the contents of the given buffer as a <code>BufferedImage</code>.
+     * Returns <code>null</code> if the given buffer is <code>null</code>.
+     * If the data can not be converted into a buffered image, then an error
+     * message is printed and <code>null</code> is returned.
      * 
      * @param byteBuffer The byte buffer
      * @return The buffered image
@@ -68,6 +77,7 @@ public class ImageUtils
         }
         catch (IOException e)
         {
+            logger.severe(e.toString());
             return null;
         }
     }
@@ -118,6 +128,18 @@ public class ImageUtils
     static ByteBuffer swizzleARGBtoRGBA(ByteBuffer pixels)
     {
         return swizzle(pixels, 16, 8, 0, 24);
+    }
+
+    /**
+     * Interpret the given byte buffer as RGBA pixels, and convert it into
+     * a direct byte buffer containing the corresponding ARGB pixels
+     * 
+     * @param pixels The input pixels
+     * @return The output pixels
+     */
+    static ByteBuffer swizzleRGBAtoARGB(ByteBuffer pixels)
+    {
+        return swizzle(pixels, 0, 24, 16, 8);
     }
     
     /**
@@ -226,6 +248,95 @@ public class ImageUtils
         int data[] = dataBufferInt.getData();
         IntBuffer intBuffer = IntBuffer.wrap(data);
         return intBuffer;
+    }
+    
+    /**
+     * Create a buffered image from the given {@link PixelData}
+     * 
+     * @param pixelData The {@link PixelData}
+     * @return The buffered image
+     */
+    public static BufferedImage createBufferedImage(PixelData pixelData)
+    {
+        int w = pixelData.getWidth();
+        int h = pixelData.getHeight();
+        BufferedImage image = new BufferedImage(
+            w, h, BufferedImage.TYPE_INT_ARGB);
+        IntBuffer imageBuffer = getBuffer(image);
+        ByteBuffer pixels = pixelData.getPixelsRGBA();
+        ByteBuffer argbBytes = swizzleRGBAtoARGB(pixels);
+        imageBuffer.put(argbBytes.asIntBuffer());
+        return image;
+    }
+    
+    /**
+     * Creates the byte buffer containing the image data for the given
+     * pixel data, with the given MIME type.<br>
+     * <br>
+     * The MIME type must be <code>"image/png"</code> or 
+     * <code>"image/gif"</code> or <code>"image/jpeg"</code> (<b>not</b> 
+     * <code>"image/jpg"</code>!).<br> 
+     * <br>
+     * If the image data cannot be written, then an error message is
+     * printed and <code>null</code> is returned.
+     * 
+     * @param pixelData The {@link PixelData}
+     * @param mimeType The MIME type
+     * @return The byte buffer
+     * @throws IllegalArgumentException If the MIME type is not one of the
+     * types listed above
+     */
+    public static ByteBuffer createImageDataBuffer(
+        PixelData pixelData, String mimeType)
+    {
+        String formatName = null;
+        if ("image/gif".equals(mimeType))
+        {
+            formatName = "gif";
+        }
+        else if ("image/jpeg".equals(mimeType))
+        {
+            formatName = "jpg";
+        }
+        else if ("image/png".equals(mimeType))
+        {
+            formatName = "png";
+        }
+        else
+        {
+            throw new IllegalArgumentException(
+                "The MIME type string must be \"image/gif\", "
+                + "\"image/jpeg\" or \"image/png\", but is " + mimeType);
+        }
+        BufferedImage image = ImageUtils.createBufferedImage(pixelData);
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream())
+        {
+            ImageIO.write(image, formatName, baos);
+            return Buffers.create(baos.toByteArray());
+        }
+        catch (IOException e)
+        {
+            logger.severe(e.toString());
+            return null;
+        }
+    }
+    
+    
+    // Only a basic test for the swizzling
+    @SuppressWarnings("javadoc")
+    public static void main(String[] args)
+    {
+        int input = 0x11223344;
+        ByteBuffer b0 = ByteBuffer.allocate(4).order(ByteOrder.BIG_ENDIAN);
+        b0.asIntBuffer().put(input);
+        ByteBuffer b1 = swizzleARGBtoRGBA(b0);
+        int rgba = b1.asIntBuffer().get();
+        ByteBuffer b2 = swizzleRGBAtoARGB(b1);
+        int argb = b2.asIntBuffer().get();
+        
+        System.out.println("Input: " + Integer.toHexString(input));
+        System.out.println("RGBA : " + Integer.toHexString(rgba));
+        System.out.println("ARGB : " + Integer.toHexString(argb));
     }
 
 }
