@@ -29,8 +29,6 @@ package de.javagl.jgltf.model.creation;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.util.logging.Logger;
 
