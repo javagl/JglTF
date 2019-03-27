@@ -401,10 +401,7 @@ public final class BufferStructureBuilder
                 
                 // The byte stride only has to be set in the buffer view
                 // when more than one accessor refers to the buffer view.
-                if (accessorModels.size() > 1)
-                {
-                    bufferViewModel.setByteStride(commonByteStride);
-                }
+                bufferViewModel.setByteStride(commonByteStride);
             }
             
             
