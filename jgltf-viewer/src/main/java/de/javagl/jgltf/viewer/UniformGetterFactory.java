@@ -107,8 +107,8 @@ class UniformGetterFactory
      * Create a supplier that supplies the value for the specified uniform.
      * If there is no {@link TechniqueParametersModel#getSemantic() semantic} 
      * defined in the {@link TechniqueModel} of the given 
-     * {@link RenderedMaterial}, then this value will be obtained from the 
-     * {@link TechniqueModel} of the {@link RenderedMaterial}. Otherwise, the 
+     * {@link DefaultRenderedMaterial}, then this value will be obtained from the 
+     * {@link TechniqueModel} of the {@link DefaultRenderedMaterial}. Otherwise, the 
      * value will be derived from the context of the currently rendered node, 
      * which is given by the local and global transform of the 
      * given {@link NodeModel}  
@@ -119,7 +119,7 @@ class UniformGetterFactory
      * @return The supplier for the uniform value
      */
     public Supplier<?> createUniformValueSupplier(String uniformName, 
-        RenderedMaterial renderedMaterial, NodeModel nodeModel)
+        DefaultRenderedMaterial renderedMaterial, NodeModel nodeModel)
     {
         TechniqueModel techniqueModel = renderedMaterial.getTechniqueModel();
         Map<String, String> uniforms = techniqueModel.getUniforms();

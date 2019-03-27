@@ -27,37 +27,27 @@
 package de.javagl.jgltf.viewer;
 
 import java.util.Objects;
-import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
-import de.javagl.jgltf.model.CameraModel;
 import de.javagl.jgltf.model.MathUtils;
 
 /**
  * The view configuration for a single {@link RenderedGltfModel}. It allows
- * setting the {@link #setCurrentCameraModel(CameraModel) current camera model}
+ * setting the {@link #setRenderedCamera(RenderedCamera) current camera}
  * that should be used for rendering, and offers the viewport, view matrix
  * and projection matrix. 
  */
 final class ViewConfiguration
 {
     /**
-     * A {@link SettableSupplier} that provides the {@link CameraModel}
-     * that should be used for rendering.  
-     * See {@link #setCurrentCameraModel(CameraModel)}
+     * The {@link RenderedCamera} that should be used for rendering.  
      */
-    private final SettableSupplier<CameraModel> currentCameraModelSupplier;
+    private RenderedCamera renderedCamera;
 
     /**
      * The supplier for the viewport, as an array [x, y, width, height]
      */
     private final Supplier<float[]> viewportSupplier;
-    
-    /**
-     * An optional supplier for the aspect ratio. If this is <code>null</code>, 
-     * then the aspect ratio of the camera will be used     
-     */
-    private final DoubleSupplier aspectRatioSupplier;
     
     /**
      * The supplier for the view matrix
@@ -74,40 +64,36 @@ final class ViewConfiguration
      *  
      * @param viewportSupplier A supplier that supplies the viewport, 
      * as 4 float elements, [x, y, width, height]
-     * @param aspectRatioSupplier An optional supplier for the aspect ratio. 
-     * If this is <code>null</code>, then the aspect ratio of the 
-     * camera will be used
-     * @param externalViewMatrixSupplier The optional external supplier of
-     * a view matrix.
-     * @param externalProjectionMatrixSupplier The optional external supplier
-     * of a projection matrix.
      */
     ViewConfiguration(
-        Supplier<float[]> viewportSupplier,
-        DoubleSupplier aspectRatioSupplier,
-        Supplier<float[]> externalViewMatrixSupplier, 
-        Supplier<float[]> externalProjectionMatrixSupplier)
+        Supplier<float[]> viewportSupplier)
     {
         this.viewportSupplier = Objects.requireNonNull(
             viewportSupplier, "The viewportSupplier may not be null");
-        this.currentCameraModelSupplier = new SettableSupplier<CameraModel>();
-        this.aspectRatioSupplier = aspectRatioSupplier;
         this.viewMatrixSupplier = 
-            createViewMatrixSupplier(externalViewMatrixSupplier);
+            createViewMatrixSupplier();
         this.projectionMatrixSupplier = 
-            createProjectionMatrixSupplier(externalProjectionMatrixSupplier);
+            createProjectionMatrixSupplier();
     }
     
     /**
-     * Set the {@link CameraModel} that should be used for rendering. 
-     * If the given {@link CameraModel} is <code>null</code>,
-     * then the external camera will be used.<br>
+     * Set the {@link RenderedCamera} that should be used for rendering. 
      * <br>
-     * @param cameraModel The {@link CameraModel} 
+     * @param renderedCamera The {@link RenderedCamera} 
      */
-    public void setCurrentCameraModel(CameraModel cameraModel)
+    public void setRenderedCamera(RenderedCamera renderedCamera)
     {
-        currentCameraModelSupplier.set(cameraModel);
+        this.renderedCamera = renderedCamera;
+    }
+    
+    /**
+     * Returns the {@link RenderedCamera}
+     * 
+     * @return The {@link RenderedCamera}
+     */
+    public RenderedCamera getRenderedCamera()
+    {
+        return renderedCamera;
     }
     
     /**
@@ -117,13 +103,9 @@ final class ViewConfiguration
      * The resulting supplier will supply a view matrix as follows:
      * <ul>
      *   <li> 
-     *     If a non-<code>null</code> {@link #setCurrentCameraModel
-     *     current camera model} has been set, then the view matrix from
-     *     this {@link CameraModel} will be returned
-     *   </li>
-     *   <li>
-     *     Otherwise, if the external matrix supplier is non-<code>null</code>,
-     *     then its matrix will be returned
+     *     If a non-<code>null</code> {@link #setRenderedCamera
+     *     current camera} has been set, then the view matrix from
+     *     this {@link RenderedCamera} will be returned
      *   </li>
      *   <li>
      *     Otherwise, an identity matrix will be returned
@@ -132,28 +114,19 @@ final class ViewConfiguration
      * Note: The supplier MAY always return the same array instance.
      * Callers MUST NOT store or modify the returned array. 
      * 
-     * @param externalViewMatrixSupplier The optional external view matrix
-     * supplier that may have been given in the constructor
      * @return The view matrix supplier
      */
-    private Supplier<float[]> createViewMatrixSupplier(
-        Supplier<float[]> externalViewMatrixSupplier)
+    private Supplier<float[]> createViewMatrixSupplier()
     {
-        float viewMatrix[] = MathUtils.createIdentity4x4();
+        float defaultViewMatrix[] = MathUtils.createIdentity4x4();
         return () ->
         {
-            CameraModel cameraModel = currentCameraModelSupplier.get();
-            if (cameraModel == null)
+            if (renderedCamera == null)
             {
-                if (externalViewMatrixSupplier == null)
-                {
-                    MathUtils.setIdentity4x4(viewMatrix);
-                    return viewMatrix;
-                }
-                return externalViewMatrixSupplier.get();
+                MathUtils.setIdentity4x4(defaultViewMatrix);
+                return defaultViewMatrix;
             }
-            cameraModel.computeViewMatrix(viewMatrix);
-            return viewMatrix;
+            return renderedCamera.getViewMatrix();
         };
     }
     
@@ -164,49 +137,30 @@ final class ViewConfiguration
      * The resulting supplier will supply a projection matrix as follows:
      * <ul>
      *   <li> 
-     *     If a non-<code>null</code> {@link #setCurrentCameraModel
-     *     current camera model} has been set, then the projection matrix from
-     *     this {@link CameraModel} will be returned
-     *   </li>
-     *   <li>
-     *     Otherwise, if the external matrix supplier is non-<code>null</code>,
-     *     then its matrix will be returned
+     *     If a non-<code>null</code> {@link #setRenderedCamera
+     *     current camera} has been set, then the projection matrix from
+     *     this {@link RenderedCamera} will be returned
      *   </li>
      *   <li>
      *     Otherwise, an identity matrix will be returned
      *   </li>
      * </ul>
      * Note: The supplier MAY always return the same array instance.
-     * Callers MUST NOT store or modify the returned array. 
-     * 
-     * @param externalProjectionMatrixSupplier The optional external projection
-     * matrix supplier that may have been given in the constructor
-     * @return The view matrix supplier
+     * Callers MUST NOT store or modify the returned array.
+     *  
+     * @return The projection matrix supplier
      */
-    private Supplier<float[]> createProjectionMatrixSupplier(
-        Supplier<float[]> externalProjectionMatrixSupplier)
+    private Supplier<float[]> createProjectionMatrixSupplier()
     {
-        float projectionMatrix[] = MathUtils.createIdentity4x4();
+        float defaultProjectionMatrix[] = MathUtils.createIdentity4x4();
         return () ->
         {
-            CameraModel cameraModel = currentCameraModelSupplier.get();
-            if (cameraModel == null)
+            if (renderedCamera == null)
             {
-                if (externalProjectionMatrixSupplier == null)
-                {
-                    MathUtils.setIdentity4x4(projectionMatrix);
-                    return projectionMatrix;
-                }
-                return externalProjectionMatrixSupplier.get();
+                MathUtils.setIdentity4x4(defaultProjectionMatrix);
+                return defaultProjectionMatrix;
             }
-            Float aspectRatio = null;
-            if (aspectRatioSupplier != null)
-            {
-                aspectRatio = (float)aspectRatioSupplier.getAsDouble();
-            }
-            cameraModel.computeProjectionMatrix(
-                projectionMatrix, aspectRatio);
-            return projectionMatrix;
+            return renderedCamera.getProjectionMatrix();
         };
     }
     

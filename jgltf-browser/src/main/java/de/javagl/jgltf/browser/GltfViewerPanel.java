@@ -51,9 +51,9 @@ import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
 
 import de.javagl.jgltf.model.BoundingBoxes;
-import de.javagl.jgltf.model.CameraModel;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.viewer.GltfViewer;
+import de.javagl.jgltf.viewer.RenderedCamera;
 import de.javagl.jgltf.viewer.jogl.GltfViewerJogl;
 import de.javagl.jgltf.viewer.lwjgl.GltfViewerLwjgl;
 
@@ -89,10 +89,10 @@ class GltfViewerPanel extends JPanel
     private JToggleButton animationsRunningButton;
     
     /**
-     * The combo box model containing the {@link CameraModel} instances 
+     * The combo box model containing the {@link RenderedCamera} instances 
      * that have been found in the {@link GltfModel}
      */
-    private DefaultComboBoxModel<CameraModel> cameraModelsComboBoxModel;
+    private DefaultComboBoxModel<RenderedCamera> renderedCamerasComboBoxModel;
     
     /**
      * The external camera 
@@ -183,10 +183,11 @@ class GltfViewerPanel extends JPanel
         
         // The combo box for selecting the camera
         cameraControlPanel.add(new JLabel("Camera:"));
-        cameraModelsComboBoxModel = new DefaultComboBoxModel<CameraModel>();
-        JComboBox<CameraModel> cameraModelsComboBox = 
-            new JComboBox<CameraModel>(cameraModelsComboBoxModel);
-        cameraModelsComboBox.setRenderer(new DefaultListCellRenderer() 
+        renderedCamerasComboBoxModel = 
+            new DefaultComboBoxModel<RenderedCamera>();
+        JComboBox<RenderedCamera> renderedCamerasComboBox = 
+            new JComboBox<RenderedCamera>(renderedCamerasComboBoxModel);
+        renderedCamerasComboBox.setRenderer(new DefaultListCellRenderer() 
         {
             private static final long serialVersionUID = 1L;
 
@@ -203,23 +204,30 @@ class GltfViewerPanel extends JPanel
                 }
                 else
                 {
-                    CameraModel cameraModel = (CameraModel)value;
-                    setText(cameraModel.getInstanceName());
+                    RenderedCamera renderedCamera = (RenderedCamera)value;
+                    setText(renderedCamera.toString());
                 }
                 return this;
             }
         });
-        cameraModelsComboBox.addActionListener(e ->
+        renderedCamerasComboBox.addActionListener(e ->
         {
-            CameraModel cameraModel = 
-                (CameraModel)cameraModelsComboBox.getSelectedItem();
+            RenderedCamera renderedCamera = 
+                (RenderedCamera)renderedCamerasComboBox.getSelectedItem();
             if (gltfViewer != null)
             {
-                gltfViewer.setCurrentCameraModel(null, cameraModel);
+                if (renderedCamera != null)
+                {
+                    gltfViewer.setRenderedCamera(renderedCamera);
+                }
+                else
+                {
+                    gltfViewer.setRenderedCamera(externalCamera);
+                }
             }
         });
-        updateCameraModelsComboBox();
-        cameraControlPanel.add(cameraModelsComboBox);
+        updateRenderedCamerasComboBox();
+        cameraControlPanel.add(renderedCamerasComboBox);
         
         JButton resetCameraButton = new JButton("Reset camera");
         resetCameraButton.addActionListener(e -> resetExternalCamera());
@@ -254,19 +262,20 @@ class GltfViewerPanel extends JPanel
     }
     
     /**
-     * Update the combo box containing the {@link CameraModel} names, based on
-     * the current {@link GltfModel}
+     * Update the combo box containing the {@link RenderedCamera} names, 
+     * based on the current {@link GltfModel}
      */
-    private void updateCameraModelsComboBox()
+    private void updateRenderedCamerasComboBox()
     {
-        cameraModelsComboBoxModel.removeAllElements();
-        cameraModelsComboBoxModel.addElement(null);
+        renderedCamerasComboBoxModel.removeAllElements();
+        renderedCamerasComboBoxModel.addElement(null);
         if (gltfViewer != null)
         {
-            List<CameraModel> cameraModels = gltfViewer.getCameraModels();
-            for (CameraModel cameraModel : cameraModels)
+            List<RenderedCamera> renderedCameras = 
+                gltfViewer.getRenderedCameras();
+            for (RenderedCamera renderedCamera : renderedCameras)
             {
-                cameraModelsComboBoxModel.addElement(cameraModel);
+                renderedCamerasComboBoxModel.addElement(renderedCamera);
             }
         }
     }
@@ -359,11 +368,11 @@ class GltfViewerPanel extends JPanel
             Component renderComponent = gltfViewer.getRenderComponent();
             externalCamera.setComponent(renderComponent);
             
-            gltfViewer.setExternalCamera(externalCamera);
+            gltfViewer.setRenderedCamera(externalCamera);
             viewerComponentContainer.add(renderComponent);
             animationsRunningButton.setEnabled(true);
             
-            updateCameraModelsComboBox();
+            updateRenderedCamerasComboBox();
         }
         catch (Throwable t)
         {

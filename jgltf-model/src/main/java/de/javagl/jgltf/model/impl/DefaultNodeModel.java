@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 
+import de.javagl.jgltf.model.CameraModel;
 import de.javagl.jgltf.model.MathUtils;
 import de.javagl.jgltf.model.MeshModel;
 import de.javagl.jgltf.model.NodeModel;
@@ -77,6 +78,11 @@ public class DefaultNodeModel extends AbstractNamedModelElement
      * The {@link SkinModel}
      */
     private SkinModel skinModel;
+    
+    /**
+     * The {@link CameraModel}
+     */
+    private CameraModel cameraModel;
 
     /**
      * The local transform matrix
@@ -126,11 +132,6 @@ public class DefaultNodeModel extends AbstractNamedModelElement
         child.setParent(this);
     }
     
-    /**
-     * Add the given {@link MeshModel} to this node
-     * 
-     * @param meshModel The {@link MeshModel}
-     */
     @Override
     public void addMeshModel(MeshModel meshModel)
     {
@@ -138,17 +139,17 @@ public class DefaultNodeModel extends AbstractNamedModelElement
         meshModels.add(meshModel);
     }
     
-    /**
-     * Set the {@link SkinModel}
-     * 
-     * @param skinModel The {@link SkinModel}
-     */
     @Override
     public void setSkinModel(SkinModel skinModel)
     {
         this.skinModel = skinModel;
     }
     
+    @Override
+    public void setCameraModel(CameraModel cameraModel)
+    {
+        this.cameraModel = cameraModel;
+    }
     
     @Override
     public NodeModel getParent()
@@ -172,6 +173,12 @@ public class DefaultNodeModel extends AbstractNamedModelElement
     public SkinModel getSkinModel()
     {
         return skinModel;
+    }
+    
+    @Override
+    public CameraModel getCameraModel()
+    {
+        return cameraModel;
     }
     
     @Override

@@ -58,6 +58,11 @@ public final class BufferStructure
      * The mapping from {@link AccessorModel} instances to their IDs
      */
     private final Map<DefaultAccessorModel, String> accessorIds;
+
+    /**
+     * The mapping from {@link AccessorModel} instances to their indices
+     */
+    private final Map<DefaultAccessorModel, Integer> accessorIndices;
     
     /**
      * The list of all {@link BufferViewModel} instances
@@ -68,6 +73,11 @@ public final class BufferStructure
      * The mapping from {@link BufferViewModel} instances to their IDs
      */
     private final Map<DefaultBufferViewModel, String> bufferViewIds;
+
+    /**
+     * The mapping from {@link BufferViewModel} instances to their indices
+     */
+    private final Map<DefaultBufferViewModel, Integer> bufferViewIndices;
     
     /**
      * The mapping from {@link BufferViewModel} instances to the list
@@ -85,6 +95,11 @@ public final class BufferStructure
      * The mapping from {@link BufferModel} instances to their IDs
      */
     private final Map<DefaultBufferModel, String> bufferIds;
+    
+    /**
+     * The mapping from {@link BufferModel} instances to their indices
+     */
+    private final Map<DefaultBufferModel, Integer> bufferIndices;
     
     /**
      * The mapping from {@link BufferModel} instances to the list
@@ -105,16 +120,22 @@ public final class BufferStructure
     BufferStructure()
     {
         this.accessorIds = new LinkedHashMap<DefaultAccessorModel, String>();
+        this.accessorIndices = 
+            new LinkedHashMap<DefaultAccessorModel, Integer>();
 
         this.bufferViewModels = new ArrayList<DefaultBufferViewModel>();
         this.bufferViewIds = 
             new LinkedHashMap<DefaultBufferViewModel, String>();
+        this.bufferViewIndices = 
+            new LinkedHashMap<DefaultBufferViewModel, Integer>();
         this.bufferViewAccessorModels = 
             new LinkedHashMap<DefaultBufferViewModel, 
                 List<DefaultAccessorModel>>();
         
         this.bufferModels = new ArrayList<DefaultBufferModel>();
         this.bufferIds = new LinkedHashMap<DefaultBufferModel, String>();
+        this.bufferIndices = 
+            new LinkedHashMap<DefaultBufferModel, Integer>();
         this.bufferBufferViewModels = 
             new LinkedHashMap<DefaultBufferModel, 
                 List<DefaultBufferViewModel>>();
@@ -132,6 +153,7 @@ public final class BufferStructure
     void addAccessorModel(DefaultAccessorModel accessorModel, String idPrefix)
     {
         String id = createId(idPrefix, accessorIds.values());
+        this.accessorIndices.put(accessorModel, accessorIndices.size());
         this.accessorIds.put(accessorModel, id);
     }
     
@@ -151,6 +173,7 @@ public final class BufferStructure
         this.bufferViewModels.add(bufferViewModel);
         String id = createId(idPrefix, bufferViewIds.values());
         this.bufferViewIds.put(bufferViewModel, id);
+        this.bufferViewIndices.put(bufferViewModel, bufferViewIndices.size());
         this.bufferViewAccessorModels.put(bufferViewModel, 
             new ArrayList<DefaultAccessorModel>(accessorModels));
     }
@@ -170,6 +193,7 @@ public final class BufferStructure
         this.bufferModels.add(bufferModel);
         String id = createId(idPrefix, bufferIds.values());
         this.bufferIds.put(bufferModel, id);
+        this.bufferIndices.put(bufferModel, bufferIndices.size());
         this.bufferBufferViewModels.put(bufferModel, 
             new ArrayList<DefaultBufferViewModel>(bufferViewModels));
     }
@@ -236,6 +260,18 @@ public final class BufferStructure
     public String getBufferId(BufferModel bufferModel)
     {
         return bufferIds.get(bufferModel);
+    }
+    
+    /**
+     * Returns the index that was assigned to the given {@link BufferModel}
+     * when it was added
+     * 
+     * @param bufferModel The {@link BufferModel}
+     * @return The index
+     */
+    public Integer getBufferIndex(BufferModel bufferModel)
+    {
+        return bufferIndices.get(bufferModel);
     }
     
     /**
@@ -307,6 +343,18 @@ public final class BufferStructure
     public String getBufferViewId(BufferViewModel bufferViewModel)
     {
         return bufferViewIds.get(bufferViewModel);
+    }
+    
+    /**
+     * Returns the index that was assigned to the given {@link BufferViewModel}
+     * when it was added
+     * 
+     * @param bufferViewModel The {@link BufferViewModel}
+     * @return The index
+     */
+    public Integer getBufferViewIndex(BufferViewModel bufferViewModel)
+    {
+        return bufferViewIndices.get(bufferViewModel);
     }
     
     /**
@@ -385,6 +433,18 @@ public final class BufferStructure
         return accessorIds.get(accessorModel);
     }
 
+    /**
+     * Returns the index that was assigned to the given {@link AccessorModel}
+     * when it was added
+     * 
+     * @param accessorModel The {@link AccessorModel}
+     * @return The index
+     */
+    public Integer getAccessorIndex(AccessorModel accessorModel)
+    {
+        return accessorIndices.get(accessorModel);
+    }
+    
     /**
      * Returns whether the given byte index was a padding byte index for the
      * given {@link BufferModel}

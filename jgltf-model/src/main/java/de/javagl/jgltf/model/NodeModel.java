@@ -66,6 +66,14 @@ public interface NodeModel extends NamedModelElement
     SkinModel getSkinModel();
     
     /**
+     * Returns the {@link CameraModel} for this node, or <code>null</code> if
+     * this node is not associated with a camera
+     *  
+     * @return The {@link CameraModel}
+     */
+    CameraModel getCameraModel();
+    
+    /**
      * Set the matrix of this node to be a <b>reference</b> to the given
      * array. <br>
      * <br>

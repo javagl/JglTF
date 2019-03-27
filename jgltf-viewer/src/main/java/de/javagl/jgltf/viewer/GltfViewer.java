@@ -28,7 +28,6 @@ package de.javagl.jgltf.viewer;
 
 import java.util.List;
 
-import de.javagl.jgltf.model.CameraModel;
 import de.javagl.jgltf.model.GltfModel;
 
 /**
@@ -38,22 +37,6 @@ import de.javagl.jgltf.model.GltfModel;
  */
 public interface GltfViewer<C>
 {
-    /**
-     * Set an optional {@link ExternalCamera}. <br>
-     * <br>
-     * If the given {@link ExternalCamera} is not <code>null</code>, then it 
-     * may supply a view- and projection matrix from an external camera that 
-     * will be used as an alternative to the camera information that is 
-     * found in the {@link GltfModel}.<br>
-     * <br>
-     * Note: This has to be set <b>before</b> any {@link GltfModel} is added
-     * with {@link #addGltfModel(GltfModel)}. Otherwise, the external camera
-     * will not affect the rendered glTF.
-     * 
-     * @param externalCamera The optional {@link ExternalCamera}
-     */
-    void setExternalCamera(ExternalCamera externalCamera);
-
     /**
      * Set whether the animations are running
      * 
@@ -108,26 +91,18 @@ public interface GltfViewer<C>
     void removeGltfModel(GltfModel gltfModel);
 
     /**
-     * Returns an unmodifiable list containing all {@link CameraModel}
-     * instances that are contained in the {@link GltfModel} instances
+     * Returns an unmodifiable list containing all {@link RenderedCamera}
+     * instances that have been created from the {@link GltfModel} instances
      * that have been added to this viewer.
      * 
-     * @return The {@link CameraModel} instances
+     * @return The {@link RenderedCamera} instances
      */
-    List<CameraModel> getCameraModels();
+    List<RenderedCamera> getRenderedCameras();
     
     /**
-     * Set {@link CameraModel} that should be used for rendering the 
-     * given {@link GltfModel}. If the given {@link GltfModel} is 
-     * <code>null</code>, then the {@link CameraModel} will be used
-     * for rendering all {@link GltfModel} instances.
-     * If the {@link CameraModel} is <code>null</code>, then the external 
-     * camera will be used. See {@link #setExternalCamera(ExternalCamera)}.
-     * 
-     * @param gltfModel The optional {@link GltfModel}
-     * @param cameraModel The {@link CameraModel}
-     * @throws IllegalArgumentException If the given {@link GltfModel} is
-     * not <code>null</code> and not contained in this viewer
+     * Set the {@link RenderedCamera} that should be used for rendering.
+     * <br>
+     * @param renderedCamera The {@link RenderedCamera}
      */
-    void setCurrentCameraModel(GltfModel gltfModel, CameraModel cameraModel);
+    void setRenderedCamera(RenderedCamera renderedCamera);
 }

@@ -34,6 +34,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.GltfConstants;
@@ -112,20 +113,30 @@ public final class MeshPrimitiveBuilder
     private final Map<String, AccessorInfo> attributeAccessorInfos;
     
     /**
+     * A consumer that will be notified about all instances that are created
+     */
+    private final Consumer<? super MeshPrimitiveModel> resultConsumer;
+    
+    /**
      * Default constructor.
      * 
      * @param bufferStructureBuilder The {@link BufferStructureBuilder} that 
      * will internally keep track of the data that was added, to eventually 
      * create the {@link BufferStructure} that includes the data for the 
      * {@link MeshPrimitiveModel}
+     * @param resultConsumer An optional consumer for the results that are
+     * created
      */
-    public MeshPrimitiveBuilder(BufferStructureBuilder bufferStructureBuilder)
+    MeshPrimitiveBuilder(
+        BufferStructureBuilder bufferStructureBuilder,
+        Consumer<? super MeshPrimitiveModel> resultConsumer)
     {
         this.bufferStructureBuilder = 
             Objects.requireNonNull(bufferStructureBuilder, 
                 "The bufferStructureBuilder may not be null");
         this.mode = GltfConstants.GL_TRIANGLES;
         this.attributeAccessorInfos = new LinkedHashMap<String, AccessorInfo>();
+        this.resultConsumer = resultConsumer;
     }
     
     /**
@@ -383,6 +394,10 @@ public final class MeshPrimitiveBuilder
                 result.putAttribute(name, accessorModel);
             }
             bufferStructureBuilder.createArrayBufferViewModel("bufferView");
+        }
+        if (resultConsumer != null)
+        {
+            resultConsumer.accept(result);
         }
         return result;
     }

@@ -27,13 +27,9 @@
 package de.javagl.jgltf.viewer;
 
 /**
- * An interface for an external camera. An instance of a class implementing
- * this interface may be passed to 
- * {@link AbstractGltfViewer#setExternalCamera(ExternalCamera)}, to allow
- * the camera of the viewer to be controlled externally, alternatively to
- * the cameras that are provided by the glTF.
+ * An interface for a camera that is used for rendering.
  */
-public interface ExternalCamera
+public interface RenderedCamera
 {
     /**
      * The view matrix of this camera, as a float array with 16 elements, 

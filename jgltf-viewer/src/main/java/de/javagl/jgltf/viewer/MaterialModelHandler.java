@@ -249,13 +249,13 @@ class MaterialModelHandler
 
     
     /**
-     * Create a {@link RenderedMaterial} instance for the given {@link Material}
+     * Create a {@link DefaultRenderedMaterial} instance for the given {@link Material}
      * 
      * @param material The {@link Material}
      * @param numJoints The number of joints
-     * @return The {@link RenderedMaterial}
+     * @return The {@link DefaultRenderedMaterial}
      */
-    RenderedMaterial createRenderedMaterial(Material material, int numJoints)
+    DefaultRenderedMaterial createRenderedMaterial(Material material, int numJoints)
     {
 
         MaterialStructure materialStructure = 
@@ -395,8 +395,8 @@ class MaterialModelHandler
         float lightPosition[] = { -800,500,500 };
         values.put("lightPosition", lightPosition);
         
-        RenderedMaterial renderedMaterial = 
-            new RenderedMaterial(techniqueModel, values);
+        DefaultRenderedMaterial renderedMaterial = 
+            new DefaultRenderedMaterial(techniqueModel, values);
         return renderedMaterial;
     }
     

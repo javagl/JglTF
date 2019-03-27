@@ -35,7 +35,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.logging.Logger;
 
 import de.javagl.jgltf.impl.v1.Accessor;
@@ -74,7 +73,6 @@ import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.MaterialModel;
-import de.javagl.jgltf.model.MathUtils;
 import de.javagl.jgltf.model.MeshModel;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
 import de.javagl.jgltf.model.NodeModel;
@@ -283,6 +281,7 @@ public final class GltfModelV1 implements GltfModel
         createAnimationModels();
         createBufferModels();
         createBufferViewModels();
+        createCameraModels();
         createImageModels();
         createMaterialModels();
         createMeshModels();
@@ -312,8 +311,6 @@ public final class GltfModelV1 implements GltfModel
         initShaderModels();
         initProgramModels();
         initTechniqueModels();
-        
-        instantiateCameraModels();
     }
     
     /**
@@ -475,6 +472,30 @@ public final class GltfModelV1 implements GltfModel
             DefaultBufferViewModel bufferViewModel = 
                 createBufferViewModel(bufferView);
             bufferViewModels.add(bufferViewModel);
+        }
+    }
+    
+    /**
+     * Create the {@link CameraModel} instances
+     */
+    private void createCameraModels()
+    {
+        Map<String, Camera> cameras = 
+            Optionals.of(gltf.getCameras());
+        for (Camera camera : cameras.values())
+        {
+            BiFunction<float[], Float, float[]> projectionMatrixComputer = 
+                (result, aspectRatio) -> 
+            {
+                float localResult[] = Utils.validate(result, 16);
+                CamerasV1.computeProjectionMatrix(
+                    camera, aspectRatio, localResult);
+                return localResult;
+            };
+            
+            DefaultCameraModel cameraModel = 
+                new DefaultCameraModel(projectionMatrixComputer);
+            cameraModels.add(cameraModel);
         }
     }
 
@@ -1068,6 +1089,13 @@ public final class GltfModelV1 implements GltfModel
                 SkinModel skinModel = get("skins", skinId, skinModels);
                 nodeModel.setSkinModel(skinModel);
             }
+            String cameraId = node.getCamera();
+            if (cameraId != null)
+            {
+                CameraModel cameraModel = 
+                    get("cameras", cameraId, cameraModels);
+                nodeModel.setCameraModel(cameraModel);
+            }
             
             float matrix[] = node.getMatrix();
             float translation[] = node.getTranslation();
@@ -1400,60 +1428,6 @@ public final class GltfModelV1 implements GltfModel
         }
     }
 
-
-
-    /**
-     * Create the {@link CameraModel} instances. This has to be be called
-     * <b>after</b> the {@link #nodeModels} have been created: Each time
-     * that a node refers to a camera, a new instance of this camera
-     * has to be created.
-     */
-    private void instantiateCameraModels()
-    {
-        Map<String, Node> nodes = Optionals.of(gltf.getNodes());
-        Map<String, Camera> cameras = Optionals.of(gltf.getCameras());
-        for (Entry<String, Node> entry : nodes.entrySet())
-        {
-            String nodeId = entry.getKey();
-            Node node = entry.getValue();
-            
-            String cameraId = node.getCamera();
-            if (cameraId != null)
-            {
-                Camera camera = cameras.get(cameraId);
-                NodeModel nodeModel = get("nodes", nodeId, nodeModels);
-                
-                Function<float[], float[]> viewMatrixComputer = result -> 
-                {
-                    float localResult[] = Utils.validate(result, 16);
-                    nodeModel.computeGlobalTransform(localResult);
-                    MathUtils.invert4x4(localResult, localResult);
-                    return localResult;
-                };
-                BiFunction<float[], Float, float[]> projectionMatrixComputer = 
-                    (result, aspectRatio) -> 
-                {
-                    float localResult[] = Utils.validate(result, 16);
-                    CamerasV1.computeProjectionMatrix(
-                        camera, aspectRatio, localResult);
-                    return localResult;
-                };
-                DefaultCameraModel cameraModel = new DefaultCameraModel(
-                    viewMatrixComputer, projectionMatrixComputer);
-                cameraModel.setName(camera.getName());
-                
-                cameraModel.setNodeModel(nodeModel);
-
-                String nodeName = Optionals.of(node.getName(), nodeId);
-                String cameraName = Optionals.of(camera.getName(), cameraId);
-                String instanceName = nodeName + "." + cameraName;
-                cameraModel.setInstanceName(instanceName);
-                
-                cameraModels.add(cameraModel);
-            }
-        }
-    }
-    
     @Override
     public List<AccessorModel> getAccessorModels()
     {
@@ -1497,11 +1471,23 @@ public final class GltfModelV1 implements GltfModel
     }
     
     @Override
+    public List<MeshModel> getMeshModels()
+    {
+        return Collections.unmodifiableList(meshModels);
+    }
+    
+    @Override
     public List<NodeModel> getNodeModels()
     {
         return Collections.unmodifiableList(nodeModels);
     }
     
+    @Override
+    public List<SkinModel> getSkinModels()
+    {
+        return Collections.unmodifiableList(skinModels);
+    }
+
     @Override
     public List<SceneModel> getSceneModels()
     {

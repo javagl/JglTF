@@ -38,8 +38,8 @@ import de.javagl.jgltf.model.gl.TechniqueParametersModel;
 
 /**
  * Utility methods related to obtaining the values of uniform variables from
- * a {@link RenderedMaterial}. Its only non-private method is 
- * {@link #createGenericSupplier(String, RenderedMaterial)}, which is
+ * a {@link DefaultRenderedMaterial}. Its only non-private method is 
+ * {@link #createGenericSupplier(String, DefaultRenderedMaterial)}, which is
  * used by the {@link UniformGetterFactory}.
  */
 class UniformGetters
@@ -78,17 +78,17 @@ class UniformGetters
      * <br>
      * If the {@link TechniqueParametersModel} for the specified uniform can
      * not be looked up in the {@link TechniqueModel} of the given 
-     * {@link RenderedMaterial} then <code>null</code> is returned.
+     * {@link DefaultRenderedMaterial} then <code>null</code> is returned.
      * 
      * @param uniformName The uniform name
-     * @param renderedMaterial The {@link RenderedMaterial}
+     * @param renderedMaterial The {@link DefaultRenderedMaterial}
      * @return The supplier
      * @throws IllegalArgumentException If the
      * {@link TechniqueParametersModel#getType()} is not one of the supported
      * types for OpenGL uniforms
      */
     static Supplier<?> createGenericSupplier(
-        String uniformName, RenderedMaterial renderedMaterial)
+        String uniformName, DefaultRenderedMaterial renderedMaterial)
     {
         TechniqueModel techniqueModel = renderedMaterial.getTechniqueModel();
         TechniqueParametersModel techniqueParametersModel = 
@@ -148,18 +148,18 @@ class UniformGetters
 
     /**
      * Obtain the value for the uniform with the given name from the given
-     * {@link RenderedMaterial}. If the value for the parameter is not 
-     * contained in the given {@link RenderedMaterial}, then return the 
+     * {@link DefaultRenderedMaterial}. If the value for the parameter is not 
+     * contained in the given {@link DefaultRenderedMaterial}, then return the 
      * default value that is specified by the {@link TechniqueModel} of 
-     * the {@link RenderedMaterial}. 
+     * the {@link DefaultRenderedMaterial}. 
      * (Note that this value may still be <code>null</code>).
      *   
      * @param uniformName The uniform name
-     * @param renderedMaterial The {@link RenderedMaterial}
+     * @param renderedMaterial The {@link DefaultRenderedMaterial}
      * @return The uniform value
      */
     private static Object getUniformValueObject(
-        String uniformName, RenderedMaterial renderedMaterial)
+        String uniformName, DefaultRenderedMaterial renderedMaterial)
     {
         TechniqueModel techniqueModel = renderedMaterial.getTechniqueModel();
         Map<String, String> uniforms = techniqueModel.getUniforms();
@@ -186,11 +186,11 @@ class UniformGetters
      * the actual value object.
      * 
      * @param uniformName The uniform name
-     * @param renderedMaterial The {@link RenderedMaterial}
+     * @param renderedMaterial The {@link DefaultRenderedMaterial}
      * @return The supplier
      */
     private static Supplier<?> createObjectArraySupplier(
-        String uniformName, RenderedMaterial renderedMaterial)
+        String uniformName, DefaultRenderedMaterial renderedMaterial)
     {
         Object value[] = new Object[1];
         return () ->
@@ -231,7 +231,7 @@ class UniformGetters
      * @return The supplier
      */
     private static Supplier<?> createIntArraySupplier(
-        String uniformName, RenderedMaterial renderedMaterial)
+        String uniformName, DefaultRenderedMaterial renderedMaterial)
     {
         Supplier<int[]> supplier = new Supplier<int[]>()
         {
@@ -279,7 +279,7 @@ class UniformGetters
      * @return The supplier
      */
     private static Supplier<?> createFloatArraySupplier(
-        String uniformName, RenderedMaterial renderedMaterial)
+        String uniformName, DefaultRenderedMaterial renderedMaterial)
     {
         Supplier<float[]> supplier = new Supplier<float[]>()
         {

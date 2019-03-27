@@ -54,8 +54,6 @@ public class BufferStructureGltfV2
     public static List<Accessor> createAccessors(
         BufferStructure bufferStructure)
     {
-        List<BufferViewModel> bufferViewModels = 
-            bufferStructure.getBufferViewModels();
         List<AccessorModel> accessorModels = 
             bufferStructure.getAccessorModels();
         List<Accessor> accessors = new ArrayList<Accessor>();
@@ -63,7 +61,8 @@ public class BufferStructureGltfV2
         {
             BufferViewModel bufferViewModel = 
                 accessorModel.getBufferViewModel();
-            int bufferViewIndex = bufferViewModels.indexOf(bufferViewModel);
+            int bufferViewIndex =
+                bufferStructure.getBufferViewIndex(bufferViewModel);
             accessors.add(createAccessor(accessorModel, bufferViewIndex));
         }
         return accessors;
@@ -106,15 +105,13 @@ public class BufferStructureGltfV2
     public static List<BufferView> createBufferViews(
         BufferStructure bufferStructure)
     {
-        List<BufferModel> bufferModels = bufferStructure.getBufferModels();
-
         List<BufferViewModel> bufferViewModels = 
             bufferStructure.getBufferViewModels();
         List<BufferView> bufferViews = new ArrayList<BufferView>();
         for (BufferViewModel bufferViewModel : bufferViewModels)
         {
             BufferModel bufferModel = bufferViewModel.getBufferModel();
-            int bufferIndex = bufferModels.indexOf(bufferModel);
+            int bufferIndex = bufferStructure.getBufferIndex(bufferModel);
             bufferViews.add(createBufferView(
                 bufferViewModel, bufferIndex));
         }

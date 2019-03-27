@@ -26,6 +26,7 @@
  */
 package de.javagl.jgltf.model.mutable;
 
+import de.javagl.jgltf.model.CameraModel;
 import de.javagl.jgltf.model.MeshModel;
 import de.javagl.jgltf.model.NodeModel;
 import de.javagl.jgltf.model.SkinModel;
@@ -62,4 +63,12 @@ public interface MutableNodeModel extends NodeModel
      * @param skinModel The {@link SkinModel}
      */
     void setSkinModel(SkinModel skinModel);
+    
+    /**
+     * Set the {@link CameraModel}
+     * 
+     * @param cameraModel The {@link CameraModel}
+     */
+    void setCameraModel(CameraModel cameraModel);
+    
 }

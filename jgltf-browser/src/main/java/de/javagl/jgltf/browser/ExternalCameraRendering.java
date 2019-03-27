@@ -34,7 +34,7 @@ import java.util.Objects;
 
 import javax.vecmath.Matrix4f;
 
-import de.javagl.jgltf.viewer.ExternalCamera;
+import de.javagl.jgltf.viewer.RenderedCamera;
 import de.javagl.rendering.core.view.Camera;
 import de.javagl.rendering.core.view.CameraListener;
 import de.javagl.rendering.core.view.CameraUtils;
@@ -45,10 +45,10 @@ import de.javagl.rendering.interaction.Control;
 import de.javagl.rendering.interaction.camera.CameraControls;
 
 /**
- * Implementation of an {@link ExternalCamera}, based on the classes
+ * Implementation of an {@link RenderedCamera}, based on the classes
  * from the https://github.com/javagl/Rendering library
  */
-class ExternalCameraRendering implements ExternalCamera
+class ExternalCameraRendering implements RenderedCamera
 {
     /**
      * The {@link Control} summarizing the mouse interaction
