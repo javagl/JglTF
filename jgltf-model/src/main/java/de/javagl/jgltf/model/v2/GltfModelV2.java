@@ -449,7 +449,7 @@ public final class GltfModelV2 implements GltfModel
         List<Skin> skins = Optionals.of(gltf.getSkins());
         for (int i = 0; i < skins.size(); i++)
         {
-            skinModels.add(new DefaultSkinModel(null));
+            skinModels.add(new DefaultSkinModel());
         }
     }
 

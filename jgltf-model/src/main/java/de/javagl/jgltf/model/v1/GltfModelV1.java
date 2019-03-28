@@ -598,7 +598,9 @@ public final class GltfModelV1 implements GltfModel
         {
             Skin skin = entry.getValue();
             float[] bindShapeMatrix = skin.getBindShapeMatrix();
-            skinModels.add(new DefaultSkinModel(bindShapeMatrix));
+            DefaultSkinModel skinModel = new DefaultSkinModel();
+            skinModel.setBindShapeMatrix(bindShapeMatrix);
+            skinModels.add(skinModel);
         }
     }
 

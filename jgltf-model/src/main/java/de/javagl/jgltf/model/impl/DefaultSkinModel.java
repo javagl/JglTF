@@ -48,7 +48,7 @@ public final class DefaultSkinModel extends AbstractNamedModelElement
     /**
      * The bind shape matrix
      */
-    private final float bindShapeMatrix[];
+    private float bindShapeMatrix[];
     
     /**
      * The joint nodes
@@ -67,12 +67,21 @@ public final class DefaultSkinModel extends AbstractNamedModelElement
     
     /**
      * Creates a new instance
+     */
+    public DefaultSkinModel()
+    {
+        this.bindShapeMatrix = MathUtils.createIdentity4x4();
+        this.joints = new ArrayList<NodeModel>();
+    }
+    
+    /**
+     * Set the bind shape matrix
      * 
      * @param bindShapeMatrix The bind shape matrix. A copy of this array
      * will be stored. If it is <code>null</code>, a new array will be 
      * created, which represents the identity matrix.
      */
-    public DefaultSkinModel(float bindShapeMatrix[])
+    public void setBindShapeMatrix(float[] bindShapeMatrix)
     {
         if (bindShapeMatrix == null)
         {
@@ -82,7 +91,6 @@ public final class DefaultSkinModel extends AbstractNamedModelElement
         {
             this.bindShapeMatrix = bindShapeMatrix.clone();
         }
-        this.joints = new ArrayList<NodeModel>();
     }
     
     /**
