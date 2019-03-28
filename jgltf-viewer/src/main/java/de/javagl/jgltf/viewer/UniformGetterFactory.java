@@ -36,7 +36,6 @@ import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.javagl.jgltf.model.MaterialModel;
 import de.javagl.jgltf.model.NodeModel;
 import de.javagl.jgltf.model.SkinModel;
 import de.javagl.jgltf.model.gl.Semantic;
@@ -45,7 +44,7 @@ import de.javagl.jgltf.model.gl.TechniqueParametersModel;
 
 /**
  * A class that provides a suppliers for the values of uniform variables, 
- * based on a {@link MaterialModel}.
+ * based on a {@link RenderedMaterial}.
  */
 class UniformGetterFactory
 {
@@ -107,19 +106,19 @@ class UniformGetterFactory
      * Create a supplier that supplies the value for the specified uniform.
      * If there is no {@link TechniqueParametersModel#getSemantic() semantic} 
      * defined in the {@link TechniqueModel} of the given 
-     * {@link DefaultRenderedMaterial}, then this value will be obtained from the 
-     * {@link TechniqueModel} of the {@link DefaultRenderedMaterial}. Otherwise, the 
+     * {@link RenderedMaterial}, then this value will be obtained from the 
+     * {@link TechniqueModel} of the {@link RenderedMaterial}. Otherwise, the 
      * value will be derived from the context of the currently rendered node, 
      * which is given by the local and global transform of the 
      * given {@link NodeModel}  
      * 
      * @param uniformName The name of the uniform
-     * @param renderedMaterial The {@link MaterialModel}
+     * @param renderedMaterial The {@link RenderedMaterial}
      * @param nodeModel The {@link NodeModel}
      * @return The supplier for the uniform value
      */
     public Supplier<?> createUniformValueSupplier(String uniformName, 
-        DefaultRenderedMaterial renderedMaterial, NodeModel nodeModel)
+        RenderedMaterial renderedMaterial, NodeModel nodeModel)
     {
         TechniqueModel techniqueModel = renderedMaterial.getTechniqueModel();
         Map<String, String> uniforms = techniqueModel.getUniforms();

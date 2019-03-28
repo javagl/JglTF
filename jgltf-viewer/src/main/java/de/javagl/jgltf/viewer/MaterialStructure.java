@@ -36,9 +36,9 @@ import de.javagl.jgltf.model.v2.gl.Materials;
 
 /**
  * A simple (package-private!) class describing the structure of a material.
- * It is only used as a key for map lookups in the {@link MaterialModelHandler},
- * to decide whether for a certain structure of a material a new technique 
- * is required.
+ * It is only used as a key for map lookups in the 
+ * {@link RenderedMaterialHandler}, to decide whether for a certain 
+ * structure of a material a new technique is required.
  */
 class MaterialStructure
 {

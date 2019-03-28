@@ -40,7 +40,6 @@ import de.javagl.jgltf.impl.v2.MaterialOcclusionTextureInfo;
 import de.javagl.jgltf.impl.v2.MaterialPbrMetallicRoughness;
 import de.javagl.jgltf.impl.v2.TextureInfo;
 import de.javagl.jgltf.model.GltfConstants;
-import de.javagl.jgltf.model.MaterialModel;
 import de.javagl.jgltf.model.NodeModel;
 import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.gl.ProgramModel;
@@ -56,24 +55,23 @@ import de.javagl.jgltf.model.gl.impl.DefaultTechniqueParametersModel;
 import de.javagl.jgltf.model.gl.impl.TechniqueStatesModels;
 import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.model.io.IO;
-import de.javagl.jgltf.model.v2.GltfModelV2;
 import de.javagl.jgltf.model.v2.gl.Materials;
 
 /**
- * A class for creating the {@link MaterialModel} instances that are required
- * in a {@link GltfModelV2}. <br>
+ * A class for creating the {@link RenderedMaterial} instances for glTF 2.0
+ * {@link Material} objects.<br>
  * <br>
  * It will lazily create the internal {@link TechniqueModel}, 
  * {@link ProgramModel} and {@link ShaderModel} instances that 
  * are required for rendering.
  */
-class MaterialModelHandler
+class RenderedMaterialHandler
 {
     /**
      * The logger used in this class
      */
     private static final Logger logger = 
-        Logger.getLogger(MaterialModelHandler.class.getName());
+        Logger.getLogger(RenderedMaterialHandler.class.getName());
     
     /**
      * The mapping from joint counts to vertex {@link ShaderModel} instances
@@ -99,7 +97,7 @@ class MaterialModelHandler
     /**
      * Default constructor
      */
-    MaterialModelHandler()
+    RenderedMaterialHandler()
     {
         this.vertexShaderModels = 
             new LinkedHashMap<Integer, ShaderModel>();
@@ -249,15 +247,14 @@ class MaterialModelHandler
 
     
     /**
-     * Create a {@link DefaultRenderedMaterial} instance for the given {@link Material}
+     * Create a {@link RenderedMaterial} instance for the given {@link Material}
      * 
      * @param material The {@link Material}
      * @param numJoints The number of joints
-     * @return The {@link DefaultRenderedMaterial}
+     * @return The {@link RenderedMaterial}
      */
-    DefaultRenderedMaterial createRenderedMaterial(Material material, int numJoints)
+    RenderedMaterial createRenderedMaterial(Material material, int numJoints)
     {
-
         MaterialStructure materialStructure = 
             new MaterialStructure(material, numJoints);
         TechniqueModel techniqueModel = 
@@ -424,7 +421,7 @@ class MaterialModelHandler
         DefaultShaderModel shaderModel = new DefaultShaderModel(
             uriString, shaderType);
         try (InputStream inputStream = 
-            MaterialModelHandler.class.getResourceAsStream("/" + resourceName))
+            RenderedMaterialHandler.class.getResourceAsStream("/" + resourceName))
         {
             byte[] data = IO.readStream(inputStream);
             String basicShaderString = new String(data);
