@@ -26,12 +26,12 @@
  */
 package de.javagl.jgltf.model.impl;
 
-import java.util.Objects;
-import java.util.function.BiFunction;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import de.javagl.jgltf.model.CameraModel;
+import de.javagl.jgltf.model.CameraOrthographicModel;
+import de.javagl.jgltf.model.CameraPerspectiveModel;
 import de.javagl.jgltf.model.Suppliers;
 
 /**
@@ -41,27 +41,61 @@ public final class DefaultCameraModel extends AbstractNamedModelElement
     implements CameraModel
 {
     /**
-     * The function that computes the projection matrix
+     * The {@link CameraOrthographicModel}
      */
-    private final BiFunction<float[], Float, float[]> projectionMatrixComputer;
-
+    private CameraOrthographicModel cameraOrthographicModel;
+    
+    /**
+     * The {@link CameraPerspectiveModel}
+     */
+    private CameraPerspectiveModel cameraPerspectiveModel;
+    
     /**
      * Creates a new instance
-     * @param projectionMatrixComputer The function that computes the 
-     * projection matrix
      */
-    public DefaultCameraModel(
-        BiFunction<float[], Float, float[]> projectionMatrixComputer)
+    public DefaultCameraModel()
     {
-        this.projectionMatrixComputer = 
-            Objects.requireNonNull(projectionMatrixComputer, 
-                "The projectionMatrixComputer may not be null");
+        // Default constructor
+    }
+    
+    /**
+     * Set the {@link CameraOrthographicModel}
+     * 
+     * @param cameraOrthographicModel The {@link CameraOrthographicModel}
+     */
+    public void setCameraOrthographicModel(
+        CameraOrthographicModel cameraOrthographicModel)
+    {
+        this.cameraOrthographicModel = cameraOrthographicModel;
+    }
+    
+    @Override
+    public CameraOrthographicModel getCameraOrthographicModel()
+    {
+        return cameraOrthographicModel;
+    }
+    
+    /**
+     * Set the {@link CameraPerspectiveModel}
+     * 
+     * @param cameraPerspectiveModel The {@link CameraPerspectiveModel}
+     */
+    public void setCameraPerspectiveModel(
+        CameraPerspectiveModel cameraPerspectiveModel)
+    {
+        this.cameraPerspectiveModel = cameraPerspectiveModel;
+    }
+    
+    @Override
+    public CameraPerspectiveModel getCameraPerspectiveModel()
+    {
+        return cameraPerspectiveModel;
     }
 
     @Override
     public float[] computeProjectionMatrix(float result[], Float aspectRatio)
     {
-        return projectionMatrixComputer.apply(result, aspectRatio);
+        return Cameras.computeProjectionMatrix(this, aspectRatio, result);
     }
     
     @Override

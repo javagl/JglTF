@@ -36,6 +36,22 @@ import java.util.function.Supplier;
 public interface CameraModel extends NamedModelElement
 {
     /**
+     * Returns the {@link CameraOrthographicModel}, or <code>null</code> if
+     * this is a perspective camera
+     * 
+     * @return The {@link CameraOrthographicModel}
+     */
+    CameraOrthographicModel getCameraOrthographicModel();
+    
+    /**
+     * Returns the {@link CameraPerspectiveModel}, or <code>null</code> if
+     * this is an orthographic camera
+     * 
+     * @return The {@link CameraPerspectiveModel}
+     */
+    CameraPerspectiveModel getCameraPerspectiveModel();
+    
+    /**
      * Compute the projection matrix for this camera.<br>
      * <br>
      * The result will be written to the given array, as a 4x4 matrix in 

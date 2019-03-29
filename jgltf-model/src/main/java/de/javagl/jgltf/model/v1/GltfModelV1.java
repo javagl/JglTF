@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.function.BiFunction;
 import java.util.logging.Logger;
 
 import de.javagl.jgltf.impl.v1.Accessor;
@@ -45,6 +44,8 @@ import de.javagl.jgltf.impl.v1.AnimationSampler;
 import de.javagl.jgltf.impl.v1.Buffer;
 import de.javagl.jgltf.impl.v1.BufferView;
 import de.javagl.jgltf.impl.v1.Camera;
+import de.javagl.jgltf.impl.v1.CameraOrthographic;
+import de.javagl.jgltf.impl.v1.CameraPerspective;
 import de.javagl.jgltf.impl.v1.GlTF;
 import de.javagl.jgltf.impl.v1.Image;
 import de.javagl.jgltf.impl.v1.Material;
@@ -80,7 +81,6 @@ import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.SceneModel;
 import de.javagl.jgltf.model.SkinModel;
 import de.javagl.jgltf.model.TextureModel;
-import de.javagl.jgltf.model.Utils;
 import de.javagl.jgltf.model.gl.ProgramModel;
 import de.javagl.jgltf.model.gl.ShaderModel;
 import de.javagl.jgltf.model.gl.ShaderModel.ShaderType;
@@ -101,6 +101,8 @@ import de.javagl.jgltf.model.impl.DefaultAnimationModel.DefaultSampler;
 import de.javagl.jgltf.model.impl.DefaultBufferModel;
 import de.javagl.jgltf.model.impl.DefaultBufferViewModel;
 import de.javagl.jgltf.model.impl.DefaultCameraModel;
+import de.javagl.jgltf.model.impl.DefaultCameraOrthographicModel;
+import de.javagl.jgltf.model.impl.DefaultCameraPerspectiveModel;
 import de.javagl.jgltf.model.impl.DefaultImageModel;
 import de.javagl.jgltf.model.impl.DefaultMeshModel;
 import de.javagl.jgltf.model.impl.DefaultMeshPrimitiveModel;
@@ -484,18 +486,48 @@ public final class GltfModelV1 implements GltfModel
             Optionals.of(gltf.getCameras());
         for (Camera camera : cameras.values())
         {
-            BiFunction<float[], Float, float[]> projectionMatrixComputer = 
-                (result, aspectRatio) -> 
+            String type = camera.getType();
+            if ("perspective".equals(type))
             {
-                float localResult[] = Utils.validate(result, 16);
-                CamerasV1.computeProjectionMatrix(
-                    camera, aspectRatio, localResult);
-                return localResult;
-            };
-            
-            DefaultCameraModel cameraModel = 
-                new DefaultCameraModel(projectionMatrixComputer);
-            cameraModels.add(cameraModel);
+                CameraPerspective cameraPerspective = camera.getPerspective();
+                DefaultCameraPerspectiveModel cameraPerspectiveModel = 
+                    new DefaultCameraPerspectiveModel();
+                cameraPerspectiveModel.setAspectRatio(
+                    cameraPerspective.getAspectRatio());
+                cameraPerspectiveModel.setYfov(
+                    cameraPerspective.getYfov());
+                cameraPerspectiveModel.setZfar(
+                    cameraPerspective.getZfar());
+                cameraPerspectiveModel.setZnear(
+                    cameraPerspective.getZnear());
+                DefaultCameraModel cameraModel = 
+                    new DefaultCameraModel();
+                cameraModel.setCameraPerspectiveModel(cameraPerspectiveModel);
+                cameraModels.add(cameraModel);
+            }
+            else if ("orthographic".equals(type))
+            {
+                CameraOrthographic cameraOrthographic = 
+                    camera.getOrthographic();
+                DefaultCameraOrthographicModel cameraOrthographicModel = 
+                    new DefaultCameraOrthographicModel();
+                cameraOrthographicModel.setXmag(
+                    cameraOrthographic.getXmag());
+                cameraOrthographicModel.setYmag(
+                    cameraOrthographic.getYmag());
+                cameraOrthographicModel.setZfar(
+                    cameraOrthographic.getZfar());
+                cameraOrthographicModel.setZnear(
+                    cameraOrthographic.getZnear());
+                DefaultCameraModel cameraModel = 
+                    new DefaultCameraModel();
+                cameraModel.setCameraOrthographicModel(cameraOrthographicModel);
+                cameraModels.add(cameraModel);
+            }
+            else
+            {
+                logger.severe("Invalid camera type: " + type);
+            }
         }
     }
 

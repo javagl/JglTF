@@ -24,55 +24,56 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.model.v1;
+package de.javagl.jgltf.model.impl;
 
 import java.util.logging.Logger;
 
-import de.javagl.jgltf.impl.v1.Camera;
-import de.javagl.jgltf.impl.v1.CameraOrthographic;
-import de.javagl.jgltf.impl.v1.CameraPerspective;
+import de.javagl.jgltf.model.CameraModel;
+import de.javagl.jgltf.model.CameraOrthographicModel;
+import de.javagl.jgltf.model.CameraPerspectiveModel;
 import de.javagl.jgltf.model.MathUtils;
 import de.javagl.jgltf.model.Utils;
 
 /**
- * Utility methods related to cameras in glTF 1.0
+ * Utility methods related to cameras
  */
-class CamerasV1
+class Cameras
 {
-    // TODO This is the same as CamerasV2, except for the package names
-    // names of the classes that it operates on. 
-    
     /**
      * The logger used in this class
      */
     private static final Logger logger = 
-        Logger.getLogger(CamerasV1.class.getName());
+        Logger.getLogger(Cameras.class.getName());
     
     /**
-     * Compute the projection matrix for the given {@link Camera}. If the 
-     * {@link Camera#getType()} is neither <code>"perspective"</code> 
-     * nor <code>"orthographic"</code>, then an error message will be 
-     * printed, and the result will be the identity matrix.<br>
+     * Compute the projection matrix for the given {@link CameraModel}. If the 
+     * camera is neither perspective orthographic, then an error message will 
+     * be printed, and the result will be the identity matrix.<br>
      * <br>
      * The result will be written to the given array, as a 4x4 matrix in 
      * column major order. If the given array is <code>null</code> or does
      * not have a length of 16, then a new array with length 16 will be 
      * created and returned. 
      * 
-     * @param camera The {@link Camera}
+     * @param cameraModel The {@link CameraModel}
      * @param aspectRatio An optional aspect ratio to use. If this is 
      * <code>null</code>, then the aspect ratio of the camera will be used.
      * @param result The array storing the result
      * @return The result array
      */
     static float[] computeProjectionMatrix(
-        Camera camera, Float aspectRatio, float result[])
+        CameraModel cameraModel, Float aspectRatio, float result[])
     {
         float localResult[] = Utils.validate(result, 16);
-        String cameraType = camera.getType();
-        if ("perspective".equals(cameraType))
+        
+        CameraPerspectiveModel cameraPerspective = 
+            cameraModel.getCameraPerspectiveModel();
+
+        CameraOrthographicModel cameraOrthographic = 
+            cameraModel.getCameraOrthographicModel();
+        
+        if (cameraPerspective != null)
         {
-            CameraPerspective cameraPerspective = camera.getPerspective();
             float fovRad = cameraPerspective.getYfov();
             float fovDeg = (float)Math.toDegrees(fovRad);
             float localAspectRatio = 1.0f;
@@ -97,10 +98,8 @@ class CamerasV1
                     fovDeg, localAspectRatio, zNear, zFar, localResult);
             }
         }
-        else if ("orthographic".equals(cameraType))
+        else if (cameraOrthographic != null)
         {
-            CameraOrthographic cameraOrthographic = 
-                camera.getOrthographic();
             float xMag = cameraOrthographic.getXmag();
             float yMag = cameraOrthographic.getYmag();
             float zNear = cameraOrthographic.getZnear();
@@ -113,7 +112,7 @@ class CamerasV1
         }
         else
         {
-            logger.severe("Invalid camera type: " + cameraType);
+            logger.severe("Invalid camera type: " + cameraModel);
             MathUtils.setIdentity4x4(localResult);
         }
         return localResult;
@@ -122,7 +121,7 @@ class CamerasV1
     /**
      * Private constructor to prevent instantiation
      */
-    private CamerasV1()
+    private Cameras()
     {
         // Private constructor to prevent instantiation
     }
