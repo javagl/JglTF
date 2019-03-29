@@ -32,13 +32,12 @@ import java.util.List;
 
 import de.javagl.jgltf.model.NodeModel;
 import de.javagl.jgltf.model.SceneModel;
-import de.javagl.jgltf.model.mutable.MutableSceneModel;
 
 /**
  * Implementation of a {@link SceneModel} 
  */
 public class DefaultSceneModel extends AbstractNamedModelElement
-    implements MutableSceneModel
+    implements SceneModel
 {
     /**
      * The list of root nodes
@@ -53,7 +52,11 @@ public class DefaultSceneModel extends AbstractNamedModelElement
         this.nodeModels = new ArrayList<NodeModel>();
     }
     
-    @Override
+    /**
+     * Add the given (root) {@link NodeModel} to this scene
+     * 
+     * @param node The {@link NodeModel}
+     */
     public void addNode(NodeModel node)
     {
        nodeModels.add(node); 

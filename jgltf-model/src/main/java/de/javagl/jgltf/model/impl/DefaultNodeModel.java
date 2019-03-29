@@ -39,13 +39,12 @@ import de.javagl.jgltf.model.NodeModel;
 import de.javagl.jgltf.model.SkinModel;
 import de.javagl.jgltf.model.Suppliers;
 import de.javagl.jgltf.model.Utils;
-import de.javagl.jgltf.model.mutable.MutableNodeModel;
 
 /**
  * Implementation of a {@link NodeModel} 
  */
 public class DefaultNodeModel extends AbstractNamedModelElement
-    implements MutableNodeModel
+    implements NodeModel
 {
     /**
      * A thread-local, temporary 16-element matrix
@@ -118,34 +117,54 @@ public class DefaultNodeModel extends AbstractNamedModelElement
         this.meshModels = new ArrayList<MeshModel>();
     }
     
-    @Override
-    public void setParent(MutableNodeModel parent)
+    /**
+     * Set the parent of this node
+     * 
+     * @param parent The parent node
+     */
+    public void setParent(DefaultNodeModel parent)
     {
         this.parent = parent;
     }
     
-    @Override
-    public void addChild(MutableNodeModel child)
+    /**
+     * Add the given child node
+     * 
+     * @param child The child node
+     */
+    public void addChild(DefaultNodeModel child)
     {
         Objects.requireNonNull(child, "The child may not be null");
         children.add(child);
         child.setParent(this);
     }
     
-    @Override
+    /**
+     * Add the given {@link MeshModel} 
+     * 
+     * @param meshModel The {@link MeshModel}
+     */
     public void addMeshModel(MeshModel meshModel)
     {
         Objects.requireNonNull(meshModel, "The meshModel may not be null");
         meshModels.add(meshModel);
     }
     
-    @Override
+    /**
+     * Set the {@link SkinModel} 
+     * 
+     * @param skinModel The {@link SkinModel}
+     */
     public void setSkinModel(SkinModel skinModel)
     {
         this.skinModel = skinModel;
     }
     
-    @Override
+    /**
+     * Set the {@link CameraModel} 
+     * 
+     * @param cameraModel The {@link CameraModel}
+     */
     public void setCameraModel(CameraModel cameraModel)
     {
         this.cameraModel = cameraModel;

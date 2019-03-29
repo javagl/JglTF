@@ -35,7 +35,6 @@ import java.util.logging.Logger;
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.impl.DefaultImageModel;
 import de.javagl.jgltf.model.io.IO;
-import de.javagl.jgltf.model.mutable.MutableImageModel;
 import de.javagl.jgltf.viewer.ImageUtils;
 import de.javagl.jgltf.viewer.PixelData;
 import de.javagl.jgltf.viewer.PixelDatas;
@@ -50,16 +49,6 @@ public class ImageModels
      */
     private static final Logger logger = 
         Logger.getLogger(ImageModels.class.getName());
-    
-    /**
-     * Create a new {@link MutableImageModel}
-     * 
-     * @return The instance
-     */
-    public static MutableImageModel create()
-    {
-        return new DefaultImageModel();
-    }
     
     /**
      * Creates a new {@link ImageModel} with the given URI, that contains
@@ -80,7 +69,7 @@ public class ImageModels
      * @throws IllegalArgumentException If the MIME type is not one of the
      * types listed above
      */
-    public static MutableImageModel create(
+    public static DefaultImageModel create(
         String fileName, String uri, String mimeType)
     {
         try (InputStream inputStream = new FileInputStream(fileName))
@@ -113,7 +102,7 @@ public class ImageModels
      * @throws IllegalArgumentException If the MIME type is not one of the
      * types listed above
      */
-    public static MutableImageModel create(
+    public static DefaultImageModel create(
         String uri, String mimeType, PixelData pixelData)
     {
         ByteBuffer imageData = ImageUtils.createImageDataBuffer(

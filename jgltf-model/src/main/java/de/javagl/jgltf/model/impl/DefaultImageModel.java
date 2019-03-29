@@ -31,13 +31,12 @@ import java.nio.ByteBuffer;
 import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.io.Buffers;
-import de.javagl.jgltf.model.mutable.MutableImageModel;
 
 /**
  * Implementation of a {@link ImageModel}
  */
 public class DefaultImageModel extends AbstractNamedModelElement
-    implements MutableImageModel
+    implements ImageModel
 {
     /**
      * The URI of the image
@@ -67,25 +66,41 @@ public class DefaultImageModel extends AbstractNamedModelElement
         // Default constructor
     }
     
-    @Override
+    /**
+     * Set the URI
+     * 
+     * @param uri The URI
+     */
     public void setUri(String uri)
     {
         this.uri = uri;
     }
     
-    @Override
+    /**
+     * Set the MIME type
+     * 
+     * @param mimeType The MIME type
+     */
     public void setMimeType(String mimeType)
     {
         this.mimeType = mimeType;
     }
 
-    @Override
+    /**
+     * Set the {@link BufferViewModel} 
+     * 
+     * @param bufferViewModel The {@link BufferViewModel}
+     */
     public void setBufferViewModel(BufferViewModel bufferViewModel)
     {
         this.bufferViewModel = bufferViewModel;
     }
     
-    @Override
+    /**
+     * Set the image data
+     * 
+     * @param imageData The image data
+     */
     public void setImageData(ByteBuffer imageData)
     {
         this.imageData = imageData;

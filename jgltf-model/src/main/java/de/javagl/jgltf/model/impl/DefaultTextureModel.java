@@ -28,13 +28,12 @@ package de.javagl.jgltf.model.impl;
 
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.TextureModel;
-import de.javagl.jgltf.model.mutable.MutableTextureModel;
 
 /**
  * Implementation of a {@link TextureModel}
  */
 public class DefaultTextureModel extends AbstractNamedModelElement
-    implements MutableTextureModel
+    implements TextureModel
 {
     /**
      * The magnification filter constant
@@ -69,7 +68,11 @@ public class DefaultTextureModel extends AbstractNamedModelElement
         // Default constructor
     }
     
-    @Override
+    /**
+     * Set the {@link ImageModel} that backs this texture
+     * 
+     * @param imageModel The {@link ImageModel}
+     */
     public void setImageModel(ImageModel imageModel)
     {
         this.imageModel = imageModel;
@@ -81,7 +84,11 @@ public class DefaultTextureModel extends AbstractNamedModelElement
         return magFilter;
     }
     
-    @Override
+    /**
+     * Set the magnification filter
+     * 
+     * @param magFilter The filter
+     */
     public void setMagFilter(Integer magFilter)
     {
         this.magFilter = magFilter;
@@ -93,7 +100,11 @@ public class DefaultTextureModel extends AbstractNamedModelElement
         return minFilter;
     }
     
-    @Override
+    /**
+     * Set the minification filter
+     * 
+     * @param minFilter The filter
+     */
     public void setMinFilter(Integer minFilter)
     {
         this.minFilter = minFilter;
@@ -105,7 +116,11 @@ public class DefaultTextureModel extends AbstractNamedModelElement
         return wrapS;
     }
     
-    @Override
+    /**
+     * Set the wrapping behavior in S-direction
+     * 
+     * @param wrapS The wrapping mode
+     */
     public void setWrapS(Integer wrapS)
     {
         this.wrapS = wrapS;
@@ -117,7 +132,11 @@ public class DefaultTextureModel extends AbstractNamedModelElement
         return wrapT;
     }
 
-    @Override
+    /**
+     * Set the wrapping behavior in T-direction
+     * 
+     * @param wrapT The wrapping mode
+     */
     public void setWrapT(Integer wrapT)
     {
         this.wrapT = wrapT;
