@@ -387,7 +387,7 @@ public final class BufferStructureBuilder
             
             boolean targetIsElementArrayBuffer = 
                 Objects.equals(GltfConstants.GL_ELEMENT_ARRAY_BUFFER, target);
-            if (targetIsElementArrayBuffer || accessorModels.size() > 1)
+            if (!targetIsElementArrayBuffer && accessorModels.size() > 1)
             {
                 // Compute the byte stride based on the element sizes of
                 // all accessors, and assign it to the accessors as well
