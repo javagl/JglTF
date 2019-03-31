@@ -24,7 +24,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.viewer;
+package de.javagl.jgltf.model.image;
 
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
@@ -79,7 +79,7 @@ public class PixelDatas
      * 
      * @return The {@link PixelData} object
      */
-    static PixelData createErrorPixelData()
+    public static PixelData createErrorPixelData()
     {
         // Right now, this is a 2x2 checkerboard of red and white pixels
         ByteBuffer pixelDataRGBA = ByteBuffer.allocateDirect(4 * Integer.SIZE);

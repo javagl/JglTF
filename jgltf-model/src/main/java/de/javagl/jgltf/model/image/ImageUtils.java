@@ -24,7 +24,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.viewer;
+package de.javagl.jgltf.model.image;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;

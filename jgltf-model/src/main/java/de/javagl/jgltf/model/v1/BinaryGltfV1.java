@@ -37,7 +37,7 @@ import de.javagl.jgltf.impl.v1.GlTFProperty;
 import de.javagl.jgltf.impl.v1.Image;
 import de.javagl.jgltf.impl.v1.Shader;
 import de.javagl.jgltf.model.GltfException;
-import de.javagl.jgltf.model.io.ImageReaders;
+import de.javagl.jgltf.model.image.ImageReaders;
 
 /**
  * Utility methods related to the binary glTF extension of glTF 1.0

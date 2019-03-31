@@ -33,11 +33,11 @@ import java.nio.ByteBuffer;
 import java.util.logging.Logger;
 
 import de.javagl.jgltf.model.ImageModel;
+import de.javagl.jgltf.model.image.ImageUtils;
+import de.javagl.jgltf.model.image.PixelData;
+import de.javagl.jgltf.model.image.PixelDatas;
 import de.javagl.jgltf.model.impl.DefaultImageModel;
 import de.javagl.jgltf.model.io.IO;
-import de.javagl.jgltf.viewer.ImageUtils;
-import de.javagl.jgltf.viewer.PixelData;
-import de.javagl.jgltf.viewer.PixelDatas;
 
 /**
  * Methods to create {@link ImageModel} instances

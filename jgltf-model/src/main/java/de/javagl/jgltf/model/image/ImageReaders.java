@@ -24,7 +24,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.model.io;
+package de.javagl.jgltf.model.image;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,6 +34,8 @@ import java.util.Iterator;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
+
+import de.javagl.jgltf.model.io.Buffers;
 
 /**
  * Utility methods to find <code>ImageReader</code> instances for given

@@ -34,6 +34,8 @@ import java.util.logging.Logger;
 
 import javax.imageio.ImageReader;
 
+import de.javagl.jgltf.model.image.ImageReaders;
+
 /**
  * Utility methods to related to the MIME type from data URLs or image data
  */
