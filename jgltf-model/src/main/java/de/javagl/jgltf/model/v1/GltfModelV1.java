@@ -832,7 +832,7 @@ public final class GltfModelV1 implements GltfModel
                 "Assuming " + inputParameterId + " to be an accessor ID");
             inputAccessorId = inputParameterId;
         }
-        DefaultAccessorModel inputAccessorModel = 
+        AccessorModel inputAccessorModel = 
             get("accessors", inputAccessorId, accessorModels);
         
         String outputParameterId = animationSampler.getOutput();
@@ -847,7 +847,7 @@ public final class GltfModelV1 implements GltfModel
                 "Assuming " + outputParameterId + " to be an accessor ID");
             outputAccessorId = outputParameterId;
         }
-        DefaultAccessorModel outputAccessorModel = 
+        AccessorModel outputAccessorModel = 
             get("accessors", outputAccessorId, accessorModels);
         
         String interpolationString = 
@@ -1219,7 +1219,7 @@ public final class GltfModelV1 implements GltfModel
             }
             
             String inverseBindMatricesId = skin.getInverseBindMatrices();
-            DefaultAccessorModel inverseBindMatrices =
+            AccessorModel inverseBindMatrices =
                 get("accessors", inverseBindMatricesId, accessorModels);
             skinModel.setInverseBindMatrices(inverseBindMatrices);
         }

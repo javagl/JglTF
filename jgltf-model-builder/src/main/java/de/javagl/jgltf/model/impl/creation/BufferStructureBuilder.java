@@ -336,7 +336,7 @@ public final class BufferStructureBuilder
     private void buildDefault()
     {
         List<DefaultBufferModel> bufferModels = 
-            bufferStructure.getBufferModelsInternal();
+            bufferStructure.getBufferModels();
         for (DefaultBufferModel bufferModel : bufferModels)
         {
             processBufferModel(bufferModel);
@@ -359,13 +359,13 @@ public final class BufferStructureBuilder
         List<ByteBuffer> bufferElements = new ArrayList<ByteBuffer>();
         
         List<DefaultBufferViewModel> bufferViewModels = 
-            bufferStructure.getBufferViewModelsInternal(bufferModel);
+            bufferStructure.getBufferViewModels(bufferModel);
         
         int accumulatedBufferBytes = 0;
         for (DefaultBufferViewModel bufferViewModel : bufferViewModels)
         {
             List<DefaultAccessorModel> accessorModels = 
-                bufferStructure.getAccessorModelsInternal(bufferViewModel);
+                bufferStructure.getAccessorModels(bufferViewModel);
             
             // Handle the padding that may have to be inserted into
             // the buffer, before the start of the buffer view: 
@@ -521,12 +521,12 @@ public final class BufferStructureBuilder
      */
     private void validatePadding(BufferModel bufferModel)
     {
-        List<BufferViewModel> bufferViewModels =
+        List<DefaultBufferViewModel> bufferViewModels =
             bufferStructure.getBufferViewModels();
 
         for (BufferViewModel bufferViewModel : bufferViewModels)
         {
-            List<AccessorModel> accessorModels =
+            List<DefaultAccessorModel> accessorModels =
                 bufferStructure.getAccessorModels(bufferViewModel);
             for (AccessorModel accessorModel : accessorModels)
             {

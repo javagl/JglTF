@@ -38,6 +38,9 @@ import de.javagl.jgltf.model.AccessorDatas;
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.BufferViewModel;
+import de.javagl.jgltf.model.impl.DefaultAccessorModel;
+import de.javagl.jgltf.model.impl.DefaultBufferModel;
+import de.javagl.jgltf.model.impl.DefaultBufferViewModel;
 
 /**
  * Utility methods for creating the glTF 1.0 elements that correspond to
@@ -55,7 +58,7 @@ public class BufferStructureGltfV1
     public static Map<String, Accessor> createAccessors(
         BufferStructure bufferStructure)
     {
-        List<AccessorModel> accessorModels = 
+        List<DefaultAccessorModel> accessorModels = 
             bufferStructure.getAccessorModels();
         Map<String, Accessor> accessors = new LinkedHashMap<String, Accessor>();
         for (AccessorModel accessorModel : accessorModels) 
@@ -109,7 +112,7 @@ public class BufferStructureGltfV1
     public static Map<String, BufferView> createBufferViews(
         BufferStructure bufferStructure)
     {
-        List<BufferViewModel> bufferViewModels = 
+        List<DefaultBufferViewModel> bufferViewModels = 
             bufferStructure.getBufferViewModels();
         Map<String, BufferView> bufferViews = 
             new LinkedHashMap<String, BufferView>();
@@ -156,7 +159,7 @@ public class BufferStructureGltfV1
     public static Map<String, Buffer> createBuffers(
         BufferStructure bufferStructure)
     {
-        List<BufferModel> bufferModels = 
+        List<DefaultBufferModel> bufferModels = 
             bufferStructure.getBufferModels();
         Map<String, Buffer> buffers = new LinkedHashMap<String, Buffer>();
         for (BufferModel bufferModel : bufferModels) 

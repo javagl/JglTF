@@ -567,7 +567,7 @@ public final class GltfModelV2 implements GltfModel
         {
             // When there is a BufferView referenced from the accessor, then 
             // the corresponding BufferViewModel may be assigned directly
-            DefaultBufferViewModel bufferViewModel = 
+            BufferViewModel bufferViewModel = 
                 bufferViewModels.get(bufferViewIndex);
             accessorModel.setBufferViewModel(bufferViewModel);
         }
@@ -580,7 +580,7 @@ public final class GltfModelV2 implements GltfModel
             int byteLength = elementSizeInBytes * count;
             ByteBuffer bufferData = Buffers.create(byteLength);
             String uriString = "buffer_for_accessor" + accessorIndex + ".bin";
-            DefaultBufferViewModel bufferViewModel = 
+            BufferViewModel bufferViewModel = 
                 createBufferViewModel(uriString, bufferData);
             accessorModel.setBufferViewModel(bufferViewModel);
         }
@@ -819,11 +819,11 @@ public final class GltfModelV2 implements GltfModel
         AnimationSampler animationSampler = samplers.get(samplerIndex);
         
         int inputAccessorIndex = animationSampler.getInput();
-        DefaultAccessorModel inputAccessorModel = 
+        AccessorModel inputAccessorModel = 
             accessorModels.get(inputAccessorIndex);
         
         int outputAccessorIndex = animationSampler.getOutput();
-        DefaultAccessorModel outputAccessorModel = 
+        AccessorModel outputAccessorModel = 
             accessorModels.get(outputAccessorIndex);
         
         String interpolationString = 
@@ -982,7 +982,7 @@ public final class GltfModelV2 implements GltfModel
             {
                 String attribute = entry.getKey();
                 Integer accessorIndex = entry.getValue();
-                DefaultAccessorModel accessorModel = 
+                AccessorModel accessorModel = 
                     accessorModels.get(accessorIndex);
                 morphTargetModel.put(attribute, accessorModel);
             }
@@ -1106,7 +1106,7 @@ public final class GltfModelV2 implements GltfModel
             }
             
             Integer inverseBindMatricesIndex = skin.getInverseBindMatrices();
-            DefaultAccessorModel inverseBindMatrices = 
+            AccessorModel inverseBindMatrices = 
                 accessorModels.get(inverseBindMatricesIndex);
             skinModel.setInverseBindMatrices(inverseBindMatrices);
         }

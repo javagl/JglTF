@@ -34,6 +34,7 @@ import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 import de.javagl.jgltf.model.BufferModel;
+import de.javagl.jgltf.model.impl.DefaultBufferModel;
 import de.javagl.jgltf.model.io.GltfReference;
 
 /**
@@ -64,7 +65,8 @@ public class BufferStructures
         Iterable<? extends GltfReference> bufferReferences, 
         BufferStructure bufferStructure)
     {
-        List<BufferModel> bufferModels = bufferStructure.getBufferModels();
+        List<DefaultBufferModel> bufferModels = 
+            bufferStructure.getBufferModels();
         Map<String, BufferModel> uriToBufferModel = 
             new LinkedHashMap<String, BufferModel>();
         for (BufferModel bufferModel : bufferModels)

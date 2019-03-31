@@ -234,18 +234,7 @@ public final class BufferStructure
      * 
      * @return The {@link BufferModel} instances
      */
-    public List<BufferModel> getBufferModels()
-    {
-        return Collections.unmodifiableList(bufferModels);
-    }
-    
-    /**
-     * Returns an unmodifiable view on the list of all {@link BufferModel}
-     * instances that have been added to this structure
-     * 
-     * @return The {@link BufferModel} instances
-     */
-    List<DefaultBufferModel> getBufferModelsInternal()
+    public List<DefaultBufferModel> getBufferModels()
     {
         return Collections.unmodifiableList(bufferModels);
     }
@@ -281,7 +270,8 @@ public final class BufferStructure
      * @param bufferModel The {@link BufferModel}
      * @return The list
      */
-    public List<BufferViewModel> getBufferViewModels(BufferModel bufferModel)
+    public List<DefaultBufferViewModel> getBufferViewModels(
+        BufferModel bufferModel)
     {
         List<DefaultBufferViewModel> bufferViewModels = 
             bufferBufferViewModels.get(bufferModel);
@@ -293,42 +283,12 @@ public final class BufferStructure
     }
 
     /**
-     * Returns an unmodifiable list containing the {@link BufferViewModel}
-     * instances that refer to the given {@link BufferModel}
-     * 
-     * @param bufferModel The {@link BufferModel}
-     * @return The list
-     */
-    List<DefaultBufferViewModel> getBufferViewModelsInternal(
-        DefaultBufferModel bufferModel)
-    {
-        List<DefaultBufferViewModel> bufferViewModels = 
-            bufferBufferViewModels.get(bufferModel);
-        if (bufferViewModels == null)
-        {
-            return Collections.emptyList();
-        }
-        return Collections.unmodifiableList(bufferViewModels);
-    }
-    
-    /**
      * Returns an unmodifiable view on the {@link BufferViewModel} instances
      * that have been added to this structure
      * 
      * @return The {@link BufferViewModel} instances 
      */
-    public List<BufferViewModel> getBufferViewModels()
-    {
-        return Collections.unmodifiableList(bufferViewModels);
-    }
-    
-    /**
-     * Returns an unmodifiable view on the {@link BufferViewModel} instances
-     * that have been added to this structure
-     * 
-     * @return The {@link BufferViewModel} instances 
-     */
-    List<DefaultBufferViewModel> getBufferViewModelsInternal()
+    public List<DefaultBufferViewModel> getBufferViewModels()
     {
         return Collections.unmodifiableList(bufferViewModels);
     }
@@ -364,7 +324,7 @@ public final class BufferStructure
      * @param bufferViewModel The {@link BufferViewModel}
      * @return The list
      */
-    public List<AccessorModel> getAccessorModels(
+    public List<DefaultAccessorModel> getAccessorModels(
         BufferViewModel bufferViewModel)
     {
         List<DefaultAccessorModel> accessorModels = 
@@ -377,44 +337,12 @@ public final class BufferStructure
     }
     
     /**
-     * Returns an unmodifiable list containing the {@link AccessorModel}
-     * instances that refer to the given {@link BufferViewModel}
-     * 
-     * @param bufferViewModel The {@link BufferViewModel}
-     * @return The list
-     */
-    List<DefaultAccessorModel> getAccessorModelsInternal(
-        DefaultBufferViewModel bufferViewModel)
-    {
-        List<DefaultAccessorModel> accessorModels = 
-            bufferViewAccessorModels.get(bufferViewModel);
-        if (accessorModels == null)
-        {
-            return Collections.emptyList();
-        }
-        return Collections.unmodifiableList(accessorModels);
-    }
-    
-    /**
      * Returns an unmodifiable list containing all {@link AccessorModel} 
      * instances that have been added to this structure
      * 
      * @return The {@link AccessorModel} instances
      */
-    public List<AccessorModel> getAccessorModels()
-    {
-        List<AccessorModel> allAccessorModels = 
-            new ArrayList<AccessorModel>(accessorIds.keySet());
-        return Collections.unmodifiableList(allAccessorModels);
-    }
-    
-    /**
-     * Returns an unmodifiable list containing all {@link AccessorModel} 
-     * instances that have been added to this structure
-     * 
-     * @return The {@link AccessorModel} instances
-     */
-    List<DefaultAccessorModel> getAccessorModelsInternal()
+    public List<DefaultAccessorModel> getAccessorModels()
     {
         List<DefaultAccessorModel> allAccessorModels = 
             new ArrayList<DefaultAccessorModel>(accessorIds.keySet());

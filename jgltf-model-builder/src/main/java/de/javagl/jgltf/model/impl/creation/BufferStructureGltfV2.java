@@ -37,6 +37,9 @@ import de.javagl.jgltf.model.AccessorDatas;
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.BufferViewModel;
+import de.javagl.jgltf.model.impl.DefaultAccessorModel;
+import de.javagl.jgltf.model.impl.DefaultBufferModel;
+import de.javagl.jgltf.model.impl.DefaultBufferViewModel;
 
 /**
  * Utility methods for creating the glTF 2.0 elements that correspond to
@@ -54,7 +57,7 @@ public class BufferStructureGltfV2
     public static List<Accessor> createAccessors(
         BufferStructure bufferStructure)
     {
-        List<AccessorModel> accessorModels = 
+        List<DefaultAccessorModel> accessorModels = 
             bufferStructure.getAccessorModels();
         List<Accessor> accessors = new ArrayList<Accessor>();
         for (AccessorModel accessorModel : accessorModels) 
@@ -105,7 +108,7 @@ public class BufferStructureGltfV2
     public static List<BufferView> createBufferViews(
         BufferStructure bufferStructure)
     {
-        List<BufferViewModel> bufferViewModels = 
+        List<DefaultBufferViewModel> bufferViewModels = 
             bufferStructure.getBufferViewModels();
         List<BufferView> bufferViews = new ArrayList<BufferView>();
         for (BufferViewModel bufferViewModel : bufferViewModels)
@@ -149,7 +152,7 @@ public class BufferStructureGltfV2
      */
     public static List<Buffer> createBuffers(BufferStructure bufferStructure)
     {
-        List<BufferModel> bufferModels = 
+        List<DefaultBufferModel> bufferModels = 
             bufferStructure.getBufferModels();
         List<Buffer> buffers = new ArrayList<Buffer>();
         for (BufferModel bufferModel : bufferModels) 

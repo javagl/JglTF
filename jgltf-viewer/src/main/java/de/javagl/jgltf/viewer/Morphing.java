@@ -374,7 +374,7 @@ class Morphing
      * @param bufferData The buffer data
      * @return The new {@link BufferViewModel}
      */
-    private static DefaultBufferViewModel createBufferViewModel(
+    private static BufferViewModel createBufferViewModel(
         String uriString, ByteBuffer bufferData)
     {
         DefaultBufferModel bufferModel = new DefaultBufferModel();

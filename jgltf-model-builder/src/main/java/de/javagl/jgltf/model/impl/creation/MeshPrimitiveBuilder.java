@@ -118,6 +118,14 @@ public final class MeshPrimitiveBuilder
     private final Consumer<? super MeshPrimitiveModel> resultConsumer;
     
     /**
+     * Default constructor
+     */
+    MeshPrimitiveBuilder()
+    {
+        this(new BufferStructureBuilder(), null);
+    }
+    
+    /**
      * Default constructor.
      * 
      * @param bufferStructureBuilder The {@link BufferStructureBuilder} that 
