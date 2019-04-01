@@ -36,8 +36,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
 
+import de.javagl.jgltf.model.AccessorData;
 import de.javagl.jgltf.model.AccessorModel;
-import de.javagl.jgltf.model.Accessors;
 import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.ElementType;
@@ -96,15 +96,6 @@ public final class BufferStructureBuilder
     private final List<DefaultAccessorModel> currentAccessorModels;
     
     /**
-     * The mapping from {@link AccessorModel} instances to the byte buffers
-     * that contain their data, as given during the construction. These
-     * byte buffers may later be combined, reordered or padded in order
-     * to create the actual buffer data!
-     */
-    private final Map<DefaultAccessorModel, ByteBuffer> 
-        rawAccessorModelByteBuffers;
-
-    /**
      * The set of {@link BufferViewModel} instances that have been created
      * by calling {@link #createBufferViewModel}, and which will be used
      * to create a {@link BufferModel} when calling 
@@ -119,8 +110,6 @@ public final class BufferStructureBuilder
     {
         this.bufferStructure = new BufferStructure();
         this.currentAccessorModels = new ArrayList<DefaultAccessorModel>();
-        this.rawAccessorModelByteBuffers = 
-            new LinkedHashMap<DefaultAccessorModel, ByteBuffer>();
         this.currentBufferViewModels = new ArrayList<DefaultBufferViewModel>();
     }
     
@@ -224,18 +213,24 @@ public final class BufferStructureBuilder
     public AccessorModel createAccessorModel(String idPrefix,
         int componentType, String type, ByteBuffer byteBuffer)
     {
-        ElementType elementType = ElementType.valueOf(type);
-        int numComponents = elementType.getNumComponents();
-        int numBytesPerComponent = 
-            Accessors.getNumBytesForAccessorComponentType(componentType);
-        int numBytesPerElement = numComponents * numBytesPerComponent;
-        int count = byteBuffer.capacity() / numBytesPerElement;
-        DefaultAccessorModel accessorModel = new DefaultAccessorModel(
-            componentType, count, elementType);
+        DefaultAccessorModel accessorModel = AccessorModels.create(
+            componentType, type, byteBuffer);
+        addAccessorModel(idPrefix, accessorModel);
+        return accessorModel;
+    }
+    
+    /**
+     * Add the given {@link AccessorModel} in the {@link BufferStructure} that 
+     * is currently being built.
+     * 
+     * @param idPrefix The ID prefix of the {@link AccessorModel}
+     * @param accessorModel The {@link AccessorModel}
+     */
+    public void addAccessorModel(
+        String idPrefix, DefaultAccessorModel accessorModel)
+    {
         bufferStructure.addAccessorModel(accessorModel, idPrefix);
         currentAccessorModels.add(accessorModel);
-        rawAccessorModelByteBuffers.put(accessorModel, byteBuffer);
-        return accessorModel;
     }
     
     /**
@@ -277,8 +272,24 @@ public final class BufferStructureBuilder
     public BufferViewModel createBufferViewModel(
         String idPrefix, Integer target)
     {
-        DefaultBufferViewModel bufferViewModel = 
+        DefaultBufferViewModel bufferViewModel =
             new DefaultBufferViewModel(target);
+        addBufferViewModel(idPrefix, bufferViewModel);
+        return bufferViewModel;
+    }
+
+    /**
+     * Add the given {@link BufferViewModel} in the {@link BufferStructure} 
+     * that is currently being built. All {@link AccessorModel} instances
+     * that have been created until now and not yet added to a 
+     * {@link BufferViewModel} will be assigned to the given model. 
+     * 
+     * @param idPrefix The ID prefix for the {@link BufferViewModel}
+     * @param bufferViewModel The {@link BufferViewModel} to add
+     */
+    public void addBufferViewModel(
+        String idPrefix, DefaultBufferViewModel bufferViewModel)
+    {
         for (DefaultAccessorModel accessorModel : currentAccessorModels)
         {
             accessorModel.setBufferViewModel(bufferViewModel);
@@ -287,9 +298,7 @@ public final class BufferStructureBuilder
             bufferViewModel, idPrefix, currentAccessorModels);
         currentBufferViewModels.add(bufferViewModel);
         currentAccessorModels.clear();
-        return bufferViewModel;
     }
-
     
     
     /**
@@ -304,6 +313,21 @@ public final class BufferStructureBuilder
     {
         DefaultBufferModel bufferModel = new DefaultBufferModel();
         bufferModel.setUri(uri);
+        addBufferModel(idPrefix, bufferModel);
+        return bufferModel;
+    }
+
+    /**
+     * Add the given {@link BufferModel} in the {@link BufferStructure} 
+     * that is currently being built. All {@link BufferViewModel} instances
+     * that have been created until now and not yet added to a 
+     * {@link BufferModel} will be assigned to the given model.
+     * 
+     * @param idPrefix The ID prefix for the {@link BufferModel}
+     * @param bufferModel The {@link BufferModel}
+     */
+    public void addBufferModel(String idPrefix, DefaultBufferModel bufferModel) 
+    {
         for (DefaultBufferViewModel bufferViewModel : currentBufferViewModels)
         {
             bufferViewModel.setBufferModel(bufferModel);
@@ -311,9 +335,8 @@ public final class BufferStructureBuilder
         bufferStructure.addBufferModel(bufferModel, idPrefix,
             currentBufferViewModels);
         currentBufferViewModels.clear();
-        return bufferModel;
     }
-
+    
     /**
      * Return the {@link BufferStructure} instance that was created with
      * this builder.
@@ -364,6 +387,20 @@ public final class BufferStructureBuilder
      */
     private void processBufferModel(DefaultBufferModel bufferModel)
     {
+        // Compute the mapping from AccessorModel instances to the
+        // byte buffers that contain their data, as given when they have 
+        // been added. These byte buffers may have to be combined, reordered 
+        // or padded in order to create the actual buffer data
+        Map<DefaultAccessorModel, ByteBuffer> rawAccessorModelByteBuffers =
+            new LinkedHashMap<DefaultAccessorModel, ByteBuffer>();
+        for (DefaultAccessorModel accessorModel : 
+            bufferStructure.getAccessorModels())
+        {
+            AccessorData accessorData = accessorModel.getAccessorData();
+            ByteBuffer byteBuffer = accessorData.createByteBuffer();
+            rawAccessorModelByteBuffers.put(accessorModel, byteBuffer);
+        }
+        
         // The sequence of accessor data buffers and paddings that
         // eventually will be combined to create the buffer data
         List<ByteBuffer> bufferElements = new ArrayList<ByteBuffer>();

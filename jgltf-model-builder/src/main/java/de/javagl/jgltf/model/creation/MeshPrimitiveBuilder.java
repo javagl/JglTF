@@ -33,12 +33,11 @@ import java.nio.ShortBuffer;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.function.Consumer;
 
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
+import de.javagl.jgltf.model.impl.DefaultAccessorModel;
 import de.javagl.jgltf.model.impl.DefaultMeshPrimitiveModel;
 import de.javagl.jgltf.model.io.Buffers;
 
@@ -48,103 +47,29 @@ import de.javagl.jgltf.model.io.Buffers;
 public final class MeshPrimitiveBuilder 
 {
     /**
-     * A class encapsulating the info that is required for creating an
-     * {@link AccessorModel} in the buffer structure
-     */
-    private static class AccessorInfo
-    {
-        /**
-         * The prefix for the ID
-         */
-        private final String idPrefix;
-        
-        /**
-         * The component type (e.g. GL_FLOAT)
-         */
-        private final int componentType;
-        
-        /**
-         * The type (e.g. "VEC3")
-         */
-        private final String type;
-        
-        /**
-         * The actual data
-         */
-        private final ByteBuffer data;
-
-        /**
-         * Default constructor
-         * 
-         * @param idPrefix The ID prefix
-         * @param componentType The component type
-         * @param type The type
-         * @param data The data
-         */
-        private AccessorInfo(
-            String idPrefix, int componentType, String type, ByteBuffer data)
-        {
-            this.idPrefix = idPrefix;
-            this.componentType = componentType;
-            this.type = type;
-            this.data = data;
-        }
-    }
-    
-    /**
-     * The {@link BufferStructureBuilder} that receives the data
-     */
-    private final BufferStructureBuilder bufferStructureBuilder;
-    
-    /**
      * The {@link MeshPrimitiveModel#getMode() rendering mode}
      */
     private int mode;
     
     /**
-     * The {@link AccessorInfo} for the indices
+     * The {@link AccessorModel} for the indices
      */
-    private AccessorInfo indicesAccessorInfo;
+    private DefaultAccessorModel indicesAccessorModel;
     
     /**
      * The mapping from attribute names (e.g. "POSITION") to the
-     * {@link AccessorInfo}
+     * {@link AccessorModel}
      */
-    private final Map<String, AccessorInfo> attributeAccessorInfos;
-    
-    /**
-     * A consumer that will be notified about all instances that are created
-     */
-    private final Consumer<? super MeshPrimitiveModel> resultConsumer;
+    private final Map<String, DefaultAccessorModel> attributeAccessorModels;
     
     /**
      * Default constructor
      */
-    MeshPrimitiveBuilder()
+    public MeshPrimitiveBuilder()
     {
-        this(new BufferStructureBuilder(), null);
-    }
-    
-    /**
-     * Default constructor.
-     * 
-     * @param bufferStructureBuilder The {@link BufferStructureBuilder} that 
-     * will internally keep track of the data that was added, to eventually 
-     * create the {@link BufferStructure} that includes the data for the 
-     * {@link MeshPrimitiveModel}
-     * @param resultConsumer An optional consumer for the results that are
-     * created
-     */
-    MeshPrimitiveBuilder(
-        BufferStructureBuilder bufferStructureBuilder,
-        Consumer<? super MeshPrimitiveModel> resultConsumer)
-    {
-        this.bufferStructureBuilder = 
-            Objects.requireNonNull(bufferStructureBuilder, 
-                "The bufferStructureBuilder may not be null");
         this.mode = GltfConstants.GL_TRIANGLES;
-        this.attributeAccessorInfos = new LinkedHashMap<String, AccessorInfo>();
-        this.resultConsumer = resultConsumer;
+        this.attributeAccessorModels = 
+            new LinkedHashMap<String, DefaultAccessorModel>();
     }
     
     /**
@@ -253,10 +178,24 @@ public final class MeshPrimitiveBuilder
     private MeshPrimitiveBuilder setIndicesInternal(
         int componentType, String type, ByteBuffer byteBuffer)
     {
-        indicesAccessorInfo = new AccessorInfo(
-            "indices accessor", componentType, type, byteBuffer);
+        DefaultAccessorModel indices = AccessorModels.create(
+            componentType, type, byteBuffer);
+        return setIndices(indices);
+    }
+    
+    /**
+     * Set the indices of the currently built {@link MeshPrimitiveModel} 
+     * to the given {@link AccessorModel}
+     * 
+     * @param indices The {@link AccessorModel} for the indices
+     * @return This builder
+     */
+    public MeshPrimitiveBuilder setIndices(DefaultAccessorModel indices)
+    {
+        indicesAccessorModel = indices;
         return this;
     }
+    
     
     /**
      * Add the given data as the "POSITION" attribute of the mesh primitive.
@@ -267,7 +206,7 @@ public final class MeshPrimitiveBuilder
      */
     public MeshPrimitiveBuilder addPositions3D(FloatBuffer data)
     {
-        return addAttributeInternal("positions", "POSITION", 3, data);
+        return addAttributeInternal("POSITION", 3, data);
     }
 
     /**
@@ -279,7 +218,7 @@ public final class MeshPrimitiveBuilder
      */
     public MeshPrimitiveBuilder addPositions4D(FloatBuffer data)
     {
-        return addAttributeInternal("positions", "POSITION", 4, data);
+        return addAttributeInternal("POSITION", 4, data);
     }
     
     /**
@@ -291,7 +230,7 @@ public final class MeshPrimitiveBuilder
      */
     public MeshPrimitiveBuilder addNormals3D(FloatBuffer data)
     {
-        return addAttributeInternal("normals", "NORMAL", 3, data);
+        return addAttributeInternal("NORMAL", 3, data);
     }
 
     /**
@@ -303,7 +242,7 @@ public final class MeshPrimitiveBuilder
      */
     public MeshPrimitiveBuilder addNormals4D(FloatBuffer data)
     {
-        return addAttributeInternal("normals", "NORMAL", 4, data);
+        return addAttributeInternal("NORMAL", 4, data);
     }
     
     /**
@@ -315,7 +254,7 @@ public final class MeshPrimitiveBuilder
      */
     public MeshPrimitiveBuilder addTexCoords02D(FloatBuffer data)
     {
-        return addAttributeInternal("texcoords0", "TEXCOORD_0", 2, data);
+        return addAttributeInternal("TEXCOORD_0", 2, data);
     }
     
     /**
@@ -327,7 +266,7 @@ public final class MeshPrimitiveBuilder
      */
     public MeshPrimitiveBuilder addTangents3D(FloatBuffer data)
     {
-        return addAttributeInternal("tangents", "TANGENT", 3, data);
+        return addAttributeInternal("TANGENT", 3, data);
     }
 
     /**
@@ -339,27 +278,41 @@ public final class MeshPrimitiveBuilder
      */
     public MeshPrimitiveBuilder addTangents4D(FloatBuffer data)
     {
-        return addAttributeInternal("tangents", "TANGENT", 4, data);
+        return addAttributeInternal("TANGENT", 4, data);
     }
 
     /**
      * Add the given data as attribute data to the mesh primitive.
      * 
-     * @param name The name for the data, only used in the ID
      * @param attributeName The attribute name, e.g. "POSITION"
      * @param dimensions The dimensions that the data has
      * @param data The actual data 
      * @return This builder
      */
     private MeshPrimitiveBuilder addAttributeInternal(
-        String name, String attributeName, int dimensions, FloatBuffer data)
+        String attributeName, int dimensions, FloatBuffer data)
     {
-        AccessorInfo accessorInfo = new AccessorInfo(name + " accessor",
+        DefaultAccessorModel accessorModel = AccessorModels.create(
             GltfConstants.GL_FLOAT, "VEC" + dimensions, 
             Buffers.createByteBufferFrom(data));
-        attributeAccessorInfos.put(attributeName, accessorInfo);
+        return addAttribute(attributeName, accessorModel);
+    }
+    
+    /**
+     * Add the given {@link AccessorModel} as an attribute to the 
+     * {@link MeshPrimitiveModel} that is currently being built.
+     * 
+     * @param attributeName The attribute name, e.g. "POSITION"
+     * @param attribute The {@link AccessorModel} with the attribute data
+     * @return This builder
+     */
+    public MeshPrimitiveBuilder addAttribute(
+        String attributeName, DefaultAccessorModel attribute)
+    {
+        attributeAccessorModels.put(attributeName, attribute);
         return this;
     }
+    
     
     /**
      * Create the {@link MeshPrimitiveModel} containing the indices and
@@ -372,41 +325,24 @@ public final class MeshPrimitiveBuilder
         DefaultMeshPrimitiveModel result =  
             new DefaultMeshPrimitiveModel(mode);
         
-        if (indicesAccessorInfo != null)
+        if (indicesAccessorModel != null)
         {
-            AccessorModel indicesAccessorModel = 
-                bufferStructureBuilder.createAccessorModel(
-                    indicesAccessorInfo.idPrefix, 
-                    indicesAccessorInfo.componentType,
-                    indicesAccessorInfo.type,
-                    indicesAccessorInfo.data);
-            bufferStructureBuilder.createArrayElementBufferViewModel(
-                "indices bufferView");
             result.setIndices(indicesAccessorModel);
+            indicesAccessorModel = null;
         }
         
-        if (!attributeAccessorInfos.isEmpty())
+        if (!attributeAccessorModels.isEmpty())
         {
-            for (Entry<String, AccessorInfo> entry : 
-                attributeAccessorInfos.entrySet())
+            for (Entry<String, DefaultAccessorModel> entry : 
+                attributeAccessorModels.entrySet())
             {
                 String name = entry.getKey();
-                AccessorInfo accessorInfo = entry.getValue();
-                
-                AccessorModel accessorModel = 
-                    bufferStructureBuilder.createAccessorModel(
-                        accessorInfo.idPrefix, 
-                        accessorInfo.componentType,
-                        accessorInfo.type,
-                        accessorInfo.data);
+                DefaultAccessorModel accessorModel = entry.getValue();
                 result.putAttribute(name, accessorModel);
             }
-            bufferStructureBuilder.createArrayBufferViewModel("bufferView");
-        }
-        if (resultConsumer != null)
-        {
-            resultConsumer.accept(result);
+            attributeAccessorModels.clear();
         }
         return result;
     }
 }
+
