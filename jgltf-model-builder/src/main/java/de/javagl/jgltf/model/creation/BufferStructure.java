@@ -407,7 +407,8 @@ public final class BufferStructure
         String id = prefix;
         while (existingIds.contains(id)) 
         {
-            id = prefix + "_" + counter; 
+            id = prefix + "_" + counter;
+            counter++;
         }
         return id;
     }
