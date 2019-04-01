@@ -24,15 +24,14 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.model.impl.creation;
+package de.javagl.jgltf.model.creation;
 
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import de.javagl.jgltf.impl.v1.Accessor;
-import de.javagl.jgltf.impl.v1.Buffer;
-import de.javagl.jgltf.impl.v1.BufferView;
+import de.javagl.jgltf.impl.v2.Accessor;
+import de.javagl.jgltf.impl.v2.Buffer;
+import de.javagl.jgltf.impl.v2.BufferView;
 import de.javagl.jgltf.model.AccessorData;
 import de.javagl.jgltf.model.AccessorDatas;
 import de.javagl.jgltf.model.AccessorModel;
@@ -43,10 +42,10 @@ import de.javagl.jgltf.model.impl.DefaultBufferModel;
 import de.javagl.jgltf.model.impl.DefaultBufferViewModel;
 
 /**
- * Utility methods for creating the glTF 1.0 elements that correspond to
+ * Utility methods for creating the glTF 2.0 elements that correspond to
  * a {@link BufferStructure}
  */
-public class BufferStructureGltfV1
+public class BufferStructureGltfV2
 {
     /**
      * Create the {@link Accessor} objects from the given 
@@ -55,21 +54,19 @@ public class BufferStructureGltfV1
      * @param bufferStructure The {@link BufferStructure}
      * @return The {@link Accessor} objects
      */
-    public static Map<String, Accessor> createAccessors(
+    public static List<Accessor> createAccessors(
         BufferStructure bufferStructure)
     {
         List<DefaultAccessorModel> accessorModels = 
             bufferStructure.getAccessorModels();
-        Map<String, Accessor> accessors = new LinkedHashMap<String, Accessor>();
+        List<Accessor> accessors = new ArrayList<Accessor>();
         for (AccessorModel accessorModel : accessorModels) 
         {
             BufferViewModel bufferViewModel = 
                 accessorModel.getBufferViewModel();
-            String bufferViewId = 
-                bufferStructure.getBufferViewId(bufferViewModel);
-            String accessorId = bufferStructure.getAccessorId(accessorModel);
-            Accessor accessor = createAccessor(accessorModel, bufferViewId);
-            accessors.put(accessorId, accessor);
+            int bufferViewIndex =
+                bufferStructure.getBufferViewIndex(bufferViewModel);
+            accessors.add(createAccessor(accessorModel, bufferViewIndex));
         }
         return accessors;
     }
@@ -79,21 +76,20 @@ public class BufferStructureGltfV1
      * {@link AccessorModel}
      * 
      * @param accessorModel The {@link AccessorModel}
-     * @param bufferViewId The {@link BufferView} ID
+     * @param bufferViewIndex The {@link BufferView} index
      * @return The {@link Accessor} object
      */
     private static Accessor createAccessor(
-        AccessorModel accessorModel, String bufferViewId)
+        AccessorModel accessorModel, int bufferViewIndex)
     {
         Accessor accessor = new Accessor();
 
-        accessor.setBufferView(bufferViewId);
+        accessor.setBufferView(bufferViewIndex);
         
         accessor.setByteOffset(accessorModel.getByteOffset());
         accessor.setComponentType(accessorModel.getComponentType());
         accessor.setCount(accessorModel.getCount());
         accessor.setType(accessorModel.getElementType().toString());
-        accessor.setByteStride(accessorModel.getByteStride());
         
         AccessorData accessorData = accessorModel.getAccessorData();
         accessor.setMax(AccessorDatas.computeMax(accessorData));
@@ -109,46 +105,44 @@ public class BufferStructureGltfV1
      * @param bufferStructure The {@link BufferStructure}
      * @return The {@link BufferView} objects
      */
-    public static Map<String, BufferView> createBufferViews(
+    public static List<BufferView> createBufferViews(
         BufferStructure bufferStructure)
     {
         List<DefaultBufferViewModel> bufferViewModels = 
             bufferStructure.getBufferViewModels();
-        Map<String, BufferView> bufferViews = 
-            new LinkedHashMap<String, BufferView>();
+        List<BufferView> bufferViews = new ArrayList<BufferView>();
         for (BufferViewModel bufferViewModel : bufferViewModels)
         {
             BufferModel bufferModel = bufferViewModel.getBufferModel();
-            String bufferId = bufferStructure.getBufferId(bufferModel);
-            String bufferViewId = 
-                bufferStructure.getBufferViewId(bufferViewModel);
-            BufferView bufferView = createBufferView(bufferViewModel, bufferId);
-            bufferViews.put(bufferViewId, bufferView);
+            int bufferIndex = bufferStructure.getBufferIndex(bufferModel);
+            bufferViews.add(createBufferView(
+                bufferViewModel, bufferIndex));
         }
         return bufferViews;
     }
-    
+
     /**
      * Create the {@link BufferView} object from the given 
      * {@link BufferViewModel}
      * 
      * @param bufferViewModel The {@link BufferViewModel}
-     * @param bufferId The {@link Buffer} ID
+     * @param bufferIndex The {@link Buffer} index
      * @return The {@link BufferView} objects
      */
     private static BufferView createBufferView(
-        BufferViewModel bufferViewModel, String bufferId)
+        BufferViewModel bufferViewModel, int bufferIndex)
     {
         BufferView bufferView = new BufferView();
 
-        bufferView.setBuffer(bufferId);
+        bufferView.setBuffer(bufferIndex);
         bufferView.setByteOffset(bufferViewModel.getByteOffset());
         bufferView.setByteLength(bufferViewModel.getByteLength());
+        bufferView.setByteStride(bufferViewModel.getByteStride());
         bufferView.setTarget(bufferViewModel.getTarget());
         
         return bufferView;
     }
-    
+
     /**
      * Create the {@link Buffer} objects from the given 
      * {@link BufferStructure}
@@ -156,21 +150,18 @@ public class BufferStructureGltfV1
      * @param bufferStructure The {@link BufferStructure}
      * @return The {@link Buffer} objects
      */
-    public static Map<String, Buffer> createBuffers(
-        BufferStructure bufferStructure)
+    public static List<Buffer> createBuffers(BufferStructure bufferStructure)
     {
         List<DefaultBufferModel> bufferModels = 
             bufferStructure.getBufferModels();
-        Map<String, Buffer> buffers = new LinkedHashMap<String, Buffer>();
+        List<Buffer> buffers = new ArrayList<Buffer>();
         for (BufferModel bufferModel : bufferModels) 
         {
-            String bufferId = bufferStructure.getBufferId(bufferModel);
-            Buffer buffer = createBuffer(bufferModel);
-            buffers.put(bufferId, buffer);
+            buffers.add(createBuffer(bufferModel));
         }
         return buffers;
     }
-  
+
     /**
      * Create the {@link Buffer} object from the given {@link BufferModel}
      * 
@@ -188,7 +179,7 @@ public class BufferStructureGltfV1
     /**
      * Private constructor to prevent instantiation
      */
-    private BufferStructureGltfV1()
+    private BufferStructureGltfV2()
     {
         // Private constructor to prevent instantiation
     }

@@ -1,4 +1,4 @@
-package de.javagl.jgltf.model.impl.creation;
+package de.javagl.jgltf.model.creation;
 
 import java.util.Arrays;
 import java.util.List;
@@ -9,6 +9,7 @@ import static org.junit.Assert.*;
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.ElementType;
 import de.javagl.jgltf.model.GltfConstants;
+import de.javagl.jgltf.model.creation.AccessorModels;
 import de.javagl.jgltf.model.impl.DefaultAccessorModel;
 
 @SuppressWarnings("javadoc")

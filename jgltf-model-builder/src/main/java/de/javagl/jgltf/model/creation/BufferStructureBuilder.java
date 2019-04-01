@@ -24,7 +24,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.model.impl.creation;
+package de.javagl.jgltf.model.creation;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -319,9 +319,19 @@ public final class BufferStructureBuilder
      * this builder.
      * 
      * @return The {@link BufferStructure}
+     * @throws IllegalStateException If there are buffer views that have
+     * not yet been combined into a buffer
      */
     public BufferStructure build()
     {
+        if (!currentBufferViewModels.isEmpty())
+        {
+            throw new IllegalStateException("There are "
+                + currentBufferViewModels.size() + " buffer views for "
+                + "which no buffer has been created yet. "
+                + "The 'createBufferModel' method must be called before "
+                + "building the buffer structure");
+        }
         buildDefault();
         return bufferStructure;
     }

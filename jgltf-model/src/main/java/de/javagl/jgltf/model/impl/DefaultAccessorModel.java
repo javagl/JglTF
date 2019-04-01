@@ -187,6 +187,16 @@ public final class DefaultAccessorModel extends AbstractNamedModelElement
         return byteStride;
     }
     
+    /**
+     * Set the {@link AccessorData} for this accessor
+     * 
+     * @param accessorData The {@link AccessorData}
+     */
+    public void setAccessorData(AccessorData accessorData)
+    {
+        this.accessorData = accessorData;
+    }
+    
     @Override
     public AccessorData getAccessorData()
     {
