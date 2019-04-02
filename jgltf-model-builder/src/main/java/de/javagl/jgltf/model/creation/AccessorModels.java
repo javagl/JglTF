@@ -34,13 +34,20 @@ import java.nio.ShortBuffer;
 import de.javagl.jgltf.model.AccessorDatas;
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.Accessors;
+import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.ElementType;
 import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.impl.DefaultAccessorModel;
 import de.javagl.jgltf.model.io.Buffers;
 
 /**
- * Methods to create to {@link AccessorModel} instances
+ * Methods to create to {@link AccessorModel} instances.<br>
+ * <br>
+ * The instances created by these methods do have an associated 
+ * {@link AccessorModel#getAccessorData() accessor data} that
+ * simply represents the data that was given at construction time.
+ * The instances do <b>not</b> have an associated {@link BufferViewModel}
+ * instance. 
  */
 public class AccessorModels 
 {
