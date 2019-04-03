@@ -75,7 +75,7 @@ final class BinaryAssetCreatorV1
      */
     GltfAssetV1 create(GltfModelV1 gltfModel)
     {
-        GlTF inputGltf = gltfModel.getGltf();
+        GlTF inputGltf = (GlTF) gltfModel.getGltf();
         GlTF outputGltf = GltfUtilsV1.copy(inputGltf);
         
         // Create the new byte buffer for the data of the "binary_glTF" Buffer

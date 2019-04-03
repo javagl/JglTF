@@ -71,8 +71,6 @@ import de.javagl.common.ui.tree.filtered.TreeModelFilter;
 import de.javagl.jgltf.browser.ObjectTrees.NodeEntry;
 import de.javagl.jgltf.browser.Resolver.ResolvedEntity;
 import de.javagl.jgltf.model.GltfModel;
-import de.javagl.jgltf.model.v1.GltfModelV1;
-import de.javagl.jgltf.model.v2.GltfModelV2;
 import de.javagl.jgltf.viewer.GltfViewer;
 
 /**
@@ -183,7 +181,7 @@ class GltfBrowserPanel extends JPanel
         this.selectionPathHistory = new LinkedList<TreePath>();
         this.infoComponentFactory = new InfoComponentFactory(gltfModel);
         
-        Object gltf = getGltf(gltfModel);
+        Object gltf = gltfModel.getGltf();
         this.resolver = new Resolver(gltf);
         
         add(createControlPanel(), BorderLayout.NORTH);
@@ -210,31 +208,6 @@ class GltfBrowserPanel extends JPanel
         
         gltfViewerPanel = new GltfViewerPanel(gltfModel);
         mainTabbedPane.addTab("View", gltfViewerPanel);
-    }
-    
-    /**
-     * Returns the raw glTF object. Depending on the version of the model,
-     * this may be a 
-     * {@link de.javagl.jgltf.impl.v1.GlTF version 1.0 glTF} or a
-     * {@link de.javagl.jgltf.impl.v1.GlTF version 2.0 glTF}.<br>
-     * 
-     * @param gltfModel The {@link GltfModel}
-     * @return The glTF object
-     */
-    static Object getGltf(GltfModel gltfModel)
-    {
-        if (gltfModel instanceof GltfModelV1)
-        {
-            GltfModelV1 gltfModelV1 = (GltfModelV1)gltfModel;
-            return gltfModelV1.getGltf();
-        }
-        if (gltfModel instanceof GltfModelV2)
-        {
-            GltfModelV2 gltfModelV2 = (GltfModelV2)gltfModel;
-            return gltfModelV2.getGltf();
-        }
-        logger.warning("Unknown glTF model type: " + gltfModel);
-        return null;
     }
     
     /**

@@ -214,7 +214,7 @@ class InfoComponentFactoryV1
         {
             return "(null)";
         }
-        GlTF gltf = gltfModel.getGltf();
+        GlTF gltf = (GlTF) gltfModel.getGltf();
         Map<String, Accessor> accessors = Optionals.of(gltf.getAccessors());
         String accessorId = findKey(accessors, accessor);
         AccessorModel accessorModel = 
@@ -232,7 +232,7 @@ class InfoComponentFactoryV1
      */
     private JComponent createShaderInfoComponent(Object selectedValue)
     {
-        GlTF gltf = gltfModel.getGltf();
+        GlTF gltf = (GlTF) gltfModel.getGltf();
         Map<String, Shader> map = gltf.getShaders();
         String key = findKey(map, selectedValue);
         if (key == null)
@@ -261,7 +261,7 @@ class InfoComponentFactoryV1
      */
     private JComponent createImageInfoComponent(Object selectedValue)
     {
-        GlTF gltf = gltfModel.getGltf();
+        GlTF gltf = (GlTF) gltfModel.getGltf();
         Map<String, Image> map = gltf.getImages();
         String key = findKey(map, selectedValue);
         if (key == null)

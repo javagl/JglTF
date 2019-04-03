@@ -79,7 +79,7 @@ final class BinaryAssetCreatorV2
      */
     GltfAssetV2 create(GltfModelV2 gltfModel)
     {
-        GlTF inputGltf = gltfModel.getGltf();
+        GlTF inputGltf = (GlTF) gltfModel.getGltf();
         GlTF outputGltf = GltfUtilsV2.copy(inputGltf);
         
         // Create the new byte buffer for the data of the "binary_glTF" Buffer
@@ -195,7 +195,7 @@ final class BinaryAssetCreatorV2
      * @param gltfModel The {@link GltfModel}
      * @return The total size for the binary glTF buffer
      */
-    private static int computeBinaryGltfBufferSize(GltfModelV2 gltfModel)
+    private static int computeBinaryGltfBufferSize(GltfModel gltfModel)
     {
         int binaryGltfBufferSize = 0;
         for (BufferModel bufferModel : gltfModel.getBufferModels())

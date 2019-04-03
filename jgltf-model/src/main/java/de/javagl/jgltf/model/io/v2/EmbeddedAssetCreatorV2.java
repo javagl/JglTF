@@ -75,7 +75,7 @@ final class EmbeddedAssetCreatorV2
      */
     GltfAssetV2 create(GltfModelV2 gltfModel)
     {
-        GlTF inputGltf = gltfModel.getGltf();
+        GlTF inputGltf = (GlTF) gltfModel.getGltf();
         GlTF outputGltf = GltfUtilsV2.copy(inputGltf);
 
         List<Buffer> buffers = Optionals.of(outputGltf.getBuffers());

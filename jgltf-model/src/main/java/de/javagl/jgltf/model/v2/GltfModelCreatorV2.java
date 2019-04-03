@@ -102,6 +102,7 @@ import de.javagl.jgltf.model.impl.DefaultSceneModel;
 import de.javagl.jgltf.model.impl.DefaultSkinModel;
 import de.javagl.jgltf.model.impl.DefaultTextureModel;
 import de.javagl.jgltf.model.io.Buffers;
+import de.javagl.jgltf.model.io.GltfAsset;
 import de.javagl.jgltf.model.io.IO;
 import de.javagl.jgltf.model.io.v2.GltfAssetV2;
 import de.javagl.jgltf.model.v2.gl.Materials;
@@ -117,11 +118,26 @@ class GltfModelCreatorV2
      */
     private static final Logger logger = 
         Logger.getLogger(GltfModelCreatorV2.class.getName());
+
+    /**
+     * Create the {@link GltfModel} for the given {@link GltfAsset}
+     * 
+     * @param gltfAsset The {@link GltfAsset}
+     * @return The {@link GltfModel}
+     */
+    static DefaultGltfModel create(GltfAsset gltfAsset)
+    {
+        DefaultGltfModel gltfModel = new DefaultGltfModel();
+        GltfModelCreatorV2 creator = 
+            new GltfModelCreatorV2(gltfAsset, gltfModel);
+        creator.create();
+        return gltfModel;
+    }
     
     /**
-     * The {@link GltfAssetV2} of this model
+     * The {@link GltfAsset} of the model
      */
-    private final GltfAssetV2 gltfAsset;
+    private final GltfAsset gltfAsset;
     
     /**
      * The {@link GlTF} of this model
@@ -139,11 +155,11 @@ class GltfModelCreatorV2
      * @param gltfAsset The {@link GltfAssetV2}
      * @param gltfModel The {@link GltfModel}
      */
-    GltfModelCreatorV2(GltfAssetV2 gltfAsset, DefaultGltfModel gltfModel)
+    GltfModelCreatorV2(GltfAsset gltfAsset, DefaultGltfModel gltfModel)
     {
         this.gltfAsset = Objects.requireNonNull(gltfAsset, 
             "The gltfAsset may not be null");
-        this.gltf = gltfAsset.getGltf();
+        this.gltf = (GlTF) gltfAsset.getGltf();
         this.gltfModel = Objects.requireNonNull(gltfModel, 
             "The gltfModel may not be null");
     }

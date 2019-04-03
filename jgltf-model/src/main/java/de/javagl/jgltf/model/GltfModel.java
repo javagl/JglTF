@@ -128,5 +128,17 @@ public interface GltfModel
      * @return The {@link TextureModel} instances
      */
     List<TextureModel> getTextureModels();
+    
+    /**
+     * Returns the glTF object that this model was created from. This
+     * may be <code>null</code> for models that have been created
+     * programmatically. Otherwise, this will be a 
+     * {@link de.javagl.jgltf.impl.v1.GlTF} or a
+     * {@link de.javagl.jgltf.impl.v2.GlTF} object.
+     * 
+     * @return The glTF object
+     */
+    Object getGltf();
+    
 }
 

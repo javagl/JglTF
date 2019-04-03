@@ -205,7 +205,7 @@ class InfoComponentFactory
      */
     private void createJson(JPanel jsonInfoPanel)
     {
-        Object gltf = GltfBrowserPanel.getGltf(gltfModel);
+        Object gltf = gltfModel.getGltf();
         SwingTask<String, ?> swingTask = new SwingTask<String, Void>()
         {
             @Override

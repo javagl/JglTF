@@ -39,11 +39,6 @@ import de.javagl.jgltf.model.io.v2.GltfAssetV2;
 public final class GltfModelV2 extends DefaultGltfModel implements GltfModel
 {
     /**
-     * The {@link GlTF} of this model
-     */
-    private final GlTF gltf;
-
-    /**
      * Creates a new model for the given glTF
      * 
      * @param gltfAsset The {@link GltfAssetV2}
@@ -52,25 +47,11 @@ public final class GltfModelV2 extends DefaultGltfModel implements GltfModel
     {
         Objects.requireNonNull(gltfAsset, 
             "The gltfAsset may not be null");
-        this.gltf = gltfAsset.getGltf();
+        setGltf(gltfAsset.getGltf());
 
         GltfModelCreatorV2 gltfModelCreatorV2 = 
             new GltfModelCreatorV2(gltfAsset, this);
         gltfModelCreatorV2.create();
-    }
-    
-    /**
-     * Returns the raw glTF object, which is a
-     * {@link de.javagl.jgltf.impl.v1.GlTF version 2.0 glTF}.<br>
-     * <br>
-     * This method should usually not be called by clients. It may be
-     * omitted in future versions.
-     * 
-     * @return The glTF object
-     */
-    public GlTF getGltf()
-    {
-        return gltf;
     }
     
 }

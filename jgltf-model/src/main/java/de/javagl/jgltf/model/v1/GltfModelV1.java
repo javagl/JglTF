@@ -36,7 +36,6 @@ import java.util.logging.Logger;
 
 import de.javagl.jgltf.impl.v1.Accessor;
 import de.javagl.jgltf.impl.v1.Buffer;
-import de.javagl.jgltf.impl.v1.BufferView;
 import de.javagl.jgltf.impl.v1.GlTF;
 import de.javagl.jgltf.impl.v1.Image;
 import de.javagl.jgltf.impl.v1.Program;
@@ -45,7 +44,6 @@ import de.javagl.jgltf.impl.v1.Technique;
 import de.javagl.jgltf.impl.v1.Texture;
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.BufferModel;
-import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.TextureModel;
@@ -75,11 +73,6 @@ public final class GltfModelV1 extends DefaultGltfModel implements GltfModel
     private IndexMappingSet indexMappingSet;
     
     /**
-     * The {@link GlTF} of the {@link GltfAssetV1}    
-     */
-    private final GlTF gltf;
-    
-    /**
      * The {@link ShaderModel} instances that have been created from
      * the {@link Shader} instances
      */
@@ -106,13 +99,13 @@ public final class GltfModelV1 extends DefaultGltfModel implements GltfModel
     {
         Objects.requireNonNull(gltfAsset, 
             "The gltfAsset may not be null");
-        this.gltf = gltfAsset.getGltf();
+        setGltf(gltfAsset.getGltf());
 
         this.shaderModels = new ArrayList<DefaultShaderModel>();
         this.programModels = new ArrayList<DefaultProgramModel>();
         this.techniqueModels = new ArrayList<DefaultTechniqueModel>();
         
-        this.indexMappingSet = IndexMappingSets.create(gltf);
+        this.indexMappingSet = IndexMappingSets.create((GlTF) getGltf());
         GltfModelCreatorV1 gltfModelCreatorV1 = 
             new GltfModelCreatorV1(gltfAsset, this, indexMappingSet);
         gltfModelCreatorV1.create();
@@ -185,21 +178,6 @@ public final class GltfModelV1 extends DefaultGltfModel implements GltfModel
     {
         return get("accessors", accessorId, this::getAccessorModel);
     }
-    
-    /**
-     * Returns the {@link BufferViewModel} for the {@link BufferView} with the 
-     * given ID.
-     * If the given ID is not valid, then a warning will be printed and 
-     * <code>null</code> will be returned.
-     *  
-     * @param bufferViewId The {@link BufferView} ID
-     * @return The {@link BufferViewModel}
-     */
-    public BufferViewModel getBufferViewModelById(String bufferViewId)
-    {
-        return get("bufferViews", bufferViewId, this::getBufferViewModel);
-    }
-
     
     /**
      * Add the given {@link ShaderModel} to this model
@@ -392,21 +370,6 @@ public final class GltfModelV1 extends DefaultGltfModel implements GltfModel
     public List<TechniqueModel> getTechniqueModels()
     {
         return Collections.unmodifiableList(techniqueModels);
-    }
-    
-
-    /**
-     * Returns the raw glTF object, which is a 
-     * {@link de.javagl.jgltf.impl.v1.GlTF version 1.0 glTF}.<br>
-     * <br>
-     * This method should usually not be called by clients. It may be
-     * omitted in future versions.
-     * 
-     * @return The glTF object
-     */
-    public GlTF getGltf()
-    {
-        return gltf;
     }
     
     /**

@@ -31,8 +31,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.function.IntFunction;
 import java.util.logging.Logger;
 
@@ -64,6 +64,8 @@ import de.javagl.jgltf.impl.v1.Texture;
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.Accessors;
 import de.javagl.jgltf.model.AnimationModel;
+import de.javagl.jgltf.model.AnimationModel.Channel;
+import de.javagl.jgltf.model.AnimationModel.Interpolation;
 import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.CameraModel;
@@ -79,15 +81,13 @@ import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.SceneModel;
 import de.javagl.jgltf.model.SkinModel;
 import de.javagl.jgltf.model.TextureModel;
-import de.javagl.jgltf.model.AnimationModel.Channel;
-import de.javagl.jgltf.model.AnimationModel.Interpolation;
 import de.javagl.jgltf.model.gl.ProgramModel;
 import de.javagl.jgltf.model.gl.ShaderModel;
+import de.javagl.jgltf.model.gl.ShaderModel.ShaderType;
 import de.javagl.jgltf.model.gl.TechniqueModel;
 import de.javagl.jgltf.model.gl.TechniqueParametersModel;
 import de.javagl.jgltf.model.gl.TechniqueStatesFunctionsModel;
 import de.javagl.jgltf.model.gl.TechniqueStatesModel;
-import de.javagl.jgltf.model.gl.ShaderModel.ShaderType;
 import de.javagl.jgltf.model.gl.impl.DefaultProgramModel;
 import de.javagl.jgltf.model.gl.impl.DefaultShaderModel;
 import de.javagl.jgltf.model.gl.impl.DefaultTechniqueModel;
@@ -96,6 +96,8 @@ import de.javagl.jgltf.model.gl.impl.DefaultTechniqueStatesModel;
 import de.javagl.jgltf.model.gl.impl.v1.DefaultTechniqueStatesFunctionsModelV1;
 import de.javagl.jgltf.model.impl.DefaultAccessorModel;
 import de.javagl.jgltf.model.impl.DefaultAnimationModel;
+import de.javagl.jgltf.model.impl.DefaultAnimationModel.DefaultChannel;
+import de.javagl.jgltf.model.impl.DefaultAnimationModel.DefaultSampler;
 import de.javagl.jgltf.model.impl.DefaultBufferModel;
 import de.javagl.jgltf.model.impl.DefaultBufferViewModel;
 import de.javagl.jgltf.model.impl.DefaultCameraModel;
@@ -109,9 +111,8 @@ import de.javagl.jgltf.model.impl.DefaultNodeModel;
 import de.javagl.jgltf.model.impl.DefaultSceneModel;
 import de.javagl.jgltf.model.impl.DefaultSkinModel;
 import de.javagl.jgltf.model.impl.DefaultTextureModel;
-import de.javagl.jgltf.model.impl.DefaultAnimationModel.DefaultChannel;
-import de.javagl.jgltf.model.impl.DefaultAnimationModel.DefaultSampler;
 import de.javagl.jgltf.model.io.Buffers;
+import de.javagl.jgltf.model.io.GltfAsset;
 import de.javagl.jgltf.model.io.IO;
 import de.javagl.jgltf.model.io.v1.GltfAssetV1;
 import de.javagl.jgltf.model.v1.gl.DefaultModels;
@@ -137,9 +138,9 @@ class GltfModelCreatorV1
     
     
     /**
-     * The {@link GltfAssetV1} of this model
+     * The {@link GltfAsset} of this model
      */
-    private final GltfAssetV1 gltfAsset;
+    private final GltfAsset gltfAsset;
     
     /**
      * The {@link GlTF} of this model
@@ -154,17 +155,17 @@ class GltfModelCreatorV1
     /**
      * Creates a new model for the given glTF
      * 
-     * @param gltfAsset The {@link GltfAssetV1}
+     * @param gltfAsset The {@link GltfAsset}
      * @param gltfModel The {@link GltfModel}
      * @param indexMappingSet The {@link IndexMappingSet}
      */
     GltfModelCreatorV1(
-        GltfAssetV1 gltfAsset, GltfModelV1 gltfModel, 
+        GltfAsset gltfAsset, GltfModelV1 gltfModel, 
         IndexMappingSet indexMappingSet)
     {
         this.gltfAsset = Objects.requireNonNull(gltfAsset, 
             "The gltfAsset may not be null");
-        this.gltf = gltfAsset.getGltf();
+        this.gltf = (GlTF) gltfAsset.getGltf();
         this.gltfModel = Objects.requireNonNull(gltfModel, 
             "The gltfModel may not be null");
         this.indexMappingSet = indexMappingSet;
@@ -596,8 +597,9 @@ class GltfModelCreatorV1
             {
                 String bufferViewId = 
                     BinaryGltfV1.getBinaryGltfBufferViewId(image);
-                BufferViewModel bufferViewModel = 
-                    gltfModel.getBufferViewModelById(bufferViewId);
+                BufferViewModel bufferViewModel =
+                    get("bufferView", bufferViewId, 
+                        gltfModel::getBufferViewModel);
                 imageModel.setBufferViewModel(bufferViewModel);
             }
             else
@@ -1101,8 +1103,10 @@ class GltfModelCreatorV1
             {
                 String bufferViewId = 
                     BinaryGltfV1.getBinaryGltfBufferViewId(shader);
-                BufferViewModel bufferViewModel = 
-                    gltfModel.getBufferViewModelById(bufferViewId);
+                BufferViewModel bufferViewModel =
+                    get("bufferView", bufferViewId, 
+                        gltfModel::getBufferViewModel);
+                
                 shaderModel.setShaderData(bufferViewModel.getBufferViewData());
             }
             else
