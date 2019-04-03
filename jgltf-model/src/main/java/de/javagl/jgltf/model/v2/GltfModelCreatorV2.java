@@ -358,9 +358,7 @@ class GltfModelCreatorV2
         List<Material> materials = Optionals.of(gltf.getMaterials());
         for (int i = 0; i < materials.size(); i++)
         {
-            Material material = materials.get(i);
             MaterialModelV2 materialModel = new MaterialModelV2();
-            materialModel.setMaterial(material);
             gltfModel.addMaterialModel(materialModel);
         }
     }

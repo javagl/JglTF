@@ -145,7 +145,7 @@ public class DefaultModels
 
         // Create a model for the default material
         Material material = GltfDefaults.getDefaultMaterial();
-        DEFAULT_MATERIAL_MODEL = new MaterialModelV1(material);
+        DEFAULT_MATERIAL_MODEL = new MaterialModelV1();
         DEFAULT_MATERIAL_MODEL.setValues(material.getValues());
         DEFAULT_MATERIAL_MODEL.setTechniqueModel(DEFAULT_TECHNIQUE_MODEL);
         

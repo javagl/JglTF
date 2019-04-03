@@ -28,11 +28,7 @@ package de.javagl.jgltf.viewer;
 
 import java.util.Objects;
 
-import de.javagl.jgltf.impl.v2.Material;
-import de.javagl.jgltf.impl.v2.MaterialPbrMetallicRoughness;
-import de.javagl.jgltf.impl.v2.TextureInfo;
-import de.javagl.jgltf.model.Optionals;
-import de.javagl.jgltf.model.v2.gl.Materials;
+import de.javagl.jgltf.model.v2.MaterialModelV2;
 
 /**
  * A simple (package-private!) class describing the structure of a material.
@@ -75,30 +71,21 @@ class MaterialStructure
     /**
      * Default constructor 
      * 
-     * @param material The {@link Material}
+     * @param material The {@link MaterialModelV2}
      * @param numJoints The number of joints
      */
-    MaterialStructure(Material material, int numJoints)
+    MaterialStructure(MaterialModelV2 material, int numJoints)
     {
-        MaterialPbrMetallicRoughness pbrMetallicRoughness = 
-            material.getPbrMetallicRoughness();
-        if (pbrMetallicRoughness == null)
-        {
-            pbrMetallicRoughness = 
-                Materials.createDefaultMaterialPbrMetallicRoughness();
-        }
-        
         this.baseColorTexCoordSemantic = 
-            getTexCoordSemantic(pbrMetallicRoughness.getBaseColorTexture());
+            getTexCoordSemantic(material.getBaseColorTexcoord());
         this.metallicRoughnessTexCoordSemantic =
-            getTexCoordSemantic(
-                pbrMetallicRoughness.getMetallicRoughnessTexture());
+            getTexCoordSemantic(material.getMetallicRoughnessTexcoord());
         this.normalTexCoordSemantic = 
-            getTexCoordSemantic(material.getNormalTexture());
+            getTexCoordSemantic(material.getNormalTexcoord());
         this.occlusionTexCoordSemantic = 
-            getTexCoordSemantic(material.getOcclusionTexture());
+            getTexCoordSemantic(material.getOcclusionTexcoord());
         this.emissiveTexCoordSemantic = 
-            getTexCoordSemantic(material.getEmissiveTexture());
+            getTexCoordSemantic(material.getEmissiveTexcoord());
         
         this.numJoints = numJoints;
     }
@@ -107,18 +94,15 @@ class MaterialStructure
      * Obtain the <code>TEXCOORD_n</code> semantic string based on the given
      * texture info, defaulting to <code>TEXCOORD_0</code>
      *  
-     * @param textureInfo The optional texture info
+     * @param texCoord The optional texture coordinate
      * @return The string
      */
-    private static String getTexCoordSemantic(TextureInfo textureInfo)
+    private static String getTexCoordSemantic(Integer texCoord)
     {
-        if (textureInfo == null)
+        if (texCoord == null)
         {
             return "TEXCOORD_0";
         }
-        int texCoord = Optionals.of(
-            textureInfo.getTexCoord(), 
-            textureInfo.defaultTexCoord());
         return "TEXCOORD_" + texCoord;
     }
     

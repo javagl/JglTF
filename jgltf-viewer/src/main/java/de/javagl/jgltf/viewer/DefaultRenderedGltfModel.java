@@ -28,6 +28,8 @@ package de.javagl.jgltf.viewer;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -35,7 +37,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
-import de.javagl.jgltf.impl.v2.Material;
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.GltfConstants;
@@ -166,7 +167,10 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
             viewConfiguration::getProjectionMatrix);
         this.uniformSetterFactory = new UniformSetterFactory(glContext);
         
-        this.materialModelHandler = new RenderedMaterialHandler();
+        Map<TextureModel, Integer> textureIndexMap = 
+            computeIndexMap(gltfModel.getTextureModels());
+        this.materialModelHandler = new RenderedMaterialHandler(
+            textureIndexMap::get);
 
         this.opaqueRenderCommands = new ArrayList<Runnable>();
         this.transparentRenderCommands = new ArrayList<Runnable>();
@@ -291,7 +295,6 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
         if (materialModel instanceof MaterialModelV2)
         {
             MaterialModelV2 materialModelV2 = (MaterialModelV2)materialModel;
-            Material material = materialModelV2.getMaterial();
             SkinModel skinModel = nodeModel.getSkinModel();
             int numJoints = 0;
             if (skinModel != null)
@@ -299,7 +302,7 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
                 numJoints = skinModel.getJoints().size();
             }
             return materialModelHandler.createRenderedMaterial(
-                material, numJoints);
+                materialModelV2, numJoints);
         }
         logger.severe("Unknown material model type: " + materialModel);
         return null;
@@ -876,5 +879,26 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
             // Empty
         };
     }
+    
+    /**
+     * Create an ordered map that contains a mapping of the given elements
+     * to consecutive integers
+     * 
+     * @param elements The elements
+     * @return The index map
+     */
+    private static <T> Map<T, Integer> computeIndexMap(
+        Collection<? extends T> elements)
+    {
+        Map<T, Integer> indices = new LinkedHashMap<T, Integer>();
+        int index = 0;
+        for (T element : elements)
+        {
+            indices.put(element, index);
+            index++;
+        }
+        return indices;
+    }
+    
 
 }

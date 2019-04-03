@@ -29,9 +29,7 @@ package de.javagl.jgltf.model.v1;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
 
-import de.javagl.jgltf.impl.v1.Material;
 import de.javagl.jgltf.model.MaterialModel;
 import de.javagl.jgltf.model.gl.TechniqueModel;
 import de.javagl.jgltf.model.impl.AbstractNamedModelElement;
@@ -42,11 +40,6 @@ import de.javagl.jgltf.model.impl.AbstractNamedModelElement;
 public final class MaterialModelV1 extends AbstractNamedModelElement
     implements MaterialModel
 {
-    /**
-     * The actual material object
-     */
-    private final Material material;
-    
     /**
      * The {@link TechniqueModel}
      */
@@ -59,20 +52,10 @@ public final class MaterialModelV1 extends AbstractNamedModelElement
 
     /**
      * Creates a new instance
-     * 
-     * @param material The material
      */
-    public MaterialModelV1(Material material)
+    public MaterialModelV1()
     {
-        this.material = Objects.requireNonNull(
-            material, "The material may not be null");
         this.values = Collections.emptyMap();
-    }
-    
-    @Override
-    public Material getMaterial()
-    {
-        return material;
     }
     
     /**

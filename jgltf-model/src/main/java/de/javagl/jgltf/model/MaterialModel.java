@@ -31,12 +31,5 @@ package de.javagl.jgltf.model;
  */
 public interface MaterialModel extends NamedModelElement
 {
-    /**
-     * Returns the actual material implementation. This may either be
-     * a {@link de.javagl.jgltf.impl.v1.Material} or a
-     * a {@link de.javagl.jgltf.impl.v2.Material}. 
-     * 
-     * @return The material
-     */
-    Object getMaterial();
+    // No common methods
 }

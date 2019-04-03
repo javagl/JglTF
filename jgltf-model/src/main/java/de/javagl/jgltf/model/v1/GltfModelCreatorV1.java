@@ -393,9 +393,9 @@ class GltfModelCreatorV1
     private void createMaterialModels()
     {
         Map<String, Material> materials = Optionals.of(gltf.getMaterials());
-        for (Material material : materials.values())
+        for (int i = 0; i < materials.size(); i++)
         {
-            gltfModel.addMaterialModel(new MaterialModelV1(material));
+            gltfModel.addMaterialModel(new MaterialModelV1());
         }
     }
     

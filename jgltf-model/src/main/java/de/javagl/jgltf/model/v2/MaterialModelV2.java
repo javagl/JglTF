@@ -26,7 +26,6 @@
  */
 package de.javagl.jgltf.model.v2;
 
-import de.javagl.jgltf.impl.v2.Material;
 import de.javagl.jgltf.model.MaterialModel;
 import de.javagl.jgltf.model.TextureModel;
 import de.javagl.jgltf.model.impl.AbstractNamedModelElement;
@@ -37,11 +36,6 @@ import de.javagl.jgltf.model.impl.AbstractNamedModelElement;
 public final class MaterialModelV2 extends AbstractNamedModelElement
     implements MaterialModel
 {
-    /**
-     * The actual material object
-     */
-    private Material material;
-    
     /**
      * The base color factor
      */
@@ -170,22 +164,6 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
         doubleSided = false;
     }
     
-    /**
-     * Set the actual material object
-     * 
-     * @param material The material
-     */
-    public void setMaterial(Material material)
-    {
-        this.material = material;
-    }
-    
-    @Override
-    public Material getMaterial()
-    {
-        return material;
-    }
-
     /**
      * Returns the base color factor
      * 
