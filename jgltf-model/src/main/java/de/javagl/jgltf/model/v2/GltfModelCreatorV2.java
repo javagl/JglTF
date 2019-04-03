@@ -1154,6 +1154,8 @@ class GltfModelCreatorV2
             int index = baseColorTextureInfo.getIndex();
             TextureModel textureModel = gltfModel.getTextureModel(index);
             materialModel.setBaseColorTexture(textureModel);
+            materialModel.setBaseColorTexcoord(
+                baseColorTextureInfo.getTexCoord());
         }
         float[] baseColorFactor = Optionals.of(
             pbrMetallicRoughness.getBaseColorFactor(),
@@ -1167,6 +1169,8 @@ class GltfModelCreatorV2
             int index = metallicRoughnessTextureInfo.getIndex();
             TextureModel textureModel = gltfModel.getTextureModel(index);
             materialModel.setMetallicRoughnessTexture(textureModel);
+            materialModel.setMetallicRoughnessTexcoord(
+                metallicRoughnessTextureInfo.getTexCoord());
         }
         float metallicFactor = Optionals.of(
             pbrMetallicRoughness.getMetallicFactor(),
@@ -1185,6 +1189,8 @@ class GltfModelCreatorV2
             int index = normalTextureInfo.getIndex();
             TextureModel textureModel = gltfModel.getTextureModel(index);
             materialModel.setNormalTexture(textureModel);
+            materialModel.setNormalTexcoord(
+                normalTextureInfo.getTexCoord());
             
             float normalScale = Optionals.of(
                 normalTextureInfo.getScale(),
@@ -1199,6 +1205,8 @@ class GltfModelCreatorV2
             int index = occlusionTextureInfo.getIndex();
             TextureModel textureModel = gltfModel.getTextureModel(index);
             materialModel.setOcclusionTexture(textureModel);
+            materialModel.setOcclusionTexcoord(
+                occlusionTextureInfo.getTexCoord());
             
             float occlusionStrength = Optionals.of(
                 occlusionTextureInfo.getStrength(),
@@ -1213,6 +1221,8 @@ class GltfModelCreatorV2
             int index = emissiveTextureInfo.getIndex();
             TextureModel textureModel = gltfModel.getTextureModel(index);
             materialModel.setEmissiveTexture(textureModel);
+            materialModel.setEmissiveTexcoord(
+                emissiveTextureInfo.getTexCoord());
         }
         
         float[] emissiveFactor = Optionals.of(

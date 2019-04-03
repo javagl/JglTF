@@ -53,6 +53,11 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
     private TextureModel baseColorTexture;
     
     /**
+     * The texture coordinate set for the base color texture
+     */
+    private Integer baseColorTexcoord;
+    
+    /**
      * The metallic factor
      */
     private float metallicFactor;
@@ -68,9 +73,19 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
     private TextureModel metallicRoughnessTexture;
     
     /**
+     * The texture coordinate set for the metallic-roughness texture
+     */
+    private Integer metallicRoughnessTexcoord;
+    
+    /**
      * The normal texture
      */
     private TextureModel normalTexture;
+
+    /**
+     * The texture coordinate set for the normal texture
+     */
+    private Integer normalTexcoord;
     
     /**
      * The normal scale
@@ -81,6 +96,11 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * The occlusion texture
      */
     private TextureModel occlusionTexture;
+
+    /**
+     * The texture coordinate set for the occlusion texture
+     */
+    private Integer occlusionTexcoord;
     
     /**
      * The occlusion strength
@@ -91,6 +111,11 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * The emissive texture
      */
     private TextureModel emissiveTexture;
+    
+    /**
+     * The texture coordinate set for the emissive texture
+     */
+    private Integer emissiveTexcoord;
     
     /**
      * The emissive factor
@@ -120,18 +145,23 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
     {
         baseColorFactor = new float[]{ 1.0f, 1.0f, 1.0f, 1.0f };
         baseColorTexture = null;
+        baseColorTexcoord = null;
         
         metallicFactor = 1.0f;
         roughnessFactor = 1.0f;
         metallicRoughnessTexture = null;
+        metallicRoughnessTexcoord = null;
         
         normalScale = 1.0f;
         normalTexture = null;
+        normalTexcoord = null;
         
         occlusionTexture = null;
+        occlusionTexcoord = null;
         occlusionStrength = 1.0f;
         
         emissiveTexture = null;
+        emissiveTexcoord = null;
         emissiveFactor = new float[]{0.0f, 0.0f, 0.0f };
 
         alphaMode = "OPAQUE";
@@ -195,6 +225,26 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
     {
         this.baseColorTexture = baseColorTexture;
     }
+    
+    /**
+     * Return the base color texture coordinate set
+     * 
+     * @return The texture coordinate set
+     */
+    public Integer getBaseColorTexcoord()
+    {
+        return baseColorTexcoord;
+    }
+    
+    /**
+     * Set the base color texture coordinate set
+     * 
+     * @param baseColorTexcoord The texture coordinate set
+     */
+    public void setBaseColorTexcoord(Integer baseColorTexcoord)
+    {
+        this.baseColorTexcoord = baseColorTexcoord;
+    }
 
     /**
      * Returns the metallic factor
@@ -251,9 +301,30 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @param metallicRoughnessTexture The metallic-roughness-texture
      */
-    public void setMetallicRoughnessTexture(TextureModel metallicRoughnessTexture)
+    public void setMetallicRoughnessTexture(
+        TextureModel metallicRoughnessTexture)
     {
         this.metallicRoughnessTexture = metallicRoughnessTexture;
+    }
+    
+    /**
+     * Returns the metallic-roughness texture coordinate set
+     * 
+     * @return The texture coordinate set
+     */
+    public Integer getMetallicRoughnessTexcoord()
+    {
+        return metallicRoughnessTexcoord;
+    }
+    
+    /**
+     * Set the metallic-roughness texture coordinate set
+     * 
+     * @param metallicRoughnessTexcoord The texture coordinate set
+     */
+    public void setMetallicRoughnessTexcoord(Integer metallicRoughnessTexcoord)
+    {
+        this.metallicRoughnessTexcoord = metallicRoughnessTexcoord;
     }
 
     /**
@@ -274,6 +345,26 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
     public void setNormalTexture(TextureModel normalTexture)
     {
         this.normalTexture = normalTexture;
+    }
+    
+    /**
+     * Returns the normal texture coordinate set
+     * 
+     * @return The texture coordinate set
+     */
+    public Integer getNormalTexcoord()
+    {
+        return normalTexcoord;
+    }
+    
+    /**
+     * Set the normal texture coordinate set
+     * 
+     * @param normalTexcoord The texture coordinate set
+     */
+    public void setNormalTexcoord(Integer normalTexcoord)
+    {
+        this.normalTexcoord = normalTexcoord;
     }
 
     /**
@@ -315,6 +406,26 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
     {
         this.occlusionTexture = occlusionTexture;
     }
+    
+    /**
+     * Returns the occlusion texture coordinate set
+     * 
+     * @return The texture coordinate set
+     */
+    public Integer getOcclusionTexcoord()
+    {
+        return occlusionTexcoord;
+    }
+    
+    /**
+     * Set the occlusion texture coordinate set
+     * 
+     * @param occlusionTexcoord The texture coordinate set
+     */
+    public void setOcclusionTexcoord(Integer occlusionTexcoord)
+    {
+        this.occlusionTexcoord = occlusionTexcoord;
+    }
 
     /**
      * Returns the occlusion strength
@@ -354,6 +465,26 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
     public void setEmissiveTexture(TextureModel emissiveTexture)
     {
         this.emissiveTexture = emissiveTexture;
+    }
+    
+    /**
+     * Set the emissive texture coordinate set
+     * 
+     * @return The texture coordinate set
+     */
+    public Integer getEmissiveTexcoord()
+    {
+        return emissiveTexcoord;
+    }
+    
+    /**
+     * Set the emissive texture coordinate set
+     * 
+     * @param emissiveTexcoord The texture coordinate set
+     */
+    public void setEmissiveTexcoord(Integer emissiveTexcoord)
+    {
+        this.emissiveTexcoord = emissiveTexcoord;
     }
     
     /**

@@ -320,7 +320,7 @@ public final class MeshPrimitiveBuilder
      * 
      * @return The {@link MeshPrimitiveModel}
      */
-    public MeshPrimitiveModel build()
+    public DefaultMeshPrimitiveModel build()
     {
         DefaultMeshPrimitiveModel result =  
             new DefaultMeshPrimitiveModel(mode);
