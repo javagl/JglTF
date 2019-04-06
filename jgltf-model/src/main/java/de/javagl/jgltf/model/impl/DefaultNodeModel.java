@@ -118,6 +118,27 @@ public class DefaultNodeModel extends AbstractNamedModelElement
     }
     
     /**
+     * Copy constructor that creates a shallow copy with <i>references</i>
+     * to the elements of the given model, except for the children and
+     * {@link MeshModel} instances (which will be empty in the copy).
+     * 
+     * @param other The other {@link NodeModel}
+     */
+    public DefaultNodeModel(NodeModel other)
+    {
+        this.cameraModel = other.getCameraModel();
+        this.children = new ArrayList<NodeModel>();
+        this.matrix = other.getMatrix();
+        this.meshModels = new ArrayList<MeshModel>();
+        this.parent = other.getParent();
+        this.rotation = other.getRotation();
+        this.scale = other.getScale();
+        this.skinModel = other.getSkinModel();
+        this.translation = other.getTranslation();
+        this.weights = other.getWeights();
+    }
+    
+    /**
      * Set the parent of this node
      * 
      * @param parent The parent node

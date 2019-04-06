@@ -32,14 +32,13 @@ import java.util.List;
 import de.javagl.jgltf.impl.v2.Accessor;
 import de.javagl.jgltf.impl.v2.Buffer;
 import de.javagl.jgltf.impl.v2.BufferView;
-import de.javagl.jgltf.model.AccessorData;
-import de.javagl.jgltf.model.AccessorDatas;
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.impl.DefaultAccessorModel;
 import de.javagl.jgltf.model.impl.DefaultBufferModel;
 import de.javagl.jgltf.model.impl.DefaultBufferViewModel;
+import de.javagl.jgltf.model.v2.GltfCreatorV2;
 
 /**
  * Utility methods for creating the glTF 2.0 elements that correspond to
@@ -66,36 +65,10 @@ public class BufferStructureGltfV2
                 accessorModel.getBufferViewModel();
             int bufferViewIndex =
                 bufferStructure.getBufferViewIndex(bufferViewModel);
-            accessors.add(createAccessor(accessorModel, bufferViewIndex));
+            accessors.add(GltfCreatorV2.createAccessor(
+                accessorModel, bufferViewIndex));
         }
         return accessors;
-    }
-
-    /**
-     * Create the {@link Accessor} object from the given 
-     * {@link AccessorModel}
-     * 
-     * @param accessorModel The {@link AccessorModel}
-     * @param bufferViewIndex The {@link BufferView} index
-     * @return The {@link Accessor} object
-     */
-    private static Accessor createAccessor(
-        AccessorModel accessorModel, int bufferViewIndex)
-    {
-        Accessor accessor = new Accessor();
-
-        accessor.setBufferView(bufferViewIndex);
-        
-        accessor.setByteOffset(accessorModel.getByteOffset());
-        accessor.setComponentType(accessorModel.getComponentType());
-        accessor.setCount(accessorModel.getCount());
-        accessor.setType(accessorModel.getElementType().toString());
-        
-        AccessorData accessorData = accessorModel.getAccessorData();
-        accessor.setMax(AccessorDatas.computeMax(accessorData));
-        accessor.setMin(AccessorDatas.computeMin(accessorData));
-        
-        return accessor;
     }
     
     /**
@@ -115,32 +88,10 @@ public class BufferStructureGltfV2
         {
             BufferModel bufferModel = bufferViewModel.getBufferModel();
             int bufferIndex = bufferStructure.getBufferIndex(bufferModel);
-            bufferViews.add(createBufferView(
+            bufferViews.add(GltfCreatorV2.createBufferView(
                 bufferViewModel, bufferIndex));
         }
         return bufferViews;
-    }
-
-    /**
-     * Create the {@link BufferView} object from the given 
-     * {@link BufferViewModel}
-     * 
-     * @param bufferViewModel The {@link BufferViewModel}
-     * @param bufferIndex The {@link Buffer} index
-     * @return The {@link BufferView} objects
-     */
-    private static BufferView createBufferView(
-        BufferViewModel bufferViewModel, int bufferIndex)
-    {
-        BufferView bufferView = new BufferView();
-
-        bufferView.setBuffer(bufferIndex);
-        bufferView.setByteOffset(bufferViewModel.getByteOffset());
-        bufferView.setByteLength(bufferViewModel.getByteLength());
-        bufferView.setByteStride(bufferViewModel.getByteStride());
-        bufferView.setTarget(bufferViewModel.getTarget());
-        
-        return bufferView;
     }
 
     /**
@@ -157,23 +108,9 @@ public class BufferStructureGltfV2
         List<Buffer> buffers = new ArrayList<Buffer>();
         for (BufferModel bufferModel : bufferModels) 
         {
-            buffers.add(createBuffer(bufferModel));
+            buffers.add(GltfCreatorV2.createBuffer(bufferModel));
         }
         return buffers;
-    }
-
-    /**
-     * Create the {@link Buffer} object from the given {@link BufferModel}
-     * 
-     * @param bufferModel The {@link BufferModel}
-     * @return The {@link Buffer}
-     */
-    private static Buffer createBuffer(BufferModel bufferModel)
-    {
-        Buffer buffer = new Buffer();
-        buffer.setUri(bufferModel.getUri());
-        buffer.setByteLength(bufferModel.getByteLength());
-        return buffer;
     }
 
     /**
