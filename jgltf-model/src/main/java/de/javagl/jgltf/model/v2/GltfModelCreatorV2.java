@@ -105,6 +105,7 @@ import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.model.io.GltfAsset;
 import de.javagl.jgltf.model.io.IO;
 import de.javagl.jgltf.model.io.v2.GltfAssetV2;
+import de.javagl.jgltf.model.v2.MaterialModelV2.AlphaMode;
 import de.javagl.jgltf.model.v2.gl.Materials;
 
 /**
@@ -120,12 +121,12 @@ class GltfModelCreatorV2
         Logger.getLogger(GltfModelCreatorV2.class.getName());
 
     /**
-     * Create the {@link GltfModel} for the given {@link GltfAsset}
+     * Create the {@link GltfModel} for the given {@link GltfAssetV2}
      * 
-     * @param gltfAsset The {@link GltfAsset}
+     * @param gltfAsset The {@link GltfAssetV2}
      * @return The {@link GltfModel}
      */
-    static DefaultGltfModel create(GltfAsset gltfAsset)
+    static DefaultGltfModel create(GltfAssetV2 gltfAsset)
     {
         DefaultGltfModel gltfModel = new DefaultGltfModel();
         GltfModelCreatorV2 creator = 
@@ -155,11 +156,11 @@ class GltfModelCreatorV2
      * @param gltfAsset The {@link GltfAssetV2}
      * @param gltfModel The {@link GltfModel}
      */
-    GltfModelCreatorV2(GltfAsset gltfAsset, DefaultGltfModel gltfModel)
+    GltfModelCreatorV2(GltfAssetV2 gltfAsset, DefaultGltfModel gltfModel)
     {
         this.gltfAsset = Objects.requireNonNull(gltfAsset, 
             "The gltfAsset may not be null");
-        this.gltf = (GlTF) gltfAsset.getGltf();
+        this.gltf = gltfAsset.getGltf();
         this.gltfModel = Objects.requireNonNull(gltfModel, 
             "The gltfModel may not be null");
     }
@@ -1141,6 +1142,14 @@ class GltfModelCreatorV2
             pbrMetallicRoughness = 
                 Materials.createDefaultMaterialPbrMetallicRoughness();
         }
+        
+        String alphaModeString = material.getAlphaMode();
+        if (alphaModeString != null)
+        {
+            materialModel.setAlphaMode(AlphaMode.valueOf(alphaModeString));
+        }
+        materialModel.setAlphaCutoff(
+            Optionals.of(material.getAlphaCutoff(), 0.5f));
         
         materialModel.setDoubleSided(
             Boolean.TRUE.equals(material.isDoubleSided()));

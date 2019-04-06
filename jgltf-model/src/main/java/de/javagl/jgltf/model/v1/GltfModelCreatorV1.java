@@ -136,7 +136,6 @@ class GltfModelCreatorV1
      */
     private final IndexMappingSet indexMappingSet;
     
-    
     /**
      * The {@link GltfAsset} of this model
      */
@@ -155,17 +154,17 @@ class GltfModelCreatorV1
     /**
      * Creates a new model for the given glTF
      * 
-     * @param gltfAsset The {@link GltfAsset}
+     * @param gltfAsset The {@link GltfAssetV1}
      * @param gltfModel The {@link GltfModel}
      * @param indexMappingSet The {@link IndexMappingSet}
      */
     GltfModelCreatorV1(
-        GltfAsset gltfAsset, GltfModelV1 gltfModel, 
+        GltfAssetV1 gltfAsset, GltfModelV1 gltfModel, 
         IndexMappingSet indexMappingSet)
     {
         this.gltfAsset = Objects.requireNonNull(gltfAsset, 
             "The gltfAsset may not be null");
-        this.gltf = (GlTF) gltfAsset.getGltf();
+        this.gltf = gltfAsset.getGltf();
         this.gltfModel = Objects.requireNonNull(gltfModel, 
             "The gltfModel may not be null");
         this.indexMappingSet = indexMappingSet;

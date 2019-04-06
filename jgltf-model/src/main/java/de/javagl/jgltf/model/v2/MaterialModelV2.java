@@ -37,6 +37,27 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
     implements MaterialModel
 {
     /**
+     * Alpha modes
+     */
+    public static enum AlphaMode
+    {
+        /**
+         * Opaque mode
+         */
+        OPAQUE,
+        
+        /**
+         * Masking mode
+         */
+        MASK,
+        
+        /**
+         * Blend mode
+         */
+        BLEND        
+    }
+    
+    /**
      * The base color factor
      */
     private float[] baseColorFactor;
@@ -119,7 +140,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
     /**
      * The alpha mode
      */
-    private String alphaMode;
+    private AlphaMode alphaMode;
     
     /**
      * The alpha cutoff
@@ -158,7 +179,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
         emissiveTexcoord = null;
         emissiveFactor = new float[]{0.0f, 0.0f, 0.0f };
 
-        alphaMode = "OPAQUE";
+        alphaMode = AlphaMode.OPAQUE;
         alphaCutoff = 0.5f;
         
         doubleSided = false;
@@ -490,7 +511,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @return The alpha mode
      */
-    public String getAlphaMode()
+    public AlphaMode getAlphaMode()
     {
         return alphaMode;
     }
@@ -500,7 +521,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @param alphaMode The alpha mode
      */
-    public void setAlphaMode(String alphaMode)
+    public void setAlphaMode(AlphaMode alphaMode)
     {
         this.alphaMode = alphaMode;
     }
