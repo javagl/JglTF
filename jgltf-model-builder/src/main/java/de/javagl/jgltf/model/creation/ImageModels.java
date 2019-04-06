@@ -37,7 +37,9 @@ import de.javagl.jgltf.model.image.ImageUtils;
 import de.javagl.jgltf.model.image.PixelData;
 import de.javagl.jgltf.model.image.PixelDatas;
 import de.javagl.jgltf.model.impl.DefaultImageModel;
+import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.model.io.IO;
+import de.javagl.jgltf.model.io.MimeTypes;
 
 /**
  * Methods to create {@link ImageModel} instances
@@ -63,7 +65,7 @@ public class ImageModels
      * printed and <code>null</code> is returned.
      * 
      * @param fileName The source file name
-     * @param uri The URI
+     * @param uri The URI that will be assigned to the {@link ImageModel}
      * @param mimeType The MIME type
      * @return The instance
      * @throws IllegalArgumentException If the MIME type is not one of the
@@ -95,7 +97,7 @@ public class ImageModels
      * <code>"image/jpg"</code>!).<br> 
      * <br>
      * 
-     * @param uri The URI
+     * @param uri The URI that will be assigned to the {@link ImageModel}
      * @param mimeType The MIME type
      * @param pixelData The {@link PixelData}
      * @return The instance
@@ -110,7 +112,53 @@ public class ImageModels
         DefaultImageModel imageModel = new DefaultImageModel();
         imageModel.setImageData(imageData);
         imageModel.setUri(uri);
+        imageModel.setMimeType(mimeType);
         return imageModel;
+    }
+    
+    /**
+     * Creates a new {@link ImageModel} with the given URI, that contains
+     * a buffer containing the image data that was read from the given 
+     * source file.<br>
+     * <br>
+     * The MIME type will be detected from the input file name (i.e. from
+     * its extension). If this is not possible, it will be detected from
+     * the image data. If this is not possible, then an error message is
+     * displayed and <code>null</code> is returned. 
+     * <br>
+     * If the source URI cannot be read, then an error message is
+     * printed and <code>null</code> is returned.
+     * 
+     * @param fileName The source file name
+     * @param uri The URI that will be assigned to the {@link ImageModel}
+     * @return The instance
+     */
+    public static DefaultImageModel create(
+        String fileName, String uri)
+    {
+        try (InputStream inputStream = new FileInputStream(fileName))
+        {
+            byte data[] = IO.readStream(inputStream);
+            ByteBuffer imageData = Buffers.create(data);
+
+            String mimeType = MimeTypes.guessImageMimeTypeString(
+                fileName, imageData);
+            if (mimeType == null)
+            {
+                logger.severe("Could not detect MIME type of " + fileName);
+                return null;
+            }
+            DefaultImageModel imageModel = new DefaultImageModel();
+            imageModel.setImageData(imageData);
+            imageModel.setUri(uri);
+            imageModel.setMimeType(mimeType);
+            return imageModel;
+        }
+        catch (IOException e)
+        {
+            logger.severe(e.toString());
+            return null;
+        }
     }
     
     /**
