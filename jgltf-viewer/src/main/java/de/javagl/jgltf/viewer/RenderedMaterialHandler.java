@@ -189,7 +189,7 @@ class RenderedMaterialHandler
     }
     
     /**
-     * Create the vertex {@link ProgramModel} for the given number of joints
+     * Create the {@link ProgramModel} for the given number of joints
      * 
      * @param numJoints The number of joints
      * @return The {@link ProgramModel}
