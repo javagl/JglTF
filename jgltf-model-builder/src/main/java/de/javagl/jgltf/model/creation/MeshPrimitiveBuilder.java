@@ -47,6 +47,16 @@ import de.javagl.jgltf.model.io.Buffers;
 public final class MeshPrimitiveBuilder 
 {
     /**
+     * Create a new {@link MeshPrimitiveBuilder}
+     * 
+     * @return The {@link MeshPrimitiveBuilder}
+     */
+    public static MeshPrimitiveBuilder create()
+    {
+        return new MeshPrimitiveBuilder();
+    }
+    
+    /**
      * The {@link MeshPrimitiveModel#getMode() rendering mode}
      */
     private int mode;
@@ -63,9 +73,9 @@ public final class MeshPrimitiveBuilder
     private final Map<String, DefaultAccessorModel> attributeAccessorModels;
     
     /**
-     * Default constructor
+     * Private constructor
      */
-    public MeshPrimitiveBuilder()
+    private MeshPrimitiveBuilder()
     {
         this.mode = GltfConstants.GL_TRIANGLES;
         this.attributeAccessorModels = 
