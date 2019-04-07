@@ -28,6 +28,7 @@ package de.javagl.jgltf.model.v1;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,8 +55,11 @@ import de.javagl.jgltf.impl.v1.Material;
 import de.javagl.jgltf.impl.v1.Mesh;
 import de.javagl.jgltf.impl.v1.MeshPrimitive;
 import de.javagl.jgltf.impl.v1.Node;
+import de.javagl.jgltf.impl.v1.Program;
 import de.javagl.jgltf.impl.v1.Scene;
+import de.javagl.jgltf.impl.v1.Shader;
 import de.javagl.jgltf.impl.v1.Skin;
+import de.javagl.jgltf.impl.v1.Technique;
 import de.javagl.jgltf.impl.v1.Texture;
 import de.javagl.jgltf.model.AccessorData;
 import de.javagl.jgltf.model.AccessorDatas;
@@ -63,12 +67,12 @@ import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.AnimationModel;
 import de.javagl.jgltf.model.AnimationModel.Channel;
 import de.javagl.jgltf.model.AnimationModel.Sampler;
-import de.javagl.jgltf.model.impl.DefaultNodeModel;
 import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.CameraModel;
 import de.javagl.jgltf.model.CameraOrthographicModel;
 import de.javagl.jgltf.model.CameraPerspectiveModel;
+import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.MaterialModel;
@@ -79,6 +83,10 @@ import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.SceneModel;
 import de.javagl.jgltf.model.SkinModel;
 import de.javagl.jgltf.model.TextureModel;
+import de.javagl.jgltf.model.gl.ProgramModel;
+import de.javagl.jgltf.model.gl.ShaderModel;
+import de.javagl.jgltf.model.gl.ShaderModel.ShaderType;
+import de.javagl.jgltf.model.gl.TechniqueModel;
 
 /**
  * A class for creating the {@link GlTF version 1.0 glTF} from a 
@@ -202,10 +210,25 @@ public class GltfCreatorV1
     private final Map<NodeModel, String> nodeIds;
 
     /**
+     * A map from {@link ProgramModel} objects to their IDs
+     */
+    private final Map<ProgramModel, String> programIds;
+
+    /**
+     * A map from {@link ShaderModel} objects to their IDs
+     */
+    private final Map<ShaderModel, String> shaderIds;
+    
+    /**
      * A map from {@link SkinModel} objects to their IDs
      */
     private final Map<SkinModel, String> skinIds;
 
+    /**
+     * A map from {@link TechniqueModel} objects to their IDs
+     */
+    private final Map<TechniqueModel, String> techniqueIds;
+    
     /**
      * A map from {@link TextureModel} objects to their IDs
      */
@@ -246,6 +269,23 @@ public class GltfCreatorV1
             "skin", gltfModel.getSkinModels());
         textureIds = computeIdMap(
             "texture", gltfModel.getTextureModels());
+        
+        if (gltfModel instanceof GltfModelV1)
+        {
+            GltfModelV1 gltfModelV1 = (GltfModelV1)gltfModel;
+            programIds = computeIdMap(
+                "program", gltfModelV1.getProgramModels());
+            shaderIds = computeIdMap(
+                "shader", gltfModelV1.getShaderModels());
+            techniqueIds = computeIdMap(
+                "technique", gltfModelV1.getTechniqueModels());
+        }
+        else
+        {
+            programIds = Collections.emptyMap();
+            shaderIds = Collections.emptyMap();
+            techniqueIds = Collections.emptyMap();
+        }
         
         samplerIds = createSamplerIds(gltfModel.getTextureModels());
     }
@@ -298,6 +338,21 @@ public class GltfCreatorV1
         gltf.setTextures(map("texture",
             gltfModel.getTextureModels(), 
             this::createTexture));
+
+        
+        if (gltfModel instanceof GltfModelV1)
+        {
+            GltfModelV1 gltfModelV1 = (GltfModelV1)gltfModel;
+            gltf.setPrograms(map("program", 
+                gltfModelV1.getProgramModels(), 
+                this::createProgram));
+            gltf.setShaders(map("shader", 
+                gltfModelV1.getShaderModels(), 
+                this::createShader));
+            gltf.setTechniques(map("technique", 
+                gltfModelV1.getTechniqueModels(), 
+                this::createTechnique));
+        }
         
         if (gltf.getScenes() != null && !gltf.getScenes().isEmpty())
         {
@@ -527,11 +582,8 @@ public class GltfCreatorV1
             bufferViewIds.get(imageModel.getBufferViewModel());
         if (bufferView != null)
         {
-            // TODO Handle images with BufferView
             logger.severe(
                 "Images with BufferView are not supported in glTF 1.0");
-            //image.setBufferView(bufferView);
-            //image.setMimeType(imageModel.getMimeType());
         }
         image.setUri(imageModel.getUri());
         
@@ -569,10 +621,82 @@ public class GltfCreatorV1
         Material material = new Material();
         material.setName(materialModel.getName());
         
-        // TODO Convert techniques etc.
-        
+        TechniqueModel techniqueModel = materialModel.getTechniqueModel();
+        material.setTechnique(techniqueIds.get(techniqueModel));
+        material.setValues(materialModel.getValues());
         return material;
     }
+    
+    /**
+     * Create the {@link Program} for the given {@link ProgramModel}
+     * 
+     * @param programModel The {@link ProgramModel}
+     * @return The {@link Program}
+     */
+    private Program createProgram(ProgramModel programModel)
+    {
+        Program program = new Program();
+        program.setName(programModel.getName());
+        
+        ShaderModel vertexShaderModel = 
+            programModel.getVertexShaderModel();
+        program.setVertexShader(shaderIds.get(vertexShaderModel));
+        
+        ShaderModel fragmentShaderModel = 
+            programModel.getFragmentShaderModel();
+        program.setFragmentShader(shaderIds.get(fragmentShaderModel));
+        
+        // TODO Not implemented yet
+        logger.severe("Programs are not yet fully supported");
+        
+        return program;
+    }
+    
+    /**
+     * Create the {@link Shader} for the given {@link ShaderModel}
+     * 
+     * @param shaderModel The {@link ShaderModel}
+     * @return The {@link Shader}
+     */
+    private Shader createShader(ShaderModel shaderModel)
+    {
+        Shader shader = new Shader();
+        shader.setName(shaderModel.getName());
+        
+        ShaderType shaderType = shaderModel.getShaderType();
+        if (shaderType == ShaderType.VERTEX_SHADER)
+        {
+            shader.setType(GltfConstants.GL_VERTEX_SHADER);
+        }
+        else if (shaderType == ShaderType.FRAGMENT_SHADER)
+        {
+            shader.setType(GltfConstants.GL_FRAGMENT_SHADER);
+        }
+        else
+        {
+            logger.severe("Invalid shader type: " + shaderType);
+        }
+        shader.setUri(shaderModel.getUri());
+        return shader;
+    }
+    
+    /**
+     * Create the {@link Technique} for the given {@link TechniqueModel}
+     * 
+     * @param techniqueModel The {@link TechniqueModel}
+     * @return The {@link Technique}
+     */
+    private Technique createTechnique(TechniqueModel techniqueModel)
+    {
+        Technique technique = new Technique();
+        technique.setName(techniqueModel.getName());
+        
+        // TODO Not implemented yet
+        logger.severe("Techniques are not yet fully supported");
+        
+        return technique;
+    }
+    
     
     /**
      * Create the {@link Mesh} for the given {@link MeshModel}
@@ -598,9 +722,7 @@ public class GltfCreatorV1
         
         if (meshModel.getWeights() != null)
         {
-            // TODO Handle morph target weights?
             logger.severe("Morph target weights are not supported in glTF 1.0");
-            //mesh.setWeights(toList(meshModel.getWeights()));
         }
         return mesh;
     }
@@ -630,17 +752,6 @@ public class GltfCreatorV1
         if (!modelTargetsList.isEmpty())
         {
             logger.severe("Morph targets are not supported in glTF 1.0");
-            /*
-            List<Map<String, Integer>> targetsList = 
-                new ArrayList<Map<String, Integer>>();
-            for (Map<String, AccessorModel> modelTargets : modelTargetsList)
-            {
-                Map<String, String> targets = resolveIds(
-                    modelTargets, accessorIds::get);
-                targetsList.add(targets);
-            }
-            meshPrimitive..setTargets(targetsList);
-            */
         }
         
         String material = materialIds.get(
@@ -680,9 +791,7 @@ public class GltfCreatorV1
         
         if (nodeModel.getWeights() != null)
         {
-            // TODO Handle morph target weights?
             logger.severe("Morph target weights are not supported in glTF 1.0");
-            //node.setWeights(toList(nodeModel.getWeights()));
         }
         
         List<MeshModel> nodeMeshModels = nodeModel.getMeshModels();
@@ -730,12 +839,8 @@ public class GltfCreatorV1
             accessorIds.get(skinModel.getInverseBindMatrices());
         skin.setInverseBindMatrices(inverseBindMatrices);
         
-        // TODO Skinning is not supported yet
-//        skin.setJoints(map(
-//            skinModel.getJoints(), nodeIds::get));
-//        
-//        String skeleton = nodeIds.get(skinModel.getSkeleton());
-//        skin.setSkeleton(skeleton);
+        // TODO Not implemented yet
+        logger.severe("Skins are not yet fully supported");
         
         return skin;
     }
@@ -831,7 +936,16 @@ public class GltfCreatorV1
     }
 
     
-    
+    /**
+     * Creates a map that maps (unspecified) strings starting with the 
+     * given prefix to the results of applying the given mapper to the
+     * given elements
+     * 
+     * @param prefix The prefix
+     * @param elements The elements
+     * @param mapper The mapper
+     * @return The map
+     */
     private static <T, U> Map<String, U> map(
         String prefix, 
         Collection<? extends T> elements,
@@ -840,6 +954,14 @@ public class GltfCreatorV1
         return map(prefix, map(elements, mapper));
     }
 
+    /**
+     * Creates a map that maps (unspecified) strings starting with the 
+     * given prefix to the given elements
+     * 
+     * @param prefix The prefix
+     * @param elements The elements
+     * @return The map
+     */
     private static <T> Map<String, T> map(
         String prefix, Collection<? extends T> elements)
     {
@@ -916,27 +1038,5 @@ public class GltfCreatorV1
             index++;
         }
         return ids;
-    }
-    
-    
-    /**
-     * Returns a new list containing the elements of the given array,
-     * or <code>null</code> if the given array is <code>null</code>
-     * 
-     * @param array The array
-     * @return The list
-     */
-    private static List<Float> toList(float array[])
-    {
-        if (array == null)
-        {
-            return null;
-        }
-        List<Float> list = new ArrayList<Float>();
-        for (float f : array)
-        {
-            list.add(f);
-        }
-        return list;
     }
 }
