@@ -67,8 +67,7 @@ public final class GltfModelWriterV1
     public void write(GltfModelV1 gltfModel, File file) 
         throws IOException
     {
-        DefaultAssetCreatorV1 assetCreator = new DefaultAssetCreatorV1();
-        GltfAssetV1 gltfAsset = assetCreator.create(gltfModel);
+        GltfAssetV1 gltfAsset = GltfAssetsV1.createDefault(gltfModel);
         GltfAssetWriter gltfAssetWriter = new GltfAssetWriter();
         gltfAssetWriter.write(gltfAsset, file);
     }
@@ -102,8 +101,7 @@ public final class GltfModelWriterV1
     public void writeBinary(GltfModelV1 gltfModel, OutputStream outputStream) 
         throws IOException
     {
-        BinaryAssetCreatorV1 assetCreator = new BinaryAssetCreatorV1();
-        GltfAssetV1 gltfAsset = assetCreator.create(gltfModel);
+        GltfAssetV1 gltfAsset = GltfAssetsV1.createBinary(gltfModel);
         GltfAssetWriterV1 gltfAssetWriter = new GltfAssetWriterV1();
         gltfAssetWriter.writeBinary(gltfAsset, outputStream);
     }
@@ -120,8 +118,7 @@ public final class GltfModelWriterV1
     public void writeEmbedded(GltfModelV1 gltfModel, OutputStream outputStream) 
         throws IOException
     {
-        EmbeddedAssetCreatorV1 assetCreator = new EmbeddedAssetCreatorV1();
-        GltfAssetV1 gltfAsset = assetCreator.create(gltfModel);
+        GltfAssetV1 gltfAsset = GltfAssetsV1.createEmbedded(gltfModel);
         GltfWriter gltfWriter = new GltfWriter();
         GlTF gltf = gltfAsset.getGltf();
         gltfWriter.write(gltf, outputStream);

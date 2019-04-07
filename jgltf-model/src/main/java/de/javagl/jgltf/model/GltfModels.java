@@ -29,7 +29,9 @@ package de.javagl.jgltf.model;
 import de.javagl.jgltf.model.io.GltfAsset;
 import de.javagl.jgltf.model.io.v1.GltfAssetV1;
 import de.javagl.jgltf.model.io.v2.GltfAssetV2;
+import de.javagl.jgltf.model.v1.GltfCreatorV1;
 import de.javagl.jgltf.model.v1.GltfModelV1;
+import de.javagl.jgltf.model.v2.GltfCreatorV2;
 import de.javagl.jgltf.model.v2.GltfModelV2;
 
 /**
@@ -61,6 +63,41 @@ public class GltfModels
             "The glTF asset has an unknown version: " + gltfAsset);
     }
     
+    public static Object getGltf(GltfModel gltfModel)
+    {
+        Object gltf = gltfModel.getGltf();
+        if (gltf != null)
+        {
+            return gltf;
+        }
+        return getGltfV2(gltfModel);
+    }
+    
+    public static de.javagl.jgltf.impl.v1.GlTF getGltfV1(GltfModel gltfModel)
+    {
+        Object gltf = gltfModel.getGltf();
+        if (gltf != null && gltf instanceof de.javagl.jgltf.impl.v1.GlTF)
+        {
+            de.javagl.jgltf.impl.v1.GlTF gltfV1 = 
+                (de.javagl.jgltf.impl.v1.GlTF)gltf;
+            return gltfV1;
+        }
+        GltfCreatorV1 gltfCreator = new GltfCreatorV1(gltfModel);
+        return gltfCreator.create();
+    }
+    
+    public static de.javagl.jgltf.impl.v2.GlTF getGltfV2(GltfModel gltfModel)
+    {
+        Object gltf = gltfModel.getGltf();
+        if (gltf != null && gltf instanceof de.javagl.jgltf.impl.v2.GlTF)
+        {
+            de.javagl.jgltf.impl.v2.GlTF gltfV2 = 
+                (de.javagl.jgltf.impl.v2.GlTF)gltf;
+            return gltfV2;
+        }
+        GltfCreatorV2 gltfCreator = new GltfCreatorV2(gltfModel);
+        return gltfCreator.create();
+    }
     
     /**
      * Private constructor to prevent instantiation

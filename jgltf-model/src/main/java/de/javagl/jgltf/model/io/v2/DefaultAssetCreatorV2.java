@@ -39,16 +39,16 @@ import de.javagl.jgltf.impl.v2.GlTF;
 import de.javagl.jgltf.impl.v2.Image;
 import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.GltfModel;
+import de.javagl.jgltf.model.GltfModels;
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.impl.UriStrings;
 import de.javagl.jgltf.model.io.GltfAsset;
 import de.javagl.jgltf.model.io.IO;
-import de.javagl.jgltf.model.v2.GltfModelV2;
 
 /**
  * A class for creating a {@link GltfAssetV2} with a default data 
- * representation from a {@link GltfModelV2}.<br>
+ * representation from a {@link GltfModel}.<br>
  * <br>
  * In the default data representation, elements are referred to via URIs. 
  * Data elements like {@link Buffer} or {@link Image}
@@ -88,7 +88,7 @@ final class DefaultAssetCreatorV2
      */
     GltfAssetV2 create(GltfModel gltfModel)
     {
-        GlTF inputGltf = (GlTF) gltfModel.getGltf();
+        GlTF inputGltf = GltfModels.getGltfV2(gltfModel);
         GlTF outputGltf = GltfUtilsV2.copy(inputGltf);
 
         List<Buffer> buffers = Optionals.of(outputGltf.getBuffers());

@@ -41,15 +41,15 @@ import de.javagl.jgltf.impl.v2.GlTF;
 import de.javagl.jgltf.impl.v2.Image;
 import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.GltfModel;
+import de.javagl.jgltf.model.GltfModels;
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.model.io.MimeTypes;
-import de.javagl.jgltf.model.v2.GltfModelV2;
 
 /**
  * A class for creating a binary {@link GltfAssetV2} from a 
- * {@link GltfModelV2}.<br>
+ * {@link GltfModel}.<br>
  * <br>
  */
 final class BinaryAssetCreatorV2
@@ -69,17 +69,17 @@ final class BinaryAssetCreatorV2
     }
     
     /**
-     * Create a binary {@link GltfAssetV2} from the given {@link GltfModelV2}.
+     * Create a binary {@link GltfAssetV2} from the given {@link GltfModel}.
      * The resulting asset will have a {@link GlTF} that uses references to
      * {@link BufferView} objects in its {@link Buffer} and {@link Image}
      * elements. 
      * 
-     * @param gltfModel The {@link GltfModelV2}
+     * @param gltfModel The {@link GltfModel}
      * @return The {@link GltfAssetV2}
      */
-    GltfAssetV2 create(GltfModelV2 gltfModel)
+    GltfAssetV2 create(GltfModel gltfModel)
     {
-        GlTF inputGltf = (GlTF) gltfModel.getGltf();
+        GlTF inputGltf = GltfModels.getGltfV2(gltfModel);
         GlTF outputGltf = GltfUtilsV2.copy(inputGltf);
         
         // Create the new byte buffer for the data of the "binary_glTF" Buffer

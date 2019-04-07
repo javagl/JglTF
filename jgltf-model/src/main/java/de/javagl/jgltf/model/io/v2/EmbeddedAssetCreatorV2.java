@@ -35,16 +35,17 @@ import de.javagl.jgltf.impl.v2.GlTF;
 import de.javagl.jgltf.impl.v2.Image;
 import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.GltfException;
+import de.javagl.jgltf.model.GltfModel;
+import de.javagl.jgltf.model.GltfModels;
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.io.GltfAsset;
 import de.javagl.jgltf.model.io.IO;
 import de.javagl.jgltf.model.io.MimeTypes;
-import de.javagl.jgltf.model.v2.GltfModelV2;
 
 /**
  * A class for creating a {@link GltfAssetV2} with an "embedded" data 
- * representation from a {@link GltfModelV2}.<br>
+ * representation from a {@link GltfModel}.<br>
  * <br>
  * In the "embedded" data representation, the data of elements like 
  * {@link Buffer} or {@link Image} objects is stored in data URIs.
@@ -61,7 +62,7 @@ final class EmbeddedAssetCreatorV2
 
     /**
      * Create a {@link GltfAssetV2} with "embedded" data representation from 
-     * the given {@link GltfModelV2}.<br>
+     * the given {@link GltfModel}.<br>
      * <br>
      * The returned {@link GltfAssetV2} will contain a {@link GlTF} where the
      * the URIs that appear in {@link Buffer} and {@link Image} instances are 
@@ -70,12 +71,12 @@ final class EmbeddedAssetCreatorV2
      * <code>null</code>, and its {@link GltfAsset#getReferenceDatas() 
      * reference data elements} will be empty.
      *  
-     * @param gltfModel The input {@link GltfModelV2}
+     * @param gltfModel The input {@link GltfModel}
      * @return The embedded {@link GltfAssetV2}
      */
-    GltfAssetV2 create(GltfModelV2 gltfModel)
+    GltfAssetV2 create(GltfModel gltfModel)
     {
-        GlTF inputGltf = (GlTF) gltfModel.getGltf();
+        GlTF inputGltf = GltfModels.getGltfV2(gltfModel);
         GlTF outputGltf = GltfUtilsV2.copy(inputGltf);
 
         List<Buffer> buffers = Optionals.of(outputGltf.getBuffers());
@@ -99,12 +100,12 @@ final class EmbeddedAssetCreatorV2
      * Convert the given {@link Buffer} into an embedded buffer, by replacing 
      * its URI with a data URI, if the URI is not already a data URI
      * 
-     * @param gltfModel The {@link GltfModelV2}
+     * @param gltfModel The {@link GltfModel}
      * @param index The index of the {@link Buffer}
      * @param buffer The {@link Buffer}
      */
     private static void convertBufferToEmbedded(
-        GltfModelV2 gltfModel, int index, Buffer buffer)
+        GltfModel gltfModel, int index, Buffer buffer)
     {
         String uriString = buffer.getUri();
         if (IO.isDataUriString(uriString))
@@ -127,14 +128,14 @@ final class EmbeddedAssetCreatorV2
      * Convert the given {@link Image} into an embedded image, by replacing 
      * its URI with a data URI, if the URI is not already a data URI
      * 
-     * @param gltfModel The {@link GltfModelV2}
+     * @param gltfModel The {@link GltfModel}
      * @param index The index of the {@link Image}
      * @param image The {@link Image}
      * @throws GltfException If the image format (and thus, the MIME type)
      * can not be determined from the image data  
      */
     private static void convertImageToEmbedded(
-        GltfModelV2 gltfModel, int index, Image image)
+        GltfModel gltfModel, int index, Image image)
     {
         String uriString = image.getUri();
         if (IO.isDataUriString(uriString))
