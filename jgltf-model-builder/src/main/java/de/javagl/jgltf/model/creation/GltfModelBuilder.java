@@ -29,6 +29,7 @@ package de.javagl.jgltf.model.creation;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import de.javagl.jgltf.model.AccessorModel;
@@ -55,6 +56,7 @@ import de.javagl.jgltf.model.impl.DefaultNodeModel;
 import de.javagl.jgltf.model.impl.DefaultSceneModel;
 import de.javagl.jgltf.model.impl.DefaultSkinModel;
 import de.javagl.jgltf.model.impl.DefaultTextureModel;
+import de.javagl.jgltf.model.v1.MaterialModelV1;
 import de.javagl.jgltf.model.v2.MaterialModelV2;
 
 /**
@@ -305,6 +307,20 @@ public class GltfModelBuilder
         boolean added = materialModelsSet.add(materialModel);
         if (added)
         {
+            if (materialModel instanceof MaterialModelV1)
+            {
+                MaterialModelV1 materialModelV1 = 
+                    (MaterialModelV1)materialModel;
+                Map<String, Object> values = materialModelV1.getValues();
+                for (Object value : values.values())
+                {
+                    if (value instanceof TextureModel)
+                    {
+                        TextureModel textureModel = (TextureModel)value;
+                        addTextureModel(textureModel);
+                    }
+                }
+            }
             if (materialModel instanceof MaterialModelV2)
             {
                 MaterialModelV2 materialModelV2 = 
