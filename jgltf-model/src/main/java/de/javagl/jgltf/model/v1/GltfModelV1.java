@@ -151,21 +151,6 @@ public final class GltfModelV1 extends DefaultGltfModel implements GltfModel
     }
     
     /**
-     * Returns the {@link TextureModel} for the {@link Texture} with the given
-     * ID. If the given ID is not valid, then a warning will be printed and 
-     * <code>null</code> will be returned.<br>
-     * <br>
-     * This is only used for supporting the legacy technique-based rendering.
-     *  
-     * @param textureId The {@link Texture} ID
-     * @return The {@link TextureModel}
-     */
-    public TextureModel getTextureModelById(String textureId)
-    {
-        return get("textures", textureId, this::getTextureModel);
-    }
-    
-    /**
      * Returns the {@link AccessorModel} for the {@link Accessor} with the 
      * given ID.
      * If the given ID is not valid, then a warning will be printed and 

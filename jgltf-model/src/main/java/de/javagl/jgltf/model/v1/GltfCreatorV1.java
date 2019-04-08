@@ -629,7 +629,25 @@ public class GltfCreatorV1
         
         TechniqueModel techniqueModel = materialModel.getTechniqueModel();
         material.setTechnique(techniqueIds.get(techniqueModel));
-        material.setValues(materialModel.getValues());
+        
+        Map<String, Object> modelValues = materialModel.getValues();
+        Map<String, Object> values = new LinkedHashMap<String, Object>();
+        for (Entry<String, Object> valueEntry : modelValues.entrySet())
+        {
+            String parameterName = valueEntry.getKey();
+            Object value = valueEntry.getValue();
+            if (value instanceof TextureModel)
+            {
+                TextureModel textureModel = (TextureModel)value;
+                String textureId = textureIds.get(textureModel);
+                values.put(parameterName, textureId);
+            }
+            else
+            {
+                values.put(parameterName, value);
+            }
+        }
+        material.setValues(values);
         return material;
     }
     

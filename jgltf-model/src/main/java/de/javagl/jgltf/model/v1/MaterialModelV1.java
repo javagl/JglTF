@@ -30,7 +30,9 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.javagl.jgltf.impl.v1.Material;
 import de.javagl.jgltf.model.MaterialModel;
+import de.javagl.jgltf.model.TextureModel;
 import de.javagl.jgltf.model.gl.TechniqueModel;
 import de.javagl.jgltf.model.impl.AbstractNamedModelElement;
 
@@ -99,7 +101,10 @@ public final class MaterialModelV1 extends AbstractNamedModelElement
     }
 
     /**
-     * Returns the parameter values of this material
+     * Returns the parameter values of this material. Note that if any 
+     * parameter value of the original {@link Material} is the texture ID 
+     * for a parameter of type GL_SAMPLER2D, then the respective value 
+     * will be the appropriate {@link TextureModel} instance.
      * 
      * @return The values
      */

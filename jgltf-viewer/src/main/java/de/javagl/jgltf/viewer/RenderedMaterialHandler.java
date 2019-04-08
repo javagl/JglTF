@@ -31,13 +31,11 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.javagl.jgltf.model.GltfConstants;
-import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.NodeModel;
 import de.javagl.jgltf.model.TextureModel;
 import de.javagl.jgltf.model.gl.ProgramModel;
@@ -93,12 +91,6 @@ class RenderedMaterialHandler
     private final Map<MaterialStructure, TechniqueModel> techniqueModels;
     
     /**
-     * A function for obtaining the index of a {@link TextureModel} in
-     * a {@link GltfModel}
-     */
-    private final Function<? super TextureModel, Integer> textureIndexLookup;
-    
-    /**
      * Default constructor
      * 
      * @param textureIndexLookup The lookup for {@link TextureModel} indices
@@ -112,8 +104,6 @@ class RenderedMaterialHandler
             new LinkedHashMap<Integer, ProgramModel>();
         this.techniqueModels =
             new LinkedHashMap<MaterialStructure, TechniqueModel>();
-        this.textureIndexLookup = Objects.requireNonNull(
-            textureIndexLookup, "The textureIndexLookup may not be null");
     }
     
     /**
@@ -288,8 +278,7 @@ class RenderedMaterialHandler
             values.put("hasBaseColorTexture", 1);
             values.put("baseColorTexCoord", 
                 materialStructure.getBaseColorTexCoordSemantic());
-            values.put("baseColorTexture", 
-                textureIndexLookup.apply(baseColorTexture));
+            values.put("baseColorTexture", baseColorTexture);
         }
         else
         {
@@ -306,8 +295,7 @@ class RenderedMaterialHandler
             values.put("hasMetallicRoughnessTexture", 1);
             values.put("metallicRoughnessTexCoord",
                 materialStructure.getMetallicRoughnessTexCoordSemantic());
-            values.put("metallicRoughnessTexture", 
-                textureIndexLookup.apply(metallicRoughnessTexture));
+            values.put("metallicRoughnessTexture", metallicRoughnessTexture);
         }
         else
         {
@@ -327,8 +315,7 @@ class RenderedMaterialHandler
             values.put("hasNormalTexture", 1);
             values.put("normalTexCoord", 
                 materialStructure.getNormalTexCoordSemantic());
-            values.put("normalTexture", 
-                textureIndexLookup.apply(normalTexture));
+            values.put("normalTexture", normalTexture);
             
             float normalScale = material.getNormalScale();
             values.put("normalScale", normalScale);
@@ -346,8 +333,7 @@ class RenderedMaterialHandler
             values.put("hasOcclusionTexture", 1);
             values.put("occlusionTexCoord", 
                 materialStructure.getOcclusionTexCoordSemantic());
-            values.put("occlusionTexture", 
-                textureIndexLookup.apply(occlusionTexture));
+            values.put("occlusionTexture", occlusionTexture);
             
             float occlusionStrength = material.getOcclusionStrength();
             values.put("occlusionStrength", occlusionStrength);
@@ -367,8 +353,7 @@ class RenderedMaterialHandler
             values.put("hasEmissiveTexture", 1);
             values.put("emissiveTexCoord",
                 materialStructure.getEmissiveTexCoordSemantic());
-            values.put("emissiveTexture", 
-                textureIndexLookup.apply(emissiveTexture));
+            values.put("emissiveTexture", emissiveTexture);
         }
         else
         {

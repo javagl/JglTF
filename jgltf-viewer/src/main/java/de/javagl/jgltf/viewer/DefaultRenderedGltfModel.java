@@ -30,10 +30,11 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
@@ -108,16 +109,6 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
     private final RenderedMaterialHandler materialModelHandler;
     
     /**
-     * A function that is used for looking up the {@link TextureModel} for
-     * a reference that is given in a {@link RenderedMaterial}. The 
-     * {@link RenderedMaterial#getValues() material values} may contain
-     * a reference to a texture for one of the uniform names. This
-     * reference may be a texture ID (for glTF 1.0) or a texture index
-     * (for glTF 2.0). 
-     */
-    private final Function<Object, ? extends TextureModel> textureModelLookup;
-    
-    /**
      * The list of commands that have to be executed for rendering the
      * opaque mesh primitives
      */
@@ -142,19 +133,13 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
      * 
      * @param gltfModel The {@link GltfModel}
      * @param glContext The {@link GlContext}
-     * @param textureModelLookup A function that is used for looking up 
-     * the {@link TextureModel} for a reference that is given in the 
-     * {@link RenderedMaterial#getValues() material values}
      * @param viewConfiguration The {@link ViewConfiguration}
      */
     public DefaultRenderedGltfModel(
         GlContext glContext, GltfModel gltfModel, 
-        Function<Object, ? extends TextureModel> textureModelLookup, 
         ViewConfiguration viewConfiguration)
     {
         Objects.requireNonNull(gltfModel, "The gltfModel may not be null");
-        this.textureModelLookup = Objects.requireNonNull(textureModelLookup,
-            "The textureModelLookup may not be null");
         this.glContext = glContext;
         
         Objects.requireNonNull(viewConfiguration,
@@ -488,6 +473,9 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
         List<Runnable> uniformSettingCommands =
             new ArrayList<Runnable>();
         
+        Set<String> missingTextureUniformNames = 
+            new LinkedHashSet<String>();
+        
         TechniqueModel techniqueModel = renderedMaterial.getTechniqueModel();
         Map<String, String> uniforms = techniqueModel.getUniforms();
         int textureCounter = 0;
@@ -498,7 +486,7 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
                 techniqueModel.getUniformParameters(uniformName);
             
             // Create the supplier for the value that corresponds
-            // the the uniform
+            // to the uniform
             Supplier<?> uniformValueSupplier = 
                 uniformGetterFactory.createUniformValueSupplier(
                     uniformName, renderedMaterial, nodeModel);
@@ -523,39 +511,38 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
                 int textureIndex = textureCounter;
                 Runnable uniformSettingCommand = () ->
                 {
-                    Object value[] = (Object[])uniformValueSupplier.get();
-                    Object textureIdOrIndex = value[0];
-                    
-                    // TODO Should this handled by a return here?
-                    // What about the texture counter etc?
-                    if (textureIdOrIndex == null)
+                    // TODO This should be solved more elegantly. 
+                    // The command should not actually be created
+                    // if the texture is missing.
+                    if (missingTextureUniformNames.contains(uniformName))
                     {
                         return;
                     }
+                    Object value[] = (Object[])uniformValueSupplier.get();
+                    Object textureModelObject = value[0];
                     
-                    TextureModel textureModel = 
-                        textureModelLookup.apply(textureIdOrIndex);
-                    
-                    // TODO Handle the case that the textureModel is not found
-                    if (textureIdOrIndex == null)
+                    if (textureModelObject == null ||
+                        !(textureModelObject instanceof TextureModel))
                     {
-                        logger.warning("No texture ID or index found "
-                            + "for uniform " + uniformName);
+                        logger.warning("No valid texture model found "
+                            + "for uniform " + uniformName + ": " 
+                            + textureModelObject);
+                        missingTextureUniformNames.add(uniformName);
+                        return;
+                    }
+                    TextureModel textureModel = 
+                        (TextureModel)textureModelObject; 
+                    Integer glTexture = 
+                        gltfRenderData.obtainGlTexture(textureModel);
+                    if (glTexture == null)
+                    {
+                        logger.warning("Could not obtain GL texture "
+                            + "for texture " + textureModel );
                     }
                     else
                     {
-                        Integer glTexture = 
-                            gltfRenderData.obtainGlTexture(textureModel);
-                        if (glTexture == null)
-                        {
-                            logger.warning("Could not obtain GL texture "
-                                + "for texture " + textureIdOrIndex );
-                        }
-                        else
-                        {
-                            glContext.setUniformSampler(
-                                location, textureIndex, glTexture);
-                        }
+                        glContext.setUniformSampler(
+                            location, textureIndex, glTexture);
                     }
                 };
                 textureCounter++;

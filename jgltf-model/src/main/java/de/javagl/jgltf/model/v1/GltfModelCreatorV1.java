@@ -201,6 +201,7 @@ class GltfModelCreatorV1
         
         initAnimationModels();
         initImageModels();
+        initTechniqueModels();
         initMaterialModels();
         initMeshModels();
         initNodeModels();
@@ -209,7 +210,6 @@ class GltfModelCreatorV1
         initTextureModels();
         initShaderModels();
         initProgramModels();
-        initTechniqueModels();
     }
     
     /**
@@ -1329,23 +1329,52 @@ class GltfModelCreatorV1
                 (MaterialModelV1) get("materials", 
                     materialId, gltfModel::getMaterialModel);
             
-            materialModel.setValues(material.getValues());
             materialModel.setName(material.getName());
             
             String techniqueId = material.getTechnique();
+            TechniqueModel techniqueModel;
             if (techniqueId == null ||
                 GltfDefaults.isDefaultTechniqueId(techniqueId))
             {
-                materialModel.setTechniqueModel(
-                    DefaultModels.getDefaultTechniqueModel());
+                techniqueModel = DefaultModels.getDefaultTechniqueModel();
             }
             else
             {
-                DefaultTechniqueModel techniqueModel =
+                techniqueModel =
                     get("techniques", techniqueId, 
                         gltfModel::getTechniqueModel);
-                materialModel.setTechniqueModel(techniqueModel);
             }
+            materialModel.setTechniqueModel(techniqueModel);
+            
+            
+            Map<String, Object> modelValues = 
+                new LinkedHashMap<String, Object>();
+            Map<String, Object> values = material.getValues();
+            for (Entry<String, Object> valueEntry : values.entrySet())
+            {
+                String parameterName = valueEntry.getKey();
+                TechniqueParametersModel techniqueParametersModel = 
+                    techniqueModel.getParameters().get(parameterName);
+                if (techniqueParametersModel != null &&
+                    techniqueParametersModel.getType() == 
+                        GltfConstants.GL_SAMPLER_2D)
+                {
+                    TextureModel textureModel = null;
+                    Object value = valueEntry.getValue();
+                    if (value != null)
+                    {
+                        String textureId = String.valueOf(value);
+                        textureModel = get("textures", textureId, 
+                            gltfModel::getTextureModel);
+                    }
+                    modelValues.put(parameterName, textureModel);
+                }
+                else
+                {
+                    modelValues.put(parameterName, valueEntry.getValue());
+                }
+            }
+            materialModel.setValues(modelValues);
         }
     }
     
