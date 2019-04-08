@@ -370,8 +370,8 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
         });
         TechniqueStatesFunctionsModel techniqueStatesFunctionsModel = 
             techniqueStatesModel.getTechniqueStatesFunctionsModel();
-        commands.addAll(
-            createTechniqueStatesFunctionsSettingCommands(
+        commands.addAll(TechniqueStatesFunctions
+            .createTechniqueStatesFunctionsSettingCommands(
                 glContext, techniqueStatesFunctionsModel));
         
         commands.addAll(attributeUpdateCommands);
@@ -579,110 +579,6 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
         return uniformSettingCommands;
     }
     
-    /**
-     * Create the functions that, when executed, call the functions
-     * in the {@link GlContext} for setting the states that have been 
-     * defined in the {@link TechniqueStatesFunctionsModel}. When any 
-     * information is missing, the default values will be set.
-     * 
-     * @param glContext The {@link GlContext}
-     * @param techniqueStatesFunctionsModel The 
-     * {@link TechniqueStatesFunctionsModel} 
-     * @return The list of commands
-     */
-    private static List<Runnable> createTechniqueStatesFunctionsSettingCommands(
-        GlContext glContext, 
-        TechniqueStatesFunctionsModel techniqueStatesFunctionsModel)
-    {
-        List<Runnable> commands = new ArrayList<Runnable>();
-        
-        float[] blendColor = 
-            techniqueStatesFunctionsModel.getBlendColor();
-        commands.add(() ->
-        {
-            glContext.setBlendColor(
-                blendColor[0], blendColor[1], 
-                blendColor[2], blendColor[3]);
-        });
-        
-        int[] blendEquationSeparate = 
-            techniqueStatesFunctionsModel.getBlendEquationSeparate();
-        commands.add(() ->
-        {
-            glContext.setBlendEquationSeparate(
-                blendEquationSeparate[0], blendEquationSeparate[1]);
-        });
-        
-        int[] blendFuncSeparate = 
-            techniqueStatesFunctionsModel.getBlendFuncSeparate();
-        commands.add(() ->
-        {
-            glContext.setBlendFuncSeparate(
-                blendFuncSeparate[0], blendFuncSeparate[1],
-                blendFuncSeparate[2], blendFuncSeparate[3]);
-        });
-        
-        boolean[] colorMask = 
-            techniqueStatesFunctionsModel.getColorMask();
-        commands.add(() ->
-        {
-            glContext.setColorMask(
-                colorMask[0], colorMask[1],
-                colorMask[2], colorMask[3]);
-        });
-        
-        int[] cullFace = 
-            techniqueStatesFunctionsModel.getCullFace();
-        commands.add(() ->
-        {
-            glContext.setCullFace(cullFace[0]);
-        });
-        
-        int[] depthFunc = 
-            techniqueStatesFunctionsModel.getDepthFunc();
-        commands.add(() ->
-        {
-            glContext.setDepthFunc(depthFunc[0]);
-        });
-        
-        boolean[] depthMask = 
-            techniqueStatesFunctionsModel.getDepthMask();
-        commands.add(() ->
-        {
-            glContext.setDepthMask(depthMask[0]);
-        });
-        
-        float[] depthRange = 
-            techniqueStatesFunctionsModel.getDepthRange();
-        commands.add(() ->
-        {
-            glContext.setDepthRange(depthRange[0], depthRange[1]);
-        });
-        
-        int[] frontFace = 
-            techniqueStatesFunctionsModel.getFrontFace();
-        commands.add(() ->
-        {
-            glContext.setFrontFace(frontFace[0]);
-        });
-        
-        float[] lineWidth = 
-            techniqueStatesFunctionsModel.getLineWidth();
-        commands.add(() ->
-        {
-            glContext.setLineWidth(lineWidth[0]);
-        });
-        
-        float[] polygonOffset = 
-            techniqueStatesFunctionsModel.getPolygonOffset();
-        commands.add(() ->
-        {
-            glContext.setPolygonOffset(
-                polygonOffset[0], polygonOffset[1]);
-        });
-        
-        return commands;
-    }
 
     /**
      * Walk through the {@link MeshPrimitiveModel#getAttributes() attributes} of

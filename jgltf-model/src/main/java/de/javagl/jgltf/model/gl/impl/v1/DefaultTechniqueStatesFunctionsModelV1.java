@@ -29,7 +29,6 @@ package de.javagl.jgltf.model.gl.impl.v1;
 import java.util.Objects;
 
 import de.javagl.jgltf.impl.v1.TechniqueStatesFunctions;
-import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.gl.TechniqueStatesFunctionsModel;
 
 /**
@@ -59,91 +58,67 @@ public class DefaultTechniqueStatesFunctionsModelV1
     @Override
     public float[] getBlendColor()
     {
-        return Optionals.of(
-            functions.getBlendColor(), 
-            functions.defaultBlendColor());
+        return functions.getBlendColor();
     }
 
     @Override
     public int[] getBlendEquationSeparate()
     {
-        return Optionals.of(
-            functions.getBlendEquationSeparate(),
-            functions.defaultBlendEquationSeparate());
+        return functions.getBlendEquationSeparate();
     }
 
     @Override
     public int[] getBlendFuncSeparate()
     {
-        return Optionals.of(
-            functions.getBlendFuncSeparate(),
-            functions.defaultBlendFuncSeparate());
+        return functions.getBlendFuncSeparate();
     }
 
     @Override
     public boolean[] getColorMask()
     {
-        return Optionals.of(
-            functions.getColorMask(),
-            functions.defaultColorMask());
+        return functions.getColorMask();
     }
 
     @Override
     public int[] getCullFace()
     {
-        return Optionals.of(
-            functions.getCullFace(),
-            functions.defaultCullFace());
+        return functions.getCullFace();
     }
 
     @Override
     public int[] getDepthFunc()
     {
-        return Optionals.of(
-            functions.getDepthFunc(),
-            functions.defaultDepthFunc());
+        return functions.getDepthFunc();
     }
 
     @Override
     public boolean[] getDepthMask()
     {
-        return Optionals.of(
-            functions.getDepthMask(),
-            functions.defaultDepthMask());
+        return functions.getDepthMask();
     }
 
     @Override
     public float[] getDepthRange()
     {
-        return Optionals.of(
-            functions.getDepthRange(),
-            functions.defaultDepthRange());
+        return functions.getDepthRange();
     }
 
     @Override
     public int[] getFrontFace()
     {
-        return Optionals.of(
-            functions.getFrontFace(),
-            functions.defaultFrontFace());
+        return functions.getFrontFace();
     }
 
     @Override
     public float[] getLineWidth()
     {
-        return Optionals.of(
-            functions.getLineWidth(),
-            functions.defaultLineWidth());
+        return functions.getLineWidth();
     }
 
     @Override
     public float[] getPolygonOffset()
     {
-        return Optionals.of( 
-            functions.getPolygonOffset(),
-            functions.defaultPolygonOffset());
+        return functions.getPolygonOffset();
     }
-    
-    
 
 }
