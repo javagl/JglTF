@@ -32,7 +32,9 @@ import java.nio.IntBuffer;
 import de.javagl.jgltf.model.io.Buffers;
 
 /**
- * Utility methods related to <code>IntBuffer</code> instances 
+ * Utility methods related to <code>IntBuffer</code> instances
+ * 
+ * @deprecated This class will be removed in a future version
  */
 public class IntBuffers
 {
