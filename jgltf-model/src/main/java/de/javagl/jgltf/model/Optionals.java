@@ -149,6 +149,38 @@ public class Optionals
     }
     
     /**
+     * Returns a clone of the given array, or <code>null</code> if the
+     * given array is <code>null</code>
+     * 
+     * @param array The array
+     * @return The result
+     */
+    public static int[] clone(int array[])
+    {
+        if (array == null)
+        {
+            return null;
+        }
+        return array.clone();
+    }
+    
+    /**
+     * Returns a clone of the given array, or <code>null</code> if the
+     * given array is <code>null</code>
+     * 
+     * @param array The array
+     * @return The result
+     */
+    public static boolean[] clone(boolean array[])
+    {
+        if (array == null)
+        {
+            return null;
+        }
+        return array.clone();
+    }
+    
+    /**
      * Private constructor to prevent instantiation
      */
     private Optionals()
