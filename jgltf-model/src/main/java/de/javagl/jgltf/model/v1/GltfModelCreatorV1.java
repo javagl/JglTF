@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.logging.Logger;
 
@@ -86,14 +87,13 @@ import de.javagl.jgltf.model.gl.ShaderModel;
 import de.javagl.jgltf.model.gl.ShaderModel.ShaderType;
 import de.javagl.jgltf.model.gl.TechniqueModel;
 import de.javagl.jgltf.model.gl.TechniqueParametersModel;
-import de.javagl.jgltf.model.gl.TechniqueStatesFunctionsModel;
 import de.javagl.jgltf.model.gl.TechniqueStatesModel;
 import de.javagl.jgltf.model.gl.impl.DefaultProgramModel;
 import de.javagl.jgltf.model.gl.impl.DefaultShaderModel;
 import de.javagl.jgltf.model.gl.impl.DefaultTechniqueModel;
 import de.javagl.jgltf.model.gl.impl.DefaultTechniqueParametersModel;
+import de.javagl.jgltf.model.gl.impl.DefaultTechniqueStatesFunctionsModel;
 import de.javagl.jgltf.model.gl.impl.DefaultTechniqueStatesModel;
-import de.javagl.jgltf.model.gl.impl.v1.DefaultTechniqueStatesFunctionsModelV1;
 import de.javagl.jgltf.model.impl.DefaultAccessorModel;
 import de.javagl.jgltf.model.impl.DefaultAnimationModel;
 import de.javagl.jgltf.model.impl.DefaultAnimationModel.DefaultChannel;
@@ -117,6 +117,7 @@ import de.javagl.jgltf.model.io.IO;
 import de.javagl.jgltf.model.io.v1.GltfAssetV1;
 import de.javagl.jgltf.model.v1.gl.DefaultModels;
 import de.javagl.jgltf.model.v1.gl.GltfDefaults;
+import de.javagl.jgltf.model.v1.gl.TechniqueStatesFunctionsModels;
 import de.javagl.jgltf.model.v1.gl.Techniques;
 
 /**
@@ -1149,6 +1150,12 @@ class GltfModelCreatorV1
             DefaultShaderModel fragmentShaderModel =
                 get("shaders", fragmentShaderId, gltfModel::getShaderModel);
             programModel.setFragmentShaderModel(fragmentShaderModel);
+            
+            List<String> attributes = Optionals.of(program.getAttributes());
+            for (String attribute : attributes)
+            {
+                programModel.addAttribute(attribute);
+            }
         }
     }
 
@@ -1160,9 +1167,15 @@ class GltfModelCreatorV1
      * 
      * @param technique The {@link Technique}
      * @param techniqueModel The {@link TechniqueModel}
+     * @param nodeLookup The function for looking up the {@link NodeModel}
+     * for a given node ID. This may be <code>null</code>, but if its is 
+     * <code>null</code> and there is a non-<code>null</code> node ID 
+     * in the technique parameters, then an error message will be 
+     * printed. 
      */
-    private void addParameters(Technique technique,
-        DefaultTechniqueModel techniqueModel)
+    private static void addParameters(Technique technique,
+        DefaultTechniqueModel techniqueModel, 
+        Function<? super String, ? extends NodeModel> nodeLookup)
     {
         Map<String, TechniqueParameters> parameters = 
             Optionals.of(technique.getParameters());
@@ -1179,7 +1192,14 @@ class GltfModelCreatorV1
             NodeModel nodeModel = null;
             if (nodeId != null)
             {
-                nodeModel = get("nodes", nodeId, gltfModel::getNodeModel);
+                if (nodeLookup == null)
+                {
+                    logger.severe("No lookup function found for the nodes");
+                }
+                else
+                {
+                    nodeModel = nodeLookup.apply(nodeId);
+                }
             }
             
             TechniqueParametersModel techniqueParametersModel =
@@ -1241,33 +1261,58 @@ class GltfModelCreatorV1
         {
             String techniqueId = entry.getKey();
             Technique technique = entry.getValue();
+            
             DefaultTechniqueModel techniqueModel = 
                 get("techniques", techniqueId, gltfModel::getTechniqueModel);
-            techniqueModel.setName(technique.getName());
             
             String programId = technique.getProgram();
             DefaultProgramModel programModel = 
                 get("programs", programId, gltfModel::getProgramModel);
             techniqueModel.setProgramModel(programModel);
-            
-            addParameters(technique, techniqueModel);
-            addAttributes(technique, techniqueModel);
-            addUniforms(technique, techniqueModel);
-            
-            List<Integer> enable = 
-                Techniques.obtainEnabledStates(technique);
-            TechniqueStatesFunctions functions = 
-                Techniques.obtainTechniqueStatesFunctions(technique);
 
-            TechniqueStatesFunctionsModel techniqueStatesFunctionsModel =
-                new DefaultTechniqueStatesFunctionsModelV1(functions);
-            TechniqueStatesModel techniqueStatesModel = 
-                new DefaultTechniqueStatesModel(
-                    enable, techniqueStatesFunctionsModel);
-            techniqueModel.setTechniqueStatesModel(techniqueStatesModel);
+            Function<String, NodeModel> nodeLookup = nodeId -> 
+                get("nodes", nodeId, gltfModel::getNodeModel);
+            
+            initTechniqueModel(techniqueModel, technique, nodeLookup);
+            
         }
     }
 
+    /**
+     * Initialize the given {@link TechniqueModel} with the values that are
+     * obtained from the given {@link Technique}
+     * 
+     * @param techniqueModel The {@link TechniqueModel}
+     * @param technique The {@link Technique}
+     * @param nodeLookup The function for looking up the {@link NodeModel}
+     * for a given node ID. This may be <code>null</code>, but if its is 
+     * <code>null</code> and there is a non-<code>null</code> node ID 
+     * in the technique parameters, then an error message will be 
+     * printed. 
+     */
+    public static void initTechniqueModel(
+        DefaultTechniqueModel techniqueModel, Technique technique,
+        Function<? super String, ? extends NodeModel> nodeLookup)
+    {
+        techniqueModel.setName(technique.getName());
+        
+        addParameters(technique, techniqueModel, nodeLookup);
+        addAttributes(technique, techniqueModel);
+        addUniforms(technique, techniqueModel);
+        
+        List<Integer> enable = 
+            Techniques.obtainEnabledStates(technique);
+        TechniqueStatesFunctions functions = 
+            Techniques.obtainTechniqueStatesFunctions(technique);
+
+        DefaultTechniqueStatesFunctionsModel techniqueStatesFunctionsModel =
+            TechniqueStatesFunctionsModels.create(functions);
+        
+        TechniqueStatesModel techniqueStatesModel = 
+            new DefaultTechniqueStatesModel(
+                enable, techniqueStatesFunctionsModel);
+        techniqueModel.setTechniqueStatesModel(techniqueStatesModel);
+    }
     
     
     /**

@@ -60,6 +60,9 @@ import de.javagl.jgltf.impl.v1.Scene;
 import de.javagl.jgltf.impl.v1.Shader;
 import de.javagl.jgltf.impl.v1.Skin;
 import de.javagl.jgltf.impl.v1.Technique;
+import de.javagl.jgltf.impl.v1.TechniqueParameters;
+import de.javagl.jgltf.impl.v1.TechniqueStates;
+import de.javagl.jgltf.impl.v1.TechniqueStatesFunctions;
 import de.javagl.jgltf.impl.v1.Texture;
 import de.javagl.jgltf.model.AccessorData;
 import de.javagl.jgltf.model.AccessorDatas;
@@ -87,6 +90,9 @@ import de.javagl.jgltf.model.gl.ProgramModel;
 import de.javagl.jgltf.model.gl.ShaderModel;
 import de.javagl.jgltf.model.gl.ShaderModel.ShaderType;
 import de.javagl.jgltf.model.gl.TechniqueModel;
+import de.javagl.jgltf.model.gl.TechniqueParametersModel;
+import de.javagl.jgltf.model.gl.TechniqueStatesFunctionsModel;
+import de.javagl.jgltf.model.gl.TechniqueStatesModel;
 
 /**
  * A class for creating the {@link GlTF version 1.0 glTF} from a 
@@ -646,9 +652,12 @@ public class GltfCreatorV1
             programModel.getFragmentShaderModel();
         program.setFragmentShader(shaderIds.get(fragmentShaderModel));
         
-        // TODO Not implemented yet
-        logger.severe("Programs are not yet fully supported");
-        
+        List<String> modelAttributes = programModel.getAttributes();
+        if (!modelAttributes.isEmpty())
+        {
+            List<String> attributes = new ArrayList<String>(modelAttributes);
+            program.setAttributes(attributes);
+        }
         return program;
     }
     
@@ -691,10 +700,132 @@ public class GltfCreatorV1
         Technique technique = new Technique();
         technique.setName(techniqueModel.getName());
         
-        // TODO Not implemented yet
-        logger.severe("Techniques are not yet fully supported");
+        ProgramModel programModel = techniqueModel.getProgramModel();
+        technique.setProgram(programIds.get(programModel));
+
+        Map<String, String> uniforms = techniqueModel.getUniforms();
+        technique.setUniforms(new LinkedHashMap<String, String>(uniforms));
+        
+        Map<String, String> attributes = techniqueModel.getAttributes();
+        technique.setAttributes(new LinkedHashMap<String, String>(attributes));
+        
+        Map<String, TechniqueParametersModel> parametersModel = 
+            techniqueModel.getParameters();
+        if (!parametersModel.isEmpty())
+        {
+            Map<String, TechniqueParameters> parameters = 
+                new LinkedHashMap<String, TechniqueParameters>();
+            
+            for (Entry<String, TechniqueParametersModel> entry : 
+                parametersModel.entrySet())
+            {
+                String key = entry.getKey();
+                TechniqueParametersModel techniqueParametersModel = 
+                    entry.getValue();
+                
+                TechniqueParameters techniqueParameters =
+                    createTechniqueParameters(techniqueParametersModel);
+                
+                parameters.put(key, techniqueParameters);
+            }
+            technique.setParameters(parameters);
+        }
+        technique.setStates(createTechniqueStates(
+            techniqueModel.getTechniqueStatesModel()));
         
         return technique;
+    }
+    
+    /**
+     * Returns the {@link TechniqueParameters} object for the given
+     * {@link TechniqueParametersModel}
+     * 
+     * @param techniqueParametersModel The {@link TechniqueParametersModel}
+     * @return The {@link TechniqueParameters}
+     */
+    private TechniqueParameters createTechniqueParameters(
+        TechniqueParametersModel techniqueParametersModel)
+    {
+        TechniqueParameters techniqueParameters = new TechniqueParameters();
+        
+        techniqueParameters.setSemantic(techniqueParametersModel.getSemantic());
+        techniqueParameters.setType(techniqueParametersModel.getType());
+        techniqueParameters.setCount(techniqueParametersModel.getCount());
+        techniqueParameters.setValue(techniqueParametersModel.getValue());
+        
+        NodeModel nodeModel = techniqueParametersModel.getNodeModel();
+        techniqueParameters.setNode(nodeIds.get(nodeModel));
+        
+        return techniqueParameters;
+    }
+    
+    /**
+     * Returns the {@link TechniqueStates} object for the given
+     * {@link TechniqueStatesModel}
+     * 
+     * @param techniqueStatesModel The {@link TechniqueStatesModel}
+     * @return The {@link TechniqueStates}
+     */
+    private TechniqueStates createTechniqueStates(
+        TechniqueStatesModel techniqueStatesModel)
+    {
+        if (techniqueStatesModel == null)
+        {
+            return null;
+        }
+        TechniqueStates techniqueStates = new TechniqueStates();
+        
+        List<Integer> enable = techniqueStatesModel.getEnable();
+        techniqueStates.setEnable(new ArrayList<Integer>(enable));
+        
+        techniqueStates.setFunctions(createTechniqueStatesFunctions(
+            techniqueStatesModel.getTechniqueStatesFunctionsModel()));
+        
+        return techniqueStates;
+    }
+    
+    /**
+     * Returns the {@link TechniqueStatesFunctions} object for the given
+     * {@link TechniqueStatesFunctionsModel}
+     * 
+     * @param techniqueStatesFunctionsModel The 
+     * {@link TechniqueStatesFunctionsModel}
+     * @return The {@link TechniqueStatesFunctions}
+     */
+    private TechniqueStatesFunctions createTechniqueStatesFunctions(
+        TechniqueStatesFunctionsModel techniqueStatesFunctionsModel)
+    {
+        if (techniqueStatesFunctionsModel == null)
+        {
+            return null;
+        }
+        TechniqueStatesFunctions techniqueStatesFunctions = 
+            new TechniqueStatesFunctions();
+        
+        techniqueStatesFunctions.setBlendColor(Optionals.clone(
+            techniqueStatesFunctionsModel.getBlendColor()));
+        techniqueStatesFunctions.setBlendEquationSeparate(Optionals.clone(
+            techniqueStatesFunctionsModel.getBlendEquationSeparate()));
+        techniqueStatesFunctions.setBlendFuncSeparate(Optionals.clone(
+            techniqueStatesFunctionsModel.getBlendFuncSeparate()));
+        techniqueStatesFunctions.setColorMask(Optionals.clone(
+            techniqueStatesFunctionsModel.getColorMask()));
+        techniqueStatesFunctions.setCullFace(Optionals.clone(
+            techniqueStatesFunctionsModel.getCullFace()));
+        techniqueStatesFunctions.setDepthFunc(Optionals.clone(
+            techniqueStatesFunctionsModel.getDepthFunc()));
+        techniqueStatesFunctions.setDepthMask(Optionals.clone(
+            techniqueStatesFunctionsModel.getDepthMask()));
+        techniqueStatesFunctions.setDepthRange(Optionals.clone(
+            techniqueStatesFunctionsModel.getDepthRange()));
+        techniqueStatesFunctions.setFrontFace(Optionals.clone(
+            techniqueStatesFunctionsModel.getFrontFace()));
+        techniqueStatesFunctions.setLineWidth(Optionals.clone(
+            techniqueStatesFunctionsModel.getLineWidth()));
+        techniqueStatesFunctions.setPolygonOffset(Optionals.clone(
+            techniqueStatesFunctionsModel.getPolygonOffset()));
+        
+        return techniqueStatesFunctions;
     }
     
     

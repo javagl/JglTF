@@ -56,7 +56,6 @@ import de.javagl.jgltf.model.gl.impl.DefaultShaderModel;
 import de.javagl.jgltf.model.gl.impl.DefaultTechniqueModel;
 import de.javagl.jgltf.model.gl.impl.DefaultTechniqueParametersModel;
 import de.javagl.jgltf.model.gl.impl.DefaultTechniqueStatesModel;
-import de.javagl.jgltf.model.gl.impl.v1.DefaultTechniqueStatesFunctionsModelV1;
 import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.model.io.IO;
 import de.javagl.jgltf.model.v1.MaterialModelV1;
@@ -137,7 +136,7 @@ public class DefaultModels
         
         TechniqueStatesFunctions functions = states.getFunctions();
         TechniqueStatesFunctionsModel techniqueStatesFunctionsModel =
-            new DefaultTechniqueStatesFunctionsModelV1(functions);
+            TechniqueStatesFunctionsModels.create(functions);
         TechniqueStatesModel techniqueStatesModel = 
             new DefaultTechniqueStatesModel(
                 enable, techniqueStatesFunctionsModel);
@@ -148,7 +147,6 @@ public class DefaultModels
         DEFAULT_MATERIAL_MODEL = new MaterialModelV1();
         DEFAULT_MATERIAL_MODEL.setValues(material.getValues());
         DEFAULT_MATERIAL_MODEL.setTechniqueModel(DEFAULT_TECHNIQUE_MODEL);
-        
     }
     
     /**

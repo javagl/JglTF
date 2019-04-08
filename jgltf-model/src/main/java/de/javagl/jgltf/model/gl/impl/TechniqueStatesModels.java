@@ -33,7 +33,7 @@ import de.javagl.jgltf.impl.v1.TechniqueStatesFunctions;
 import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.gl.TechniqueStatesFunctionsModel;
 import de.javagl.jgltf.model.gl.TechniqueStatesModel;
-import de.javagl.jgltf.model.gl.impl.v1.DefaultTechniqueStatesFunctionsModelV1;
+import de.javagl.jgltf.model.v1.gl.TechniqueStatesFunctionsModels;
 
 /**
  * Methods to create {@link TechniqueStatesModel} instances
@@ -47,9 +47,6 @@ public class TechniqueStatesModels
      */
     public static TechniqueStatesModel createDefault()
     {
-        // This implementation is backed by the V1 implementation of the
-        // technique states functions, but this will not be visible for
-        // the caller
         List<Integer> enable = Arrays.asList(
             GltfConstants.GL_DEPTH_TEST, 
             GltfConstants.GL_CULL_FACE
@@ -58,7 +55,7 @@ public class TechniqueStatesModels
             de.javagl.jgltf.model.v1.gl.Techniques
                 .createDefaultTechniqueStatesFunctions();
         TechniqueStatesFunctionsModel techniqueStatesFunctionsModel =
-            new DefaultTechniqueStatesFunctionsModelV1(functions);
+            TechniqueStatesFunctionsModels.create(functions);
         TechniqueStatesModel techniqueStatesModel = 
             new DefaultTechniqueStatesModel(
                 enable, techniqueStatesFunctionsModel);
