@@ -150,6 +150,22 @@ public final class MeshPrimitiveBuilder
 
     /**
      * Set the given indices as the indices for the mesh primitive. 
+     * The indices will be of the type "unsigned byte", and be
+     * created by casting the elements of the given buffer to 
+     * "byte"
+     * 
+     * @param indices The indices 
+     * @return This builder
+     */
+    public MeshPrimitiveBuilder setIntIndicesAsByte(IntBuffer indices)
+    {
+        return setIndicesInternal(  
+            GltfConstants.GL_UNSIGNED_BYTE, "SCALAR",
+            Buffers.castToByteBuffer(indices));
+    }
+
+    /**
+     * Set the given indices as the indices for the mesh primitive. 
      * The indices will be of the type "unsigned short".
      * 
      * @param indices The indices 
@@ -174,6 +190,42 @@ public final class MeshPrimitiveBuilder
         return setIndicesInternal(  
             GltfConstants.GL_UNSIGNED_BYTE, "SCALAR", 
             Buffers.copyOf(indices, indices.capacity()));
+    }
+    
+    /**
+     * Set the given indices as the indices for the mesh primitive. 
+     * The component type may be <code>GL_UNSIGNED_BYTE</code>, 
+     * <code>GL_UNSIGNED_SHORT</code>, or <code>GL_UNSIGNED_INT</code>,
+     * and the given indices will be casted to the given component type 
+     * if necessary.
+     * 
+     * @param indices The indices 
+     * @param componentType The component type
+     * @return This builder
+     * @throws IllegalArgumentException If the component type is not one
+     * of the valid types listed above
+     */
+    public MeshPrimitiveBuilder setIndicesAs(
+        IntBuffer indices, int componentType)
+    {
+        switch (componentType)
+        {
+            case GltfConstants.GL_UNSIGNED_BYTE:
+                return setIntIndicesAsShort(indices);
+                
+            case GltfConstants.GL_UNSIGNED_SHORT:
+                return setIntIndicesAsShort(indices);
+                
+            case GltfConstants.GL_UNSIGNED_INT:
+                return setIntIndices(indices);
+                
+            default:
+                break;
+        }
+        throw new IllegalArgumentException(
+            "The component type must be GL_UNSIGNED_BYTE," + 
+            "GL_UNSIGNED_SHORT or GL_UNSIGNED_INT, but is " +
+            GltfConstants.stringFor(componentType));
     }
     
     
