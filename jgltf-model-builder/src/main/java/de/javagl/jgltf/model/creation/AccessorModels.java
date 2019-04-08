@@ -168,7 +168,7 @@ public class AccessorModels
      * is not divisible by the element size that is implied by the given
      * type and component type
      */
-    static DefaultAccessorModel create(
+    public static DefaultAccessorModel create(
         int componentType, String type, ByteBuffer byteBuffer)
     {
         ElementType elementType = ElementType.valueOf(type);
