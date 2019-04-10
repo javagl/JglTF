@@ -29,7 +29,9 @@ package de.javagl.jgltf.model.creation;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.ByteBuffer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.javagl.jgltf.model.ImageModel;
@@ -82,7 +84,7 @@ public class ImageModels
         }
         catch (IOException e)
         {
-            logger.severe(e.toString());
+            logger.log(Level.SEVERE, e.toString(), e);
             return null;
         }
     }
@@ -119,7 +121,7 @@ public class ImageModels
     /**
      * Creates a new {@link ImageModel} with the given URI, that contains
      * a buffer containing the image data that was read from the given 
-     * source file.<br>
+     * source URI.<br>
      * <br>
      * The MIME type will be detected from the input file name (i.e. from
      * its extension). If this is not possible, it will be detected from
@@ -129,36 +131,37 @@ public class ImageModels
      * If the source URI cannot be read, then an error message is
      * printed and <code>null</code> is returned.
      * 
-     * @param fileName The source file name
+     * @param inputUri The source file name
      * @param uri The URI that will be assigned to the {@link ImageModel}
      * @return The instance
      */
     public static DefaultImageModel create(
-        String fileName, String uri)
+        String inputUri, String uri)
     {
-        try (InputStream inputStream = new FileInputStream(fileName))
+        byte data[] = null;
+        try
         {
-            byte data[] = IO.readStream(inputStream);
-            ByteBuffer imageData = Buffers.create(data);
-
-            String mimeType = MimeTypes.guessImageMimeTypeString(
-                fileName, imageData);
-            if (mimeType == null)
-            {
-                logger.severe("Could not detect MIME type of " + fileName);
-                return null;
-            }
-            DefaultImageModel imageModel = new DefaultImageModel();
-            imageModel.setImageData(imageData);
-            imageModel.setUri(uri);
-            imageModel.setMimeType(mimeType);
-            return imageModel;
+            data = IO.read(URI.create(inputUri));
         }
         catch (IOException e)
         {
-            logger.severe(e.toString());
+            logger.log(Level.SEVERE, e.toString(), e);
             return null;
         }
+        ByteBuffer imageData = Buffers.create(data);
+
+        String mimeType = MimeTypes.guessImageMimeTypeString(
+            inputUri, imageData);
+        if (mimeType == null)
+        {
+            logger.severe("Could not detect MIME type of " + inputUri);
+            return null;
+        }
+        DefaultImageModel imageModel = new DefaultImageModel();
+        imageModel.setImageData(imageData);
+        imageModel.setUri(uri);
+        imageModel.setMimeType(mimeType);
+        return imageModel;
     }
     
     /**
