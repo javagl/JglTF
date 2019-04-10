@@ -112,7 +112,7 @@ import de.javagl.jgltf.model.v2.gl.Materials;
  * A class that is responsible for filling a {@link DefaultGltfModel} with
  * the model instances that are created from a {@link GltfAssetV2}
  */
-class GltfModelCreatorV2
+public class GltfModelCreatorV2
 {
     /**
      * The logger used in this class
@@ -126,7 +126,7 @@ class GltfModelCreatorV2
      * @param gltfAsset The {@link GltfAssetV2}
      * @return The {@link GltfModel}
      */
-    static DefaultGltfModel create(GltfAssetV2 gltfAsset)
+    public static DefaultGltfModel create(GltfAssetV2 gltfAsset)
     {
         DefaultGltfModel gltfModel = new DefaultGltfModel();
         GltfModelCreatorV2 creator = 

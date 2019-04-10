@@ -32,7 +32,7 @@ import de.javagl.jgltf.model.io.v2.GltfAssetV2;
 import de.javagl.jgltf.model.v1.GltfCreatorV1;
 import de.javagl.jgltf.model.v1.GltfModelV1;
 import de.javagl.jgltf.model.v2.GltfCreatorV2;
-import de.javagl.jgltf.model.v2.GltfModelV2;
+import de.javagl.jgltf.model.v2.GltfModelCreatorV2;
 
 /**
  * Methods to create {@link GltfModel} instances from a {@link GltfAsset}
@@ -57,12 +57,26 @@ public class GltfModels
         if (gltfAsset instanceof GltfAssetV2)
         {
             GltfAssetV2 gltfAssetV2 = (GltfAssetV2)gltfAsset;
-            return new GltfModelV2(gltfAssetV2);
+            return GltfModelCreatorV2.create(gltfAssetV2);
         }
         throw new IllegalArgumentException(
             "The glTF asset has an unknown version: " + gltfAsset);
     }
     
+    /**
+     * Obtains the raw glTF object for the given {@link GltfModel}.<br>
+     * <br>
+     * If the given {@link GltfModel#getGltf()} method returns a 
+     * non-<code>null</code> value, then this value will be returned.
+     * This may either be a {@link de.javagl.jgltf.impl.v1.GlTF glTF 1.0}
+     * or a {@link de.javagl.jgltf.impl.v2.GlTF glTF 2.0} object.<br>
+     * <br>
+     * Otherwise a {@link de.javagl.jgltf.impl.v2.GlTF glTF 2.0} object
+     * for the given model will be created.
+     * 
+     * @param gltfModel The {@link GltfModel}
+     * @return The glTF object
+     */
     public static Object getGltf(GltfModel gltfModel)
     {
         Object gltf = gltfModel.getGltf();
@@ -73,6 +87,19 @@ public class GltfModels
         return getGltfV2(gltfModel);
     }
     
+    /**
+     * Obtains a {@link de.javagl.jgltf.impl.v1.GlTF glTF 1.0} object for
+     * the given {@link GltfModel}.<br>
+     * <br>
+     * If the given {@link GltfModel#getGltf()} method returns a 
+     * non-<code>null</code> value, and this value already is a 
+     * glTF 1.0 object, it will be returned. Otherwise, a new 
+     * glTF 1.0 object will be created from the given model 
+     * and returned.
+     * 
+     * @param gltfModel The {@link GltfModel}
+     * @return The glTF object
+     */
     public static de.javagl.jgltf.impl.v1.GlTF getGltfV1(GltfModel gltfModel)
     {
         Object gltf = gltfModel.getGltf();
@@ -86,6 +113,19 @@ public class GltfModels
         return gltfCreator.create();
     }
     
+    /**
+     * Obtains a {@link de.javagl.jgltf.impl.v1.GlTF glTF 2.0} object for
+     * the given {@link GltfModel}.<br>
+     * <br>
+     * If the given {@link GltfModel#getGltf()} method returns a 
+     * non-<code>null</code> value, and this value already is a 
+     * glTF 2.0 object, it will be returned. Otherwise, a new 
+     * glTF 2.0 object will be created from the given model 
+     * and returned.
+     * 
+     * @param gltfModel The {@link GltfModel}
+     * @return The glTF object
+     */
     public static de.javagl.jgltf.impl.v2.GlTF getGltfV2(GltfModel gltfModel)
     {
         Object gltf = gltfModel.getGltf();

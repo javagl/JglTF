@@ -28,6 +28,8 @@ package de.javagl.jgltf.model.io.v1;
 
 import java.nio.ByteBuffer;
 import java.util.Base64;
+import java.util.Map;
+import java.util.function.Function;
 
 import de.javagl.jgltf.impl.v1.Buffer;
 import de.javagl.jgltf.impl.v1.GlTF;
@@ -35,6 +37,7 @@ import de.javagl.jgltf.impl.v1.Image;
 import de.javagl.jgltf.impl.v1.Shader;
 import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.GltfException;
+import de.javagl.jgltf.model.GltfModels;
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.gl.ShaderModel;
@@ -78,15 +81,33 @@ final class EmbeddedAssetCreatorV1
      */
     GltfAssetV1 create(GltfModelV1 gltfModel)
     {
-        GlTF inputGltf = (GlTF) gltfModel.getGltf();
+        GlTF inputGltf = GltfModels.getGltfV1(gltfModel);
         GlTF outputGltf = GltfUtilsV1.copy(inputGltf);
 
+        // TODO This is not solved very elegantly, due to the 
+        // transition of glTF 1.0 to glTF 2.0 - refactor this!
+        
+        // Create mappings from the IDs to the corresponding model elements.
+        // This assumes that they are in the same order.
+        Map<String, BufferModel> bufferIdToBuffer = GltfUtilsV1.createMap(
+            inputGltf.getBuffers(), 
+            gltfModel.getBufferModels());
+        Map<String, ImageModel> imageIdToImage = GltfUtilsV1.createMap(
+            inputGltf.getImages(), 
+            gltfModel.getImageModels());
+        Map<String, ShaderModel> shaderIdToShader = GltfUtilsV1.createMap(
+            inputGltf.getShaders(), 
+            gltfModel.getShaderModels());
+        
         Optionals.of(outputGltf.getBuffers()).forEach((id, value) -> 
-            convertBufferToEmbedded(gltfModel, id, value));
+            convertBufferToEmbedded(
+                gltfModel, id, value, bufferIdToBuffer::get));
         Optionals.of(outputGltf.getImages()).forEach((id, value) -> 
-            convertImageToEmbedded(gltfModel, id, value));
+            convertImageToEmbedded(
+                gltfModel, id, value, imageIdToImage::get));
         Optionals.of(outputGltf.getShaders()).forEach((id, value) -> 
-            convertShaderToEmbedded(gltfModel, id, value));
+            convertShaderToEmbedded(
+                gltfModel, id, value, shaderIdToShader::get));
 
         return new GltfAssetV1(outputGltf, null);
     }
@@ -98,16 +119,18 @@ final class EmbeddedAssetCreatorV1
      * @param gltfModel The {@link GltfModelV1}
      * @param id The ID of the {@link Buffer}
      * @param buffer The {@link Buffer}
+     * @param lookup The lookup from ID to model
      */
     private static void convertBufferToEmbedded(
-        GltfModelV1 gltfModel, String id, Buffer buffer)
+        GltfModelV1 gltfModel, String id, Buffer buffer, 
+        Function<? super String, ? extends BufferModel> lookup)
     {
         String uriString = buffer.getUri();
         if (IO.isDataUriString(uriString))
         {
             return;
         }
-        BufferModel bufferModel = gltfModel.getBufferModelById(id);
+        BufferModel bufferModel = lookup.apply(id);
         ByteBuffer bufferData = bufferModel.getBufferData();
         
         byte data[] = new byte[bufferData.capacity()];
@@ -126,18 +149,20 @@ final class EmbeddedAssetCreatorV1
      * @param gltfModel The {@link GltfModelV1}
      * @param id The ID of the {@link Image}
      * @param image The {@link Image}
+     * @param lookup The lookup from ID to model
      * @throws GltfException If the image format (and thus, the MIME type)
      * can not be determined from the image data  
      */
     private static void convertImageToEmbedded(
-        GltfModelV1 gltfModel, String id, Image image)
+        GltfModelV1 gltfModel, String id, Image image, 
+        Function<? super String, ? extends ImageModel> lookup)
     {
         String uriString = image.getUri();
         if (IO.isDataUriString(uriString))
         {
             return;
         }
-        ImageModel imageModel = gltfModel.getImageModelById(id);
+        ImageModel imageModel = lookup.apply(id);
         ByteBuffer imageData = imageModel.getImageData();
         
         String uri = image.getUri();
@@ -166,16 +191,18 @@ final class EmbeddedAssetCreatorV1
      * @param gltfModel The {@link GltfModelV1}
      * @param id The ID of the {@link Shader}
      * @param shader The {@link Shader}
+     * @param lookup The lookup from ID to model
      */
     private static void convertShaderToEmbedded(
-        GltfModelV1 gltfModel, String id, Shader shader)
+        GltfModelV1 gltfModel, String id, Shader shader, 
+        Function<? super String, ? extends ShaderModel> lookup)
     {
         String uriString = shader.getUri();
         if (IO.isDataUriString(uriString))
         {
             return;
         }
-        ShaderModel shaderModel = gltfModel.getShaderModelById(id);
+        ShaderModel shaderModel = lookup.apply(id);
         ByteBuffer shaderData = shaderModel.getShaderData();
         
         byte data[] = new byte[shaderData.capacity()];

@@ -65,7 +65,6 @@ import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.model.io.GltfWriter;
 import de.javagl.jgltf.model.v1.GltfModelV1;
-import de.javagl.jgltf.model.v2.GltfModelV2;
 import de.javagl.swing.tasks.SwingTask;
 import de.javagl.swing.tasks.SwingTaskExecutors;
 
@@ -87,6 +86,11 @@ class InfoComponentFactory
     private final GltfModel gltfModel;
     
     /**
+     * The glTF object
+     */
+    private final Object gltf;
+    
+    /**
      * The FileChooser for saving files
      */
     private final JFileChooser saveFileChooser;
@@ -96,10 +100,12 @@ class InfoComponentFactory
      * that appear in the given {@link GltfModel}
      * 
      * @param gltfModel The backing {@link GltfModel}
+     * @param gltf The glTF
      */
-    InfoComponentFactory(GltfModel gltfModel)
+    InfoComponentFactory(GltfModel gltfModel, Object gltf)
     {
         this.gltfModel = gltfModel;
+        this.gltf = gltf;
         this.saveFileChooser = new JFileChooser();
     }
     
@@ -205,7 +211,6 @@ class InfoComponentFactory
      */
     private void createJson(JPanel jsonInfoPanel)
     {
-        Object gltf = gltfModel.getGltf();
         SwingTask<String, ?> swingTask = new SwingTask<String, Void>()
         {
             @Override
@@ -285,24 +290,19 @@ class InfoComponentFactory
         if (gltfModel instanceof GltfModelV1)
         {
             GltfModelV1 gltfModelV1 = (GltfModelV1)gltfModel;
+            de.javagl.jgltf.impl.v1.GlTF gltfV1 = 
+                (de.javagl.jgltf.impl.v1.GlTF) gltf;
             InfoComponentFactoryV1 infoComponentFactory =
-                new InfoComponentFactoryV1(this, gltfModelV1);
+                new InfoComponentFactoryV1(this, gltfModelV1, gltfV1);
             return infoComponentFactory.createGenericInfoComponent(
                 selectedValue);
         }
-        else if (gltfModel instanceof GltfModelV2)
-        {
-            GltfModelV2 gltfModelV2 = (GltfModelV2)gltfModel;
-            InfoComponentFactoryV2 infoComponentFactory =
-                new InfoComponentFactoryV2(this, gltfModelV2);
-            return infoComponentFactory.createGenericInfoComponent(
-                selectedValue);
-        }
-        else
-        {
-            logger.warning("GltfModel version is not supported yet");
-        }
-        return null;
+        de.javagl.jgltf.impl.v2.GlTF gltfV2 = 
+            (de.javagl.jgltf.impl.v2.GlTF) gltf;
+        InfoComponentFactoryV2 infoComponentFactory =
+            new InfoComponentFactoryV2(this, gltfModel, gltfV2);
+        return infoComponentFactory.createGenericInfoComponent(
+            selectedValue);
     }
 
 

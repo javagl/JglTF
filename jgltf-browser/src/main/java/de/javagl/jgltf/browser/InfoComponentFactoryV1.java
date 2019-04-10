@@ -33,6 +33,7 @@ import java.awt.image.BufferedImage;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.ByteBuffer;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -53,7 +54,6 @@ import de.javagl.jgltf.model.AccessorData;
 import de.javagl.jgltf.model.AccessorDatas;
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.ImageModel;
-import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.gl.ShaderModel;
 import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.model.v1.GltfModelV1;
@@ -74,15 +74,23 @@ class InfoComponentFactoryV1
     private final GltfModelV1 gltfModel;
     
     /**
+     * The {@link GlTF} object
+     */
+    private final GlTF gltf;
+    
+    /**
      * Default constructor
      * 
      * @param parent The parent {@link InfoComponentFactory}
      * @param gltfModel The {@link GltfModelV1}
+     * @param gltf The {@link GlTF}
      */
-    InfoComponentFactoryV1(InfoComponentFactory parent, GltfModelV1 gltfModel)
+    InfoComponentFactoryV1(
+        InfoComponentFactory parent, GltfModelV1 gltfModel, GlTF gltf)
     {
         this.parent = parent;
         this.gltfModel = gltfModel;
+        this.gltf = gltf;
     }
     
     /**
@@ -214,14 +222,16 @@ class InfoComponentFactoryV1
         {
             return "(null)";
         }
-        GlTF gltf = (GlTF) gltfModel.getGltf();
-        Map<String, Accessor> accessors = Optionals.of(gltf.getAccessors());
-        String accessorId = findKey(accessors, accessor);
-        AccessorModel accessorModel = 
-            gltfModel.getAccessorModelById(accessorId);
+        AccessorModel accessorModel = find(
+            gltf.getAccessors(), accessor, gltfModel.getAccessorModels());
+        if (accessorModel == null)
+        {
+            return "(no matching model found)";
+        }
         AccessorData accessorData = accessorModel.getAccessorData();
         return AccessorDatas.createString(accessorData, elementsPerRow);
     }
+    
 
     /**
      * Create an info component for the given selected value (which is 
@@ -232,22 +242,19 @@ class InfoComponentFactoryV1
      */
     private JComponent createShaderInfoComponent(Object selectedValue)
     {
-        GlTF gltf = (GlTF) gltfModel.getGltf();
-        Map<String, Shader> map = gltf.getShaders();
-        String key = findKey(map, selectedValue);
-        if (key == null)
+        ShaderModel shaderModel = find(
+            gltf.getShaders(), selectedValue, gltfModel.getShaderModels());
+        if (shaderModel == null)
         {
             return parent.createMessageInfoPanel(
-                "Could not find shader in glTF");
+                "Could not find shader model in glTF");
         }
-        ShaderModel shaderModel = gltfModel.getShaderModelById(key);
         ByteBuffer shaderData = shaderModel.getShaderData();
         String shaderString = Buffers.readAsString(shaderData);
         if (shaderString == null)
         {
             return parent.createMessageInfoPanel(
-                "Could not find shader data for " + selectedValue + 
-                "with ID " + key);
+                "Could not find shader data for " + selectedValue);
         }
         return parent.createTextInfoPanel("Shader source code:", shaderString);
     }
@@ -261,52 +268,54 @@ class InfoComponentFactoryV1
      */
     private JComponent createImageInfoComponent(Object selectedValue)
     {
-        GlTF gltf = (GlTF) gltfModel.getGltf();
-        Map<String, Image> map = gltf.getImages();
-        String key = findKey(map, selectedValue);
-        if (key == null)
+        ImageModel imageModel = find(
+            gltf.getImages(), selectedValue, gltfModel.getImageModels());
+        if (imageModel == null)
         {
             return parent.createMessageInfoPanel(
-                "Could not find image in glTF");
+                "Could not find image model in glTF");
         }
-        ImageModel imageModel = gltfModel.getImageModelById(key);
         ByteBuffer imageData = imageModel.getImageData();
         BufferedImage bufferedImage = 
             InfoComponentFactory.readAsBufferedImage(imageData);
         if (bufferedImage == null)
         {
             return parent.createMessageInfoPanel(
-                "Could not find image data for " + selectedValue + 
-                " with ID " + key);
+                "Could not find image data for " + selectedValue);
         }
         return parent.createImageInfoPanel(bufferedImage);
     }
     
     /**
-     * Find the key of the given map that is mapped to the given value.
-     * Returns <code>null</code> if the given map is <code>null</code>,
-     * or if no matching key is found
+     * Returns the element of the given list that is at the index where the
+     * given query object appears in the given map as a value, in iteration
+     * order. Returns <code>null</code> if the given map is <code>null</code>
+     * or the element is not found
      * 
      * @param map The map
-     * @param value The value
-     * @return The key
+     * @param queryValue The query object
+     * @param list The list
+     * @return The result
      */
-    private static <K> K findKey(Map<K, ?> map, Object value)
+    private static <V> V find(
+        Map<?, ?> map, Object queryValue, List<? extends V> list)
     {
         if (map == null)
         {
             return null;
         }
-        for (Entry<K, ?> entry : map.entrySet())
+        int index = 0;
+        for (Entry<?, ?> entry : map.entrySet())
         {
-            if (Objects.equals(entry.getValue(), value))
+            Object value = entry.getValue();
+            if (Objects.equals(value, queryValue))
             {
-                return entry.getKey();
+                return list.get(index);
             }
+            index++;
         }
         return null;
     }
-    
     
     
 

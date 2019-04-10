@@ -157,18 +157,16 @@ class GltfModelCreatorV1
      * 
      * @param gltfAsset The {@link GltfAssetV1}
      * @param gltfModel The {@link GltfModel}
-     * @param indexMappingSet The {@link IndexMappingSet}
      */
     GltfModelCreatorV1(
-        GltfAssetV1 gltfAsset, GltfModelV1 gltfModel, 
-        IndexMappingSet indexMappingSet)
+        GltfAssetV1 gltfAsset, GltfModelV1 gltfModel)
     {
         this.gltfAsset = Objects.requireNonNull(gltfAsset, 
             "The gltfAsset may not be null");
         this.gltf = gltfAsset.getGltf();
         this.gltfModel = Objects.requireNonNull(gltfModel, 
             "The gltfModel may not be null");
-        this.indexMappingSet = indexMappingSet;
+        this.indexMappingSet = IndexMappingSets.create(gltfAsset.getGltf());
     }
     
     /**

@@ -406,6 +406,7 @@ public class GltfCreatorV1
         accessor.setComponentType(accessorModel.getComponentType());
         accessor.setCount(accessorModel.getCount());
         accessor.setType(accessorModel.getElementType().toString());
+        accessor.setByteStride(accessorModel.getByteStride());
         
         AccessorData accessorData = accessorModel.getAccessorData();
         accessor.setMax(AccessorDatas.computeMax(accessorData));
@@ -1088,7 +1089,8 @@ public class GltfCreatorV1
     /**
      * Creates a map that maps (unspecified) strings starting with the 
      * given prefix to the results of applying the given mapper to the
-     * given elements
+     * given elements, or <code>null</code> if the given collection is 
+     * empty
      * 
      * @param prefix The prefix
      * @param elements The elements
@@ -1105,7 +1107,8 @@ public class GltfCreatorV1
 
     /**
      * Creates a map that maps (unspecified) strings starting with the 
-     * given prefix to the given elements
+     * given prefix to the given elements, or <code>null</code> if the 
+     * given collection is <code>null</code> or empty 
      * 
      * @param prefix The prefix
      * @param elements The elements
@@ -1114,6 +1117,10 @@ public class GltfCreatorV1
     private static <T> Map<String, T> map(
         String prefix, Collection<? extends T> elements)
     {
+        if (elements == null || elements.isEmpty())
+        {
+            return null;
+        }
         Map<String, T> map = new LinkedHashMap<String, T>();
         int index = 0;
         for (T element : elements)

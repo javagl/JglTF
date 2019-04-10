@@ -35,7 +35,7 @@ import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.io.v1.GltfAssetV1;
 import de.javagl.jgltf.model.io.v2.GltfAssetV2;
 import de.javagl.jgltf.model.v1.GltfModelV1;
-import de.javagl.jgltf.model.v2.GltfModelV2;
+import de.javagl.jgltf.model.v2.GltfModelCreatorV2;
 
 /**
  * A class for reading a {@link GltfModel} from a URI.
@@ -143,7 +143,7 @@ public final class GltfModelReader
         if (gltfAsset instanceof GltfAssetV2)
         {
             GltfAssetV2 gltfAssetV2 = (GltfAssetV2)gltfAsset;
-            return new GltfModelV2(gltfAssetV2);
+            return GltfModelCreatorV2.create(gltfAssetV2);
         }
         throw new IOException(
             "The glTF asset has an unknown version: " + gltfAsset);

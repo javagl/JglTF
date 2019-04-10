@@ -28,6 +28,11 @@ package de.javagl.jgltf.model.io.v1;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -123,6 +128,41 @@ class GltfUtilsV1
         copy.setType(shader.getType());
         copy.setUri(shader.getUri());
         return copy;
+    }
+    
+    /**
+     * Combine the keys of the given map with the elements of the given
+     * collection, in iteration order.
+     * 
+     * @param map The map
+     * @param collection The collection
+     * @return The resulting map
+     * @throws IllegalArgumentException If the inputs have different sizes
+     */
+    static <K, V> Map<K, V> createMap(
+        Map<? extends K, ?> map, 
+        Collection<? extends V> collection)
+    {
+        if (map == null)
+        {
+            return Collections.emptyMap();
+        }
+        if (map.size() != collection.size())
+        {
+            throw new IllegalArgumentException(
+                "The inputs must have the same size, but the sizes are "
+                + map.size() + " and " + collection.size());
+        }
+        Iterator<? extends K> iterator0 = map.keySet().iterator();
+        Iterator<? extends V> iterator1 = collection.iterator();
+        Map<K, V> result = new LinkedHashMap<K, V>();
+        while (iterator0.hasNext())
+        {
+            K k = iterator0.next();
+            V v = iterator1.next();
+            result.put(k, v);
+        }
+        return result;
     }
     
     /**

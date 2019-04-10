@@ -31,22 +31,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.IntFunction;
-import java.util.logging.Logger;
 
-import de.javagl.jgltf.impl.v1.Accessor;
-import de.javagl.jgltf.impl.v1.Buffer;
 import de.javagl.jgltf.impl.v1.GlTF;
-import de.javagl.jgltf.impl.v1.Image;
 import de.javagl.jgltf.impl.v1.Program;
 import de.javagl.jgltf.impl.v1.Shader;
 import de.javagl.jgltf.impl.v1.Technique;
-import de.javagl.jgltf.impl.v1.Texture;
-import de.javagl.jgltf.model.AccessorModel;
-import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.GltfModel;
-import de.javagl.jgltf.model.ImageModel;
-import de.javagl.jgltf.model.TextureModel;
 import de.javagl.jgltf.model.gl.ProgramModel;
 import de.javagl.jgltf.model.gl.ShaderModel;
 import de.javagl.jgltf.model.gl.TechniqueModel;
@@ -61,17 +51,6 @@ import de.javagl.jgltf.model.io.v1.GltfAssetV1;
  */
 public final class GltfModelV1 extends DefaultGltfModel implements GltfModel
 {
-    /**
-     * The logger used in this class
-     */
-    private static final Logger logger = 
-        Logger.getLogger(GltfModelV1.class.getName());
-
-    /**
-     * The {@link IndexMappingSet}
-     */
-    private IndexMappingSet indexMappingSet;
-    
     /**
      * The {@link ShaderModel} instances that have been created from
      * the {@link Shader} instances
@@ -105,63 +84,19 @@ public final class GltfModelV1 extends DefaultGltfModel implements GltfModel
         this.programModels = new ArrayList<DefaultProgramModel>();
         this.techniqueModels = new ArrayList<DefaultTechniqueModel>();
         
-        this.indexMappingSet = IndexMappingSets.create((GlTF) getGltf());
         GltfModelCreatorV1 gltfModelCreatorV1 = 
-            new GltfModelCreatorV1(gltfAsset, this, indexMappingSet);
+            new GltfModelCreatorV1(gltfAsset, this);
         gltfModelCreatorV1.create();
     }
     
     /**
-     * Returns the {@link BufferModel} for the {@link Buffer} with the given ID.
-     * If the given ID is not valid, then a warning will be printed and 
-     * <code>null</code> will be returned.
-     *  
-     * @param bufferId The {@link Buffer} ID
-     * @return The {@link BufferModel}
+     * Creates a new, empty model
      */
-    public BufferModel getBufferModelById(String bufferId)
+    public GltfModelV1()
     {
-        return get("buffers", bufferId, this::getBufferModel);
-    }
-    
-    /**
-     * Returns the {@link ShaderModel} for the {@link Shader} with the given ID.
-     * If the given ID is not valid, then a warning will be printed and 
-     * <code>null</code> will be returned.
-     *  
-     * @param shaderId The {@link Shader} ID
-     * @return The {@link ShaderModel}
-     */
-    public ShaderModel getShaderModelById(String shaderId)
-    {
-        return get("shaders", shaderId, this::getShaderModel);
-    }
-
-    /**
-     * Returns the {@link ImageModel} for the {@link Image} with the given ID.
-     * If the given ID is not valid, then a warning will be printed and 
-     * <code>null</code> will be returned.
-     *  
-     * @param imageId The {@link Image} ID
-     * @return The {@link ImageModel}
-     */
-    public ImageModel getImageModelById(String imageId)
-    {
-        return get("images", imageId, this::getImageModel);
-    }
-    
-    /**
-     * Returns the {@link AccessorModel} for the {@link Accessor} with the 
-     * given ID.
-     * If the given ID is not valid, then a warning will be printed and 
-     * <code>null</code> will be returned.
-     *  
-     * @param accessorId The {@link Accessor} ID
-     * @return The {@link AccessorModel}
-     */
-    public AccessorModel getAccessorModelById(String accessorId)
-    {
-        return get("accessors", accessorId, this::getAccessorModel);
+        this.shaderModels = new ArrayList<DefaultShaderModel>();
+        this.programModels = new ArrayList<DefaultProgramModel>();
+        this.techniqueModels = new ArrayList<DefaultTechniqueModel>();
     }
     
     /**
@@ -356,33 +291,5 @@ public final class GltfModelV1 extends DefaultGltfModel implements GltfModel
     {
         return Collections.unmodifiableList(techniqueModels);
     }
-    
-    /**
-     * Return the element from the given getter, based on the 
-     * {@link #indexMappingSet} for the given name and ID. 
-     * If the ID is <code>null</code>, then <code>null</code> is 
-     * returned. If there is no proper index stored for the given
-     * ID, then a warning will be printed and <code>null</code>
-     * will be returned.
-     * 
-     * @param <T> The element type
-     * 
-     * @param name The name
-     * @param id The ID
-     * @param getter The getter
-     * @return The element
-     */
-    private <T> T get(String name, String id, IntFunction<? extends T> getter)
-    {
-        Integer index = indexMappingSet.getIndex(name, id);
-        if (index == null)
-        {
-            logger.severe("No index found for " + name + " ID " + id);
-            return null;
-        }
-        T element = getter.apply(index);
-        return element;
-    }
-    
     
 }

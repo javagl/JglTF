@@ -69,15 +69,23 @@ class InfoComponentFactoryV2
     private final GltfModel gltfModel;
     
     /**
+     * The {@link GlTF}
+     */
+    private final GlTF gltf;
+    
+    /**
      * Default constructor
      * 
      * @param parent The parent {@link InfoComponentFactory}
      * @param gltfModel The {@link GltfModel}
+     * @param gltf The {@link GlTF}
      */
-    InfoComponentFactoryV2(InfoComponentFactory parent, GltfModel gltfModel)
+    InfoComponentFactoryV2(
+        InfoComponentFactory parent, GltfModel gltfModel, GlTF gltf)
     {
         this.parent = parent;
         this.gltfModel = gltfModel;
+        this.gltf = gltf;
     }
     
     /**
@@ -204,7 +212,6 @@ class InfoComponentFactoryV2
         {
             return "(null)";
         }
-        GlTF gltf = (GlTF) gltfModel.getGltf();
         List<Accessor> accessors = Optionals.of(gltf.getAccessors());
         int index = accessors.indexOf(accessor);
         if (index == -1)
@@ -227,7 +234,6 @@ class InfoComponentFactoryV2
      */
     private JComponent createImageInfoComponent(Object selectedValue)
     {
-        GlTF gltf = (GlTF) gltfModel.getGltf();
         List<Image> images = Optionals.of(gltf.getImages());
         int index = images.indexOf(selectedValue);
         if (index == -1)

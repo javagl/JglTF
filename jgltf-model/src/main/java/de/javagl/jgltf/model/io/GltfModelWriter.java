@@ -35,7 +35,6 @@ import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.io.v1.GltfModelWriterV1;
 import de.javagl.jgltf.model.io.v2.GltfModelWriterV2;
 import de.javagl.jgltf.model.v1.GltfModelV1;
-import de.javagl.jgltf.model.v2.GltfModelV2;
 
 /**
  * A class for writing a {@link GltfModel}. The model can be written as
@@ -90,18 +89,11 @@ public class GltfModelWriter
             GltfModelWriterV1 gltfModelWriterV1 = 
                 new GltfModelWriterV1();
             gltfModelWriterV1.write(gltfModelV1, file);
+            return;
         }
-        else if (gltfModel instanceof GltfModelV2)
-        {
-            GltfModelV2 gltfModelV2 = (GltfModelV2)gltfModel;
-            GltfModelWriterV2 gltfModelWriterV2 = 
-                new GltfModelWriterV2();
-            gltfModelWriterV2.write(gltfModelV2, file);
-        }
-        else
-        {
-            throw new IOException("Unsupported glTF version: " + gltfModel);
-        }
+        GltfModelWriterV2 gltfModelWriterV2 = 
+            new GltfModelWriterV2();
+        gltfModelWriterV2.write(gltfModel, file);
     }
     
     /**
@@ -139,18 +131,11 @@ public class GltfModelWriter
             GltfModelWriterV1 gltfModelWriterV1 = 
                 new GltfModelWriterV1();
             gltfModelWriterV1.writeBinary(gltfModelV1, outputStream);
+            return;
         }
-        else if (gltfModel instanceof GltfModelV2)
-        {
-            GltfModelV2 gltfModelV2 = (GltfModelV2)gltfModel;
-            GltfModelWriterV2 gltfModelWriterV2 = 
-                new GltfModelWriterV2();
-            gltfModelWriterV2.writeBinary(gltfModelV2, outputStream);
-        }
-        else
-        {
-            throw new IOException("Unsupported glTF version: " + gltfModel);
-        }
+        GltfModelWriterV2 gltfModelWriterV2 = 
+            new GltfModelWriterV2();
+        gltfModelWriterV2.writeBinary(gltfModel, outputStream);
     }
     
 
@@ -189,18 +174,11 @@ public class GltfModelWriter
             GltfModelWriterV1 gltfModelWriterV1 = 
                 new GltfModelWriterV1();
             gltfModelWriterV1.writeEmbedded(gltfModelV1, outputStream);
+            return;
         }
-        else if (gltfModel instanceof GltfModelV2)
-        {
-            GltfModelV2 gltfModelV2 = (GltfModelV2)gltfModel;
-            GltfModelWriterV2 gltfModelWriterV2 = 
-                new GltfModelWriterV2();
-            gltfModelWriterV2.writeEmbedded(gltfModelV2, outputStream);
-        }
-        else
-        {
-            throw new IOException("Unsupported glTF version: " + gltfModel);
-        }
+        GltfModelWriterV2 gltfModelWriterV2 = 
+            new GltfModelWriterV2();
+        gltfModelWriterV2.writeEmbedded(gltfModel, outputStream);
     }
 }
 

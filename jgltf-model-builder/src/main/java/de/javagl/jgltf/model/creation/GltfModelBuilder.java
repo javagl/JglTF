@@ -47,6 +47,12 @@ import de.javagl.jgltf.model.NodeModel;
 import de.javagl.jgltf.model.SceneModel;
 import de.javagl.jgltf.model.SkinModel;
 import de.javagl.jgltf.model.TextureModel;
+import de.javagl.jgltf.model.gl.ProgramModel;
+import de.javagl.jgltf.model.gl.ShaderModel;
+import de.javagl.jgltf.model.gl.TechniqueModel;
+import de.javagl.jgltf.model.gl.impl.DefaultProgramModel;
+import de.javagl.jgltf.model.gl.impl.DefaultShaderModel;
+import de.javagl.jgltf.model.gl.impl.DefaultTechniqueModel;
 import de.javagl.jgltf.model.impl.DefaultAnimationModel;
 import de.javagl.jgltf.model.impl.DefaultCameraModel;
 import de.javagl.jgltf.model.impl.DefaultGltfModel;
@@ -56,6 +62,7 @@ import de.javagl.jgltf.model.impl.DefaultNodeModel;
 import de.javagl.jgltf.model.impl.DefaultSceneModel;
 import de.javagl.jgltf.model.impl.DefaultSkinModel;
 import de.javagl.jgltf.model.impl.DefaultTextureModel;
+import de.javagl.jgltf.model.v1.GltfModelV1;
 import de.javagl.jgltf.model.v1.MaterialModelV1;
 import de.javagl.jgltf.model.v2.MaterialModelV2;
 
@@ -78,7 +85,10 @@ import de.javagl.jgltf.model.v2.MaterialModelV2;
  * objects from all scene elements and create the required 
  * {@link BufferViewModel} and {@link BufferModel} instances. The exact
  * strategy of how these models are created is not yet specified or
- * configurable.
+ * configurable.<br>
+ * <br>
+ * TODO: The creation of glTF 1.0 instances with {@link #buildV1()} will
+ * probably be refactored soon.
  */
 public class GltfModelBuilder
 {
@@ -136,6 +146,21 @@ public class GltfModelBuilder
      * The set of {@link TextureModel} objects
      */
     private final Set<DefaultTextureModel> textureModelsSet;
+    
+    /**
+     * The set of {@link TechniqueModel} objects
+     */
+    private final Set<DefaultTechniqueModel> techniqueModelsSet;
+
+    /**
+     * The set of {@link ProgramModel} objects
+     */
+    private final Set<DefaultProgramModel> programModelsSet;
+
+    /**
+     * The set of {@link ShaderModel} objects
+     */
+    private final Set<DefaultShaderModel> shaderModelsSet;
 
     /**
      * Private constructor
@@ -151,6 +176,25 @@ public class GltfModelBuilder
         this.sceneModelsSet = new LinkedHashSet<DefaultSceneModel>();
         this.skinModelsSet = new LinkedHashSet<DefaultSkinModel>();
         this.textureModelsSet = new LinkedHashSet<DefaultTextureModel>();
+        this.techniqueModelsSet = new LinkedHashSet<DefaultTechniqueModel>();
+        this.programModelsSet = new LinkedHashSet<DefaultProgramModel>();
+        this.shaderModelsSet = new LinkedHashSet<DefaultShaderModel>();
+    }
+    
+    /**
+     * Build the {@link GltfModel} containing all elements that have been
+     * added to this builder.
+     * 
+     * @return The {@link GltfModel}
+     */
+    public DefaultGltfModel buildV1()
+    {
+        GltfModelV1 gltfModel = new GltfModelV1();
+        fill(gltfModel);
+        gltfModel.addTechniqueModels(techniqueModelsSet);
+        gltfModel.addProgramModels(programModelsSet);
+        gltfModel.addShaderModels(shaderModelsSet);
+        return gltfModel;
     }
     
     /**
@@ -161,6 +205,19 @@ public class GltfModelBuilder
      */
     public DefaultGltfModel build()
     {
+        DefaultGltfModel gltfModel = new DefaultGltfModel();
+        fill(gltfModel);
+        return gltfModel;
+    }
+    
+    /**
+     * Fill the {@link GltfModel} with all elements that have been
+     * added to this builder.
+     * 
+     * @param gltfModel The {@link GltfModel}
+     */
+    private void fill(DefaultGltfModel gltfModel)
+    {
         BufferBuilderStrategy bufferBuilderStrategy = 
             new DefaultBufferBuilderStrategy();
         
@@ -170,8 +227,6 @@ public class GltfModelBuilder
         bufferBuilderStrategy.processSkinModels(skinModelsSet);
         
         bufferBuilderStrategy.finish();
-        
-        DefaultGltfModel gltfModel = new DefaultGltfModel();
         
         gltfModel.addAnimationModels(animationModelsSet);
         gltfModel.addCameraModels(cameraModelsSet);
@@ -189,8 +244,6 @@ public class GltfModelBuilder
             bufferBuilderStrategy.getBufferViewModels());
         gltfModel.addBufferModels(
             bufferBuilderStrategy.getBufferModels());
-        
-        return gltfModel;
     }
     
     
@@ -311,6 +364,9 @@ public class GltfModelBuilder
             {
                 MaterialModelV1 materialModelV1 = 
                     (MaterialModelV1)materialModel;
+                
+                addTechniqueModel(materialModelV1.getTechniqueModel());
+                
                 Map<String, Object> values = materialModelV1.getValues();
                 for (Object value : values.values())
                 {
@@ -521,5 +577,106 @@ public class GltfModelBuilder
             addTextureModel(textureModel);
         }
     }
-   
+    
+    
+    /**
+     * Add the given {@link TechniqueModel}
+     * 
+     * @param techniqueModel The instance to add
+     */
+    public void addTechniqueModel(TechniqueModel techniqueModel)
+    {
+        if (techniqueModel == null)
+        {
+            return;
+        }
+        DefaultTechniqueModel defaultTechniqueModel = 
+            (DefaultTechniqueModel)techniqueModel;
+        boolean added = techniqueModelsSet.add(defaultTechniqueModel);
+        if (added) 
+        {
+            addProgramModel(techniqueModel.getProgramModel());
+        }
+    }
+    
+    /**
+     * Add the given {@link TechniqueModel} instances
+     * 
+     * @param techniqueModels The instances to add
+     */
+    public void addTechniqueModels(
+        Collection<? extends TechniqueModel> techniqueModels)
+    {
+        for (TechniqueModel techniqueModel : techniqueModels)
+        {
+            addTechniqueModel(techniqueModel);
+        }
+    }
+    
+
+    /**
+     * Add the given {@link ProgramModel}
+     * 
+     * @param programModel The instance to add
+     */
+    public void addProgramModel(ProgramModel programModel)
+    {
+        if (programModel == null)
+        {
+            return;
+        }
+        DefaultProgramModel defaultProgramModel = 
+            (DefaultProgramModel)programModel;
+        boolean added = programModelsSet.add(defaultProgramModel);
+        if (added) 
+        {
+            addShaderModel(programModel.getVertexShaderModel());
+            addShaderModel(programModel.getFragmentShaderModel());
+        }
+    }
+
+    /**
+     * Add the given {@link ProgramModel} instances
+     * 
+     * @param programModels The instances to add
+     */
+    public void addProgramModels(
+        Collection<? extends ProgramModel> programModels)
+    {
+        for (ProgramModel programModel : programModels)
+        {
+            addProgramModel(programModel);
+        }
+    }
+
+    /**
+     * Add the given {@link ShaderModel}
+     * 
+     * @param shaderModel The instance to add
+     */
+    public void addShaderModel(ShaderModel shaderModel)
+    {
+        if (shaderModel == null)
+        {
+            return;
+        }
+        DefaultShaderModel defaultShaderModel = 
+            (DefaultShaderModel)shaderModel;
+        shaderModelsSet.add(defaultShaderModel);
+    }
+
+    /**
+     * Add the given {@link ShaderModel} instances
+     * 
+     * @param shaderModels The instances to add
+     */
+    public void addShaderModels(
+        Collection<? extends ShaderModel> shaderModels)
+    {
+        for (ShaderModel shaderModel : shaderModels)
+        {
+            addShaderModel(shaderModel);
+        }
+    }
+    
 }
