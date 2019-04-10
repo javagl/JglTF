@@ -31,7 +31,10 @@ import de.javagl.jgltf.model.TextureModel;
 import de.javagl.jgltf.model.impl.AbstractNamedModelElement;
 
 /**
- * Implementation of a {@link MaterialModel} for glTF 2.0
+ * Implementation of a {@link MaterialModel} for glTF 2.0.<br>
+ * <br>
+ * Note: This class might be renamed to "PbrBasedMaterialModel" and moved to 
+ * a different package in the future.
  */
 public final class MaterialModelV2 extends AbstractNamedModelElement
     implements MaterialModel

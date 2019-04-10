@@ -37,7 +37,11 @@ import de.javagl.jgltf.model.gl.TechniqueModel;
 import de.javagl.jgltf.model.impl.AbstractNamedModelElement;
 
 /**
- * Implementation of a {@link MaterialModel} for glTF 1.0
+ * Implementation of a {@link MaterialModel} for glTF 1.0.<br>
+ * <br> 
+ * Note: This class is actually no longer specific for glTF 1.0. It might
+ * be renamed to "TechniqueBasedMaterialModel" and moved to a different
+ * package in the future.
  */
 public final class MaterialModelV1 extends AbstractNamedModelElement
     implements MaterialModel
