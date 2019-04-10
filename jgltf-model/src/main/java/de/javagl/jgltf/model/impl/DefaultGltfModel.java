@@ -111,11 +111,6 @@ public class DefaultGltfModel implements GltfModel
     private final List<DefaultTextureModel> textureModels;
 
     /**
-     * The (optional) glTF object that this model was created from
-     */
-    private Object gltf;
-    
-    /**
      * Creates a new model 
      */
     public DefaultGltfModel()
@@ -841,25 +836,4 @@ public class DefaultGltfModel implements GltfModel
     {
         return Collections.unmodifiableList(textureModels);
     }
-    
-    /**
-     * Set the glTF object that this model was created from. This should
-     * remain <code>null</code> for models that have been created 
-     * programmatically. Otherwise, it will be a 
-     * {@link de.javagl.jgltf.impl.v1.GlTF} or a
-     * {@link de.javagl.jgltf.impl.v2.GlTF} object.
-     * 
-     * @param gltf The glTF object
-     */
-    public void setGltf(Object gltf)
-    {
-        this.gltf = gltf;
-    }
-    
-    @Override
-    public Object getGltf()
-    {
-        return gltf;
-    }
-    
 }

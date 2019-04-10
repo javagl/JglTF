@@ -40,11 +40,11 @@ import de.javagl.jgltf.impl.v1.Image;
 import de.javagl.jgltf.impl.v1.Shader;
 import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.GltfModel;
-import de.javagl.jgltf.model.GltfModels;
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.gl.ShaderModel;
 import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.model.v1.BinaryGltfV1;
+import de.javagl.jgltf.model.v1.GltfCreatorV1;
 import de.javagl.jgltf.model.v1.GltfExtensionsV1;
 import de.javagl.jgltf.model.v1.GltfIds;
 import de.javagl.jgltf.model.v1.GltfModelV1;
@@ -76,8 +76,7 @@ final class BinaryAssetCreatorV1
      */
     GltfAssetV1 create(GltfModelV1 gltfModel)
     {
-        GlTF inputGltf = GltfModels.getGltfV1(gltfModel);
-        GlTF outputGltf = GltfUtilsV1.copy(inputGltf);
+        GlTF outputGltf = GltfCreatorV1.create(gltfModel);
         
         // Create the new byte buffer for the data of the "binary_glTF" Buffer
         int binaryGltfBufferSize = 
@@ -232,15 +231,15 @@ final class BinaryAssetCreatorV1
 
         // Place the newly created mappings into the output glTF,
         // if there have been non-null mappings for them in the input
-        if (inputGltf.getBuffers() != null)
+        if (!newBuffers.isEmpty())
         {
             outputGltf.setBuffers(newBuffers);
         }
-        if (inputGltf.getImages() != null)
+        if (!newImages.isEmpty())
         {
             outputGltf.setImages(newImages);
         }
-        if (inputGltf.getShaders() != null)
+        if (!newShaders.isEmpty())
         {
             outputGltf.setShaders(newShaders);
         }

@@ -109,6 +109,18 @@ public class GltfCreatorV1
         Logger.getLogger(GltfCreatorV1.class.getName());
     
     /**
+     * Creates a {@link GlTF} from the given {@link GltfModel}
+     * 
+     * @param gltfModel The {@link GltfModel}
+     * @return The {@link GlTF}
+     */
+    public static GlTF create(GltfModel gltfModel)
+    {
+        GltfCreatorV1 creator = new GltfCreatorV1(gltfModel);
+        return creator.create();
+    }
+    
+    /**
      * Inner class containing the information that is necessary to define
      * a glTF {@link de.javagl.jgltf.impl.v1.Sampler}
      */
@@ -250,7 +262,7 @@ public class GltfCreatorV1
      * 
      * @param gltfModel The {@link GltfModel}
      */
-    public GltfCreatorV1(GltfModel gltfModel)
+    private GltfCreatorV1(GltfModel gltfModel)
     {
         this.gltfModel = Objects.requireNonNull(
             gltfModel, "The gltfModel may not be null");

@@ -78,7 +78,6 @@ public final class GltfModelV1 extends DefaultGltfModel implements GltfModel
     {
         Objects.requireNonNull(gltfAsset, 
             "The gltfAsset may not be null");
-        setGltf(gltfAsset.getGltf());
 
         this.shaderModels = new ArrayList<DefaultShaderModel>();
         this.programModels = new ArrayList<DefaultProgramModel>();

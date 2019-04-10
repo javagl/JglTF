@@ -71,7 +71,6 @@ import de.javagl.common.ui.tree.filtered.TreeModelFilter;
 import de.javagl.jgltf.browser.ObjectTrees.NodeEntry;
 import de.javagl.jgltf.browser.Resolver.ResolvedEntity;
 import de.javagl.jgltf.model.GltfModel;
-import de.javagl.jgltf.model.GltfModels;
 import de.javagl.jgltf.viewer.GltfViewer;
 
 /**
@@ -172,16 +171,19 @@ class GltfBrowserPanel extends JPanel
      * Creates a new browser panel for the given {@link GltfModel}
      * 
      * @param gltfModel The {@link GltfModel}
+     * @param gltf The glTF object associated with the model
      */
-    GltfBrowserPanel(GltfModel gltfModel)
+    GltfBrowserPanel(GltfModel gltfModel, Object gltf)
     {
         super(new BorderLayout());
         
         this.gltfModel = Objects.requireNonNull(
             gltfModel, "The gltfModel may not be null");
+        Objects.requireNonNull(
+            gltf, "The gltf may not be null");
+
         this.selectionPathHistory = new LinkedList<TreePath>();
         
-        Object gltf = GltfModels.getGltf(gltfModel);
         this.infoComponentFactory = new InfoComponentFactory(gltfModel, gltf);
         this.resolver = new Resolver(gltf);
         

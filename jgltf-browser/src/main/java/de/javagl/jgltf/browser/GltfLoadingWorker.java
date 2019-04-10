@@ -33,6 +33,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
 import java.text.NumberFormat;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.Map.Entry;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
@@ -56,7 +58,8 @@ import de.javagl.swing.tasks.SwingTaskViews;
  * swing task that performs the loading in a background thread, while 
  * showing a modal dialog with progress information. 
  */
-final class GltfLoadingWorker extends SwingTask<GltfModel, Object>
+final class GltfLoadingWorker 
+    extends SwingTask<Entry<GltfModel, Object>, Object>
 {
     /**
      * The logger used in this class
@@ -126,7 +129,7 @@ final class GltfLoadingWorker extends SwingTask<GltfModel, Object>
     }
 
     @Override
-    protected GltfModel doInBackground() throws IOException
+    protected Entry<GltfModel, Object> doInBackground() throws IOException
     {
         String message = "Loading glTF from " + IO.extractFileName(uri);
         long contentLength = IO.getContentLength(uri);
@@ -161,7 +164,10 @@ final class GltfLoadingWorker extends SwingTask<GltfModel, Object>
         });
         GltfAsset gltfAsset = gltfAssetReaderThreaded.readGltfAsset(uri);
         GltfModel gltfModel = GltfModels.create(gltfAsset);
-        return gltfModel;
+        Object gltf = gltfAsset.getGltf();
+        Entry<GltfModel, Object> result = 
+            new SimpleEntry<GltfModel, Object>(gltfModel, gltf);
+        return result;
     }
 
     @Override
@@ -169,9 +175,11 @@ final class GltfLoadingWorker extends SwingTask<GltfModel, Object>
     {
         try
         {
-            GltfModel gltfModel = get();
+            Entry<GltfModel, Object> result = get();
+            GltfModel gltfModel = result.getKey();
+            Object gltf = result.getValue();
             String fileName = IO.extractFileName(uri);
-            owner.createGltfBrowserPanel(fileName, gltfModel);
+            owner.createGltfBrowserPanel(fileName, gltfModel, gltf);
         } 
         catch (CancellationException e)
         {

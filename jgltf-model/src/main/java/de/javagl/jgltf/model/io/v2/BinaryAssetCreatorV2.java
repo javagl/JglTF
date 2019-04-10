@@ -41,11 +41,11 @@ import de.javagl.jgltf.impl.v2.GlTF;
 import de.javagl.jgltf.impl.v2.Image;
 import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.GltfModel;
-import de.javagl.jgltf.model.GltfModels;
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.model.io.MimeTypes;
+import de.javagl.jgltf.model.v2.GltfCreatorV2;
 
 /**
  * A class for creating a binary {@link GltfAssetV2} from a 
@@ -79,8 +79,7 @@ final class BinaryAssetCreatorV2
      */
     GltfAssetV2 create(GltfModel gltfModel)
     {
-        GlTF inputGltf = GltfModels.getGltfV2(gltfModel);
-        GlTF outputGltf = GltfUtilsV2.copy(inputGltf);
+        GlTF outputGltf = GltfCreatorV2.create(gltfModel);
         
         // Create the new byte buffer for the data of the "binary_glTF" Buffer
         int binaryGltfBufferSize = 
@@ -175,7 +174,7 @@ final class BinaryAssetCreatorV2
 
         // Place the newly created lists into the output glTF,
         // if there have been non-null lists for them in the input
-        if (inputGltf.getImages() != null)
+        if (!oldImages.isEmpty())
         {
             outputGltf.setImages(newImages);
         }

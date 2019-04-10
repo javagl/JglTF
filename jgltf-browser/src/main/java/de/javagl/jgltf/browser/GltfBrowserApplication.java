@@ -37,6 +37,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
@@ -544,7 +546,7 @@ class GltfBrowserApplication
     /**
      * Execute the task of loading the {@link GltfModel} in a background 
      * thread, showing a modal dialog. When the data is loaded, it will 
-     * be passed to {@link #createGltfBrowserPanel(String, GltfModel)}
+     * be passed to {@link #createGltfBrowserPanel(String, GltfModel, Object)}
      * 
      * @param uri The URI to load from
      */
@@ -587,10 +589,11 @@ class GltfBrowserApplication
             objImportAccessoryPanel.getSelectedIndicesComponentType();
         boolean assigningRandomColorsToParts =
             objImportAccessoryPanel.isAssigningRandomColorsToParts();
-        SwingTask<GltfModel, ?> swingTask = new SwingTask<GltfModel, Void>()
+        SwingTask<Entry<GltfModel, Object>, ?> swingTask = 
+            new SwingTask<Entry<GltfModel, Object>, Void>()
         {
             @Override
-            protected GltfModel doInBackground() throws Exception
+            protected Entry<GltfModel, Object> doInBackground() throws Exception
             {
                 ObjGltfAssetCreatorV2 objGltfAssetCreator = 
                     new ObjGltfAssetCreatorV2(bufferStrategy);
@@ -599,17 +602,25 @@ class GltfBrowserApplication
                 objGltfAssetCreator.setAssigningRandomColorsToParts(
                     assigningRandomColorsToParts);
                 GltfAssetV2 gltfAsset = objGltfAssetCreator.create(uri);
-                return GltfModels.create(gltfAsset);
+
+                GltfModel gltfModel = GltfModels.create(gltfAsset);
+                Object gltf = gltfAsset.getGltf();
+                Entry<GltfModel, Object> result = 
+                    new SimpleEntry<GltfModel, Object>(gltfModel, gltf);
+                return result;
+                
             }
         };
         swingTask.addDoneCallback(task -> 
         {
             try
             {
-                GltfModel gltfModel = task.get();
+                Entry<GltfModel, Object> result = task.get();
+                GltfModel gltfModel = result.getKey();
+                Object gltf = result.getValue();
                 String frameTitle =
                     "glTF for " + IO.extractFileName(uri);
-                createGltfBrowserPanel(frameTitle, gltfModel);
+                createGltfBrowserPanel(frameTitle, gltfModel, gltf);
             } 
             catch (InterruptedException e)
             {
@@ -634,9 +645,10 @@ class GltfBrowserApplication
      * 
      * @param frameTitle The internal frame title
      * @param gltfModel The {@link GltfModel}
+     * @param gltf The glTF object
      */
     void createGltfBrowserPanel(
-        String frameTitle, GltfModel gltfModel)
+        String frameTitle, GltfModel gltfModel, Object gltf)
     {
         final boolean resizable = true;
         final boolean closable = true;
@@ -646,7 +658,7 @@ class GltfBrowserApplication
             frameTitle, resizable, closable , maximizable, iconifiable);
         internalFrame.addPropertyChangeListener(selectedInternalFrameTracker);
         GltfBrowserPanel gltfBrowserPanel = 
-            new GltfBrowserPanel(gltfModel);
+            new GltfBrowserPanel(gltfModel, gltf);
         internalFrame.getContentPane().add(gltfBrowserPanel);
         internalFrame.setSize(
             desktopPane.getWidth(), 

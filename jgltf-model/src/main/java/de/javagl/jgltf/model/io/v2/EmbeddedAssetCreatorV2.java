@@ -36,12 +36,12 @@ import de.javagl.jgltf.impl.v2.Image;
 import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.GltfException;
 import de.javagl.jgltf.model.GltfModel;
-import de.javagl.jgltf.model.GltfModels;
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.io.GltfAsset;
 import de.javagl.jgltf.model.io.IO;
 import de.javagl.jgltf.model.io.MimeTypes;
+import de.javagl.jgltf.model.v2.GltfCreatorV2;
 
 /**
  * A class for creating a {@link GltfAssetV2} with an "embedded" data 
@@ -76,8 +76,7 @@ final class EmbeddedAssetCreatorV2
      */
     GltfAssetV2 create(GltfModel gltfModel)
     {
-        GlTF inputGltf = GltfModels.getGltfV2(gltfModel);
-        GlTF outputGltf = GltfUtilsV2.copy(inputGltf);
+        GlTF outputGltf = GltfCreatorV2.create(gltfModel);
 
         List<Buffer> buffers = Optionals.of(outputGltf.getBuffers());
         for (int i = 0; i < buffers.size(); i++)

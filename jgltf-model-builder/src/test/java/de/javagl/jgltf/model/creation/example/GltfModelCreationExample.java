@@ -122,9 +122,8 @@ public class GltfModelCreationExample
         gltfModelBuilder.addSceneModel(sceneModel);
         DefaultGltfModel gltfModel = gltfModelBuilder.build();
 
-        // Print the glTF to the console. TODO: Some refactoring pending here
-        GltfCreatorV2 gltfCreator = new GltfCreatorV2(gltfModel);
-        GlTF gltf = gltfCreator.create();
+        // Print the glTF to the console.
+        GlTF gltf = GltfCreatorV2.create(gltfModel);
         GltfWriter gltfWriter = new GltfWriter();
         gltfWriter.setIndenting(true);
         gltfWriter.write(gltf, System.out);

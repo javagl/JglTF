@@ -67,7 +67,6 @@ import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.AnimationModel;
 import de.javagl.jgltf.model.AnimationModel.Channel;
 import de.javagl.jgltf.model.AnimationModel.Sampler;
-import de.javagl.jgltf.model.impl.DefaultNodeModel;
 import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.CameraModel;
@@ -83,6 +82,7 @@ import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.SceneModel;
 import de.javagl.jgltf.model.SkinModel;
 import de.javagl.jgltf.model.TextureModel;
+import de.javagl.jgltf.model.impl.DefaultNodeModel;
 import de.javagl.jgltf.model.v2.MaterialModelV2.AlphaMode;
 
 /**
@@ -96,6 +96,18 @@ public class GltfCreatorV2
      */
     private static final Logger logger = 
         Logger.getLogger(GltfCreatorV2.class.getName());
+    
+    /**
+     * Creates a {@link GlTF} from the given {@link GltfModel}
+     * 
+     * @param gltfModel The {@link GltfModel}
+     * @return The {@link GlTF}
+     */
+    public static GlTF create(GltfModel gltfModel)
+    {
+        GltfCreatorV2 creator = new GltfCreatorV2(gltfModel);
+        return creator.create();
+    }
     
     /**
      * Inner class containing the information that is necessary to define
@@ -232,7 +244,7 @@ public class GltfCreatorV2
      * 
      * @param gltfModel The {@link GltfModel}
      */
-    public GltfCreatorV2(GltfModel gltfModel)
+    private GltfCreatorV2(GltfModel gltfModel)
     {
         this.gltfModel = Objects.requireNonNull(
             gltfModel, "The gltfModel may not be null");

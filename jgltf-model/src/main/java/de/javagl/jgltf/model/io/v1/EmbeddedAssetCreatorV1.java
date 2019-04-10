@@ -37,7 +37,6 @@ import de.javagl.jgltf.impl.v1.Image;
 import de.javagl.jgltf.impl.v1.Shader;
 import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.GltfException;
-import de.javagl.jgltf.model.GltfModels;
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.gl.ShaderModel;
@@ -45,6 +44,7 @@ import de.javagl.jgltf.model.io.GltfAsset;
 import de.javagl.jgltf.model.io.IO;
 import de.javagl.jgltf.model.io.MimeTypes;
 import de.javagl.jgltf.model.v1.BinaryGltfV1;
+import de.javagl.jgltf.model.v1.GltfCreatorV1;
 import de.javagl.jgltf.model.v1.GltfModelV1;
 
 /**
@@ -81,8 +81,7 @@ final class EmbeddedAssetCreatorV1
      */
     GltfAssetV1 create(GltfModelV1 gltfModel)
     {
-        GlTF inputGltf = GltfModels.getGltfV1(gltfModel);
-        GlTF outputGltf = GltfUtilsV1.copy(inputGltf);
+        GlTF outputGltf = GltfCreatorV1.create(gltfModel);
 
         // TODO This is not solved very elegantly, due to the 
         // transition of glTF 1.0 to glTF 2.0 - refactor this!
@@ -90,13 +89,13 @@ final class EmbeddedAssetCreatorV1
         // Create mappings from the IDs to the corresponding model elements.
         // This assumes that they are in the same order.
         Map<String, BufferModel> bufferIdToBuffer = GltfUtilsV1.createMap(
-            inputGltf.getBuffers(), 
+            outputGltf.getBuffers(), 
             gltfModel.getBufferModels());
         Map<String, ImageModel> imageIdToImage = GltfUtilsV1.createMap(
-            inputGltf.getImages(), 
+            outputGltf.getImages(), 
             gltfModel.getImageModels());
         Map<String, ShaderModel> shaderIdToShader = GltfUtilsV1.createMap(
-            inputGltf.getShaders(), 
+            outputGltf.getShaders(), 
             gltfModel.getShaderModels());
         
         Optionals.of(outputGltf.getBuffers()).forEach((id, value) -> 
