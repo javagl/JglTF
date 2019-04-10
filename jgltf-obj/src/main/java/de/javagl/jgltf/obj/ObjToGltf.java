@@ -36,11 +36,8 @@ import java.util.logging.Logger;
 
 import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.GltfModel;
-import de.javagl.jgltf.model.GltfModels;
-import de.javagl.jgltf.model.io.GltfAsset;
 import de.javagl.jgltf.model.io.GltfModelWriter;
-import de.javagl.jgltf.obj.v1.ObjGltfAssetCreatorV1;
-import de.javagl.jgltf.obj.v2.ObjGltfAssetCreatorV2;
+import de.javagl.jgltf.obj.model.ObjGltfModelCreator;
 
 /**
  * A class for converting OBJ files to glTF
@@ -73,11 +70,11 @@ public class ObjToGltf
         String outputFileName = null;
         boolean embedded = false;
         boolean binary = false;
-        BufferStrategy bufferStrategy = BufferStrategy.BUFFER_PER_FILE;
         int indicesComponentType = GltfConstants.GL_UNSIGNED_SHORT;
         int version = 2;
-        for (String arg : args)
+        for (String a : args)
         {
+            String arg = a.trim();
             if (arg.startsWith("-i="))
             {
                 inputFileName = arg.substring(3);
@@ -93,28 +90,6 @@ public class ObjToGltf
             else if (arg.equals("-b"))
             {
                 binary = true;
-            }
-            else if (arg.startsWith("-s="))
-            {
-                String s = arg.substring(3);
-                if (s.equalsIgnoreCase("file"))
-                {
-                    bufferStrategy = BufferStrategy.BUFFER_PER_FILE;
-                }
-                else if (s.equalsIgnoreCase("group"))
-                {
-                    bufferStrategy = BufferStrategy.BUFFER_PER_GROUP;
-                }
-                else if (s.equalsIgnoreCase("part"))
-                {
-                    bufferStrategy = BufferStrategy.BUFFER_PER_PART;
-                }
-                else
-                {
-                    System.err.println("Invalid buffer strategy: " + s);
-                    displayHelp();
-                    return;
-                }
             }
             else if (arg.startsWith("-c"))
             {
@@ -178,22 +153,14 @@ public class ObjToGltf
 
         URI objUri = Paths.get(inputFileName).toUri();
 
-        GltfAsset gltfAsset = null;
+        GltfModel gltfModel = null;
+        ObjGltfModelCreator gltfModelCreator = new ObjGltfModelCreator();
+        gltfModelCreator.setIndicesComponentType(indicesComponentType);
         if (version == 1)
         {
-            ObjGltfAssetCreatorV1 gltfAssetCreator = 
-                new ObjGltfAssetCreatorV1(bufferStrategy);
-            gltfAssetCreator.setIndicesComponentType(indicesComponentType);
-            gltfAsset = gltfAssetCreator.create(objUri);
+            gltfModelCreator.setTechniqueBasedMaterials(true);
         }
-        else
-        {
-            ObjGltfAssetCreatorV2 gltfAssetCreator = 
-                new ObjGltfAssetCreatorV2(bufferStrategy);
-            gltfAssetCreator.setIndicesComponentType(indicesComponentType);
-            gltfAsset = gltfAssetCreator.create(objUri);
-        }
-        GltfModel gltfModel = GltfModels.create(gltfAsset);
+        gltfModel = gltfModelCreator.create(objUri);
 
         GltfModelWriter gltfModelWriter = new GltfModelWriter();
         File outputFile = new File(outputFileName);
@@ -238,13 +205,6 @@ public class ObjToGltf
         System.out.println("  -o=<file>   : The output file name");
         System.out.println("  -e          : Write the output as embedded glTF");
         System.out.println("  -b          : Write the output as binary glTF");
-        System.out.println("  -s=         : The buffer strategy:");
-        System.out.println("     file     : "
-            + "Create one buffer for the whole file");
-        System.out.println("     group    : "
-            + "Create one buffer for each material group");
-        System.out.println("     part     : "
-            + "Create one buffer for each part");
         System.out.println("  -c=<type>   : The indices component type. "
             + "The <type> may be GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT "
             + "or GL_UNSIGNED_INT. The default is GL_UNSIGNED_SHORT");
