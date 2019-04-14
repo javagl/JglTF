@@ -1,15 +1,17 @@
 {
   "accessors" : {
-    "accessor_21" : {
-      "bufferView" : "bufferView_29",
+    "accessor_0" : {
+      "bufferView" : "bufferView_0",
       "byteOffset" : 0,
       "byteStride" : 0,
       "componentType" : 5123,
       "count" : 36,
-      "type" : "SCALAR"
+      "type" : "SCALAR",
+      "max" : [ 23 ],
+      "min" : [ 0 ]
     },
-    "accessor_23" : {
-      "bufferView" : "bufferView_30",
+    "accessor_1" : {
+      "bufferView" : "bufferView_1",
       "byteOffset" : 0,
       "byteStride" : 12,
       "componentType" : 5126,
@@ -18,8 +20,8 @@
       "max" : [ 0.5, 0.5, 0.5 ],
       "min" : [ -0.5, -0.5, -0.5 ]
     },
-    "accessor_25" : {
-      "bufferView" : "bufferView_30",
+    "accessor_2" : {
+      "bufferView" : "bufferView_1",
       "byteOffset" : 288,
       "byteStride" : 12,
       "componentType" : 5126,
@@ -29,41 +31,34 @@
       "min" : [ -1.0, -1.0, -1.0 ]
     }
   },
-  "animations" : { },
   "asset" : {
-    "generator" : "collada2gltf@027f74366341d569dea42e9a68b7104cc3892054",
-    "premultipliedAlpha" : true,
-    "profile" : {
-      "api" : "WebGL",
-      "version" : "1.0.2"
-    },
+    "generator" : "JglTF from https://github.com/javagl/JglTF",
     "version" : "1.0"
   },
   "buffers" : {
-    "Box" : {
+    "buffer_0" : {
       "uri" : "data:application/gltf-buffer;base64,AAABAAIAAwACAAEABAAFAAYABwAGAAUACAAJAAoACwAKAAkADAANAA4ADwAOAA0AEAARABIAEwASABEAFAAVABYAFwAWABUAAAAAvwAAAL8AAAA/AAAAPwAAAL8AAAA/AAAAvwAAAD8AAAA/AAAAPwAAAD8AAAA/AAAAPwAAAL8AAAA/AAAAvwAAAL8AAAA/AAAAPwAAAL8AAAC/AAAAvwAAAL8AAAC/AAAAPwAAAD8AAAA/AAAAPwAAAL8AAAA/AAAAPwAAAD8AAAC/AAAAPwAAAL8AAAC/AAAAvwAAAD8AAAA/AAAAPwAAAD8AAAA/AAAAvwAAAD8AAAC/AAAAPwAAAD8AAAC/AAAAvwAAAL8AAAA/AAAAvwAAAD8AAAA/AAAAvwAAAL8AAAC/AAAAvwAAAD8AAAC/AAAAvwAAAL8AAAC/AAAAvwAAAD8AAAC/AAAAPwAAAL8AAAC/AAAAPwAAAD8AAAC/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAAAAAACAvwAAAAAAAAAAAACAvwAAAAAAAAAAAACAvwAAAAAAAAAAAACAvwAAAAAAAAAAAAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/",
-      "byteLength" : 648,
-      "type" : "arraybuffer"
+      "byteLength" : 648
     }
   },
   "bufferViews" : {
-    "bufferView_29" : {
-      "buffer" : "Box",
+    "bufferView_0" : {
+      "buffer" : "buffer_0",
       "byteOffset" : 0,
       "byteLength" : 72,
       "target" : 34963
     },
-    "bufferView_30" : {
-      "buffer" : "Box",
+    "bufferView_1" : {
+      "buffer" : "buffer_0",
       "byteOffset" : 72,
       "byteLength" : 576,
       "target" : 34962
     }
   },
   "materials" : {
-    "Effect-Red" : {
+    "material_0" : {
       "name" : "Red",
-      "technique" : "technique0",
+      "technique" : "technique_0",
       "values" : {
         "diffuse" : [ 0.8, 0, 0, 1 ],
         "shininess" : 256,
@@ -72,86 +67,92 @@
     }
   },
   "meshes" : {
-    "Geometry-mesh002" : {
+    "mesh_0" : {
       "name" : "Mesh",
       "primitives" : [ {
         "attributes" : {
-          "NORMAL" : "accessor_25",
-          "POSITION" : "accessor_23"
+          "NORMAL" : "accessor_2",
+          "POSITION" : "accessor_1"
         },
-        "indices" : "accessor_21",
-        "material" : "Effect-Red",
+        "indices" : "accessor_0",
+        "material" : "material_0",
         "mode" : 4
       } ]
     }
   },
   "nodes" : {
-    "Geometry-mesh002Node" : {
+    "node_0" : {
       "name" : "Mesh",
-      "children" : [ ],
       "matrix" : [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ],
-      "meshes" : [ "Geometry-mesh002" ]
+      "meshes" : [ "mesh_0" ]
     },
     "node_1" : {
       "name" : "Y_UP_Transform",
-      "children" : [ "Geometry-mesh002Node" ],
+      "children" : [ "node_0" ],
       "matrix" : [ 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0 ]
     }
   },
   "programs" : {
     "program_0" : {
       "attributes" : [ "a_normal", "a_position" ],
-      "fragmentShader" : "Box0FS",
-      "vertexShader" : "Box0VS"
+      "fragmentShader" : "shader_0",
+      "vertexShader" : "shader_1"
     }
   },
-  "scene" : "defaultScene",
+  "scene" : "scene_0",
   "scenes" : {
-    "defaultScene" : {
+    "scene_0" : {
       "nodes" : [ "node_1" ]
     }
   },
   "shaders" : {
-    "Box0FS" : {
+    "shader_0" : {
       "uri" : "data:text/plain;base64,cHJlY2lzaW9uIGhpZ2hwIGZsb2F0Owp2YXJ5aW5nIHZlYzMgdl9ub3JtYWw7CnVuaWZvcm0gdmVjNCB1X2RpZmZ1c2U7CnVuaWZvcm0gdmVjNCB1X3NwZWN1bGFyOwp1bmlmb3JtIGZsb2F0IHVfc2hpbmluZXNzOwp2b2lkIG1haW4odm9pZCkgewp2ZWMzIG5vcm1hbCA9IG5vcm1hbGl6ZSh2X25vcm1hbCk7CnZlYzQgY29sb3IgPSB2ZWM0KDAuLCAwLiwgMC4sIDAuKTsKdmVjNCBkaWZmdXNlID0gdmVjNCgwLiwgMC4sIDAuLCAxLik7CnZlYzQgc3BlY3VsYXI7CmRpZmZ1c2UgPSB1X2RpZmZ1c2U7CnNwZWN1bGFyID0gdV9zcGVjdWxhcjsKZGlmZnVzZS54eXogKj0gbWF4KGRvdChub3JtYWwsdmVjMygwLiwwLiwxLikpLCAwLik7CmNvbG9yLnh5eiArPSBkaWZmdXNlLnh5ejsKY29sb3IgPSB2ZWM0KGNvbG9yLnJnYiAqIGRpZmZ1c2UuYSwgZGlmZnVzZS5hKTsKZ2xfRnJhZ0NvbG9yID0gY29sb3I7Cn0K",
       "type" : 35632
     },
-    "Box0VS" : {
+    "shader_1" : {
       "uri" : "data:text/plain;base64,cHJlY2lzaW9uIGhpZ2hwIGZsb2F0OwphdHRyaWJ1dGUgdmVjMyBhX3Bvc2l0aW9uOwphdHRyaWJ1dGUgdmVjMyBhX25vcm1hbDsKdmFyeWluZyB2ZWMzIHZfbm9ybWFsOwp1bmlmb3JtIG1hdDMgdV9ub3JtYWxNYXRyaXg7CnVuaWZvcm0gbWF0NCB1X21vZGVsVmlld01hdHJpeDsKdW5pZm9ybSBtYXQ0IHVfcHJvamVjdGlvbk1hdHJpeDsKdm9pZCBtYWluKHZvaWQpIHsKdmVjNCBwb3MgPSB1X21vZGVsVmlld01hdHJpeCAqIHZlYzQoYV9wb3NpdGlvbiwxLjApOwp2X25vcm1hbCA9IHVfbm9ybWFsTWF0cml4ICogYV9ub3JtYWw7CmdsX1Bvc2l0aW9uID0gdV9wcm9qZWN0aW9uTWF0cml4ICogcG9zOwp9Cg==",
       "type" : 35633
     }
   },
-  "skins" : { },
   "techniques" : {
-    "technique0" : {
+    "technique_0" : {
       "parameters" : {
         "diffuse" : {
+          "count" : 1,
           "type" : 35666
         },
         "modelViewMatrix" : {
+          "count" : 1,
           "type" : 35676,
           "semantic" : "MODELVIEW"
         },
         "normal" : {
+          "count" : 1,
           "type" : 35665,
           "semantic" : "NORMAL"
         },
         "normalMatrix" : {
+          "count" : 1,
           "type" : 35675,
           "semantic" : "MODELVIEWINVERSETRANSPOSE"
         },
         "position" : {
+          "count" : 1,
           "type" : 35665,
           "semantic" : "POSITION"
         },
         "projectionMatrix" : {
+          "count" : 1,
           "type" : 35676,
           "semantic" : "PROJECTION"
         },
         "shininess" : {
+          "count" : 1,
           "type" : 5126
         },
         "specular" : {
+          "count" : 1,
           "type" : 35666
         }
       },

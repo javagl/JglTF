@@ -25,7 +25,7 @@
     "min" : [ -0.5, -0.5, -0.5 ]
   } ],
   "asset" : {
-    "generator" : "COLLADA2GLTF",
+    "generator" : "JglTF from https://github.com/javagl/JglTF",
     "version" : "2.0"
   },
   "buffers" : [ {
@@ -48,8 +48,11 @@
     "name" : "Red",
     "pbrMetallicRoughness" : {
       "baseColorFactor" : [ 0.8, 0.0, 0.0, 1.0 ],
-      "metallicFactor" : 0.0
-    }
+      "metallicFactor" : 0.0,
+      "roughnessFactor" : 1.0
+    },
+    "alphaMode" : "OPAQUE",
+    "doubleSided" : false
   } ],
   "meshes" : [ {
     "name" : "Mesh",
