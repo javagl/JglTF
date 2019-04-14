@@ -60,6 +60,7 @@ import de.javagl.jgltf.impl.v1.Shader;
 import de.javagl.jgltf.impl.v1.Skin;
 import de.javagl.jgltf.impl.v1.Technique;
 import de.javagl.jgltf.impl.v1.TechniqueParameters;
+import de.javagl.jgltf.impl.v1.TechniqueStates;
 import de.javagl.jgltf.impl.v1.TechniqueStatesFunctions;
 import de.javagl.jgltf.impl.v1.Texture;
 import de.javagl.jgltf.model.AccessorModel;
@@ -118,7 +119,6 @@ import de.javagl.jgltf.model.io.v1.GltfAssetV1;
 import de.javagl.jgltf.model.v1.gl.DefaultModels;
 import de.javagl.jgltf.model.v1.gl.GltfDefaults;
 import de.javagl.jgltf.model.v1.gl.TechniqueStatesFunctionsModels;
-import de.javagl.jgltf.model.v1.gl.Techniques;
 
 /**
  * A class that is responsible for filling a {@link DefaultGltfModel} with
@@ -1102,7 +1102,7 @@ class GltfModelCreatorV1
                 String bufferViewId = 
                     BinaryGltfV1.getBinaryGltfBufferViewId(shader);
                 BufferViewModel bufferViewModel =
-                    get("bufferView", bufferViewId, 
+                    get("bufferViews", bufferViewId, 
                         gltfModel::getBufferViewModel);
                 
                 shaderModel.setShaderData(bufferViewModel.getBufferViewData());
@@ -1298,18 +1298,29 @@ class GltfModelCreatorV1
         addAttributes(technique, techniqueModel);
         addUniforms(technique, techniqueModel);
         
-        List<Integer> enable = 
-            Techniques.obtainEnabledStates(technique);
-        TechniqueStatesFunctions functions = 
-            Techniques.obtainTechniqueStatesFunctions(technique);
-
-        DefaultTechniqueStatesFunctionsModel techniqueStatesFunctionsModel =
-            TechniqueStatesFunctionsModels.create(functions);
-        
-        TechniqueStatesModel techniqueStatesModel = 
-            new DefaultTechniqueStatesModel(
-                enable, techniqueStatesFunctionsModel);
-        techniqueModel.setTechniqueStatesModel(techniqueStatesModel);
+        List<Integer> enableModel = null;
+        DefaultTechniqueStatesFunctionsModel techniqueStatesFunctionsModel = 
+            null;
+        TechniqueStates states = technique.getStates();
+        if (states != null)
+        {
+            List<Integer> enable = states.getEnable();
+            if (enable != null)
+            {
+                enableModel = new ArrayList<Integer>(enable);
+            }
+            TechniqueStatesFunctions functions = states.getFunctions();
+            if (functions != null)
+            {
+                techniqueStatesFunctionsModel =
+                    TechniqueStatesFunctionsModels.create(functions);
+            }
+            
+            TechniqueStatesModel techniqueStatesModel = 
+                new DefaultTechniqueStatesModel(
+                    enableModel, techniqueStatesFunctionsModel);
+            techniqueModel.setTechniqueStatesModel(techniqueStatesModel);
+        }
     }
     
     

@@ -807,7 +807,10 @@ public class GltfCreatorV1
         TechniqueStates techniqueStates = new TechniqueStates();
         
         List<Integer> enable = techniqueStatesModel.getEnable();
-        techniqueStates.setEnable(new ArrayList<Integer>(enable));
+        if (enable != null)
+        {
+            techniqueStates.setEnable(new ArrayList<Integer>(enable));
+        }
         
         techniqueStates.setFunctions(createTechniqueStatesFunctions(
             techniqueStatesModel.getTechniqueStatesFunctionsModel()));

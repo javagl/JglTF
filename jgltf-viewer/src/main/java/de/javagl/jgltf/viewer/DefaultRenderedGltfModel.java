@@ -55,8 +55,10 @@ import de.javagl.jgltf.model.gl.TechniqueModel;
 import de.javagl.jgltf.model.gl.TechniqueParametersModel;
 import de.javagl.jgltf.model.gl.TechniqueStatesFunctionsModel;
 import de.javagl.jgltf.model.gl.TechniqueStatesModel;
+import de.javagl.jgltf.model.gl.impl.TechniqueStatesModels;
 import de.javagl.jgltf.model.v1.MaterialModelV1;
 import de.javagl.jgltf.model.v1.gl.DefaultModels;
+import de.javagl.jgltf.model.v1.gl.GltfDefaults;
 import de.javagl.jgltf.model.v2.MaterialModelV2;
 import de.javagl.jgltf.viewer.Morphing.MorphableAttribute;
 
@@ -349,12 +351,30 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
         
         TechniqueStatesModel techniqueStatesModel = 
             techniqueModel.getTechniqueStatesModel();
-        List<Integer> enabledStates = techniqueStatesModel.getEnable();
+        List<Integer> enabledStates;
+        if (techniqueStatesModel.getEnable() != null)
+        {
+            enabledStates = techniqueStatesModel.getEnable();
+        }
+        else
+        {
+            enabledStates = 
+                TechniqueStatesModels.createDefaultTechniqueStatesEnable();
+        }
         commands.add(() -> {
             glContext.enable(enabledStates);
         });
-        TechniqueStatesFunctionsModel techniqueStatesFunctionsModel = 
-            techniqueStatesModel.getTechniqueStatesFunctionsModel();
+        TechniqueStatesFunctionsModel techniqueStatesFunctionsModel;
+        if (techniqueStatesModel.getTechniqueStatesFunctionsModel() != null)
+        {
+            techniqueStatesFunctionsModel = 
+                techniqueStatesModel.getTechniqueStatesFunctionsModel();
+        }
+        else
+        {
+            techniqueStatesFunctionsModel = 
+                TechniqueStatesModels.createDefaultTechniqueStatesFunctions();
+        }
         commands.addAll(TechniqueStatesFunctions
             .createTechniqueStatesFunctionsSettingCommands(
                 glContext, techniqueStatesFunctionsModel));

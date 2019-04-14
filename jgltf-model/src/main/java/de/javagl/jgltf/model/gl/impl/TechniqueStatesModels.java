@@ -47,20 +47,43 @@ public class TechniqueStatesModels
      */
     public static TechniqueStatesModel createDefault()
     {
-        List<Integer> enable = Arrays.asList(
-            GltfConstants.GL_DEPTH_TEST, 
-            GltfConstants.GL_CULL_FACE
-        );
+        TechniqueStatesModel techniqueStatesModel = 
+            new DefaultTechniqueStatesModel(
+                createDefaultTechniqueStatesEnable(), 
+                createDefaultTechniqueStatesFunctions());
+        return techniqueStatesModel;
+    }
+    
+    /**
+     * Create the default {@link TechniqueStatesFunctionsModel}
+     * @return The {@link TechniqueStatesFunctionsModel}
+     */
+    public static TechniqueStatesFunctionsModel 
+        createDefaultTechniqueStatesFunctions()
+    {
         TechniqueStatesFunctions functions = 
             de.javagl.jgltf.model.v1.gl.Techniques
                 .createDefaultTechniqueStatesFunctions();
         TechniqueStatesFunctionsModel techniqueStatesFunctionsModel =
             TechniqueStatesFunctionsModels.create(functions);
-        TechniqueStatesModel techniqueStatesModel = 
-            new DefaultTechniqueStatesModel(
-                enable, techniqueStatesFunctionsModel);
-        return techniqueStatesModel;
+        return techniqueStatesFunctionsModel;
     }
+    
+    /**
+     * Returns the default {@link TechniqueStatesModel#getEnable() enable}
+     * states 
+     * 
+     * @return The default enable states
+     */
+    public static List<Integer> createDefaultTechniqueStatesEnable()
+    {
+        List<Integer> enable = Arrays.asList(
+            GltfConstants.GL_DEPTH_TEST, 
+            GltfConstants.GL_CULL_FACE
+        );
+        return enable;
+    }
+    
     /**
      * Private constructor to prevent instantiation
      */
