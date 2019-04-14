@@ -58,7 +58,6 @@ import de.javagl.jgltf.model.gl.TechniqueStatesModel;
 import de.javagl.jgltf.model.gl.impl.TechniqueStatesModels;
 import de.javagl.jgltf.model.v1.MaterialModelV1;
 import de.javagl.jgltf.model.v1.gl.DefaultModels;
-import de.javagl.jgltf.model.v1.gl.GltfDefaults;
 import de.javagl.jgltf.model.v2.MaterialModelV2;
 import de.javagl.jgltf.viewer.Morphing.MorphableAttribute;
 
