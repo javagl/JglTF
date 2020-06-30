@@ -71,8 +71,11 @@ public final class AccessorFloatData
             numComponentsPerElement, Float.BYTES, byteStride);
         AccessorDatas.validateFloatType(componentType);
 
+        int numBytesPerElement = 
+            getNumComponentsPerElement() * getNumBytesPerComponent();
         AccessorDatas.validateCapacity(byteOffset, getNumElements(), 
-            getByteStridePerElement(), bufferViewByteBuffer.capacity());
+            numBytesPerElement, getByteStridePerElement(), 
+            bufferViewByteBuffer.capacity());
     }
     
     /**

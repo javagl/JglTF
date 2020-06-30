@@ -77,8 +77,12 @@ public final class AccessorIntData
         AccessorDatas.validateIntType(componentType);
 
         this.unsigned = AccessorDatas.isUnsignedType(componentType);
+
+        int numBytesPerElement = 
+            getNumComponentsPerElement() * getNumBytesPerComponent();
         AccessorDatas.validateCapacity(byteOffset, getNumElements(), 
-            getByteStridePerElement(), bufferViewByteBuffer.capacity());
+            numBytesPerElement, getByteStridePerElement(), 
+            bufferViewByteBuffer.capacity());
     }
     
     /**

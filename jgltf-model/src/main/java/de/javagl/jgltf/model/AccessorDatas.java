@@ -450,21 +450,24 @@ public class AccessorDatas
      * 
      * @param byteOffset The byte offset 
      * @param numElements The number of elements
+     * @param numBytesPerElement The number of bytes per element
      * @param byteStridePerElement The byte stride
      * @param bufferCapacity The buffer capacity
      * @throws IllegalArgumentException If the given byte buffer does not
      * have a sufficient capacity
      */
     static void validateCapacity(int byteOffset, int numElements,
-        int byteStridePerElement, int bufferCapacity)
+        int numBytesPerElement, int byteStridePerElement, int bufferCapacity)
     {
-        int expectedCapacity = numElements * byteStridePerElement;
+        int expectedCapacity = 
+            (numElements - 1) * byteStridePerElement + numBytesPerElement;
         if (expectedCapacity > bufferCapacity)
         {
             throw new IllegalArgumentException(
                 "The accessorModel has an offset of " + byteOffset + " and " + 
                 numElements + " elements with a byte stride of " + 
-                byteStridePerElement + ", requiring " + expectedCapacity + 
+                byteStridePerElement + " and a size of " + numBytesPerElement + 
+                ", requiring " + expectedCapacity + 
                 " bytes, but the buffer view has only " + 
                 bufferCapacity + " bytes");
         }
