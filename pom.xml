@@ -43,6 +43,7 @@
     <module>jgltf-impl-v2</module>
     <module>jgltf-impl-v2-technique-webgl</module>
     <module>jgltf-model</module>
+    <module>jgltf-model-builder</module>
     <module>jgltf-obj</module>
     <module>jgltf-validator</module>
     <module>jgltf-viewer</module>
