@@ -117,7 +117,7 @@ public final class BufferStructure
     /**
      * Default constructor
      */
-    BufferStructure()
+    public BufferStructure()
     {
         this.accessorIds = new LinkedHashMap<DefaultAccessorModel, String>();
         this.accessorIndices = 
@@ -150,7 +150,7 @@ public final class BufferStructure
      * @param accessorModel The {@link AccessorModel}
      * @param idPrefix The ID prefix
      */
-    void addAccessorModel(DefaultAccessorModel accessorModel, String idPrefix)
+    public void addAccessorModel(DefaultAccessorModel accessorModel, String idPrefix)
     {
         String id = createId(idPrefix, accessorIds.values());
         this.accessorIndices.put(accessorModel, accessorIndices.size());
@@ -166,7 +166,7 @@ public final class BufferStructure
      * refer to the given {@link BufferViewModel}. A copy of the 
      * given collection will be stored internally.
      */
-    void addBufferViewModel(
+    public void addBufferViewModel(
         DefaultBufferViewModel bufferViewModel, String idPrefix, 
         Collection<? extends DefaultAccessorModel> accessorModels)
     {
@@ -187,7 +187,7 @@ public final class BufferStructure
      * that refer to the given {@link BufferModel}.  A copy of the 
      * given collection will be stored internally.
      */
-    void addBufferModel(DefaultBufferModel bufferModel, String idPrefix,
+    public void addBufferModel(DefaultBufferModel bufferModel, String idPrefix,
         Collection<? extends DefaultBufferViewModel> bufferViewModels)
     {
         this.bufferModels.add(bufferModel);
