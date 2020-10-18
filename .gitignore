@@ -4,6 +4,9 @@
 /.project
 /.ucdetector_reports
 /target
+.idea
+*.iml
+
 
 /jgltf-model-builder
 /jgltf-obj-multimesh
