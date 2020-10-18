@@ -17,7 +17,8 @@ import de.javagl.jgltf.model.impl.DefaultNodeModel;
 import de.javagl.jgltf.model.impl.DefaultSceneModel;
 import de.javagl.jgltf.model.impl.DefaultTextureModel;
 import de.javagl.jgltf.model.io.GltfWriter;
-import de.javagl.jgltf.model.v2.GltfCreatorV2;
+import de.javagl.jgltf.model.io.v2.GltfAssetV2;
+import de.javagl.jgltf.model.io.v2.GltfAssetsV2;
 import de.javagl.jgltf.model.v2.MaterialModelV2;
 
 /**
@@ -123,7 +124,8 @@ public class GltfModelCreationExample
         DefaultGltfModel gltfModel = gltfModelBuilder.build();
 
         // Print the glTF to the console.
-        GlTF gltf = GltfCreatorV2.create(gltfModel);
+        GltfAssetV2 asset = GltfAssetsV2.createEmbedded(gltfModel);
+        GlTF gltf = asset.getGltf();
         GltfWriter gltfWriter = new GltfWriter();
         gltfWriter.setIndenting(true);
         gltfWriter.write(gltf, System.out);
