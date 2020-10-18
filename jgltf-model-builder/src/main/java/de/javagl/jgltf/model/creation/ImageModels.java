@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.ByteBuffer;
+import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -129,7 +130,9 @@ public class ImageModels
      * displayed and <code>null</code> is returned. 
      * <br>
      * If the source URI cannot be read, then an error message is
-     * printed and <code>null</code> is returned.
+     * printed and <code>null</code> is returned. If the source URI
+     * is not absolute, it will be assumed to be a path description
+     * that is resolved against the default file system.
      * 
      * @param inputUri The source file name
      * @param uri The URI that will be assigned to the {@link ImageModel}
@@ -141,7 +144,12 @@ public class ImageModels
         byte data[] = null;
         try
         {
-            data = IO.read(URI.create(inputUri));
+            URI localInputUri = URI.create(inputUri);
+            if (!localInputUri.isAbsolute())
+            {
+                localInputUri = Paths.get(inputUri).toUri().normalize();
+            }
+            data = IO.read(localInputUri);
         }
         catch (IOException e)
         {
