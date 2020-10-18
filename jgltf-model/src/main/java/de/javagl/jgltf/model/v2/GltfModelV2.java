@@ -723,6 +723,7 @@ public final class GltfModelV2 implements GltfModel
         {
             Animation animation = animations.get(i);
             DefaultAnimationModel animationModel = animationModels.get(i);
+            animationModel.setName(animation.getName());
             List<AnimationChannel> channels = 
                 Optionals.of(animation.getChannels());
             for (AnimationChannel animationChannel : channels)
