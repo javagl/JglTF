@@ -47,10 +47,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
-import javax.vecmath.Point3f;
-import javax.vecmath.Vector3f;
 
-import de.javagl.jgltf.model.BoundingBoxes;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.viewer.GltfViewer;
 import de.javagl.jgltf.viewer.RenderedCamera;
@@ -230,11 +227,13 @@ class GltfViewerPanel extends JPanel
         cameraControlPanel.add(renderedCamerasComboBox);
         
         JButton resetCameraButton = new JButton("Reset camera");
-        resetCameraButton.addActionListener(e -> resetExternalCamera());
+        resetCameraButton.addActionListener(
+            e -> externalCamera.fit(null));
         cameraControlPanel.add(resetCameraButton);
         
         JButton fitCameraButton = new JButton("Fit camera");
-        fitCameraButton.addActionListener(e -> fitExternalCamera());
+        fitCameraButton.addActionListener(
+            e -> externalCamera.fit(gltfModel));
         cameraControlPanel.add(fitCameraButton);
         
         JPanel p = new JPanel(new GridLayout(0,1));
@@ -278,73 +277,6 @@ class GltfViewerPanel extends JPanel
                 renderedCamerasComboBoxModel.addElement(renderedCamera);
             }
         }
-    }
-    
-    /**
-     * Reset the external camera to its initial configuration
-     */
-    private void resetExternalCamera()
-    {
-        de.javagl.rendering.core.view.Camera camera = 
-            externalCamera.getCamera();
-        camera.setEyePoint(new Point3f(0, 0, 1));
-        camera.setViewPoint(new Point3f(0, 0, 0)); 
-        camera.setUpVector(new Vector3f(0, 1, 0));
-        camera.setFovDegY(60.0f);            
-    }
-    
-    /**
-     * Fit the external camera to show the whole scene contents 
-     */
-    private void fitExternalCamera()
-    {
-        // Note: This is a VERY simple implementation that does not 
-        // guarantee the "tightest fitting" view configuration, but 
-        // generously moves the camera so that for usual scenes 
-        // everything is visible, regardless of the aspect ratio
-        
-        float minMax[] = BoundingBoxes.computeBoundingBoxMinMax(gltfModel);
-        
-        // Compute diagonal length and center of the bounding box
-        Point3f min = new Point3f();
-        min.x = minMax[0];
-        min.y = minMax[1];
-        min.z = minMax[2];
-        
-        Point3f max = new Point3f();
-        max.x = minMax[3];
-        max.y = minMax[4];
-        max.z = minMax[5];
-
-        float diagonalLength = max.distance(min);
-
-        Point3f center = new Point3f();
-        Point3f size = new Point3f();
-        size.sub(max, min);
-        center.scaleAdd(0.5f, size, min);
-        
-        // Compute the normal of the view plane (i.e. the normalized
-        // direction from the view point to the eye point)
-        de.javagl.rendering.core.view.Camera camera = 
-            externalCamera.getCamera();
-        Vector3f viewPlaneNormal = new Vector3f();
-        Point3f eyePoint = camera.getEyePoint();
-        Point3f viewPoint = camera.getViewPoint();
-        viewPlaneNormal.sub(eyePoint, viewPoint);
-        viewPlaneNormal.normalize();
-        
-        // Compute the required viewing distance, and apply
-        // it to the camera
-        float fovRadY = (float) Math.toRadians(camera.getFovDegY());
-        float distance = 
-            (float) (diagonalLength * 0.5 / Math.tan(fovRadY * 0.5));
-        
-        Point3f newViewPoint = new Point3f(center);
-        Point3f newEyePoint = new Point3f();
-        newEyePoint.scaleAdd(distance, viewPlaneNormal, newViewPoint);
-
-        camera.setEyePoint(newEyePoint);
-        camera.setViewPoint(newViewPoint); 
     }
 
     /**
