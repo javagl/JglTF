@@ -90,6 +90,7 @@ public class GltfAssetWriterV1
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream())
         {
             GltfWriter gltfWriter = new GltfWriter();
+            gltfWriter.setIndenting(false);
             gltfWriter.write(gltf, baos);
             sceneData = baos.toByteArray();
         }

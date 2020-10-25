@@ -99,6 +99,7 @@ public final class GltfAssetWriterV2
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream())
         {
             GltfWriter gltfWriter = new GltfWriter();
+            gltfWriter.setIndenting(false);
             gltfWriter.write(gltf, baos);
             jsonData = baos.toByteArray();
         }
