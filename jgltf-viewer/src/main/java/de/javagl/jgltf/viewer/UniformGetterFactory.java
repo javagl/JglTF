@@ -76,6 +76,11 @@ class UniformGetterFactory
      * was already reported. This is mainly intended for debugging.
      */
     private final Set<String> reportedNullUniformNames;
+
+    /**
+     * The RTC center point for the CESIUM_RTC extension
+     */
+    private float rtcCenter[];
     
     /**
      * Creates a new instance
@@ -87,11 +92,14 @@ class UniformGetterFactory
      * @param projectionMatrixSupplier A supplier that supplies the projection
      * matrix, which is a 4x4 matrix, given as a float array, in 
      * column-major order
+     * @param rtcCenter An optional 3D center point for the CESIUM_RTC 
+     * extension
      */
     public UniformGetterFactory(
         Supplier<float[]> viewportSupplier,
         Supplier<float[]> viewMatrixSupplier,
-        Supplier<float[]> projectionMatrixSupplier)
+        Supplier<float[]> projectionMatrixSupplier,
+        float rtcCenter[])
     {
         this.viewportSupplier = Objects.requireNonNull(viewportSupplier, 
             "The viewportSupplier may not be null");
@@ -100,6 +108,7 @@ class UniformGetterFactory
         this.projectionMatrixSupplier = 
             Objects.requireNonNull(projectionMatrixSupplier, 
                 "The projectionMatrixSupplier may not be null");
+        this.rtcCenter = rtcCenter == null ? new float[3] : rtcCenter.clone();
         this.reportedNullUniformNames = new LinkedHashSet<String>();
     }
     
@@ -253,14 +262,6 @@ class UniformGetterFactory
         
         TechniqueParametersModel techniqueParameters =
             techniqueModel.getUniformParameters(uniformName);
-        String semanticString = techniqueParameters.getSemantic();
-        if (!Semantic.contains(semanticString))
-        {
-            throw new IllegalArgumentException(
-                "Uniform " + uniformName + " has invalid semantic " + 
-                semanticString + " in technique " + techniqueModel);
-        }
-        Semantic semantic = Semantic.valueOf(semanticString);
         
         NodeModel nodeModel = currentNodeModel;
         NodeModel parameterNodeModel = techniqueParameters.getNodeModel();
@@ -268,7 +269,21 @@ class UniformGetterFactory
         {
             nodeModel = parameterNodeModel;
         }
-
+        
+        String semanticString = techniqueParameters.getSemantic();
+        if (CesiumRtcUtils.isCesiumRtcModelViewSemantic(semanticString))
+        {
+            return CesiumRtcUtils.createCesiumRtcModelViewMatrixSupplier(
+                nodeModel, viewMatrixSupplier, rtcCenter);
+        }
+        
+        if (!Semantic.contains(semanticString))
+        {
+            throw new IllegalArgumentException(
+                "Uniform " + uniformName + " has invalid semantic " + 
+                semanticString + " in technique " + techniqueModel);
+        }
+        Semantic semantic = Semantic.valueOf(semanticString);
         switch (semantic)
         {
             case LOCAL:
@@ -412,7 +427,6 @@ class UniformGetterFactory
         logger.severe("Unsupported semantic: "+semantic);
         return null;
     }
-    
     
     /**
      * Create a supplier for the joint matrix (actually, joint matrices) of
