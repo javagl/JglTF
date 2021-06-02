@@ -706,9 +706,27 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
 
             if (accessorModel == null)
             {
-                logger.fine(
-                    "No accessor model found for semantic " + semantic);
-                continue;
+                if (semantic.equals("NORMAL"))
+                {
+                    logger.info(
+                        "No normals found, computing default");
+                    
+                    // TODO: The normals would actually have to be updated
+                    // during the animation. This could be done by creating
+                    // an attributeUpdateCommand here.
+                    AccessorModel positionsAccessorModel = 
+                        meshPrimitiveAttributes.get("POSITION");
+                    AccessorModel indicesAccessorModel = 
+                        meshPrimitiveModel.getIndices();
+                    accessorModel = NormalComputation.createDefaultNormals(
+                        positionsAccessorModel, indicesAccessorModel);
+                }
+                else
+                {
+                    logger.fine(
+                        "No accessor model found for semantic " + semantic);
+                    continue;
+                }
             }
 
             BufferViewModel bufferViewModel =
@@ -754,6 +772,8 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
         }
         return attributeUpdateCommands;
     }
+    
+    
 
     /**
      * Create a command that updates the specified attribute data. <br>

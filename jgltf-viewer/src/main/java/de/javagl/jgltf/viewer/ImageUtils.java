@@ -226,4 +226,12 @@ class ImageUtils
         return intBuffer;
     }
 
+    /**
+     * Private constructor to prevent instantiation
+     */
+    private ImageUtils()
+    {
+        // Private constructor to prevent instantiation
+    }
+    
 }
