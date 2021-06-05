@@ -79,7 +79,8 @@ public class Node
      */
     private float[] rotation;
     /**
-     * The node's non-uniform scale. (optional)<br> 
+     * The node's non-uniform scale, given as the scaling factors along the 
+     * x, y, and z axes. (optional)<br> 
      * Default: [1.0,1.0,1.0]<br> 
      * Number of items: 3<br> 
      * Array elements:<br> 
@@ -88,7 +89,7 @@ public class Node
      */
     private float[] scale;
     /**
-     * The node's translation. (optional)<br> 
+     * The node's translation along the x, y, and z axes. (optional)<br> 
      * Default: [0.0,0.0,0.0]<br> 
      * Number of items: 3<br> 
      * Array elements:<br> 
@@ -391,7 +392,8 @@ public class Node
     }
 
     /**
-     * The node's non-uniform scale. (optional)<br> 
+     * The node's non-uniform scale, given as the scaling factors along the 
+     * x, y, and z axes. (optional)<br> 
      * Default: [1.0,1.0,1.0]<br> 
      * Number of items: 3<br> 
      * Array elements:<br> 
@@ -417,7 +419,8 @@ public class Node
     }
 
     /**
-     * The node's non-uniform scale. (optional)<br> 
+     * The node's non-uniform scale, given as the scaling factors along the 
+     * x, y, and z axes. (optional)<br> 
      * Default: [1.0,1.0,1.0]<br> 
      * Number of items: 3<br> 
      * Array elements:<br> 
@@ -442,7 +445,7 @@ public class Node
     }
 
     /**
-     * The node's translation. (optional)<br> 
+     * The node's translation along the x, y, and z axes. (optional)<br> 
      * Default: [0.0,0.0,0.0]<br> 
      * Number of items: 3<br> 
      * Array elements:<br> 
@@ -468,7 +471,7 @@ public class Node
     }
 
     /**
-     * The node's translation. (optional)<br> 
+     * The node's translation along the x, y, and z axes. (optional)<br> 
      * Default: [0.0,0.0,0.0]<br> 
      * Number of items: 3<br> 
      * Array elements:<br> 

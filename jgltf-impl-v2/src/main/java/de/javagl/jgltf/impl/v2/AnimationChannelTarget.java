@@ -28,7 +28,12 @@ public class AnimationChannelTarget
     private Integer node;
     /**
      * The name of the node's TRS property to modify, or the "weights" of the 
-     * Morph Targets it instantiates. (required)<br> 
+     * Morph Targets it instantiates. For the "translation" property, the 
+     * values that are provided by the sampler are the translation along the 
+     * x, y, and z axes. For the "rotation" property, the values are a 
+     * quaternion in the order (x, y, z, w), where w is the scalar. For the 
+     * "scale" property, the values are the scaling factors along the x, y, 
+     * and z axes. (required)<br> 
      * Valid values: ["translation", "rotation", "scale", "weights"] 
      * 
      */
@@ -60,7 +65,12 @@ public class AnimationChannelTarget
 
     /**
      * The name of the node's TRS property to modify, or the "weights" of the 
-     * Morph Targets it instantiates. (required)<br> 
+     * Morph Targets it instantiates. For the "translation" property, the 
+     * values that are provided by the sampler are the translation along the 
+     * x, y, and z axes. For the "rotation" property, the values are a 
+     * quaternion in the order (x, y, z, w), where w is the scalar. For the 
+     * "scale" property, the values are the scaling factors along the x, y, 
+     * and z axes. (required)<br> 
      * Valid values: ["translation", "rotation", "scale", "weights"] 
      * 
      * @param path The path to set
@@ -81,7 +91,12 @@ public class AnimationChannelTarget
 
     /**
      * The name of the node's TRS property to modify, or the "weights" of the 
-     * Morph Targets it instantiates. (required)<br> 
+     * Morph Targets it instantiates. For the "translation" property, the 
+     * values that are provided by the sampler are the translation along the 
+     * x, y, and z axes. For the "rotation" property, the values are a 
+     * quaternion in the order (x, y, z, w), where w is the scalar. For the 
+     * "scale" property, the values are the scaling factors along the x, y, 
+     * and z axes. (required)<br> 
      * Valid values: ["translation", "rotation", "scale", "weights"] 
      * 
      * @return The path

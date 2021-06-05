@@ -22,12 +22,14 @@ public class CameraOrthographic
 {
 
     /**
-     * The floating-point horizontal magnification of the view. (required) 
+     * The floating-point horizontal magnification of the view. Must not be 
+     * zero. (required) 
      * 
      */
     private Float xmag;
     /**
-     * The floating-point vertical magnification of the view. (required) 
+     * The floating-point vertical magnification of the view. Must not be 
+     * zero. (required) 
      * 
      */
     private Float ymag;
@@ -46,7 +48,8 @@ public class CameraOrthographic
     private Float znear;
 
     /**
-     * The floating-point horizontal magnification of the view. (required) 
+     * The floating-point horizontal magnification of the view. Must not be 
+     * zero. (required) 
      * 
      * @param xmag The xmag to set
      * @throws NullPointerException If the given value is <code>null</code>
@@ -60,7 +63,8 @@ public class CameraOrthographic
     }
 
     /**
-     * The floating-point horizontal magnification of the view. (required) 
+     * The floating-point horizontal magnification of the view. Must not be 
+     * zero. (required) 
      * 
      * @return The xmag
      * 
@@ -70,7 +74,8 @@ public class CameraOrthographic
     }
 
     /**
-     * The floating-point vertical magnification of the view. (required) 
+     * The floating-point vertical magnification of the view. Must not be 
+     * zero. (required) 
      * 
      * @param ymag The ymag to set
      * @throws NullPointerException If the given value is <code>null</code>
@@ -84,7 +89,8 @@ public class CameraOrthographic
     }
 
     /**
-     * The floating-point vertical magnification of the view. (required) 
+     * The floating-point vertical magnification of the view. Must not be 
+     * zero. (required) 
      * 
      * @return The ymag
      * 

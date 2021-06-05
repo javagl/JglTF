@@ -30,7 +30,7 @@ public class AnimationSampler
     /**
      * Interpolation algorithm. (optional)<br> 
      * Default: "LINEAR"<br> 
-     * Valid values: ["LINEAR", "STEP", "CATMULLROMSPLINE", "CUBICSPLINE"] 
+     * Valid values: ["LINEAR", "STEP", "CUBICSPLINE"] 
      * 
      */
     private String interpolation;
@@ -70,7 +70,7 @@ public class AnimationSampler
     /**
      * Interpolation algorithm. (optional)<br> 
      * Default: "LINEAR"<br> 
-     * Valid values: ["LINEAR", "STEP", "CATMULLROMSPLINE", "CUBICSPLINE"] 
+     * Valid values: ["LINEAR", "STEP", "CUBICSPLINE"] 
      * 
      * @param interpolation The interpolation to set
      * @throws IllegalArgumentException If the given value does not meet
@@ -82,8 +82,8 @@ public class AnimationSampler
             this.interpolation = interpolation;
             return ;
         }
-        if ((((!"LINEAR".equals(interpolation))&&(!"STEP".equals(interpolation)))&&(!"CATMULLROMSPLINE".equals(interpolation)))&&(!"CUBICSPLINE".equals(interpolation))) {
-            throw new IllegalArgumentException((("Invalid value for interpolation: "+ interpolation)+", valid: [\"LINEAR\", \"STEP\", \"CATMULLROMSPLINE\", \"CUBICSPLINE\"]"));
+        if (((!"LINEAR".equals(interpolation))&&(!"STEP".equals(interpolation)))&&(!"CUBICSPLINE".equals(interpolation))) {
+            throw new IllegalArgumentException((("Invalid value for interpolation: "+ interpolation)+", valid: [\"LINEAR\", \"STEP\", \"CUBICSPLINE\"]"));
         }
         this.interpolation = interpolation;
     }
@@ -91,7 +91,7 @@ public class AnimationSampler
     /**
      * Interpolation algorithm. (optional)<br> 
      * Default: "LINEAR"<br> 
-     * Valid values: ["LINEAR", "STEP", "CATMULLROMSPLINE", "CUBICSPLINE"] 
+     * Valid values: ["LINEAR", "STEP", "CUBICSPLINE"] 
      * 
      * @return The interpolation
      * 

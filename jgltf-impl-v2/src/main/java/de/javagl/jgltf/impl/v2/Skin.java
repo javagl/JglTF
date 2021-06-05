@@ -31,8 +31,7 @@ public class Skin
      */
     private Integer inverseBindMatrices;
     /**
-     * The index of the node used as a skeleton root. When undefined, joints 
-     * transforms resolve to scene root. (optional) 
+     * The index of the node used as a skeleton root. (optional) 
      * 
      */
     private Integer skeleton;
@@ -77,8 +76,7 @@ public class Skin
     }
 
     /**
-     * The index of the node used as a skeleton root. When undefined, joints 
-     * transforms resolve to scene root. (optional) 
+     * The index of the node used as a skeleton root. (optional) 
      * 
      * @param skeleton The skeleton to set
      * 
@@ -92,8 +90,7 @@ public class Skin
     }
 
     /**
-     * The index of the node used as a skeleton root. When undefined, joints 
-     * transforms resolve to scene root. (optional) 
+     * The index of the node used as a skeleton root. (optional) 
      * 
      * @return The skeleton
      * 

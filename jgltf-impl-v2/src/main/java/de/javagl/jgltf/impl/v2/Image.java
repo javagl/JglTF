@@ -27,7 +27,8 @@ public class Image
      */
     private String uri;
     /**
-     * The image's MIME type. (optional)<br> 
+     * The image's MIME type. Required if `bufferView` is defined. 
+     * (optional)<br> 
      * Valid values: ["image/jpeg", "image/png"] 
      * 
      */
@@ -64,7 +65,8 @@ public class Image
     }
 
     /**
-     * The image's MIME type. (optional)<br> 
+     * The image's MIME type. Required if `bufferView` is defined. 
+     * (optional)<br> 
      * Valid values: ["image/jpeg", "image/png"] 
      * 
      * @param mimeType The mimeType to set
@@ -84,7 +86,8 @@ public class Image
     }
 
     /**
-     * The image's MIME type. (optional)<br> 
+     * The image's MIME type. Required if `bufferView` is defined. 
+     * (optional)<br> 
      * Valid values: ["image/jpeg", "image/png"] 
      * 
      * @return The mimeType

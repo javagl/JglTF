@@ -28,7 +28,9 @@ public class Texture
      */
     private Integer sampler;
     /**
-     * The index of the image used by this texture. (optional) 
+     * The index of the image used by this texture. When undefined, it is 
+     * expected that an extension or other mechanism will supply an alternate 
+     * texture source, otherwise behavior is undefined. (optional) 
      * 
      */
     private Integer source;
@@ -62,7 +64,9 @@ public class Texture
     }
 
     /**
-     * The index of the image used by this texture. (optional) 
+     * The index of the image used by this texture. When undefined, it is 
+     * expected that an extension or other mechanism will supply an alternate 
+     * texture source, otherwise behavior is undefined. (optional) 
      * 
      * @param source The source to set
      * 
@@ -76,7 +80,9 @@ public class Texture
     }
 
     /**
-     * The index of the image used by this texture. (optional) 
+     * The index of the image used by this texture. When undefined, it is 
+     * expected that an extension or other mechanism will supply an alternate 
+     * texture source, otherwise behavior is undefined. (optional) 
      * 
      * @return The source
      * 
