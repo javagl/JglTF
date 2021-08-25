@@ -822,8 +822,17 @@ public final class GltfModelV2 implements GltfModel
                 }
                 else
                 {
-                    ByteBuffer bufferData = gltfAsset.getReferenceData(uri);
-                    bufferModel.setBufferData(bufferData);
+                    if (uri == null)
+                    {
+                        logger.warning("Buffer " + i + " does not have "
+                            + "a uri. Binary chunks that are not the main GLB "
+                            + "buffer are not supported.");
+                    }
+                    else
+                    {
+                        ByteBuffer bufferData = gltfAsset.getReferenceData(uri);
+                        bufferModel.setBufferData(bufferData);
+                    }
                 }
             }
         }
