@@ -3,7 +3,7 @@
  * 
  * Do not modify this class. It is automatically generated
  * with JsonModelGen (https://github.com/javagl/JsonModelGen)
- * Copyright (c) 2016 Marco Hutter - http://www.javagl.de
+ * Copyright (c) 2016-2021 Marco Hutter - http://www.javagl.de
  */
 
 package de.javagl.jgltf.impl.v2;
@@ -21,7 +21,7 @@ public class Buffer
 {
 
     /**
-     * The uri of the buffer. (optional) 
+     * The URI (or IRI) of the buffer. (optional) 
      * 
      */
     private String uri;
@@ -33,7 +33,7 @@ public class Buffer
     private Integer byteLength;
 
     /**
-     * The uri of the buffer. (optional) 
+     * The URI (or IRI) of the buffer. (optional) 
      * 
      * @param uri The uri to set
      * 
@@ -47,7 +47,7 @@ public class Buffer
     }
 
     /**
-     * The uri of the buffer. (optional) 
+     * The URI (or IRI) of the buffer. (optional) 
      * 
      * @return The uri
      * 

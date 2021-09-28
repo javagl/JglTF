@@ -3,7 +3,7 @@
  * 
  * Do not modify this class. It is automatically generated
  * with JsonModelGen (https://github.com/javagl/JsonModelGen)
- * Copyright (c) 2016 Marco Hutter - http://www.javagl.de
+ * Copyright (c) 2016-2021 Marco Hutter - http://www.javagl.de
  */
 
 package de.javagl.jgltf.impl.v2;
@@ -11,9 +11,11 @@ package de.javagl.jgltf.impl.v2;
 
 
 /**
- * Array of size `accessor.sparse.count` times number of components 
- * storing the displaced accessor attributes pointed by 
- * `accessor.sparse.indices`. 
+ * An object pointing to a buffer view containing the deviating accessor 
+ * values. The number of elements is equal to `accessor.sparse.count` 
+ * times number of components. The elements have the same component type 
+ * as the base accessor. The elements are tightly packed. Data **MUST** 
+ * be aligned following the same rules as the base accessor. 
  * 
  * Auto-generated for accessor.sparse.values.schema.json 
  * 
@@ -23,14 +25,15 @@ public class AccessorSparseValues
 {
 
     /**
-     * The index of the bufferView with sparse values. Referenced bufferView 
-     * can't have ARRAY_BUFFER or ELEMENT_ARRAY_BUFFER target. (required) 
+     * The index of the bufferView with sparse values. The referenced buffer 
+     * view **MUST NOT** have its `target` or `byteStride` properties 
+     * defined. (required) 
      * 
      */
     private Integer bufferView;
     /**
-     * The offset relative to the start of the bufferView in bytes. Must be 
-     * aligned. (optional)<br> 
+     * The offset relative to the start of the bufferView in bytes. 
+     * (optional)<br> 
      * Default: 0<br> 
      * Minimum: 0 (inclusive) 
      * 
@@ -38,8 +41,9 @@ public class AccessorSparseValues
     private Integer byteOffset;
 
     /**
-     * The index of the bufferView with sparse values. Referenced bufferView 
-     * can't have ARRAY_BUFFER or ELEMENT_ARRAY_BUFFER target. (required) 
+     * The index of the bufferView with sparse values. The referenced buffer 
+     * view **MUST NOT** have its `target` or `byteStride` properties 
+     * defined. (required) 
      * 
      * @param bufferView The bufferView to set
      * @throws NullPointerException If the given value is <code>null</code>
@@ -53,8 +57,9 @@ public class AccessorSparseValues
     }
 
     /**
-     * The index of the bufferView with sparse values. Referenced bufferView 
-     * can't have ARRAY_BUFFER or ELEMENT_ARRAY_BUFFER target. (required) 
+     * The index of the bufferView with sparse values. The referenced buffer 
+     * view **MUST NOT** have its `target` or `byteStride` properties 
+     * defined. (required) 
      * 
      * @return The bufferView
      * 
@@ -64,8 +69,8 @@ public class AccessorSparseValues
     }
 
     /**
-     * The offset relative to the start of the bufferView in bytes. Must be 
-     * aligned. (optional)<br> 
+     * The offset relative to the start of the bufferView in bytes. 
+     * (optional)<br> 
      * Default: 0<br> 
      * Minimum: 0 (inclusive) 
      * 
@@ -86,8 +91,8 @@ public class AccessorSparseValues
     }
 
     /**
-     * The offset relative to the start of the bufferView in bytes. Must be 
-     * aligned. (optional)<br> 
+     * The offset relative to the start of the bufferView in bytes. 
+     * (optional)<br> 
      * Default: 0<br> 
      * Minimum: 0 (inclusive) 
      * 

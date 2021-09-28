@@ -3,7 +3,7 @@
  * 
  * Do not modify this class. It is automatically generated
  * with JsonModelGen (https://github.com/javagl/JsonModelGen)
- * Copyright (c) 2016 Marco Hutter - http://www.javagl.de
+ * Copyright (c) 2016-2021 Marco Hutter - http://www.javagl.de
  */
 
 package de.javagl.jgltf.impl.v2;
@@ -11,10 +11,7 @@ package de.javagl.jgltf.impl.v2;
 
 
 /**
- * A typed view into a bufferView. A bufferView contains raw binary data. 
- * An accessor provides a typed view into a bufferView or a subset of a 
- * bufferView similar to how WebGL's `vertexAttribPointer()` defines an 
- * attribute in a buffer. 
+ * A typed view into a buffer view that contains raw binary data. 
  * 
  * Auto-generated for accessor.schema.json 
  * 
@@ -29,7 +26,7 @@ public class Accessor
      */
     private Integer bufferView;
     /**
-     * The offset relative to the start of the bufferView in bytes. 
+     * The offset relative to the start of the buffer view in bytes. 
      * (optional)<br> 
      * Default: 0<br> 
      * Minimum: 0 (inclusive) 
@@ -37,34 +34,33 @@ public class Accessor
      */
     private Integer byteOffset;
     /**
-     * The datatype of components in the attribute. (required)<br> 
+     * The datatype of the accessor's components. (required)<br> 
      * Valid values: [5120, 5121, 5122, 5123, 5125, 5126] 
      * 
      */
     private Integer componentType;
     /**
-     * Specifies whether integer data values should be normalized. 
+     * Specifies whether integer data values are normalized before usage. 
      * (optional)<br> 
      * Default: false 
      * 
      */
     private Boolean normalized;
     /**
-     * The number of attributes referenced by this accessor. (required)<br> 
+     * The number of elements referenced by this accessor. (required)<br> 
      * Minimum: 1 (inclusive) 
      * 
      */
     private Integer count;
     /**
-     * Specifies if the attribute is a scalar, vector, or matrix. 
-     * (required)<br> 
-     * Valid values: ["SCALAR", "VEC2", "VEC3", "VEC4", "MAT2", "MAT3", 
-     * "MAT4"] 
+     * Specifies if the accessor's elements are scalars, vectors, or 
+     * matrices. (required)<br> 
+     * Valid values: [SCALAR, VEC2, VEC3, VEC4, MAT2, MAT3, MAT4] 
      * 
      */
     private String type;
     /**
-     * Maximum value of each component in this attribute. (optional)<br> 
+     * Maximum value of each component in this accessor. (optional)<br> 
      * Minimum number of items: 1<br> 
      * Maximum number of items: 16<br> 
      * Array elements:<br> 
@@ -73,7 +69,7 @@ public class Accessor
      */
     private Number[] max;
     /**
-     * Minimum value of each component in this attribute. (optional)<br> 
+     * Minimum value of each component in this accessor. (optional)<br> 
      * Minimum number of items: 1<br> 
      * Maximum number of items: 16<br> 
      * Array elements:<br> 
@@ -82,7 +78,7 @@ public class Accessor
      */
     private Number[] min;
     /**
-     * Sparse storage of attributes that deviate from their initialization 
+     * Sparse storage of elements that deviate from their initialization 
      * value. (optional) 
      * 
      */
@@ -113,7 +109,7 @@ public class Accessor
     }
 
     /**
-     * The offset relative to the start of the bufferView in bytes. 
+     * The offset relative to the start of the buffer view in bytes. 
      * (optional)<br> 
      * Default: 0<br> 
      * Minimum: 0 (inclusive) 
@@ -135,7 +131,7 @@ public class Accessor
     }
 
     /**
-     * The offset relative to the start of the bufferView in bytes. 
+     * The offset relative to the start of the buffer view in bytes. 
      * (optional)<br> 
      * Default: 0<br> 
      * Minimum: 0 (inclusive) 
@@ -159,7 +155,7 @@ public class Accessor
     }
 
     /**
-     * The datatype of components in the attribute. (required)<br> 
+     * The datatype of the accessor's components. (required)<br> 
      * Valid values: [5120, 5121, 5122, 5123, 5125, 5126] 
      * 
      * @param componentType The componentType to set
@@ -179,7 +175,7 @@ public class Accessor
     }
 
     /**
-     * The datatype of components in the attribute. (required)<br> 
+     * The datatype of the accessor's components. (required)<br> 
      * Valid values: [5120, 5121, 5122, 5123, 5125, 5126] 
      * 
      * @return The componentType
@@ -190,7 +186,7 @@ public class Accessor
     }
 
     /**
-     * Specifies whether integer data values should be normalized. 
+     * Specifies whether integer data values are normalized before usage. 
      * (optional)<br> 
      * Default: false 
      * 
@@ -206,7 +202,7 @@ public class Accessor
     }
 
     /**
-     * Specifies whether integer data values should be normalized. 
+     * Specifies whether integer data values are normalized before usage. 
      * (optional)<br> 
      * Default: false 
      * 
@@ -229,7 +225,7 @@ public class Accessor
     }
 
     /**
-     * The number of attributes referenced by this accessor. (required)<br> 
+     * The number of elements referenced by this accessor. (required)<br> 
      * Minimum: 1 (inclusive) 
      * 
      * @param count The count to set
@@ -249,7 +245,7 @@ public class Accessor
     }
 
     /**
-     * The number of attributes referenced by this accessor. (required)<br> 
+     * The number of elements referenced by this accessor. (required)<br> 
      * Minimum: 1 (inclusive) 
      * 
      * @return The count
@@ -260,10 +256,9 @@ public class Accessor
     }
 
     /**
-     * Specifies if the attribute is a scalar, vector, or matrix. 
-     * (required)<br> 
-     * Valid values: ["SCALAR", "VEC2", "VEC3", "VEC4", "MAT2", "MAT3", 
-     * "MAT4"] 
+     * Specifies if the accessor's elements are scalars, vectors, or 
+     * matrices. (required)<br> 
+     * Valid values: [SCALAR, VEC2, VEC3, VEC4, MAT2, MAT3, MAT4] 
      * 
      * @param type The type to set
      * @throws NullPointerException If the given value is <code>null</code>
@@ -276,16 +271,15 @@ public class Accessor
             throw new NullPointerException((("Invalid value for type: "+ type)+", may not be null"));
         }
         if (((((((!"SCALAR".equals(type))&&(!"VEC2".equals(type)))&&(!"VEC3".equals(type)))&&(!"VEC4".equals(type)))&&(!"MAT2".equals(type)))&&(!"MAT3".equals(type)))&&(!"MAT4".equals(type))) {
-            throw new IllegalArgumentException((("Invalid value for type: "+ type)+", valid: [\"SCALAR\", \"VEC2\", \"VEC3\", \"VEC4\", \"MAT2\", \"MAT3\", \"MAT4\"]"));
+            throw new IllegalArgumentException((("Invalid value for type: "+ type)+", valid: [SCALAR, VEC2, VEC3, VEC4, MAT2, MAT3, MAT4]"));
         }
         this.type = type;
     }
 
     /**
-     * Specifies if the attribute is a scalar, vector, or matrix. 
-     * (required)<br> 
-     * Valid values: ["SCALAR", "VEC2", "VEC3", "VEC4", "MAT2", "MAT3", 
-     * "MAT4"] 
+     * Specifies if the accessor's elements are scalars, vectors, or 
+     * matrices. (required)<br> 
+     * Valid values: [SCALAR, VEC2, VEC3, VEC4, MAT2, MAT3, MAT4] 
      * 
      * @return The type
      * 
@@ -295,7 +289,7 @@ public class Accessor
     }
 
     /**
-     * Maximum value of each component in this attribute. (optional)<br> 
+     * Maximum value of each component in this accessor. (optional)<br> 
      * Minimum number of items: 1<br> 
      * Maximum number of items: 16<br> 
      * Array elements:<br> 
@@ -321,7 +315,7 @@ public class Accessor
     }
 
     /**
-     * Maximum value of each component in this attribute. (optional)<br> 
+     * Maximum value of each component in this accessor. (optional)<br> 
      * Minimum number of items: 1<br> 
      * Maximum number of items: 16<br> 
      * Array elements:<br> 
@@ -335,7 +329,7 @@ public class Accessor
     }
 
     /**
-     * Minimum value of each component in this attribute. (optional)<br> 
+     * Minimum value of each component in this accessor. (optional)<br> 
      * Minimum number of items: 1<br> 
      * Maximum number of items: 16<br> 
      * Array elements:<br> 
@@ -361,7 +355,7 @@ public class Accessor
     }
 
     /**
-     * Minimum value of each component in this attribute. (optional)<br> 
+     * Minimum value of each component in this accessor. (optional)<br> 
      * Minimum number of items: 1<br> 
      * Maximum number of items: 16<br> 
      * Array elements:<br> 
@@ -375,7 +369,7 @@ public class Accessor
     }
 
     /**
-     * Sparse storage of attributes that deviate from their initialization 
+     * Sparse storage of elements that deviate from their initialization 
      * value. (optional) 
      * 
      * @param sparse The sparse to set
@@ -390,7 +384,7 @@ public class Accessor
     }
 
     /**
-     * Sparse storage of attributes that deviate from their initialization 
+     * Sparse storage of elements that deviate from their initialization 
      * value. (optional) 
      * 
      * @return The sparse

@@ -3,7 +3,7 @@
  * 
  * Do not modify this class. It is automatically generated
  * with JsonModelGen (https://github.com/javagl/JsonModelGen)
- * Copyright (c) 2016 Marco Hutter - http://www.javagl.de
+ * Copyright (c) 2016-2021 Marco Hutter - http://www.javagl.de
  */
 
 package de.javagl.jgltf.impl.v2;
@@ -22,29 +22,29 @@ public class Material
 
     /**
      * A set of parameter values that are used to define the 
-     * metallic-roughness material model from Physically-Based Rendering 
-     * (PBR) methodology. When not specified, all the default values of 
-     * `pbrMetallicRoughness` apply. (optional) 
+     * metallic-roughness material model from Physically Based Rendering 
+     * (PBR) methodology. When undefined, all the default values of 
+     * `pbrMetallicRoughness` **MUST** apply. (optional) 
      * 
      */
     private MaterialPbrMetallicRoughness pbrMetallicRoughness;
     /**
-     * The normal map texture. (optional) 
+     * The tangent space normal texture. (optional) 
      * 
      */
     private MaterialNormalTextureInfo normalTexture;
     /**
-     * The occlusion map texture. (optional) 
+     * The occlusion texture. (optional) 
      * 
      */
     private MaterialOcclusionTextureInfo occlusionTexture;
     /**
-     * The emissive map texture. (optional) 
+     * The emissive texture. (optional) 
      * 
      */
     private TextureInfo emissiveTexture;
     /**
-     * The emissive color of the material. (optional)<br> 
+     * The factors for the emissive color of the material. (optional)<br> 
      * Default: [0.0,0.0,0.0]<br> 
      * Number of items: 3<br> 
      * Array elements:<br> 
@@ -57,7 +57,7 @@ public class Material
     /**
      * The alpha rendering mode of the material. (optional)<br> 
      * Default: "OPAQUE"<br> 
-     * Valid values: ["OPAQUE", "MASK", "BLEND"] 
+     * Valid values: [OPAQUE, MASK, BLEND] 
      * 
      */
     private String alphaMode;
@@ -77,9 +77,9 @@ public class Material
 
     /**
      * A set of parameter values that are used to define the 
-     * metallic-roughness material model from Physically-Based Rendering 
-     * (PBR) methodology. When not specified, all the default values of 
-     * `pbrMetallicRoughness` apply. (optional) 
+     * metallic-roughness material model from Physically Based Rendering 
+     * (PBR) methodology. When undefined, all the default values of 
+     * `pbrMetallicRoughness` **MUST** apply. (optional) 
      * 
      * @param pbrMetallicRoughness The pbrMetallicRoughness to set
      * 
@@ -94,9 +94,9 @@ public class Material
 
     /**
      * A set of parameter values that are used to define the 
-     * metallic-roughness material model from Physically-Based Rendering 
-     * (PBR) methodology. When not specified, all the default values of 
-     * `pbrMetallicRoughness` apply. (optional) 
+     * metallic-roughness material model from Physically Based Rendering 
+     * (PBR) methodology. When undefined, all the default values of 
+     * `pbrMetallicRoughness` **MUST** apply. (optional) 
      * 
      * @return The pbrMetallicRoughness
      * 
@@ -106,7 +106,7 @@ public class Material
     }
 
     /**
-     * The normal map texture. (optional) 
+     * The tangent space normal texture. (optional) 
      * 
      * @param normalTexture The normalTexture to set
      * 
@@ -120,7 +120,7 @@ public class Material
     }
 
     /**
-     * The normal map texture. (optional) 
+     * The tangent space normal texture. (optional) 
      * 
      * @return The normalTexture
      * 
@@ -130,7 +130,7 @@ public class Material
     }
 
     /**
-     * The occlusion map texture. (optional) 
+     * The occlusion texture. (optional) 
      * 
      * @param occlusionTexture The occlusionTexture to set
      * 
@@ -144,7 +144,7 @@ public class Material
     }
 
     /**
-     * The occlusion map texture. (optional) 
+     * The occlusion texture. (optional) 
      * 
      * @return The occlusionTexture
      * 
@@ -154,7 +154,7 @@ public class Material
     }
 
     /**
-     * The emissive map texture. (optional) 
+     * The emissive texture. (optional) 
      * 
      * @param emissiveTexture The emissiveTexture to set
      * 
@@ -168,7 +168,7 @@ public class Material
     }
 
     /**
-     * The emissive map texture. (optional) 
+     * The emissive texture. (optional) 
      * 
      * @return The emissiveTexture
      * 
@@ -178,7 +178,7 @@ public class Material
     }
 
     /**
-     * The emissive color of the material. (optional)<br> 
+     * The factors for the emissive color of the material. (optional)<br> 
      * Default: [0.0,0.0,0.0]<br> 
      * Number of items: 3<br> 
      * Array elements:<br> 
@@ -214,7 +214,7 @@ public class Material
     }
 
     /**
-     * The emissive color of the material. (optional)<br> 
+     * The factors for the emissive color of the material. (optional)<br> 
      * Default: [0.0,0.0,0.0]<br> 
      * Number of items: 3<br> 
      * Array elements:<br> 
@@ -243,7 +243,7 @@ public class Material
     /**
      * The alpha rendering mode of the material. (optional)<br> 
      * Default: "OPAQUE"<br> 
-     * Valid values: ["OPAQUE", "MASK", "BLEND"] 
+     * Valid values: [OPAQUE, MASK, BLEND] 
      * 
      * @param alphaMode The alphaMode to set
      * @throws IllegalArgumentException If the given value does not meet
@@ -256,7 +256,7 @@ public class Material
             return ;
         }
         if (((!"OPAQUE".equals(alphaMode))&&(!"MASK".equals(alphaMode)))&&(!"BLEND".equals(alphaMode))) {
-            throw new IllegalArgumentException((("Invalid value for alphaMode: "+ alphaMode)+", valid: [\"OPAQUE\", \"MASK\", \"BLEND\"]"));
+            throw new IllegalArgumentException((("Invalid value for alphaMode: "+ alphaMode)+", valid: [OPAQUE, MASK, BLEND]"));
         }
         this.alphaMode = alphaMode;
     }
@@ -264,7 +264,7 @@ public class Material
     /**
      * The alpha rendering mode of the material. (optional)<br> 
      * Default: "OPAQUE"<br> 
-     * Valid values: ["OPAQUE", "MASK", "BLEND"] 
+     * Valid values: [OPAQUE, MASK, BLEND] 
      * 
      * @return The alphaMode
      * 

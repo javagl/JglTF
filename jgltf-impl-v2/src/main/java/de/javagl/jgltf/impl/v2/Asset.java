@@ -3,7 +3,7 @@
  * 
  * Do not modify this class. It is automatically generated
  * with JsonModelGen (https://github.com/javagl/JsonModelGen)
- * Copyright (c) 2016 Marco Hutter - http://www.javagl.de
+ * Copyright (c) 2016-2021 Marco Hutter - http://www.javagl.de
  */
 
 package de.javagl.jgltf.impl.v2;
@@ -32,12 +32,15 @@ public class Asset
      */
     private String generator;
     /**
-     * The glTF version that this asset targets. (required) 
+     * The glTF version in the form of `<major>.<minor>` that this asset 
+     * targets. (required) 
      * 
      */
     private String version;
     /**
-     * The minimum glTF version that this asset targets. (optional) 
+     * The minimum glTF version in the form of `<major>.<minor>` that this 
+     * asset targets. This property **MUST NOT** be greater than the asset 
+     * version. (optional) 
      * 
      */
     private String minVersion;
@@ -93,7 +96,8 @@ public class Asset
     }
 
     /**
-     * The glTF version that this asset targets. (required) 
+     * The glTF version in the form of `<major>.<minor>` that this asset 
+     * targets. (required) 
      * 
      * @param version The version to set
      * @throws NullPointerException If the given value is <code>null</code>
@@ -107,7 +111,8 @@ public class Asset
     }
 
     /**
-     * The glTF version that this asset targets. (required) 
+     * The glTF version in the form of `<major>.<minor>` that this asset 
+     * targets. (required) 
      * 
      * @return The version
      * 
@@ -117,7 +122,9 @@ public class Asset
     }
 
     /**
-     * The minimum glTF version that this asset targets. (optional) 
+     * The minimum glTF version in the form of `<major>.<minor>` that this 
+     * asset targets. This property **MUST NOT** be greater than the asset 
+     * version. (optional) 
      * 
      * @param minVersion The minVersion to set
      * 
@@ -131,7 +138,9 @@ public class Asset
     }
 
     /**
-     * The minimum glTF version that this asset targets. (optional) 
+     * The minimum glTF version in the form of `<major>.<minor>` that this 
+     * asset targets. This property **MUST NOT** be greater than the asset 
+     * version. (optional) 
      * 
      * @return The minVersion
      * 

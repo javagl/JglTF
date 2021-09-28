@@ -3,7 +3,7 @@
  * 
  * Do not modify this class. It is automatically generated
  * with JsonModelGen (https://github.com/javagl/JsonModelGen)
- * Copyright (c) 2016 Marco Hutter - http://www.javagl.de
+ * Copyright (c) 2016-2021 Marco Hutter - http://www.javagl.de
  */
 
 package de.javagl.jgltf.impl.v2;
@@ -46,7 +46,8 @@ public class BufferView
      */
     private Integer byteStride;
     /**
-     * The target that the GPU buffer should be bound to. (optional)<br> 
+     * The hint representing the intended GPU buffer type to use with this 
+     * buffer view. (optional)<br> 
      * Valid values: [34962, 34963] 
      * 
      */
@@ -188,7 +189,8 @@ public class BufferView
     }
 
     /**
-     * The target that the GPU buffer should be bound to. (optional)<br> 
+     * The hint representing the intended GPU buffer type to use with this 
+     * buffer view. (optional)<br> 
      * Valid values: [34962, 34963] 
      * 
      * @param target The target to set
@@ -208,7 +210,8 @@ public class BufferView
     }
 
     /**
-     * The target that the GPU buffer should be bound to. (optional)<br> 
+     * The hint representing the intended GPU buffer type to use with this 
+     * buffer view. (optional)<br> 
      * Valid values: [34962, 34963] 
      * 
      * @return The target

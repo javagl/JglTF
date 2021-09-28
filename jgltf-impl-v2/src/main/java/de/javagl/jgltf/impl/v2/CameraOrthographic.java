@@ -3,7 +3,7 @@
  * 
  * Do not modify this class. It is automatically generated
  * with JsonModelGen (https://github.com/javagl/JsonModelGen)
- * Copyright (c) 2016 Marco Hutter - http://www.javagl.de
+ * Copyright (c) 2016-2021 Marco Hutter - http://www.javagl.de
  */
 
 package de.javagl.jgltf.impl.v2;
@@ -22,20 +22,23 @@ public class CameraOrthographic
 {
 
     /**
-     * The floating-point horizontal magnification of the view. Must not be 
-     * zero. (required) 
+     * The floating-point horizontal magnification of the view. This value 
+     * **MUST NOT** be equal to zero. This value **SHOULD NOT** be negative. 
+     * (required) 
      * 
      */
     private Float xmag;
     /**
-     * The floating-point vertical magnification of the view. Must not be 
-     * zero. (required) 
+     * The floating-point vertical magnification of the view. This value 
+     * **MUST NOT** be equal to zero. This value **SHOULD NOT** be negative. 
+     * (required) 
      * 
      */
     private Float ymag;
     /**
-     * The floating-point distance to the far clipping plane. `zfar` must be 
-     * greater than `znear`. (required)<br> 
+     * The floating-point distance to the far clipping plane. This value 
+     * **MUST NOT** be equal to zero. `zfar` **MUST** be greater than 
+     * `znear`. (required)<br> 
      * Minimum: 0.0 (exclusive) 
      * 
      */
@@ -48,8 +51,9 @@ public class CameraOrthographic
     private Float znear;
 
     /**
-     * The floating-point horizontal magnification of the view. Must not be 
-     * zero. (required) 
+     * The floating-point horizontal magnification of the view. This value 
+     * **MUST NOT** be equal to zero. This value **SHOULD NOT** be negative. 
+     * (required) 
      * 
      * @param xmag The xmag to set
      * @throws NullPointerException If the given value is <code>null</code>
@@ -63,8 +67,9 @@ public class CameraOrthographic
     }
 
     /**
-     * The floating-point horizontal magnification of the view. Must not be 
-     * zero. (required) 
+     * The floating-point horizontal magnification of the view. This value 
+     * **MUST NOT** be equal to zero. This value **SHOULD NOT** be negative. 
+     * (required) 
      * 
      * @return The xmag
      * 
@@ -74,8 +79,9 @@ public class CameraOrthographic
     }
 
     /**
-     * The floating-point vertical magnification of the view. Must not be 
-     * zero. (required) 
+     * The floating-point vertical magnification of the view. This value 
+     * **MUST NOT** be equal to zero. This value **SHOULD NOT** be negative. 
+     * (required) 
      * 
      * @param ymag The ymag to set
      * @throws NullPointerException If the given value is <code>null</code>
@@ -89,8 +95,9 @@ public class CameraOrthographic
     }
 
     /**
-     * The floating-point vertical magnification of the view. Must not be 
-     * zero. (required) 
+     * The floating-point vertical magnification of the view. This value 
+     * **MUST NOT** be equal to zero. This value **SHOULD NOT** be negative. 
+     * (required) 
      * 
      * @return The ymag
      * 
@@ -100,8 +107,9 @@ public class CameraOrthographic
     }
 
     /**
-     * The floating-point distance to the far clipping plane. `zfar` must be 
-     * greater than `znear`. (required)<br> 
+     * The floating-point distance to the far clipping plane. This value 
+     * **MUST NOT** be equal to zero. `zfar` **MUST** be greater than 
+     * `znear`. (required)<br> 
      * Minimum: 0.0 (exclusive) 
      * 
      * @param zfar The zfar to set
@@ -121,8 +129,9 @@ public class CameraOrthographic
     }
 
     /**
-     * The floating-point distance to the far clipping plane. `zfar` must be 
-     * greater than `znear`. (required)<br> 
+     * The floating-point distance to the far clipping plane. This value 
+     * **MUST NOT** be equal to zero. `zfar` **MUST** be greater than 
+     * `znear`. (required)<br> 
      * Minimum: 0.0 (exclusive) 
      * 
      * @return The zfar

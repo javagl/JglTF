@@ -3,7 +3,7 @@
  * 
  * Do not modify this class. It is automatically generated
  * with JsonModelGen (https://github.com/javagl/JsonModelGen)
- * Copyright (c) 2016 Marco Hutter - http://www.javagl.de
+ * Copyright (c) 2016-2021 Marco Hutter - http://www.javagl.de
  */
 
 package de.javagl.jgltf.impl.v2;
@@ -23,9 +23,9 @@ public class Animation
 {
 
     /**
-     * An array of channels, each of which targets an animation's sampler at 
-     * a node's property. Different channels of the same animation can't have 
-     * equal targets. (required)<br> 
+     * An array of animation channels, each of which targets an animation's 
+     * sampler at a node's property. Different channels of the same animation 
+     * **MUST NOT** have the same targets. (required)<br> 
      * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;Targets an animation's sampler at a node's property. 
@@ -34,9 +34,9 @@ public class Animation
      */
     private List<AnimationChannel> channels;
     /**
-     * An array of samplers that combines input and output accessors with an 
-     * interpolation algorithm to define a keyframe graph (but not its 
-     * target). (required)<br> 
+     * An array of animation samplers that combines input and output 
+     * accessors with an interpolation algorithm to define a keyframe graph 
+     * (but not its target). (required)<br> 
      * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;Combines input and output accessors with an interpolation 
@@ -46,9 +46,9 @@ public class Animation
     private List<AnimationSampler> samplers;
 
     /**
-     * An array of channels, each of which targets an animation's sampler at 
-     * a node's property. Different channels of the same animation can't have 
-     * equal targets. (required)<br> 
+     * An array of animation channels, each of which targets an animation's 
+     * sampler at a node's property. Different channels of the same animation 
+     * **MUST NOT** have the same targets. (required)<br> 
      * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;Targets an animation's sampler at a node's property. 
@@ -71,9 +71,9 @@ public class Animation
     }
 
     /**
-     * An array of channels, each of which targets an animation's sampler at 
-     * a node's property. Different channels of the same animation can't have 
-     * equal targets. (required)<br> 
+     * An array of animation channels, each of which targets an animation's 
+     * sampler at a node's property. Different channels of the same animation 
+     * **MUST NOT** have the same targets. (required)<br> 
      * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;Targets an animation's sampler at a node's property. 
@@ -131,9 +131,9 @@ public class Animation
     }
 
     /**
-     * An array of samplers that combines input and output accessors with an 
-     * interpolation algorithm to define a keyframe graph (but not its 
-     * target). (required)<br> 
+     * An array of animation samplers that combines input and output 
+     * accessors with an interpolation algorithm to define a keyframe graph 
+     * (but not its target). (required)<br> 
      * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;Combines input and output accessors with an interpolation 
@@ -156,9 +156,9 @@ public class Animation
     }
 
     /**
-     * An array of samplers that combines input and output accessors with an 
-     * interpolation algorithm to define a keyframe graph (but not its 
-     * target). (required)<br> 
+     * An array of animation samplers that combines input and output 
+     * accessors with an interpolation algorithm to define a keyframe graph 
+     * (but not its target). (required)<br> 
      * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;Combines input and output accessors with an interpolation 

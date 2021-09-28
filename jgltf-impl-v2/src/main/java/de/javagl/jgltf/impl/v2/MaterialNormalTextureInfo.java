@@ -3,7 +3,7 @@
  * 
  * Do not modify this class. It is automatically generated
  * with JsonModelGen (https://github.com/javagl/JsonModelGen)
- * Copyright (c) 2016 Marco Hutter - http://www.javagl.de
+ * Copyright (c) 2016-2021 Marco Hutter - http://www.javagl.de
  */
 
 package de.javagl.jgltf.impl.v2;
@@ -19,7 +19,7 @@ public class MaterialNormalTextureInfo
 {
 
     /**
-     * The scalar multiplier applied to each normal vector of the normal 
+     * The scalar parameter applied to each normal vector of the normal 
      * texture. (optional)<br> 
      * Default: 1.0 
      * 
@@ -27,7 +27,7 @@ public class MaterialNormalTextureInfo
     private Float scale;
 
     /**
-     * The scalar multiplier applied to each normal vector of the normal 
+     * The scalar parameter applied to each normal vector of the normal 
      * texture. (optional)<br> 
      * Default: 1.0 
      * 
@@ -43,7 +43,7 @@ public class MaterialNormalTextureInfo
     }
 
     /**
-     * The scalar multiplier applied to each normal vector of the normal 
+     * The scalar parameter applied to each normal vector of the normal 
      * texture. (optional)<br> 
      * Default: 1.0 
      * 

@@ -3,7 +3,7 @@
  * 
  * Do not modify this class. It is automatically generated
  * with JsonModelGen (https://github.com/javagl/JsonModelGen)
- * Copyright (c) 2016 Marco Hutter - http://www.javagl.de
+ * Copyright (c) 2016-2021 Marco Hutter - http://www.javagl.de
  */
 
 package de.javagl.jgltf.impl.v2;
@@ -30,7 +30,7 @@ public class AnimationSampler
     /**
      * Interpolation algorithm. (optional)<br> 
      * Default: "LINEAR"<br> 
-     * Valid values: ["LINEAR", "STEP", "CUBICSPLINE"] 
+     * Valid values: [LINEAR, STEP, CUBICSPLINE] 
      * 
      */
     private String interpolation;
@@ -70,7 +70,7 @@ public class AnimationSampler
     /**
      * Interpolation algorithm. (optional)<br> 
      * Default: "LINEAR"<br> 
-     * Valid values: ["LINEAR", "STEP", "CUBICSPLINE"] 
+     * Valid values: [LINEAR, STEP, CUBICSPLINE] 
      * 
      * @param interpolation The interpolation to set
      * @throws IllegalArgumentException If the given value does not meet
@@ -83,7 +83,7 @@ public class AnimationSampler
             return ;
         }
         if (((!"LINEAR".equals(interpolation))&&(!"STEP".equals(interpolation)))&&(!"CUBICSPLINE".equals(interpolation))) {
-            throw new IllegalArgumentException((("Invalid value for interpolation: "+ interpolation)+", valid: [\"LINEAR\", \"STEP\", \"CUBICSPLINE\"]"));
+            throw new IllegalArgumentException((("Invalid value for interpolation: "+ interpolation)+", valid: [LINEAR, STEP, CUBICSPLINE]"));
         }
         this.interpolation = interpolation;
     }
@@ -91,7 +91,7 @@ public class AnimationSampler
     /**
      * Interpolation algorithm. (optional)<br> 
      * Default: "LINEAR"<br> 
-     * Valid values: ["LINEAR", "STEP", "CUBICSPLINE"] 
+     * Valid values: [LINEAR, STEP, CUBICSPLINE] 
      * 
      * @return The interpolation
      * 
