@@ -70,17 +70,12 @@ public class Image
      * Valid values: [image/jpeg, image/png] 
      * 
      * @param mimeType The mimeType to set
-     * @throws IllegalArgumentException If the given value does not meet
-     * the given constraints
      * 
      */
     public void setMimeType(String mimeType) {
         if (mimeType == null) {
             this.mimeType = mimeType;
             return ;
-        }
-        if ((!"image/jpeg".equals(mimeType))&&(!"image/png".equals(mimeType))) {
-            throw new IllegalArgumentException((("Invalid value for mimeType: "+ mimeType)+", valid: [image/jpeg, image/png]"));
         }
         this.mimeType = mimeType;
     }

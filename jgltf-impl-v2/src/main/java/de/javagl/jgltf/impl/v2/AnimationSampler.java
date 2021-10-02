@@ -11,8 +11,8 @@ package de.javagl.jgltf.impl.v2;
 
 
 /**
- * Combines input and output accessors with an interpolation algorithm to 
- * define a keyframe graph (but not its target). 
+ * An animation sampler combines timestamps with a sequence of output 
+ * values and defines an interpolation algorithm. 
  * 
  * Auto-generated for animation.sampler.schema.json 
  * 
@@ -22,8 +22,7 @@ public class AnimationSampler
 {
 
     /**
-     * The index of an accessor containing keyframe input values, e.g., time. 
-     * (required) 
+     * The index of an accessor containing keyframe timestamps. (required) 
      * 
      */
     private Integer input;
@@ -42,8 +41,7 @@ public class AnimationSampler
     private Integer output;
 
     /**
-     * The index of an accessor containing keyframe input values, e.g., time. 
-     * (required) 
+     * The index of an accessor containing keyframe timestamps. (required) 
      * 
      * @param input The input to set
      * @throws NullPointerException If the given value is <code>null</code>
@@ -57,8 +55,7 @@ public class AnimationSampler
     }
 
     /**
-     * The index of an accessor containing keyframe input values, e.g., time. 
-     * (required) 
+     * The index of an accessor containing keyframe timestamps. (required) 
      * 
      * @return The input
      * 
