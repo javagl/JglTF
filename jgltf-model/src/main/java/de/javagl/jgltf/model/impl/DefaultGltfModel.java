@@ -48,7 +48,7 @@ import de.javagl.jgltf.model.TextureModel;
 /**
  * Default implementation of a {@link GltfModel}.<br>
  */
-public class DefaultGltfModel implements GltfModel
+public class DefaultGltfModel extends AbstractModelElement implements GltfModel
 {
     /**
      * The {@link AccessorModel} instances

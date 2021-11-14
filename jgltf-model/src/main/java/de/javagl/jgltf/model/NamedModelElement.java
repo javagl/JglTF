@@ -31,7 +31,7 @@ package de.javagl.jgltf.model;
  * This is the name that was given to the <code>GlTFChildOfRootProperty</code>
  * of the original glTF asset.
  */
-public interface NamedModelElement
+public interface NamedModelElement extends ModelElement
 {
     /**
      * Returns the name of this element, or <code>null</code> if this element

@@ -104,64 +104,15 @@ class CesiumRtcUtils
      */
     static float[] extractRtcCenterFromModel(GltfModel gltfModel)
     {
-        // TODO MODEL_CREATION This has not been updated yet for
-        // the model-creation branch
-//        if (gltfModel instanceof GltfModelV1)
-//        {
-//            GltfModelV1 gltfModelV1 = (GltfModelV1) gltfModel;
-//            Object gltf = gltfModelV1.getGltf();
-//            float[] rtcCenter = extractRtcCenterFromGltf(gltf);
-//            return rtcCenter;
-//        }
-//        if (gltfModel instanceof GltfModelV2)
-//        {
-//            GltfModelV2 gltfModelV2 = (GltfModelV2) gltfModel;
-//            Object gltf = gltfModelV2.getGltf();
-//            return extractRtcCenterFromGltf(gltf);
-//        }
-        logger.warning("Unknown GltfModel version: " + gltfModel.getClass());
-        return null;
+        Map<String, Object> extensions = gltfModel.getExtensions();
+        if (extensions == null) 
+        {
+            return null;
+        }
+        Object rtcExtension = extensions.get("CESIUM_RTC");
+        return extractRtcCenterFromExtensionObbject(rtcExtension);
     }
 
-    /**
-     * Extract the 3D float array from the given glTF that is stored
-     * as the <code>"center"</code> property in the <code>"CESIUM_RTC"</code>
-     * extension. If no such property is found, then <code>null</code> is
-     * returned.
-     * 
-     * @param gltf The glTF object
-     * @return The RTC center
-     */
-    private static float[] extractRtcCenterFromGltf(Object gltf)
-    {
-        if (gltf instanceof de.javagl.jgltf.impl.v1.GlTF)
-        {
-            de.javagl.jgltf.impl.v1.GlTF gltfV1 = 
-                (de.javagl.jgltf.impl.v1.GlTF) gltf;
-            Map<String, Object> extensions = gltfV1.getExtensions();
-            if (extensions == null) 
-            {
-                return null;
-            }
-            Object rtcExtension = extensions.get("CESIUM_RTC");
-            return extractRtcCenterFromExtensionObbject(rtcExtension);
-        }
-        if (gltf instanceof de.javagl.jgltf.impl.v2.GlTF)
-        {
-            de.javagl.jgltf.impl.v2.GlTF gltfV2 = 
-                (de.javagl.jgltf.impl.v2.GlTF) gltf;
-            Map<String, Object> extensions = gltfV2.getExtensions();
-            if (extensions == null) 
-            {
-                return null;
-            }
-            Object rtcExtension = extensions.get("CESIUM_RTC");
-            return extractRtcCenterFromExtensionObbject(rtcExtension);
-        }
-        logger.warning("Unknown Gltf version: " + gltf.getClass());
-        return null;
-    }
-    
     /**
      * Extract the 3D float array from the given <code>"CESIUM_RTC"</code>
      * extension object. This will be an array containing the numbers that

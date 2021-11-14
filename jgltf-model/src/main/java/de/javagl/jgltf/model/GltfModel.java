@@ -31,7 +31,7 @@ import java.util.List;
 /**
  * Interface for a model that was created from a glTF asset
  */
-public interface GltfModel
+public interface GltfModel extends ModelElement
 {
     /**
      * Returns an unmodifiable view on the list of {@link AccessorModel} 
