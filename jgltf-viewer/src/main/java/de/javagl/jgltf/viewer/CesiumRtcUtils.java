@@ -34,8 +34,6 @@ import java.util.logging.Logger;
 
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.NodeModel;
-import de.javagl.jgltf.model.v1.GltfModelV1;
-import de.javagl.jgltf.model.v2.GltfModelV2;
 
 /**
  * Internal utility methods for handling the CESIUM_RTC extension
@@ -106,19 +104,21 @@ class CesiumRtcUtils
      */
     static float[] extractRtcCenterFromModel(GltfModel gltfModel)
     {
-        if (gltfModel instanceof GltfModelV1)
-        {
-            GltfModelV1 gltfModelV1 = (GltfModelV1) gltfModel;
-            Object gltf = gltfModelV1.getGltf();
-            float[] rtcCenter = extractRtcCenterFromGltf(gltf);
-            return rtcCenter;
-        }
-        if (gltfModel instanceof GltfModelV2)
-        {
-            GltfModelV2 gltfModelV2 = (GltfModelV2) gltfModel;
-            Object gltf = gltfModelV2.getGltf();
-            return extractRtcCenterFromGltf(gltf);
-        }
+        // TODO MODEL_CREATION This has not been updated yet for
+        // the model-creation branch
+//        if (gltfModel instanceof GltfModelV1)
+//        {
+//            GltfModelV1 gltfModelV1 = (GltfModelV1) gltfModel;
+//            Object gltf = gltfModelV1.getGltf();
+//            float[] rtcCenter = extractRtcCenterFromGltf(gltf);
+//            return rtcCenter;
+//        }
+//        if (gltfModel instanceof GltfModelV2)
+//        {
+//            GltfModelV2 gltfModelV2 = (GltfModelV2) gltfModel;
+//            Object gltf = gltfModelV2.getGltf();
+//            return extractRtcCenterFromGltf(gltf);
+//        }
         logger.warning("Unknown GltfModel version: " + gltfModel.getClass());
         return null;
     }
