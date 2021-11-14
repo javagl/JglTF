@@ -3,7 +3,7 @@
  * 
  * Do not modify this class. It is automatically generated
  * with JsonModelGen (https://github.com/javagl/JsonModelGen)
- * Copyright (c) 2016 Marco Hutter - http://www.javagl.de
+ * Copyright (c) 2016-2021 Marco Hutter - http://www.javagl.de
  */
 
 package de.javagl.jgltf.impl.v2;
@@ -23,36 +23,38 @@ public class Animation
 {
 
     /**
-     * An array of channels, each of which targets an animation's sampler at 
-     * a node's property. Different channels of the same animation can't have 
-     * equal targets. (required)<br> 
+     * An array of animation channels. An animation channel combines an 
+     * animation sampler with a target property being animated. Different 
+     * channels of the same animation **MUST NOT** have the same targets. 
+     * (required)<br> 
      * Minimum number of items: 1<br> 
      * Array elements:<br> 
-     * &nbsp;&nbsp;Targets an animation's sampler at a node's property. 
-     * (optional) 
+     * &nbsp;&nbsp;An animation channel combines an animation sampler with a 
+     * target property being animated. (optional) 
      * 
      */
     private List<AnimationChannel> channels;
     /**
-     * An array of samplers that combines input and output accessors with an 
-     * interpolation algorithm to define a keyframe graph (but not its 
-     * target). (required)<br> 
+     * An array of animation samplers. An animation sampler combines 
+     * timestamps with a sequence of output values and defines an 
+     * interpolation algorithm. (required)<br> 
      * Minimum number of items: 1<br> 
      * Array elements:<br> 
-     * &nbsp;&nbsp;Combines input and output accessors with an interpolation 
-     * algorithm to define a keyframe graph (but not its target). (optional) 
+     * &nbsp;&nbsp;An animation sampler combines timestamps with a sequence 
+     * of output values and defines an interpolation algorithm. (optional) 
      * 
      */
     private List<AnimationSampler> samplers;
 
     /**
-     * An array of channels, each of which targets an animation's sampler at 
-     * a node's property. Different channels of the same animation can't have 
-     * equal targets. (required)<br> 
+     * An array of animation channels. An animation channel combines an 
+     * animation sampler with a target property being animated. Different 
+     * channels of the same animation **MUST NOT** have the same targets. 
+     * (required)<br> 
      * Minimum number of items: 1<br> 
      * Array elements:<br> 
-     * &nbsp;&nbsp;Targets an animation's sampler at a node's property. 
-     * (optional) 
+     * &nbsp;&nbsp;An animation channel combines an animation sampler with a 
+     * target property being animated. (optional) 
      * 
      * @param channels The channels to set
      * @throws NullPointerException If the given value is <code>null</code>
@@ -71,13 +73,14 @@ public class Animation
     }
 
     /**
-     * An array of channels, each of which targets an animation's sampler at 
-     * a node's property. Different channels of the same animation can't have 
-     * equal targets. (required)<br> 
+     * An array of animation channels. An animation channel combines an 
+     * animation sampler with a target property being animated. Different 
+     * channels of the same animation **MUST NOT** have the same targets. 
+     * (required)<br> 
      * Minimum number of items: 1<br> 
      * Array elements:<br> 
-     * &nbsp;&nbsp;Targets an animation's sampler at a node's property. 
-     * (optional) 
+     * &nbsp;&nbsp;An animation channel combines an animation sampler with a 
+     * target property being animated. (optional) 
      * 
      * @return The channels
      * 
@@ -131,13 +134,13 @@ public class Animation
     }
 
     /**
-     * An array of samplers that combines input and output accessors with an 
-     * interpolation algorithm to define a keyframe graph (but not its 
-     * target). (required)<br> 
+     * An array of animation samplers. An animation sampler combines 
+     * timestamps with a sequence of output values and defines an 
+     * interpolation algorithm. (required)<br> 
      * Minimum number of items: 1<br> 
      * Array elements:<br> 
-     * &nbsp;&nbsp;Combines input and output accessors with an interpolation 
-     * algorithm to define a keyframe graph (but not its target). (optional) 
+     * &nbsp;&nbsp;An animation sampler combines timestamps with a sequence 
+     * of output values and defines an interpolation algorithm. (optional) 
      * 
      * @param samplers The samplers to set
      * @throws NullPointerException If the given value is <code>null</code>
@@ -156,13 +159,13 @@ public class Animation
     }
 
     /**
-     * An array of samplers that combines input and output accessors with an 
-     * interpolation algorithm to define a keyframe graph (but not its 
-     * target). (required)<br> 
+     * An array of animation samplers. An animation sampler combines 
+     * timestamps with a sequence of output values and defines an 
+     * interpolation algorithm. (required)<br> 
      * Minimum number of items: 1<br> 
      * Array elements:<br> 
-     * &nbsp;&nbsp;Combines input and output accessors with an interpolation 
-     * algorithm to define a keyframe graph (but not its target). (optional) 
+     * &nbsp;&nbsp;An animation sampler combines timestamps with a sequence 
+     * of output values and defines an interpolation algorithm. (optional) 
      * 
      * @return The samplers
      * 

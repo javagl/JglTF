@@ -26,7 +26,6 @@
  */
 package de.javagl.jgltf.viewer;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -34,18 +33,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import de.javagl.jgltf.impl.v2.BufferView;
 import de.javagl.jgltf.model.AccessorData;
 import de.javagl.jgltf.model.AccessorFloatData;
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.BufferViewModel;
-import de.javagl.jgltf.model.ElementType;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
-import de.javagl.jgltf.model.impl.DefaultAccessorModel;
-import de.javagl.jgltf.model.impl.DefaultBufferModel;
-import de.javagl.jgltf.model.impl.DefaultBufferViewModel;
-import de.javagl.jgltf.model.io.Buffers;
 
 /**
  * Utility methods and classes related to morphing.
@@ -254,7 +247,7 @@ class Morphing
         }
         
         AccessorModel instantiatedAccessorModel =
-            instantiate(baseAccessorModel, 
+            AccessorModelCreation.instantiate(baseAccessorModel, 
                 "buffer_for_morphed_attribute_" + semantic + ".bin");
         return new MorphableAttribute(instantiatedAccessorModel,
             baseAccessorModel, targetAccessorFloatDatas);
@@ -303,120 +296,6 @@ class Morphing
     }
 
 
-    /**
-     * Create a new {@link AccessorModel} that describes the same data as
-     * the given {@link AccessorModel}, but in a compact form. The returned
-     * {@link AccessorModel} will refer to a newly created 
-     * {@link BufferViewModel} and a newly created {@link BufferModel} that
-     * contain exactly the data for the accessor.<br>
-     * <br>
-     * The given {@link AccessorModel} is assumed to have a <code>float</code>
-     * component type.
-     * 
-     * @param accessorModel The {@link AccessorModel}
-     * @param bufferUriString The URI string for the {@link BufferModel}
-     * @return The new {@link AccessorModel} instance.
-     */
-    private static AccessorModel instantiate(
-        AccessorModel accessorModel, String bufferUriString)
-    {
-        AccessorModel instantiatedAccessorModel = createAccessorModel(
-            accessorModel.getComponentType(), accessorModel.getCount(),
-            accessorModel.getElementType(), bufferUriString);
-
-        AccessorData accessorData = accessorModel.getAccessorData();
-        AccessorFloatData accessorFloatData = (AccessorFloatData)accessorData;
-        
-        AccessorData instantiatedAccessorData =
-            instantiatedAccessorModel.getAccessorData();
-        AccessorFloatData instantiatedAccessorFloatData =
-            (AccessorFloatData)instantiatedAccessorData;
-
-        setElements(instantiatedAccessorFloatData, accessorFloatData);
-
-        return instantiatedAccessorModel;
-    }
-
-    /**
-     * Creates a new {@link AccessorModel} from the given parameters. It will
-     * refer to a newly created {@link BufferViewModel}, which in turn refers to
-     * a newly created {@link BufferModel}, each containing exactly the data
-     * required for the accessor.
-     * 
-     * @param componentType The component type
-     * @param count The count
-     * @param elementType The element type
-     * @param bufferUriString The URI string for the {@link BufferModel}
-     * @return The {@link AccessorModel}
-     */
-    private static AccessorModel createAccessorModel(int componentType,
-        int count, ElementType elementType, String bufferUriString)
-    {
-        DefaultAccessorModel accessorModel =
-            new DefaultAccessorModel(componentType, count, elementType);
-        int elementSize = accessorModel.getElementSizeInBytes();
-        accessorModel.setByteOffset(0);
-        accessorModel.setByteStride(elementSize);
-        ByteBuffer bufferData = Buffers.create(count * elementSize);
-        accessorModel.setBufferViewModel(
-            createBufferViewModel(bufferUriString, bufferData));
-        return accessorModel;
-    }
-
-    /**
-     * Create a new {@link BufferViewModel} with an associated
-     * {@link BufferModel} that serves as the basis for a sparse accessor, or 
-     * an accessor that does not refer to a {@link BufferView})
-     * 
-     * @param uriString The URI string that will be assigned to the
-     * {@link BufferModel} that is created internally. This string is not
-     * strictly required, but helpful for debugging, at least
-     * @param bufferData The buffer data
-     * @return The new {@link BufferViewModel}
-     */
-    private static BufferViewModel createBufferViewModel(
-        String uriString, ByteBuffer bufferData)
-    {
-        DefaultBufferModel bufferModel = new DefaultBufferModel();
-        bufferModel.setUri(uriString);
-        bufferModel.setBufferData(bufferData);
-
-        DefaultBufferViewModel bufferViewModel =
-            new DefaultBufferViewModel(null);
-        bufferViewModel.setByteOffset(0);
-        bufferViewModel.setByteLength(bufferData.capacity());
-        bufferViewModel.setBufferModel(bufferModel);
-
-        return bufferViewModel;
-    }
-    
-    /**
-     * Set the values of the given target {@link AccessorData} to the same
-     * values as in the given source {@link AccessorData}. If either of
-     * them has fewer elements (or fewer components per element) than the
-     * other, then the minimum of both will be used, respectively.
-     * 
-     * @param target The target {@link AccessorData}
-     * @param source The source {@link AccessorData}
-     */
-    private static void setElements(
-        AccessorFloatData target,
-        AccessorFloatData source)
-    {
-        int numElements =
-            Math.min(target.getNumElements(), source.getNumElements());
-        int numComponents = Math.min(
-            target.getNumComponentsPerElement(),
-            source.getNumComponentsPerElement());
-        for (int e = 0; e < numElements; e++)
-        {
-            for (int c = 0; c < numComponents; c++)
-            {
-                float value = source.get(e, c);
-                target.set(e, c, value);
-            }
-        }
-    }
     
     /**
      * Private constructor to prevent instantiation

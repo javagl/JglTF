@@ -3,7 +3,7 @@
  * 
  * Do not modify this class. It is automatically generated
  * with JsonModelGen (https://github.com/javagl/JsonModelGen)
- * Copyright (c) 2016 Marco Hutter - http://www.javagl.de
+ * Copyright (c) 2016-2021 Marco Hutter - http://www.javagl.de
  */
 
 package de.javagl.jgltf.impl.v2;
@@ -11,8 +11,8 @@ package de.javagl.jgltf.impl.v2;
 
 
 /**
- * Sparse storage of attributes that deviate from their initialization 
- * value. 
+ * Sparse storage of accessor values that deviate from their 
+ * initialization value. 
  * 
  * Auto-generated for accessor.sparse.schema.json 
  * 
@@ -22,29 +22,29 @@ public class AccessorSparse
 {
 
     /**
-     * Number of entries stored in the sparse array. (required)<br> 
+     * Number of deviating accessor values stored in the sparse array. 
+     * (required)<br> 
      * Minimum: 1 (inclusive) 
      * 
      */
     private Integer count;
     /**
-     * Index array of size `count` that points to those accessor attributes 
-     * that deviate from their initialization value. Indices must strictly 
-     * increase. (required) 
+     * An object pointing to a buffer view containing the indices of 
+     * deviating accessor values. The number of indices is equal to `count`. 
+     * Indices **MUST** strictly increase. (required) 
      * 
      */
     private AccessorSparseIndices indices;
     /**
-     * Array of size `count` times number of components, storing the 
-     * displaced accessor attributes pointed by `indices`. Substituted values 
-     * must have the same `componentType` and number of components as the 
-     * base accessor. (required) 
+     * An object pointing to a buffer view containing the deviating accessor 
+     * values. (required) 
      * 
      */
     private AccessorSparseValues values;
 
     /**
-     * Number of entries stored in the sparse array. (required)<br> 
+     * Number of deviating accessor values stored in the sparse array. 
+     * (required)<br> 
      * Minimum: 1 (inclusive) 
      * 
      * @param count The count to set
@@ -64,7 +64,8 @@ public class AccessorSparse
     }
 
     /**
-     * Number of entries stored in the sparse array. (required)<br> 
+     * Number of deviating accessor values stored in the sparse array. 
+     * (required)<br> 
      * Minimum: 1 (inclusive) 
      * 
      * @return The count
@@ -75,9 +76,9 @@ public class AccessorSparse
     }
 
     /**
-     * Index array of size `count` that points to those accessor attributes 
-     * that deviate from their initialization value. Indices must strictly 
-     * increase. (required) 
+     * An object pointing to a buffer view containing the indices of 
+     * deviating accessor values. The number of indices is equal to `count`. 
+     * Indices **MUST** strictly increase. (required) 
      * 
      * @param indices The indices to set
      * @throws NullPointerException If the given value is <code>null</code>
@@ -91,9 +92,9 @@ public class AccessorSparse
     }
 
     /**
-     * Index array of size `count` that points to those accessor attributes 
-     * that deviate from their initialization value. Indices must strictly 
-     * increase. (required) 
+     * An object pointing to a buffer view containing the indices of 
+     * deviating accessor values. The number of indices is equal to `count`. 
+     * Indices **MUST** strictly increase. (required) 
      * 
      * @return The indices
      * 
@@ -103,10 +104,8 @@ public class AccessorSparse
     }
 
     /**
-     * Array of size `count` times number of components, storing the 
-     * displaced accessor attributes pointed by `indices`. Substituted values 
-     * must have the same `componentType` and number of components as the 
-     * base accessor. (required) 
+     * An object pointing to a buffer view containing the deviating accessor 
+     * values. (required) 
      * 
      * @param values The values to set
      * @throws NullPointerException If the given value is <code>null</code>
@@ -120,10 +119,8 @@ public class AccessorSparse
     }
 
     /**
-     * Array of size `count` times number of components, storing the 
-     * displaced accessor attributes pointed by `indices`. Substituted values 
-     * must have the same `componentType` and number of components as the 
-     * base accessor. (required) 
+     * An object pointing to a buffer view containing the deviating accessor 
+     * values. (required) 
      * 
      * @return The values
      * 

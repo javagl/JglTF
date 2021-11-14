@@ -3,7 +3,7 @@
  * 
  * Do not modify this class. It is automatically generated
  * with JsonModelGen (https://github.com/javagl/JsonModelGen)
- * Copyright (c) 2016 Marco Hutter - http://www.javagl.de
+ * Copyright (c) 2016-2021 Marco Hutter - http://www.javagl.de
  */
 
 package de.javagl.jgltf.impl.v2;
@@ -14,15 +14,15 @@ import java.util.List;
 
 /**
  * A node in the node hierarchy. When the node contains `skin`, all 
- * `mesh.primitives` must contain `JOINTS_0` and `WEIGHTS_0` attributes. 
- * A node can have either a `matrix` or any combination of 
- * `translation`/`rotation`/`scale` (TRS) properties. TRS properties are 
- * converted to matrices and postmultiplied in the `T * R * S` order to 
- * compose the transformation matrix; first the scale is applied to the 
- * vertices, then the rotation, and then the translation. If none are 
+ * `mesh.primitives` **MUST** contain `JOINTS_0` and `WEIGHTS_0` 
+ * attributes. A node **MAY** have either a `matrix` or any combination 
+ * of `translation`/`rotation`/`scale` (TRS) properties. TRS properties 
+ * are converted to matrices and postmultiplied in the `T * R * S` order 
+ * to compose the transformation matrix; first the scale is applied to 
+ * the vertices, then the rotation, and then the translation. If none are 
  * provided, the transform is the identity. When a node is targeted for 
- * animation (referenced by an animation.channel.target), only TRS 
- * properties may be present; `matrix` will not be present. 
+ * animation (referenced by an animation.channel.target), `matrix` **MUST 
+ * NOT** be present. 
  * 
  * Auto-generated for node.schema.json 
  * 
@@ -79,7 +79,8 @@ public class Node
      */
     private float[] rotation;
     /**
-     * The node's non-uniform scale. (optional)<br> 
+     * The node's non-uniform scale, given as the scaling factors along the 
+     * x, y, and z axes. (optional)<br> 
      * Default: [1.0,1.0,1.0]<br> 
      * Number of items: 3<br> 
      * Array elements:<br> 
@@ -88,7 +89,7 @@ public class Node
      */
     private float[] scale;
     /**
-     * The node's translation. (optional)<br> 
+     * The node's translation along the x, y, and z axes. (optional)<br> 
      * Default: [0.0,0.0,0.0]<br> 
      * Number of items: 3<br> 
      * Array elements:<br> 
@@ -97,8 +98,9 @@ public class Node
      */
     private float[] translation;
     /**
-     * The weights of the instantiated Morph Target. Number of elements must 
-     * match number of Morph Targets of used mesh. (optional)<br> 
+     * The weights of the instantiated morph target. The number of array 
+     * elements **MUST** match the number of morph targets of the referenced 
+     * mesh. When defined, `mesh` **MUST** also be defined. (optional)<br> 
      * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;The elements of this array (optional) 
@@ -391,7 +393,8 @@ public class Node
     }
 
     /**
-     * The node's non-uniform scale. (optional)<br> 
+     * The node's non-uniform scale, given as the scaling factors along the 
+     * x, y, and z axes. (optional)<br> 
      * Default: [1.0,1.0,1.0]<br> 
      * Number of items: 3<br> 
      * Array elements:<br> 
@@ -417,7 +420,8 @@ public class Node
     }
 
     /**
-     * The node's non-uniform scale. (optional)<br> 
+     * The node's non-uniform scale, given as the scaling factors along the 
+     * x, y, and z axes. (optional)<br> 
      * Default: [1.0,1.0,1.0]<br> 
      * Number of items: 3<br> 
      * Array elements:<br> 
@@ -442,7 +446,7 @@ public class Node
     }
 
     /**
-     * The node's translation. (optional)<br> 
+     * The node's translation along the x, y, and z axes. (optional)<br> 
      * Default: [0.0,0.0,0.0]<br> 
      * Number of items: 3<br> 
      * Array elements:<br> 
@@ -468,7 +472,7 @@ public class Node
     }
 
     /**
-     * The node's translation. (optional)<br> 
+     * The node's translation along the x, y, and z axes. (optional)<br> 
      * Default: [0.0,0.0,0.0]<br> 
      * Number of items: 3<br> 
      * Array elements:<br> 
@@ -493,8 +497,9 @@ public class Node
     }
 
     /**
-     * The weights of the instantiated Morph Target. Number of elements must 
-     * match number of Morph Targets of used mesh. (optional)<br> 
+     * The weights of the instantiated morph target. The number of array 
+     * elements **MUST** match the number of morph targets of the referenced 
+     * mesh. When defined, `mesh` **MUST** also be defined. (optional)<br> 
      * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;The elements of this array (optional) 
@@ -516,8 +521,9 @@ public class Node
     }
 
     /**
-     * The weights of the instantiated Morph Target. Number of elements must 
-     * match number of Morph Targets of used mesh. (optional)<br> 
+     * The weights of the instantiated morph target. The number of array 
+     * elements **MUST** match the number of morph targets of the referenced 
+     * mesh. When defined, `mesh` **MUST** also be defined. (optional)<br> 
      * Minimum number of items: 1<br> 
      * Array elements:<br> 
      * &nbsp;&nbsp;The elements of this array (optional) 

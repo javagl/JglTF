@@ -146,11 +146,26 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
         Objects.requireNonNull(viewConfiguration,
             "The viewConfiguration may not be null");
 
+        float rtcCenter[] = CesiumRtcUtils.extractRtcCenterFromModel(gltfModel);
+        if (rtcCenter != null)
+        {
+            // NOTE: The RTC center is not really APPLIED here during 
+            // rendering, because this is handling a single model that
+            // should always be relative to the application coordinate
+            // system at 0,0,0
+            logger.info("CESIUM_RTC center is " + Arrays.toString(rtcCenter));
+            logger.info("Resetting to 0, 0, 0");
+            rtcCenter[0] = 0.0f;
+            rtcCenter[1] = 0.0f;
+            rtcCenter[2] = 0.0f;
+        }
+        
         this.gltfRenderData = new GltfRenderData(glContext);
         this.uniformGetterFactory = new UniformGetterFactory( 
             viewConfiguration::getViewport,
             viewConfiguration::getViewMatrix,
-            viewConfiguration::getProjectionMatrix);
+            viewConfiguration::getProjectionMatrix,
+            rtcCenter);
         this.uniformSetterFactory = new UniformSetterFactory(glContext);
         
         Map<TextureModel, Integer> textureIndexMap = 
@@ -166,6 +181,7 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
             .forEach(this::processSceneModel);
         logger.fine("Processing scenes DONE...");
     }
+    
     
     
     @Override
@@ -648,9 +664,27 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
 
             if (accessorModel == null)
             {
-                logger.fine(
-                    "No accessor model found for semantic " + semantic);
-                continue;
+                if (semantic.equals("NORMAL"))
+                {
+                    logger.info(
+                        "No normals found, computing default");
+                    
+                    // TODO: The normals would actually have to be updated
+                    // during the animation. This could be done by creating
+                    // an attributeUpdateCommand here.
+                    AccessorModel positionsAccessorModel = 
+                        meshPrimitiveAttributes.get("POSITION");
+                    AccessorModel indicesAccessorModel = 
+                        meshPrimitiveModel.getIndices();
+                    accessorModel = NormalComputation.createDefaultNormals(
+                        positionsAccessorModel, indicesAccessorModel);
+                }
+                else
+                {
+                    logger.fine(
+                        "No accessor model found for semantic " + semantic);
+                    continue;
+                }
             }
 
             BufferViewModel bufferViewModel =
@@ -696,6 +730,8 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
         }
         return attributeUpdateCommands;
     }
+    
+    
 
     /**
      * Create a command that updates the specified attribute data. <br>

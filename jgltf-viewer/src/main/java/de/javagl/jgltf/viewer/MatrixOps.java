@@ -200,6 +200,26 @@ class MatrixOps
     }
     
     /**
+     * Adds the operation to translate by the given amount
+     * 
+     * @param x The x-translation
+     * @param y The y-translation
+     * @param z The z-translation
+     * @return This builder
+     */
+    MatrixOps translate(float x, float y, float z)
+    {
+        float result[] = new float[16];
+        functions.add(named("translate", input -> 
+        {
+            MathUtils.translate(input, x, y, z, result);
+            return result;
+        }));
+        return this;
+    }
+    
+    
+    /**
      * Adds the operation to print a log message about the current matrix
      * 
      * @param name The name of the matrix, which will be part of the message
@@ -272,4 +292,5 @@ class MatrixOps
             return current;
         };  
     }
+
 }

@@ -3,7 +3,7 @@
  * 
  * Do not modify this class. It is automatically generated
  * with JsonModelGen (https://github.com/javagl/JsonModelGen)
- * Copyright (c) 2016 Marco Hutter - http://www.javagl.de
+ * Copyright (c) 2016-2021 Marco Hutter - http://www.javagl.de
  */
 
 package de.javagl.jgltf.impl.v2;
@@ -11,8 +11,8 @@ package de.javagl.jgltf.impl.v2;
 
 
 /**
- * Image data used to create a texture. Image can be referenced by URI or 
- * `bufferView` index. `mimeType` is required in the latter case. 
+ * Image data used to create a texture. Image **MAY** be referenced by an 
+ * URI (or IRI) or a buffer view index. 
  * 
  * Auto-generated for image.schema.json 
  * 
@@ -22,25 +22,26 @@ public class Image
 {
 
     /**
-     * The uri of the image. (optional) 
+     * The URI (or IRI) of the image. (optional) 
      * 
      */
     private String uri;
     /**
-     * The image's MIME type. (optional)<br> 
-     * Valid values: ["image/jpeg", "image/png"] 
+     * The image's media type. This field **MUST** be defined when 
+     * `bufferView` is defined. (optional)<br> 
+     * Valid values: [image/jpeg, image/png] 
      * 
      */
     private String mimeType;
     /**
-     * The index of the bufferView that contains the image. Use this instead 
-     * of the image's uri property. (optional) 
+     * The index of the bufferView that contains the image. This field **MUST 
+     * NOT** be defined when `uri` is defined. (optional) 
      * 
      */
     private Integer bufferView;
 
     /**
-     * The uri of the image. (optional) 
+     * The URI (or IRI) of the image. (optional) 
      * 
      * @param uri The uri to set
      * 
@@ -54,7 +55,7 @@ public class Image
     }
 
     /**
-     * The uri of the image. (optional) 
+     * The URI (or IRI) of the image. (optional) 
      * 
      * @return The uri
      * 
@@ -64,12 +65,11 @@ public class Image
     }
 
     /**
-     * The image's MIME type. (optional)<br> 
-     * Valid values: ["image/jpeg", "image/png"] 
+     * The image's media type. This field **MUST** be defined when 
+     * `bufferView` is defined. (optional)<br> 
+     * Valid values: [image/jpeg, image/png] 
      * 
      * @param mimeType The mimeType to set
-     * @throws IllegalArgumentException If the given value does not meet
-     * the given constraints
      * 
      */
     public void setMimeType(String mimeType) {
@@ -77,15 +77,13 @@ public class Image
             this.mimeType = mimeType;
             return ;
         }
-        if ((!"image/jpeg".equals(mimeType))&&(!"image/png".equals(mimeType))) {
-            throw new IllegalArgumentException((("Invalid value for mimeType: "+ mimeType)+", valid: [\"image/jpeg\", \"image/png\"]"));
-        }
         this.mimeType = mimeType;
     }
 
     /**
-     * The image's MIME type. (optional)<br> 
-     * Valid values: ["image/jpeg", "image/png"] 
+     * The image's media type. This field **MUST** be defined when 
+     * `bufferView` is defined. (optional)<br> 
+     * Valid values: [image/jpeg, image/png] 
      * 
      * @return The mimeType
      * 
@@ -95,8 +93,8 @@ public class Image
     }
 
     /**
-     * The index of the bufferView that contains the image. Use this instead 
-     * of the image's uri property. (optional) 
+     * The index of the bufferView that contains the image. This field **MUST 
+     * NOT** be defined when `uri` is defined. (optional) 
      * 
      * @param bufferView The bufferView to set
      * 
@@ -110,8 +108,8 @@ public class Image
     }
 
     /**
-     * The index of the bufferView that contains the image. Use this instead 
-     * of the image's uri property. (optional) 
+     * The index of the bufferView that contains the image. This field **MUST 
+     * NOT** be defined when `uri` is defined. (optional) 
      * 
      * @return The bufferView
      * 

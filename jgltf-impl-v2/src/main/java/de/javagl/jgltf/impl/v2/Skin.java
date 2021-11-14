@@ -3,7 +3,7 @@
  * 
  * Do not modify this class. It is automatically generated
  * with JsonModelGen (https://github.com/javagl/JsonModelGen)
- * Copyright (c) 2016 Marco Hutter - http://www.javagl.de
+ * Copyright (c) 2016-2021 Marco Hutter - http://www.javagl.de
  */
 
 package de.javagl.jgltf.impl.v2;
@@ -24,15 +24,12 @@ public class Skin
 
     /**
      * The index of the accessor containing the floating-point 4x4 
-     * inverse-bind matrices. The default is that each matrix is a 4x4 
-     * identity matrix, which implies that inverse-bind matrices were 
-     * pre-applied. (optional) 
+     * inverse-bind matrices. (optional) 
      * 
      */
     private Integer inverseBindMatrices;
     /**
-     * The index of the node used as a skeleton root. When undefined, joints 
-     * transforms resolve to scene root. (optional) 
+     * The index of the node used as a skeleton root. (optional) 
      * 
      */
     private Integer skeleton;
@@ -48,9 +45,7 @@ public class Skin
 
     /**
      * The index of the accessor containing the floating-point 4x4 
-     * inverse-bind matrices. The default is that each matrix is a 4x4 
-     * identity matrix, which implies that inverse-bind matrices were 
-     * pre-applied. (optional) 
+     * inverse-bind matrices. (optional) 
      * 
      * @param inverseBindMatrices The inverseBindMatrices to set
      * 
@@ -65,9 +60,7 @@ public class Skin
 
     /**
      * The index of the accessor containing the floating-point 4x4 
-     * inverse-bind matrices. The default is that each matrix is a 4x4 
-     * identity matrix, which implies that inverse-bind matrices were 
-     * pre-applied. (optional) 
+     * inverse-bind matrices. (optional) 
      * 
      * @return The inverseBindMatrices
      * 
@@ -77,8 +70,7 @@ public class Skin
     }
 
     /**
-     * The index of the node used as a skeleton root. When undefined, joints 
-     * transforms resolve to scene root. (optional) 
+     * The index of the node used as a skeleton root. (optional) 
      * 
      * @param skeleton The skeleton to set
      * 
@@ -92,8 +84,7 @@ public class Skin
     }
 
     /**
-     * The index of the node used as a skeleton root. When undefined, joints 
-     * transforms resolve to scene root. (optional) 
+     * The index of the node used as a skeleton root. (optional) 
      * 
      * @return The skeleton
      * 

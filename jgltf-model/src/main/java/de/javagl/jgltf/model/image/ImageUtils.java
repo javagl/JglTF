@@ -339,4 +339,12 @@ public class ImageUtils
         System.out.println("ARGB : " + Integer.toHexString(argb));
     }
 
+    /**
+     * Private constructor to prevent instantiation
+     */
+    private ImageUtils()
+    {
+        // Private constructor to prevent instantiation
+    }
+    
 }

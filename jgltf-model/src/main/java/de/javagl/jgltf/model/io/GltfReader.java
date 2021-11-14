@@ -79,7 +79,7 @@ final class GltfReader
      * 
      * @param jsonErrorConsumer The consumer
      */
-    public void setJsonErrorConsumer(
+    void setJsonErrorConsumer(
         Consumer<? super JsonError> jsonErrorConsumer)
     {
         this.jsonErrorConsumer = jsonErrorConsumer;

@@ -3,7 +3,7 @@
  * 
  * Do not modify this class. It is automatically generated
  * with JsonModelGen (https://github.com/javagl/JsonModelGen)
- * Copyright (c) 2016 Marco Hutter - http://www.javagl.de
+ * Copyright (c) 2016-2021 Marco Hutter - http://www.javagl.de
  */
 
 package de.javagl.jgltf.impl.v2;
@@ -23,7 +23,7 @@ public class MaterialPbrMetallicRoughness
 {
 
     /**
-     * The material's base color factor. (optional)<br> 
+     * The factors for the base color of the material. (optional)<br> 
      * Default: [1.0,1.0,1.0,1.0]<br> 
      * Number of items: 4<br> 
      * Array elements:<br> 
@@ -39,7 +39,7 @@ public class MaterialPbrMetallicRoughness
      */
     private TextureInfo baseColorTexture;
     /**
-     * The metalness of the material. (optional)<br> 
+     * The factor for the metalness of the material. (optional)<br> 
      * Default: 1.0<br> 
      * Minimum: 0.0 (inclusive)<br> 
      * Maximum: 1.0 (inclusive) 
@@ -47,7 +47,7 @@ public class MaterialPbrMetallicRoughness
      */
     private Float metallicFactor;
     /**
-     * The roughness of the material. (optional)<br> 
+     * The factor for the roughness of the material. (optional)<br> 
      * Default: 1.0<br> 
      * Minimum: 0.0 (inclusive)<br> 
      * Maximum: 1.0 (inclusive) 
@@ -61,7 +61,7 @@ public class MaterialPbrMetallicRoughness
     private TextureInfo metallicRoughnessTexture;
 
     /**
-     * The material's base color factor. (optional)<br> 
+     * The factors for the base color of the material. (optional)<br> 
      * Default: [1.0,1.0,1.0,1.0]<br> 
      * Number of items: 4<br> 
      * Array elements:<br> 
@@ -97,7 +97,7 @@ public class MaterialPbrMetallicRoughness
     }
 
     /**
-     * The material's base color factor. (optional)<br> 
+     * The factors for the base color of the material. (optional)<br> 
      * Default: [1.0,1.0,1.0,1.0]<br> 
      * Number of items: 4<br> 
      * Array elements:<br> 
@@ -148,7 +148,7 @@ public class MaterialPbrMetallicRoughness
     }
 
     /**
-     * The metalness of the material. (optional)<br> 
+     * The factor for the metalness of the material. (optional)<br> 
      * Default: 1.0<br> 
      * Minimum: 0.0 (inclusive)<br> 
      * Maximum: 1.0 (inclusive) 
@@ -173,7 +173,7 @@ public class MaterialPbrMetallicRoughness
     }
 
     /**
-     * The metalness of the material. (optional)<br> 
+     * The factor for the metalness of the material. (optional)<br> 
      * Default: 1.0<br> 
      * Minimum: 0.0 (inclusive)<br> 
      * Maximum: 1.0 (inclusive) 
@@ -197,7 +197,7 @@ public class MaterialPbrMetallicRoughness
     }
 
     /**
-     * The roughness of the material. (optional)<br> 
+     * The factor for the roughness of the material. (optional)<br> 
      * Default: 1.0<br> 
      * Minimum: 0.0 (inclusive)<br> 
      * Maximum: 1.0 (inclusive) 
@@ -222,7 +222,7 @@ public class MaterialPbrMetallicRoughness
     }
 
     /**
-     * The roughness of the material. (optional)<br> 
+     * The factor for the roughness of the material. (optional)<br> 
      * Default: 1.0<br> 
      * Minimum: 0.0 (inclusive)<br> 
      * Maximum: 1.0 (inclusive) 

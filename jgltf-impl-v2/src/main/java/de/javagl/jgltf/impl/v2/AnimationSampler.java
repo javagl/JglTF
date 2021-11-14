@@ -3,7 +3,7 @@
  * 
  * Do not modify this class. It is automatically generated
  * with JsonModelGen (https://github.com/javagl/JsonModelGen)
- * Copyright (c) 2016 Marco Hutter - http://www.javagl.de
+ * Copyright (c) 2016-2021 Marco Hutter - http://www.javagl.de
  */
 
 package de.javagl.jgltf.impl.v2;
@@ -11,8 +11,8 @@ package de.javagl.jgltf.impl.v2;
 
 
 /**
- * Combines input and output accessors with an interpolation algorithm to 
- * define a keyframe graph (but not its target). 
+ * An animation sampler combines timestamps with a sequence of output 
+ * values and defines an interpolation algorithm. 
  * 
  * Auto-generated for animation.sampler.schema.json 
  * 
@@ -22,15 +22,14 @@ public class AnimationSampler
 {
 
     /**
-     * The index of an accessor containing keyframe input values, e.g., time. 
-     * (required) 
+     * The index of an accessor containing keyframe timestamps. (required) 
      * 
      */
     private Integer input;
     /**
      * Interpolation algorithm. (optional)<br> 
      * Default: "LINEAR"<br> 
-     * Valid values: ["LINEAR", "STEP", "CATMULLROMSPLINE", "CUBICSPLINE"] 
+     * Valid values: [LINEAR, STEP, CUBICSPLINE] 
      * 
      */
     private String interpolation;
@@ -42,8 +41,7 @@ public class AnimationSampler
     private Integer output;
 
     /**
-     * The index of an accessor containing keyframe input values, e.g., time. 
-     * (required) 
+     * The index of an accessor containing keyframe timestamps. (required) 
      * 
      * @param input The input to set
      * @throws NullPointerException If the given value is <code>null</code>
@@ -57,8 +55,7 @@ public class AnimationSampler
     }
 
     /**
-     * The index of an accessor containing keyframe input values, e.g., time. 
-     * (required) 
+     * The index of an accessor containing keyframe timestamps. (required) 
      * 
      * @return The input
      * 
@@ -70,7 +67,7 @@ public class AnimationSampler
     /**
      * Interpolation algorithm. (optional)<br> 
      * Default: "LINEAR"<br> 
-     * Valid values: ["LINEAR", "STEP", "CATMULLROMSPLINE", "CUBICSPLINE"] 
+     * Valid values: [LINEAR, STEP, CUBICSPLINE] 
      * 
      * @param interpolation The interpolation to set
      * @throws IllegalArgumentException If the given value does not meet
@@ -82,8 +79,8 @@ public class AnimationSampler
             this.interpolation = interpolation;
             return ;
         }
-        if ((((!"LINEAR".equals(interpolation))&&(!"STEP".equals(interpolation)))&&(!"CATMULLROMSPLINE".equals(interpolation)))&&(!"CUBICSPLINE".equals(interpolation))) {
-            throw new IllegalArgumentException((("Invalid value for interpolation: "+ interpolation)+", valid: [\"LINEAR\", \"STEP\", \"CATMULLROMSPLINE\", \"CUBICSPLINE\"]"));
+        if (((!"LINEAR".equals(interpolation))&&(!"STEP".equals(interpolation)))&&(!"CUBICSPLINE".equals(interpolation))) {
+            throw new IllegalArgumentException((("Invalid value for interpolation: "+ interpolation)+", valid: [LINEAR, STEP, CUBICSPLINE]"));
         }
         this.interpolation = interpolation;
     }
@@ -91,7 +88,7 @@ public class AnimationSampler
     /**
      * Interpolation algorithm. (optional)<br> 
      * Default: "LINEAR"<br> 
-     * Valid values: ["LINEAR", "STEP", "CATMULLROMSPLINE", "CUBICSPLINE"] 
+     * Valid values: [LINEAR, STEP, CUBICSPLINE] 
      * 
      * @return The interpolation
      * 

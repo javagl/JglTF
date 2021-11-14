@@ -453,6 +453,25 @@ public class MathUtils
     }
     
     /**
+     * Writes the given matrix into the given result matrix, with the
+     * given values added to the translation component
+     * 
+     * @param m The input matrix
+     * @param x The x-translation
+     * @param y The y-translation
+     * @param z The z-translation
+     * @param result The result matrix
+     */
+    public static void translate(
+        float m[], float x, float y, float z, float result[])
+    {
+        set(m,  result);
+        result[12] += x;
+        result[13] += y;
+        result[14] += z;
+    }
+    
+    /**
      * Fill the given matrix to describe an infinite perspective projection 
      * with the given parameters. 
      * 
@@ -661,4 +680,5 @@ public class MathUtils
     {
         // Private constructor to prevent instantiation
     }
+
 }

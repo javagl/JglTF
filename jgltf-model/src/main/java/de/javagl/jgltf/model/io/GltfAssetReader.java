@@ -52,33 +52,23 @@ import de.javagl.jgltf.model.io.v2.GltfAssetV2;
  * that do not have external references, or for cases where the external
  * references should be resolved manually.<br>
  * <br>
- * In addition to returning the {@link GltfAsset} that was read, the
- * {@link #getMajorVersion() major version} of the read asset may be
- * queried. Depending on the version, the asset may be obtained as a 
- * {@link #getAsGltfAssetV1() glTF 1.0 asset} or a 
- * {@link #getAsGltfAssetV2() glTF 2.0 asset}.<br> 
- * <br> 
  * Such a {@link GltfAsset} may then be processed further, for example,
  * by creating a {@link GltfModel} using {@link GltfModels#create(GltfAsset)}.
  */
 public final class GltfAssetReader
 {
     /**
-     * The {@link GltfReader} for the JSON part
+     * A consumer for {@link JsonError}s that may occur while reading
+     * the glTF JSON
      */
-    private final GltfReader gltfReader;
-    
-    /**
-     * The {@link GltfAsset} that was read
-     */
-    private GltfAsset gltfAsset;
+    private Consumer<? super JsonError> jsonErrorConsumer;
     
     /**
      * Creates a new instance
      */
     public GltfAssetReader()
     {
-        this.gltfReader = new GltfReader();
+        // Default constructor
     }
     
     /**
@@ -90,21 +80,21 @@ public final class GltfAssetReader
     public void setJsonErrorConsumer(
         Consumer<? super JsonError> jsonErrorConsumer)
     {
-        gltfReader.setJsonErrorConsumer(jsonErrorConsumer);
+        this.jsonErrorConsumer = jsonErrorConsumer;
     }
     
     /**
      * Read the {@link GltfAsset} from the given URI
      * 
      * @param uri The URI
-     * @return The {@link GltfModel}
+     * @return The {@link GltfAsset}
      * @throws IOException If an IO error occurs
      */
     public GltfAsset read(URI uri) throws IOException
     {
         try (InputStream inputStream = uri.toURL().openStream())
         {
-            readWithoutReferences(inputStream);
+            GltfAsset gltfAsset = readWithoutReferences(inputStream);
             URI baseUri = IO.getParent(uri);
             GltfReferenceResolver.resolveAll(
                 gltfAsset.getReferences(), baseUri);
@@ -122,30 +112,27 @@ public final class GltfAssetReader
      * have external references.
      * 
      * @param uri The URI
-     * @return The {@link GltfModel}
+     * @return The {@link GltfAsset}
      * @throws IOException If an IO error occurs
      */
     public GltfAsset readWithoutReferences(URI uri) throws IOException
     {
         try (InputStream inputStream = uri.toURL().openStream())
         {
-            readWithoutReferences(inputStream);
-            return gltfAsset;
+            return readWithoutReferences(inputStream);
         }
     }
     
     /**
      * Read the glTF asset from the given input stream. The caller is 
-     * responsible for closing the given stream. After this method
-     * has been called, the version of the glTF may be obtained with
-     * {@link #getMajorVersion()}, and the actual asset may be obtained
-     * with {@link #getAsGltfAssetV1()} or {@link #getAsGltfAssetV2()}.<br>
+     * responsible for closing the given stream.<br>
      * <br>
      * In contrast to the {@link #read(URI)} method, this method will
      * not resolve any external references.<br>
      * <br>
      * This is mainly intended for binary- or embedded glTF assets that do not
-     * have external references.
+     * have external references, or for cases where the external
+     * references should be resolved manually.
      * 
      * @param inputStream The input stream
      * @return The {@link GltfAsset}
@@ -155,6 +142,20 @@ public final class GltfAssetReader
         throws IOException
     {
         RawGltfData rawGltfData = RawGltfDataReader.read(inputStream);
+        return read(rawGltfData);
+    }
+
+    /**
+     * Read the {@link GltfAsset} from the given {@link RawGltfData}
+     * 
+     * @param rawGltfData The {@link RawGltfData}
+     * @return The {@link GltfAsset}
+     * @throws IOException If the data cannot be read
+     */
+    GltfAsset read(RawGltfData rawGltfData) throws IOException
+    {
+        GltfReader gltfReader = new GltfReader();
+        gltfReader.setJsonErrorConsumer(jsonErrorConsumer);        
         ByteBuffer jsonData = rawGltfData.getJsonData();
         try (InputStream jsonInputStream =
             Buffers.createByteBufferInputStream(jsonData))
@@ -165,14 +166,14 @@ public final class GltfAssetReader
             {
                 de.javagl.jgltf.impl.v1.GlTF gltfV1 = 
                     gltfReader.getAsGltfV1();
-                gltfAsset = new GltfAssetV1(gltfV1, 
+                return new GltfAssetV1(gltfV1, 
                     rawGltfData.getBinaryData());
             }
             else if (majorVersion == 2)
             {
                 de.javagl.jgltf.impl.v2.GlTF gltfV2 = 
                     gltfReader.getAsGltfV2();
-                gltfAsset = new GltfAssetV2(gltfV2, 
+                return new GltfAssetV2(gltfV2, 
                     rawGltfData.getBinaryData());
             }
             else
@@ -181,52 +182,6 @@ public final class GltfAssetReader
                     "Unsupported major version: " + majorVersion);
             }
         }
-        return gltfAsset;
-    }
-    
-    
-    /**
-     * Returns the major version of the glTF, or 0 of no glTF was read yet.
-     * 
-     * @return The major version number
-     */
-    int getMajorVersion()
-    {
-        return gltfReader.getMajorVersion();
-    }
-    
-    /**
-     * Returns the {@link GltfAssetV1} with a 
-     * {@link de.javagl.jgltf.impl.v1.GlTF version 1.0 glTF}, 
-     * or <code>null</code> if no asset has been read yet, or
-     * the glTF asset that has been read is not a glTF 1.0 asset. 
-     * 
-     * @return The {@link GltfAssetV1}
-     */
-    GltfAssetV1 getAsGltfAssetV1()
-    {
-        if (gltfAsset instanceof GltfAssetV1)
-        {
-            return (GltfAssetV1)gltfAsset;
-        }
-        return null;
-    }
-    
-    /**
-     * Returns the {@link GltfAssetV2} with a 
-     * {@link de.javagl.jgltf.impl.v2.GlTF version 2.0 glTF}, 
-     * or <code>null</code> if no asset has been read yet, or
-     * the glTF asset that has been read is not a glTF 2.0 asset. 
-     * 
-     * @return The {@link GltfAssetV2}
-     */
-    GltfAssetV2 getAsGltfAssetV2()
-    {
-        if (gltfAsset instanceof GltfAssetV2)
-        {
-            return (GltfAssetV2)gltfAsset;
-        }
-        return null;
     }
     
     

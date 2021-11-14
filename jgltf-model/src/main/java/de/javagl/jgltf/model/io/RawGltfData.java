@@ -27,6 +27,7 @@
 package de.javagl.jgltf.model.io;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.util.Objects;
 
 /**
@@ -62,6 +63,19 @@ public final class RawGltfData
         this.jsonData = Objects.requireNonNull(
             jsonData, "The jsonData may not be null");
         this.binaryData = binaryData;
+    }
+    
+    /**
+     * Returns the JSON string from this data
+     * 
+     * @return The JSON string
+     */
+    public String getJsonString() 
+    {
+        byte jsonDataArray[] = new byte[jsonData.capacity()];
+        jsonData.slice().get(jsonDataArray);
+        String jsonString = new String(jsonDataArray, Charset.forName("UTF-8"));
+        return jsonString;
     }
     
     /**
