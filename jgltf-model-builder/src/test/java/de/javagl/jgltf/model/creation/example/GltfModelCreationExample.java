@@ -57,10 +57,10 @@ public class GltfModelCreationExample
         };
         float texCoords0[] =
         {
-            0.0f, 0.0f,
-            1.0f, 0.0f,
             0.0f, 1.0f,
             1.0f, 1.0f,
+            0.0f, 0.0f,
+            1.0f, 0.0f,
         };
         
         MeshPrimitiveBuilder meshPrimitiveBuilder = 
