@@ -104,10 +104,12 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
         MeshPrimitiveModel meshPrimitiveModel)
     {
         AccessorModel indices = meshPrimitiveModel.getIndices();
-        bufferStructureBuilder.addAccessorModel("indices", 
-            (DefaultAccessorModel)indices);
-        bufferStructureBuilder.createArrayElementBufferViewModel("indices");
-        
+        if (indices != null)
+        {
+            bufferStructureBuilder.addAccessorModel("indices", 
+                (DefaultAccessorModel)indices);
+            bufferStructureBuilder.createArrayElementBufferViewModel("indices");
+        }
         Collection<AccessorModel> attributes = 
             meshPrimitiveModel.getAttributes().values();
         for (AccessorModel attribute : attributes)
