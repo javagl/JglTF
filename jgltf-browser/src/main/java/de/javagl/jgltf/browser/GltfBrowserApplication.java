@@ -61,13 +61,13 @@ import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import de.javagl.jgltf.impl.v2.GlTF;
 import de.javagl.jgltf.model.GltfModel;
-import de.javagl.jgltf.model.GltfModels;
 import de.javagl.jgltf.model.io.GltfModelWriter;
 import de.javagl.jgltf.model.io.IO;
 import de.javagl.jgltf.model.io.v2.GltfAssetV2;
-import de.javagl.jgltf.obj.BufferStrategy;
-import de.javagl.jgltf.obj.v2.ObjGltfAssetCreatorV2;
+import de.javagl.jgltf.model.io.v2.GltfAssetsV2;
+import de.javagl.jgltf.obj.model.ObjGltfModelCreator;
 import de.javagl.swing.tasks.SwingTask;
 import de.javagl.swing.tasks.SwingTaskExecutors;
 
@@ -583,8 +583,6 @@ class GltfBrowserApplication
      */
     private void importObjUriInBackground(URI uri)
     {
-        BufferStrategy bufferStrategy = 
-            objImportAccessoryPanel.getSelectedBufferStrategy();
         Integer indicesComponentType = 
             objImportAccessoryPanel.getSelectedIndicesComponentType();
         boolean assigningRandomColorsToParts =
@@ -595,16 +593,14 @@ class GltfBrowserApplication
             @Override
             protected Entry<GltfModel, Object> doInBackground() throws Exception
             {
-                ObjGltfAssetCreatorV2 objGltfAssetCreator = 
-                    new ObjGltfAssetCreatorV2(bufferStrategy);
-                objGltfAssetCreator.setIndicesComponentType(
-                    indicesComponentType);
-                objGltfAssetCreator.setAssigningRandomColorsToParts(
+                ObjGltfModelCreator gltfModelCreator = 
+                    new ObjGltfModelCreator();
+                gltfModelCreator.setIndicesComponentType(indicesComponentType);
+                gltfModelCreator.setAssigningRandomColorsToParts(
                     assigningRandomColorsToParts);
-                GltfAssetV2 gltfAsset = objGltfAssetCreator.create(uri);
-
-                GltfModel gltfModel = GltfModels.create(gltfAsset);
-                Object gltf = gltfAsset.getGltf();
+                GltfModel gltfModel = gltfModelCreator.create(uri);
+                GltfAssetV2 gltfAsset = GltfAssetsV2.createDefault(gltfModel);
+                GlTF gltf = gltfAsset.getGltf();
                 Entry<GltfModel, Object> result = 
                     new SimpleEntry<GltfModel, Object>(gltfModel, gltf);
                 return result;

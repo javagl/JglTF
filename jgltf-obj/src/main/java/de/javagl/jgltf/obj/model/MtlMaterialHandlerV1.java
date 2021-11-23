@@ -37,8 +37,6 @@ import de.javagl.obj.ReadableObj;
 /**
  * Implementation of a {@link MtlMaterialHandler} that generates 
  * {@link MaterialModelV1} instances
- * @author User
- *
  */
 class MtlMaterialHandlerV1 implements MtlMaterialHandler
 {

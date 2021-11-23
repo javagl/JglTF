@@ -104,12 +104,18 @@ public class ObjGltfModelCreator
      * For testing: Assign a material with a random color to each 
      * mesh primitive that was created during the splitting process
      */
-    private boolean assigningRandomColorsToParts = true;
+    private boolean assigningRandomColorsToParts = false;
     
     /**
      * Whether technique-based materials should be used
      */
     private boolean techniqueBasedMaterials = false;
+    
+    /**
+     * Whether each primitive should be in its own mesh, attached
+     * to its own node
+     */
+    private boolean oneMeshPerPrimitive = false;
     
     /**
      * Default constructor
@@ -181,6 +187,17 @@ public class ObjGltfModelCreator
         boolean assigningRandomColorsToParts)
     {
         this.assigningRandomColorsToParts = assigningRandomColorsToParts;
+    }
+    
+    /**
+     * Set whether each mesh primitive should be in its own mesh,
+     * assigned to its own node
+     * 
+     * @param oneMeshPerPrimitive The flag
+     */
+    public void setOneMeshPerPrimitive(boolean oneMeshPerPrimitive)
+    {
+        this.oneMeshPerPrimitive = oneMeshPerPrimitive;
     }
     
     /**
@@ -281,17 +298,32 @@ public class ObjGltfModelCreator
         List<DefaultMeshPrimitiveModel> meshPrimitives = 
             createMeshPrimitives(obj, mtls);
         
-        DefaultMeshModel mesh = new DefaultMeshModel();
-        for (MeshPrimitiveModel meshPrimitive : meshPrimitives)
+        DefaultSceneModel scene = new DefaultSceneModel();
+
+        if (oneMeshPerPrimitive)
         {
-            mesh.addMeshPrimitiveModel(meshPrimitive);
+            for (MeshPrimitiveModel meshPrimitive : meshPrimitives)
+            {
+                DefaultMeshModel mesh = new DefaultMeshModel();
+                mesh.addMeshPrimitiveModel(meshPrimitive);
+                DefaultNodeModel node = new DefaultNodeModel();
+                node.addMeshModel(mesh);
+
+                scene.addNode(node);
+            }
+        }
+        else
+        {
+            DefaultMeshModel mesh = new DefaultMeshModel();
+            for (MeshPrimitiveModel meshPrimitive : meshPrimitives)
+            {
+                mesh.addMeshPrimitiveModel(meshPrimitive);
+            }
+            DefaultNodeModel node = new DefaultNodeModel();
+            node.addMeshModel(mesh);
+            scene.addNode(node);
         }
         
-        DefaultNodeModel node = new DefaultNodeModel();
-        node.addMeshModel(mesh);
-
-        DefaultSceneModel scene = new DefaultSceneModel();
-        scene.addNode(node);
         
         GltfModelBuilder gltfModelBuilder = GltfModelBuilder.create();
         gltfModelBuilder.addSceneModel(scene);

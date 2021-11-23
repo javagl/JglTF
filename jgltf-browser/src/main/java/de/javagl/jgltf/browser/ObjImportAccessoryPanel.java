@@ -39,7 +39,6 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 
 import de.javagl.jgltf.model.GltfConstants;
-import de.javagl.jgltf.obj.BufferStrategy;
 
 /**
  * A panel that will be used as the accessory component for the file chooser
@@ -52,11 +51,6 @@ class ObjImportAccessoryPanel extends JPanel
      * Serial UIID 
      */
     private static final long serialVersionUID = 557070448719270804L;
-    
-    /**
-     * The combo box for the {@link BufferStrategy} for the OBJ import
-     */
-    private final JComboBox<BufferStrategy> bufferStrategyComboBox;
     
     /**
      * The combo box for the component type of the indices
@@ -80,12 +74,6 @@ class ObjImportAccessoryPanel extends JPanel
         
         JPanel mainPanel = new JPanel(new GridLayout(0,2));
     
-        mainPanel.add(new JLabel("Buffer creation strategy:"));
-        bufferStrategyComboBox = 
-            new JComboBox<BufferStrategy>(BufferStrategy.values());
-        bufferStrategyComboBox.setSelectedItem(BufferStrategy.BUFFER_PER_FILE);
-        mainPanel.add(bufferStrategyComboBox);
-        
         mainPanel.add(new JLabel("Component type for mesh primitive indices:"));
         indicesComponentTypeComboBox = new JComboBox<Integer>(new Integer[] { 
             GltfConstants.GL_UNSIGNED_BYTE, 
@@ -120,16 +108,6 @@ class ObjImportAccessoryPanel extends JPanel
         mainPanel.add(assigningRandomColorsToPartsCheckBox);
         
         add(mainPanel, BorderLayout.NORTH);
-    }
-    
-    /**
-     * Returns the selected {@link BufferStrategy}
-     * 
-     * @return The {@link BufferStrategy}
-     */
-    BufferStrategy getSelectedBufferStrategy()
-    {
-        return (BufferStrategy) bufferStrategyComboBox.getSelectedItem();
     }
     
     /**

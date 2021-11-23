@@ -71,6 +71,7 @@ public class ObjToGltf
         boolean embedded = false;
         boolean binary = false;
         int indicesComponentType = GltfConstants.GL_UNSIGNED_SHORT;
+        boolean oneMeshPerPrimitive = false;
         int version = 2;
         for (String a : args)
         {
@@ -90,6 +91,10 @@ public class ObjToGltf
             else if (arg.equals("-b"))
             {
                 binary = true;
+            }
+            else if (arg.equals("-m"))
+            {
+                oneMeshPerPrimitive = true;
             }
             else if (arg.startsWith("-c"))
             {
@@ -156,6 +161,7 @@ public class ObjToGltf
         GltfModel gltfModel = null;
         ObjGltfModelCreator gltfModelCreator = new ObjGltfModelCreator();
         gltfModelCreator.setIndicesComponentType(indicesComponentType);
+        gltfModelCreator.setOneMeshPerPrimitive(oneMeshPerPrimitive);
         if (version == 1)
         {
             gltfModelCreator.setTechniqueBasedMaterials(true);
@@ -208,6 +214,8 @@ public class ObjToGltf
         System.out.println("  -c=<type>   : The indices component type. "
             + "The <type> may be GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT "
             + "or GL_UNSIGNED_INT. The default is GL_UNSIGNED_SHORT");
+        System.out.println("  -m          : Create one mesh per primitive, "
+            + "each attached to its own node.");
         System.out.println("  -h          : Print this message.");
         System.out.println("  -v=<number> : The target glTF version. "
             + "The <number> may be 1 or 2. The default is 2.");
