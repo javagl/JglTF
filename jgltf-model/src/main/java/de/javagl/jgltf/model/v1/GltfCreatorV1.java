@@ -566,6 +566,7 @@ public class GltfCreatorV1
             cameraPerspective.setZnear(
                 cameraPerspectiveModel.getZnear());
             camera.setPerspective(cameraPerspective);
+            camera.setType("perspective");
         }
         else if (cameraOrthographicModel != null)
         {
@@ -578,6 +579,8 @@ public class GltfCreatorV1
                 cameraOrthographicModel.getZfar());
             cameraOrthographic.setZnear(
                 cameraOrthographicModel.getZnear());
+            camera.setOrthographic(cameraOrthographic);
+            camera.setType("orthographic");
         }
         else
         {
