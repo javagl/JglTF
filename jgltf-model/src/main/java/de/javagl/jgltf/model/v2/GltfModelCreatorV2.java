@@ -469,6 +469,9 @@ public class GltfModelCreatorV2
             
             int byteOffset = Optionals.of(accessor.getByteOffset(), 0);
             accessorModel.setByteOffset(byteOffset);
+            
+            Boolean normalized = accessor.isNormalized();
+            accessorModel.setNormalized(Boolean.TRUE.equals(normalized));
 
             AccessorSparse accessorSparse = accessor.getSparse();
             if (accessorSparse == null)

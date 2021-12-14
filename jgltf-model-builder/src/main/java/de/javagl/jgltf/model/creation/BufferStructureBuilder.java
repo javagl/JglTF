@@ -214,7 +214,7 @@ public final class BufferStructureBuilder
         int componentType, String type, ByteBuffer byteBuffer)
     {
         DefaultAccessorModel accessorModel = AccessorModels.create(
-            componentType, type, byteBuffer);
+            componentType, type, false, byteBuffer);
         addAccessorModel(idPrefix, accessorModel);
         return accessorModel;
     }

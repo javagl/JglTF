@@ -57,6 +57,13 @@ public interface AccessorModel extends NamedModelElement
     Class<?> getComponentDataType();
     
     /**
+     * Returns whether this accessor contains normalized data
+     * 
+     * @return Whether this accessor contains normalized data
+     */
+    boolean isNormalized();
+    
+    /**
      * Returns the size of one component, in bytes
      * 
      * @return The component size, in bytes

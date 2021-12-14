@@ -388,6 +388,7 @@ public class GltfCreatorV2
         accessor.setComponentType(accessorModel.getComponentType());
         accessor.setCount(accessorModel.getCount());
         accessor.setType(accessorModel.getElementType().toString());
+        accessor.setNormalized(accessorModel.isNormalized());
         
         AccessorData accessorData = accessorModel.getAccessorData();
         accessor.setMax(AccessorDatas.computeMax(accessorData));

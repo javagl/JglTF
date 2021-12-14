@@ -64,7 +64,7 @@ public class AccessorModels
     public static DefaultAccessorModel createUnsignedIntScalar(IntBuffer data)
     {
         return create(
-            GltfConstants.GL_UNSIGNED_INT, "SCALAR",
+            GltfConstants.GL_UNSIGNED_INT, "SCALAR", false,
             Buffers.createByteBufferFrom(data));
     }
 
@@ -83,7 +83,7 @@ public class AccessorModels
     public static DefaultAccessorModel createUnsignedShortScalar(IntBuffer data)
     {
         return create(  
-            GltfConstants.GL_UNSIGNED_SHORT, "SCALAR",
+            GltfConstants.GL_UNSIGNED_SHORT, "SCALAR", false,
             Buffers.castToShortByteBuffer(data));
     }
 
@@ -101,7 +101,7 @@ public class AccessorModels
         ShortBuffer data)
     {
         return create(  
-            GltfConstants.GL_UNSIGNED_SHORT, "SCALAR",
+            GltfConstants.GL_UNSIGNED_SHORT, "SCALAR", false,
             Buffers.createByteBufferFrom(data));
     }
 
@@ -118,7 +118,7 @@ public class AccessorModels
     public static DefaultAccessorModel createFloat2D(FloatBuffer data)
     {
         return create(
-            GltfConstants.GL_FLOAT, "VEC2", 
+            GltfConstants.GL_FLOAT, "VEC2", false,
             Buffers.createByteBufferFrom(data));
     }
     
@@ -135,7 +135,7 @@ public class AccessorModels
     public static DefaultAccessorModel createFloat3D(FloatBuffer data)
     {
         return create(
-            GltfConstants.GL_FLOAT, "VEC3", 
+            GltfConstants.GL_FLOAT, "VEC3", false,
             Buffers.createByteBufferFrom(data));
     }
     
@@ -152,7 +152,7 @@ public class AccessorModels
     public static DefaultAccessorModel createFloat4D(FloatBuffer data)
     {
         return create(
-            GltfConstants.GL_FLOAT, "VEC4", 
+            GltfConstants.GL_FLOAT, "VEC4", false,
             Buffers.createByteBufferFrom(data));
     }
     
@@ -162,6 +162,7 @@ public class AccessorModels
      * @param componentType The component type, as a GL constant
      * @param type The type of the data, as a string corresponding to
      * the {@link ElementType} of the accessor
+     * @param normalized Whether the data is normalized
      * @param byteBuffer The actual data
      * @return The {@link AccessorModel}
      * @throws IllegalArgumentException If the capacity of the given buffer
@@ -169,7 +170,8 @@ public class AccessorModels
      * type and component type
      */
     public static DefaultAccessorModel create(
-        int componentType, String type, ByteBuffer byteBuffer)
+        int componentType, String type, boolean normalized, 
+        ByteBuffer byteBuffer)
     {
         ElementType elementType = ElementType.valueOf(type);
         int numComponents = elementType.getNumComponents();
@@ -187,6 +189,7 @@ public class AccessorModels
         int count = byteBuffer.capacity() / numBytesPerElement;
         DefaultAccessorModel accessorModel = new DefaultAccessorModel(
             componentType, count, elementType);
+        accessorModel.setNormalized(normalized);
         accessorModel.setAccessorData(
             AccessorDatas.create(accessorModel, byteBuffer));
         return accessorModel;

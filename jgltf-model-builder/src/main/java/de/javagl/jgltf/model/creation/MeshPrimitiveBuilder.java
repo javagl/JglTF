@@ -241,7 +241,7 @@ public final class MeshPrimitiveBuilder
         int componentType, String type, ByteBuffer byteBuffer)
     {
         DefaultAccessorModel indices = AccessorModels.create(
-            componentType, type, byteBuffer);
+            componentType, type, false, byteBuffer);
         return setIndices(indices);
     }
     
@@ -355,7 +355,7 @@ public final class MeshPrimitiveBuilder
         String attributeName, int dimensions, FloatBuffer data)
     {
         DefaultAccessorModel accessorModel = AccessorModels.create(
-            GltfConstants.GL_FLOAT, "VEC" + dimensions, 
+            GltfConstants.GL_FLOAT, "VEC" + dimensions, false, 
             Buffers.createByteBufferFrom(data));
         return addAttribute(attributeName, accessorModel);
     }

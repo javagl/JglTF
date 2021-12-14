@@ -45,6 +45,11 @@ public final class DefaultAccessorModel extends AbstractNamedModelElement
     private final int componentType;
     
     /**
+     * Whether the accessor is normalized
+     */
+    private boolean normalized;
+    
+    /**
      * The offset in bytes, referring to the buffer view
      */
     private int byteOffset;
@@ -149,6 +154,22 @@ public final class DefaultAccessorModel extends AbstractNamedModelElement
     {
         return Accessors.getDataTypeForAccessorComponentType(
             getComponentType());
+    }
+    
+    @Override
+    public boolean isNormalized()
+    {
+        return normalized;
+    }
+    
+    /**
+     * Set whether the underlying data is normalized
+     * 
+     * @param normalized Whether the underlying data is normalized 
+     */
+    public void setNormalized(boolean normalized)
+    {
+        this.normalized = normalized;
     }
     
     @Override
