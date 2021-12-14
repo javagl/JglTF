@@ -199,12 +199,9 @@ public class NormalComputation
     private static void getVector3D(AccessorFloatData accessorFloatData,
         int index, float result[])
     {
-        for (int i = 0; i < 3; i++)
-        {
-            result[0] = accessorFloatData.get(index, 0);
-            result[1] = accessorFloatData.get(index, 1);
-            result[2] = accessorFloatData.get(index, 2);
-        }
+        result[0] = accessorFloatData.get(index, 0);
+        result[1] = accessorFloatData.get(index, 1);
+        result[2] = accessorFloatData.get(index, 2);
     }    
     
     /**
@@ -217,12 +214,9 @@ public class NormalComputation
     private static void setVector3D(AccessorFloatData accessorFloatData,
         int index, float vector[])
     {
-        for (int i = 0; i < 3; i++)
-        {
-            accessorFloatData.set(index, 0, vector[0]);
-            accessorFloatData.set(index, 1, vector[1]);
-            accessorFloatData.set(index, 2, vector[2]);
-        }
+        accessorFloatData.set(index, 0, vector[0]);
+        accessorFloatData.set(index, 1, vector[1]);
+        accessorFloatData.set(index, 2, vector[2]);
     }    
 
     /**
