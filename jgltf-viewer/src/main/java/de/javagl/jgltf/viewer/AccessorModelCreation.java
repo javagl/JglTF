@@ -74,7 +74,8 @@ class AccessorModelCreation
         AccessorFloatData instantiatedAccessorFloatData =
             (AccessorFloatData)instantiatedAccessorData;
 
-        setElements(instantiatedAccessorFloatData, accessorFloatData);
+        AccessorDataUtils.copyFloats(
+            instantiatedAccessorFloatData, accessorFloatData);
 
         return instantiatedAccessorModel;
     }
@@ -132,34 +133,6 @@ class AccessorModelCreation
         return bufferViewModel;
     }
     
-    /**
-     * Set the values of the given target {@link AccessorData} to the same
-     * values as in the given source {@link AccessorData}. If either of
-     * them has fewer elements (or fewer components per element) than the
-     * other, then the minimum of both will be used, respectively.
-     * 
-     * @param target The target {@link AccessorData}
-     * @param source The source {@link AccessorData}
-     */
-    private static void setElements(
-        AccessorFloatData target,
-        AccessorFloatData source)
-    {
-        int numElements =
-            Math.min(target.getNumElements(), source.getNumElements());
-        int numComponents = Math.min(
-            target.getNumComponentsPerElement(),
-            source.getNumComponentsPerElement());
-        for (int e = 0; e < numElements; e++)
-        {
-            for (int c = 0; c < numComponents; c++)
-            {
-                float value = source.get(e, c);
-                target.set(e, c, value);
-            }
-        }
-    }
-
     /**
      * Private constructor to prevent instantiation
      */

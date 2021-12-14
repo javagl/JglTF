@@ -60,11 +60,11 @@ public class NormalComputation
         {
             AccessorData indicesAccessorData = 
                 AccessorDatas.create(indicesAccessorModel);
-            indices = AccessorIndexUtils.extractIndices(indicesAccessorData);
+            indices = AccessorDataUtils.readInts(indicesAccessorData);
         } 
         else
         {
-            indices = AccessorIndexUtils.createDefaultIndices(numTriangles);
+            indices = createDefaultIndices(numTriangles);
         }
         AccessorFloatData positionsAccessorData = 
             AccessorDatas.createFloat(positionsAccessorModel);
@@ -99,6 +99,23 @@ public class NormalComputation
             setVector3D(normalsAccessorData, index2, normal);
         }
         return normalsAccessorModel;
+    }
+    
+    /**
+     * Create default indices for the given number of triangles
+     * 
+     * @param numTriangles The number of triangles
+     * @return The indices
+     */
+    static int[] createDefaultIndices(int numTriangles)
+    {
+        int n = numTriangles * 3;
+        int result[] = new int[n];
+        for (int i = 0; i < n; i++)
+        {
+            result[i] = i;
+        }
+        return result;
     }
     
     /**
