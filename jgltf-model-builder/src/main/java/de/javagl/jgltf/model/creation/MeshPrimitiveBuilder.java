@@ -211,7 +211,7 @@ public final class MeshPrimitiveBuilder
         switch (componentType)
         {
             case GltfConstants.GL_UNSIGNED_BYTE:
-                return setIntIndicesAsShort(indices);
+                return setIntIndicesAsByte(indices);
                 
             case GltfConstants.GL_UNSIGNED_SHORT:
                 return setIntIndicesAsShort(indices);
