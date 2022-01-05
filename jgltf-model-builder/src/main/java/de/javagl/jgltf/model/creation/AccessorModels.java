@@ -157,7 +157,13 @@ public class AccessorModels
     }
     
     /**
-     * Create an {@link AccessorModel} from the given data
+     * Create an {@link AccessorModel} from the given data.
+     * 
+     * The byte buffer containing the data can be created from buffers
+     * with the respective component type by using the utility methods
+     * in the {@link Buffers} class. For example, when the input data
+     * is a <code>FloatBuffer</code>, then the byte buffer can be 
+     * created with <code>Buffers.createByteBufferFrom(floatBuffer)</code>.
      * 
      * @param componentType The component type, as a GL constant
      * @param type The type of the data, as a string corresponding to
