@@ -1,0 +1,69 @@
+{
+  "asset" : {
+    "version" : "2.0"
+  },
+  "extensions": {
+    "EXT_mesh_features": {
+      "schema": {
+        "classes": {
+          "exampleClass": {
+            "name": "Example class name",
+            "description": "Example class description",
+            "properties": {
+              "exampleInt8": { 
+                "description": "An (SINGLE) INT8 example property", 
+                "componentType": "INT8",
+                "required" : true
+              },
+              "exampleFloat32" : {
+                "description": "A (SINGLE) FLOAT32 example property",
+                "componentType": "FLOAT32",
+                "required" : true
+              },
+              "exampleVec3Float32" : {
+                "description": "A VEC3 FLOAT32 example property",
+                "type": "VEC3",
+                "componentType": "FLOAT32",
+                "required" : true
+              },
+              "exampleArrayInt32" : {
+                "description": "An ARRAY INT32 example property",
+                "type": "ARRAY",
+                "componentType": "INT32",
+                "required" : true
+              },
+              "exampleEnum" : {
+                "description": "An ENUM example property",
+                "componentType": "ENUM",
+                "enumType": "exampleEnumType",
+                "required" : true
+              },
+              "exampleString" : {
+                "description": "A (SINGLE) STRING example property",
+                "componentType": "STRING",
+                "required" : true
+              },
+              "exampleArrayString" : {
+                "description": "An ARRAY STRING example property",
+                "type": "ARRAY",
+                "componentType": "STRING",
+                "required" : true
+              }
+            }
+          }
+        },
+        "enums": {
+          "exampleEnumType": {
+            "name": "Example enum type name",
+            "description": "Example enum type description",
+            "values": [
+              { "name": "exampleEnumValueA", "value": 0 },
+              { "name": "exampleEnumValueB", "value": 1 },
+              { "name": "exampleEnumValueC", "value": 2 }
+            ]
+          }
+        }
+      }
+    }
+  }
+}
