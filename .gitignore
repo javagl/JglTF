@@ -77,3 +77,7 @@
 /jgltf-impl-v2-technique-webgl/.project
 /jgltf-impl-v2-technique-webgl/target
 
+/jgltf-impl-v2-ext-mesh-features/.classpath
+/jgltf-impl-v2-ext-mesh-features/.settings
+/jgltf-impl-v2-ext-mesh-features/.project
+/jgltf-impl-v2-ext-mesh-features/target
