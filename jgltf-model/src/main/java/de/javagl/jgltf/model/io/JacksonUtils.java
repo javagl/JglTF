@@ -27,10 +27,13 @@
 package de.javagl.jgltf.model.io;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.BeanDescription;
@@ -38,6 +41,7 @@ import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.BeanDeserializerBuilder;
 import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
@@ -156,6 +160,18 @@ public class JacksonUtils
     }
     
     /**
+     * Create a default Jackson object mapper for this class
+     * 
+     * @return The object mapper
+     */
+    public static ObjectMapper createObjectMapper()
+    {
+        ObjectMapper objectMapper = new ObjectMapper();
+        configure(objectMapper, null);
+        return objectMapper;
+    }
+    
+    /**
      * Perform a default configuration of the given object mapper for
      * parsing glTF data
      * 
@@ -178,6 +194,11 @@ public class JacksonUtils
         objectMapper.addHandler(
             createDeserializationProblemHandler(jsonErrorConsumer));
 
+        objectMapper.setSerializationInclusion(Include.NON_DEFAULT);
+        
+        objectMapper.setPropertyNamingStrategy(
+            new KeywordPropertyNamingStrategy());
+        
         // Register the module that will initialize the setup context
         // with the error handling bean deserializer modifier
         objectMapper.registerModule(new SimpleModule()
@@ -197,6 +218,23 @@ public class JacksonUtils
             }
         });
 
+    }
+    
+    /**
+     * Read a Jackson JSON node from the given JSON data
+     * 
+     * @param jsonData The JSON data
+     * @return The Jackson JSON node
+     * @throws IOException If an IO error occurs
+     */
+    public static JsonNode readJson(ByteBuffer jsonData) throws IOException
+    {
+        ObjectMapper objectMapper = createObjectMapper();
+        try (InputStream jsonInputStream =
+            Buffers.createByteBufferInputStream(jsonData))
+        {
+            return objectMapper.readTree(jsonInputStream);
+        }
     }
     
     /**
