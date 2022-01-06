@@ -2,65 +2,87 @@
   "asset" : {
     "version" : "2.0"
   },
+  "extensionsUsed" : [ "EXT_mesh_features" ],
   "extensions": {
     "EXT_mesh_features": {
-      "schema": {
-        "classes": {
-          "exampleClass": {
-            "name": "Example class name",
-            "description": "Example class description",
-            "properties": {
-              "exampleInt8": { 
-                "description": "An (SINGLE) INT8 example property", 
-                "componentType": "INT8",
-                "required" : true
+      "schema" : {
+        "classes" : {
+          "exampleClass" : {
+            "name" : "Example metadata class",
+            "description" : "An example metadata class with different property types",
+            "properties" : {
+              "example_INT8" : {
+                "name" : "Example INT8 property",
+                "description" : "An example property, with component type INT8",
+                "type" : "SINGLE",
+                "componentType" : "INT8"
               },
-              "exampleFloat32" : {
-                "description": "A (SINGLE) FLOAT32 example property",
-                "componentType": "FLOAT32",
-                "required" : true
+              "example_FLOAT32" : {
+                "name" : "Example FLOAT32 property",
+                "description" : "An example property, with component type FLOAT32",
+                "type" : "SINGLE",
+                "componentType" : "FLOAT32"
               },
-              "exampleVec3Float32" : {
-                "description": "A VEC3 FLOAT32 example property",
-                "type": "VEC3",
-                "componentType": "FLOAT32",
-                "required" : true
+              "example_VEC3_FLOAT32" : {
+                "name" : "Example VEC3 FLOAT32 property",
+                "description" : "An example property, with type VEC3, with component type FLOAT32",
+                "type" : "VEC3",
+                "componentType" : "FLOAT32"
               },
-              "exampleArrayInt32" : {
-                "description": "An ARRAY INT32 example property",
-                "type": "ARRAY",
-                "componentType": "INT32",
-                "required" : true
+              "example_STRING" : {
+                "name" : "Example STRING property",
+                "description" : "An example property, with component type STRING",
+                "type" : "SINGLE",
+                "componentType" : "STRING"
               },
-              "exampleEnum" : {
-                "description": "An ENUM example property",
-                "componentType": "ENUM",
-                "enumType": "exampleEnumType",
-                "required" : true
+              "example_ENUM" : {
+                "name" : "Example ENUM property",
+                "description" : "An example property, with component type ENUM, enum type exampleEnumType",
+                "type" : "SINGLE",
+                "enumType" : "exampleEnumType",
+                "componentType" : "ENUM"
               },
-              "exampleString" : {
-                "description": "A (SINGLE) STRING example property",
-                "componentType": "STRING",
-                "required" : true
+              "example_variable_length_ARRAY_INT32" : {
+                "name" : "Example variable-length ARRAY INT32 property",
+                "description" : "An example property, with type ARRAY, with component type INT32, and variable length ",
+                "type" : "ARRAY",
+                "componentType" : "INT32"
               },
-              "exampleArrayString" : {
-                "description": "An ARRAY STRING example property",
-                "type": "ARRAY",
-                "componentType": "STRING",
-                "required" : true
+              "example_fixed_length_ARRAY_INT32" : {
+                "name" : "Example fixed-length ARRAY INT32 property",
+                "description" : "An example property, with type ARRAY, with component type INT32, and fixed length ",
+                "type" : "ARRAY",
+                "componentType" : "INT32",
+                "componentCount" : 5
+              },
+              "example_variable_length_ARRAY_ENUM" : {
+                "name" : "Example variable-length ARRAY ENUM property",
+                "description" : "An example property, with type ARRAY, with component type ENUM, enum type exampleEnumType, and variable length ",
+                "type" : "ARRAY",
+                "enumType" : "exampleEnumType",
+                "componentType" : "ENUM"
+              },
+              "example_variable_length_ARRAY_STRING" : {
+                "name" : "Example variable-length ARRAY STRING property",
+                "description" : "An example property, with type ARRAY, with component type STRING, and variable length ",
+                "type" : "ARRAY",
+                "componentType" : "STRING"
               }
             }
           }
         },
-        "enums": {
-          "exampleEnumType": {
-            "name": "Example enum type name",
-            "description": "Example enum type description",
-            "values": [
-              { "name": "exampleEnumValueA", "value": 0 },
-              { "name": "exampleEnumValueB", "value": 1 },
-              { "name": "exampleEnumValueC", "value": 2 }
-            ]
+        "enums" : {
+          "exampleEnumType" : {
+            "values" : [ {
+              "name" : "ExampleEnumValueA",
+              "value" : 0
+            }, {
+              "name" : "ExampleEnumValueB",
+              "value" : 1
+            }, {
+              "name" : "ExampleEnumValueC",
+              "value" : 2
+            } ]
           }
         }
       }
