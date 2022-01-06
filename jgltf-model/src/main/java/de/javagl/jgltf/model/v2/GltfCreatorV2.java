@@ -381,6 +381,7 @@ public class GltfCreatorV2
     {
         Accessor accessor = new Accessor();
         accessor.setName(accessorModel.getName());
+        accessor.setExtensions(accessorModel.getExtensions());
         
         accessor.setBufferView(bufferViewIndex);
         
@@ -408,6 +409,7 @@ public class GltfCreatorV2
     {
         Animation animation = new Animation();
         animation.setName(animationModel.getName());
+        animation.setExtensions(animationModel.getExtensions());
         
         List<Sampler> samplers = new ArrayList<Sampler>();
         List<Channel> channels = animationModel.getChannels();
@@ -464,6 +466,7 @@ public class GltfCreatorV2
     {
         Buffer buffer = new Buffer();
         buffer.setName(bufferModel.getName());
+        buffer.setExtensions(bufferModel.getExtensions());
 
         buffer.setUri(bufferModel.getUri());
         buffer.setByteLength(bufferModel.getByteLength());
@@ -496,6 +499,7 @@ public class GltfCreatorV2
     {
         BufferView bufferView = new BufferView();
         bufferView.setName(bufferViewModel.getName());
+        bufferView.setExtensions(bufferViewModel.getExtensions());
 
         bufferView.setBuffer(bufferIndex);
         bufferView.setByteOffset(bufferViewModel.getByteOffset());
@@ -517,6 +521,7 @@ public class GltfCreatorV2
     {
         Camera camera = new Camera();
         camera.setName(cameraModel.getName());
+        camera.setExtensions(cameraModel.getExtensions());
         
         CameraPerspectiveModel cameraPerspectiveModel = 
             cameraModel.getCameraPerspectiveModel();
@@ -567,6 +572,7 @@ public class GltfCreatorV2
     {
         Image image = new Image();
         image.setName(imageModel.getName());
+        image.setExtensions(imageModel.getExtensions());
         
         Integer bufferView = 
             bufferViewIndices.get(imageModel.getBufferViewModel());
@@ -608,6 +614,7 @@ public class GltfCreatorV2
     {
         Material material = new Material();
         material.setName(materialModel.getName());
+        material.setExtensions(materialModel.getExtensions());
         
         
         AlphaMode alphaMode = materialModel.getAlphaMode();
@@ -715,6 +722,7 @@ public class GltfCreatorV2
     {
         Mesh mesh = new Mesh();
         mesh.setName(meshModel.getName());
+        mesh.setExtensions(meshModel.getExtensions());
         
         List<MeshPrimitive> meshPrimitives = new ArrayList<MeshPrimitive>();
         List<MeshPrimitiveModel> meshPrimitiveModels = 
@@ -741,6 +749,7 @@ public class GltfCreatorV2
     {
         MeshPrimitive meshPrimitive = new MeshPrimitive();
         meshPrimitive.setMode(meshPrimitiveModel.getMode());
+        meshPrimitive.setExtensions(meshPrimitiveModel.getExtensions());
         
         Map<String, Integer> attributes = resolveIndices(
             meshPrimitiveModel.getAttributes(), 
@@ -782,6 +791,7 @@ public class GltfCreatorV2
     {
         Node node = new Node();
         node.setName(nodeModel.getName());
+        node.setExtensions(nodeModel.getExtensions());
         
         if (!nodeModel.getChildren().isEmpty())
         {
@@ -829,6 +839,7 @@ public class GltfCreatorV2
     {
         Scene scene = new Scene();
         scene.setName(sceneModel.getName());
+        scene.setExtensions(sceneModel.getExtensions());
         
         scene.setNodes(map(
             sceneModel.getNodeModels(), nodeIndices::get));
@@ -845,6 +856,7 @@ public class GltfCreatorV2
     {
         Skin skin = new Skin();
         skin.setName(skinModel.getName());
+        skin.setExtensions(skinModel.getExtensions());
         
         Integer inverseBindMatrices = 
             accessorIndices.get(skinModel.getInverseBindMatrices());
@@ -937,6 +949,7 @@ public class GltfCreatorV2
     {
         Texture texture = new Texture();
         texture.setName(textureModel.getName());
+        texture.setExtensions(textureModel.getExtensions());
         
         SamplerInfo samplerInfo = new SamplerInfo(textureModel);
         Integer index = samplerIndices.get(samplerInfo);

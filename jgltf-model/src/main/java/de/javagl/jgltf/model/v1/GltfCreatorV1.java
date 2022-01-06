@@ -411,6 +411,7 @@ public class GltfCreatorV1
     {
         Accessor accessor = new Accessor();
         accessor.setName(accessorModel.getName());
+        accessor.setExtensions(accessorModel.getExtensions());
         
         accessor.setBufferView(bufferViewId);
         
@@ -437,6 +438,7 @@ public class GltfCreatorV1
     {
         Animation animation = new Animation();
         animation.setName(animationModel.getName());
+        animation.setExtensions(animationModel.getExtensions());
         
         Map<Sampler, String> samplers = new LinkedHashMap<Sampler, String>();
         List<Channel> channels = animationModel.getChannels();
@@ -497,6 +499,7 @@ public class GltfCreatorV1
     {
         Buffer buffer = new Buffer();
         buffer.setName(bufferModel.getName());
+        buffer.setExtensions(bufferModel.getExtensions());
 
         buffer.setUri(bufferModel.getUri());
         buffer.setByteLength(bufferModel.getByteLength());
@@ -529,6 +532,7 @@ public class GltfCreatorV1
     {
         BufferView bufferView = new BufferView();
         bufferView.setName(bufferViewModel.getName());
+        bufferView.setExtensions(bufferViewModel.getExtensions());
 
         bufferView.setBuffer(bufferId);
         bufferView.setByteOffset(bufferViewModel.getByteOffset());
@@ -549,6 +553,7 @@ public class GltfCreatorV1
     {
         Camera camera = new Camera();
         camera.setName(cameraModel.getName());
+        camera.setExtensions(cameraModel.getExtensions());
         
         CameraPerspectiveModel cameraPerspectiveModel = 
             cameraModel.getCameraPerspectiveModel();
@@ -599,6 +604,7 @@ public class GltfCreatorV1
     {
         Image image = new Image();
         image.setName(imageModel.getName());
+        image.setExtensions(imageModel.getExtensions());
         
         String bufferView = 
             bufferViewIds.get(imageModel.getBufferViewModel());
@@ -642,6 +648,7 @@ public class GltfCreatorV1
     {
         Material material = new Material();
         material.setName(materialModel.getName());
+        material.setExtensions(materialModel.getExtensions());
         
         TechniqueModel techniqueModel = materialModel.getTechniqueModel();
         material.setTechnique(techniqueIds.get(techniqueModel));
@@ -677,6 +684,7 @@ public class GltfCreatorV1
     {
         Program program = new Program();
         program.setName(programModel.getName());
+        program.setExtensions(programModel.getExtensions());
         
         ShaderModel vertexShaderModel = 
             programModel.getVertexShaderModel();
@@ -705,6 +713,7 @@ public class GltfCreatorV1
     {
         Shader shader = new Shader();
         shader.setName(shaderModel.getName());
+        shader.setExtensions(shaderModel.getExtensions());
         
         ShaderType shaderType = shaderModel.getShaderType();
         if (shaderType == ShaderType.VERTEX_SHADER)
@@ -733,6 +742,7 @@ public class GltfCreatorV1
     {
         Technique technique = new Technique();
         technique.setName(techniqueModel.getName());
+        technique.setExtensions(techniqueModel.getExtensions());
         
         ProgramModel programModel = techniqueModel.getProgramModel();
         technique.setProgram(programIds.get(programModel));
@@ -876,6 +886,7 @@ public class GltfCreatorV1
     {
         Mesh mesh = new Mesh();
         mesh.setName(meshModel.getName());
+        mesh.setExtensions(meshModel.getExtensions());
         
         List<MeshPrimitive> meshPrimitives = new ArrayList<MeshPrimitive>();
         List<MeshPrimitiveModel> meshPrimitiveModels = 
@@ -939,6 +950,7 @@ public class GltfCreatorV1
     {
         Node node = new Node();
         node.setName(nodeModel.getName());
+        node.setExtensions(nodeModel.getExtensions());
         
         if (!nodeModel.getChildren().isEmpty())
         {
@@ -986,6 +998,7 @@ public class GltfCreatorV1
     {
         Scene scene = new Scene();
         scene.setName(sceneModel.getName());
+        scene.setExtensions(sceneModel.getExtensions());
         
         scene.setNodes(map(
             sceneModel.getNodeModels(), nodeIds::get));
@@ -1002,6 +1015,7 @@ public class GltfCreatorV1
     {
         Skin skin = new Skin();
         skin.setName(skinModel.getName());
+        skin.setExtensions(skinModel.getExtensions());
         
         String inverseBindMatrices = 
             accessorIds.get(skinModel.getInverseBindMatrices());
@@ -1093,6 +1107,7 @@ public class GltfCreatorV1
     {
         Texture texture = new Texture();
         texture.setName(textureModel.getName());
+        texture.setExtensions(textureModel.getExtensions());
         
         SamplerInfo samplerInfo = new SamplerInfo(textureModel);
         String id = samplerIds.get(samplerInfo);

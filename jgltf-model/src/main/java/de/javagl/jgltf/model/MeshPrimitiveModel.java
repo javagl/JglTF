@@ -32,7 +32,7 @@ import java.util.Map;
 /**
  * Interface for a primitive that is part of a mesh
  */
-public interface MeshPrimitiveModel
+public interface MeshPrimitiveModel extends ModelElement
 {
     /**
      * Returns an unmodifiable view on the mapping from attribute names to
