@@ -40,7 +40,8 @@ import de.javagl.jgltf.model.MeshPrimitiveModel;
 /**
  * Implementation of a {@link MeshPrimitiveModel}
  */
-public final class DefaultMeshPrimitiveModel implements MeshPrimitiveModel
+public final class DefaultMeshPrimitiveModel extends AbstractModelElement 
+    implements MeshPrimitiveModel
 {
     /**
      * The attributes of this mesh primitive model
