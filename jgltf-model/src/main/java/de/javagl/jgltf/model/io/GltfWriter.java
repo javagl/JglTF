@@ -29,7 +29,6 @@ package de.javagl.jgltf.model.io;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
@@ -83,8 +82,7 @@ public final class GltfWriter
     public void write(Object gltf, OutputStream outputStream) 
         throws IOException 
     {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.setSerializationInclusion(Include.NON_NULL);
+        ObjectMapper objectMapper = JacksonUtils.createObjectMapper();
         if (indenting)
         {
             objectMapper.enable(SerializationFeature.INDENT_OUTPUT);

@@ -30,11 +30,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.javagl.jgltf.impl.v1.GlTF;
 import de.javagl.jgltf.impl.v1.GlTFProperty;
+import de.javagl.jgltf.model.io.JacksonUtils;
 
 /**
  * Utility methods related to glTF extensions for glTF 1.0
@@ -211,11 +211,8 @@ public class GltfExtensionsV1
         {
             return null;
         }
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(
-            DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
-        objectMapper.configure(
-            DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        ObjectMapper objectMapper = 
+            JacksonUtils.createObjectMapper();
         T extension = objectMapper.convertValue(extensionObject, type);
         return extension;
     }

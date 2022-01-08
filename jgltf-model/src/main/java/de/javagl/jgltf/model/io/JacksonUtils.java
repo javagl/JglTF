@@ -170,6 +170,21 @@ public class JacksonUtils
         configure(objectMapper, null);
         return objectMapper;
     }
+
+    /**
+     * Create a default Jackson object mapper for this class
+     * 
+     * @return The object mapper
+     * @param jsonErrorConsumer The consumer for {@link JsonError}s. If this 
+     * is <code>null</code>, then the errors will not be handled.
+     */
+    public static ObjectMapper createObjectMapper(
+        Consumer<? super JsonError> jsonErrorConsumer)
+    {
+        ObjectMapper objectMapper = new ObjectMapper();
+        configure(objectMapper, jsonErrorConsumer);
+        return objectMapper;
+    }
     
     /**
      * Perform a default configuration of the given object mapper for
@@ -194,7 +209,7 @@ public class JacksonUtils
         objectMapper.addHandler(
             createDeserializationProblemHandler(jsonErrorConsumer));
 
-        objectMapper.setSerializationInclusion(Include.NON_DEFAULT);
+        objectMapper.setSerializationInclusion(Include.NON_NULL);
         
         objectMapper.setPropertyNamingStrategy(
             new KeywordPropertyNamingStrategy());

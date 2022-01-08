@@ -70,7 +70,8 @@ final class GltfReader
      */
     GltfReader()
     {
-        objectMapper = new ObjectMapper();
+        objectMapper = 
+            JacksonUtils.createObjectMapper(jsonErrorConsumer);
     }
     
     /**

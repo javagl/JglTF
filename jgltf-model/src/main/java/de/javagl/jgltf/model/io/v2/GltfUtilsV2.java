@@ -29,13 +29,13 @@ package de.javagl.jgltf.model.io.v2;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.javagl.jgltf.impl.v2.BufferView;
 import de.javagl.jgltf.impl.v2.GlTF;
 import de.javagl.jgltf.impl.v2.Image;
 import de.javagl.jgltf.model.GltfException;
+import de.javagl.jgltf.model.io.JacksonUtils;
 
 /**
  * Utility methods related to {@link GlTF}s
@@ -57,8 +57,8 @@ class GltfUtilsV2
      */
     static GlTF copy(GlTF gltf)
     {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.setSerializationInclusion(Include.NON_NULL);
+        ObjectMapper objectMapper = 
+            JacksonUtils.createObjectMapper();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try
         {

@@ -34,7 +34,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.javagl.jgltf.impl.v1.BufferView;
@@ -42,6 +41,7 @@ import de.javagl.jgltf.impl.v1.GlTF;
 import de.javagl.jgltf.impl.v1.Image;
 import de.javagl.jgltf.impl.v1.Shader;
 import de.javagl.jgltf.model.GltfException;
+import de.javagl.jgltf.model.io.JacksonUtils;
 
 /**
  * Utility methods related to {@link GlTF}s
@@ -63,8 +63,8 @@ class GltfUtilsV1
      */
     static GlTF copy(GlTF gltf)
     {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.setSerializationInclusion(Include.NON_NULL);
+        ObjectMapper objectMapper = 
+            JacksonUtils.createObjectMapper();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try
         {
