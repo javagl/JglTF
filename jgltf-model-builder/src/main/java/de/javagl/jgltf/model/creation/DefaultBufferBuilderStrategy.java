@@ -31,6 +31,8 @@ import java.util.List;
 
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.AnimationModel;
+import de.javagl.jgltf.model.BufferModel;
+import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.AnimationModel.Channel;
 import de.javagl.jgltf.model.AnimationModel.Sampler;
 import de.javagl.jgltf.model.ImageModel;
@@ -120,6 +122,31 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
         bufferStructureBuilder.createArrayBufferViewModel("attributes");
     }
     
+    /**
+     * Manually add an {@link AccessorModel}
+     * 
+     * TODO Experimental for EXT_mesh_features
+     * 
+     * @param idPrefix The ID prefix
+     * @param accessorModel The {@link AccessorModel}
+     */
+    void addAccessorModel(String idPrefix, DefaultAccessorModel accessorModel)
+    {
+        bufferStructureBuilder.addAccessorModel(idPrefix, accessorModel);
+    }
+    
+    /**
+     * Manually create an {@link BufferViewModel}
+     * 
+     * TODO Experimental for EXT_mesh_features
+     * 
+     * @param idPrefix The ID prefix
+     */
+    void createArrayBufferViewModel(String idPrefix)
+    {
+        bufferStructureBuilder.createArrayBufferViewModel("attributes");
+    }
+    
     @Override
     public void processImageModels(
         Collection<? extends DefaultImageModel> imageModels)
@@ -197,11 +224,22 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
         bufferStructureBuilder.createArrayBufferViewModel("skin");
     }
     
+    /**
+     * Commit the the current buffer data
+     * 
+     * TODO Experimental for EXT_mesh_features
+     * 
+     * @param idPrefix The ID prefix for the {@link BufferModel}
+     * @param uri The {@link BufferModel#getUri()}
+     */
+    void commitBuffer(String idPrefix, String uri)
+    {
+        bufferStructureBuilder.createBufferModel(idPrefix, uri);
+    }
     
     @Override
     public void finish()
     {
-        bufferStructureBuilder.createBufferModel("buffer", "buffer.bin");
         bufferStructure = bufferStructureBuilder.build();
     }
 

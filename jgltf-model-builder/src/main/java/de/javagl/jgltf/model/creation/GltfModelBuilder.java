@@ -26,6 +26,7 @@
  */
 package de.javagl.jgltf.model.creation;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -53,6 +54,7 @@ import de.javagl.jgltf.model.gl.TechniqueModel;
 import de.javagl.jgltf.model.gl.impl.DefaultProgramModel;
 import de.javagl.jgltf.model.gl.impl.DefaultShaderModel;
 import de.javagl.jgltf.model.gl.impl.DefaultTechniqueModel;
+import de.javagl.jgltf.model.impl.DefaultAccessorModel;
 import de.javagl.jgltf.model.impl.DefaultAnimationModel;
 import de.javagl.jgltf.model.impl.DefaultCameraModel;
 import de.javagl.jgltf.model.impl.DefaultGltfModel;
@@ -162,6 +164,9 @@ public class GltfModelBuilder
      */
     private final Set<DefaultShaderModel> shaderModelsSet;
 
+    
+    private final Set<DefaultAccessorModel> manualAccessorModelsSet;
+    
     /**
      * Private constructor
      */
@@ -179,6 +184,9 @@ public class GltfModelBuilder
         this.techniqueModelsSet = new LinkedHashSet<DefaultTechniqueModel>();
         this.programModelsSet = new LinkedHashSet<DefaultProgramModel>();
         this.shaderModelsSet = new LinkedHashSet<DefaultShaderModel>();
+        
+        this.manualAccessorModelsSet = 
+            new LinkedHashSet<DefaultAccessorModel>();
     }
     
     /**
@@ -218,13 +226,29 @@ public class GltfModelBuilder
      */
     private void fill(DefaultGltfModel gltfModel)
     {
-        BufferBuilderStrategy bufferBuilderStrategy = 
+        DefaultBufferBuilderStrategy bufferBuilderStrategy = 
             new DefaultBufferBuilderStrategy();
         
         bufferBuilderStrategy.processMeshModels(meshModelsSet);
         bufferBuilderStrategy.processImageModels(imageModelsSet);
         bufferBuilderStrategy.processAnimationModels(animationModelsSet);
         bufferBuilderStrategy.processSkinModels(skinModelsSet);
+        
+        bufferBuilderStrategy.commitBuffer("buffer", "buffer.bin");
+        
+        // TODO Experimental for EXT_mesh_features
+        if (!manualAccessorModelsSet.isEmpty())
+        {
+            String idPrefix = "_MANUAL_";
+            for (DefaultAccessorModel accessorModel : manualAccessorModelsSet)
+            {
+                bufferBuilderStrategy.addAccessorModel(
+                    idPrefix, accessorModel);
+            }
+            bufferBuilderStrategy.createArrayBufferViewModel("metadata");
+            bufferBuilderStrategy.commitBuffer(
+                "metadata", "metadataBuffer.bin");
+        }
         
         bufferBuilderStrategy.finish();
         
@@ -238,14 +262,31 @@ public class GltfModelBuilder
         gltfModel.addSkinModels(skinModelsSet);
         gltfModel.addTextureModels(textureModelsSet);
         
-        gltfModel.addAccessorModels(
-            bufferBuilderStrategy.getAccessorModels());
+        // TODO Experimental for EXT_mesh_features
+        List<DefaultAccessorModel> accessorModels = 
+            bufferBuilderStrategy.getAccessorModels();
+        List<DefaultAccessorModel> relevantAccessorModels =
+            new ArrayList<DefaultAccessorModel>(accessorModels);
+        relevantAccessorModels.removeAll(manualAccessorModelsSet);
+        
+        gltfModel.addAccessorModels(relevantAccessorModels);
         gltfModel.addBufferViewModels(
             bufferBuilderStrategy.getBufferViewModels());
         gltfModel.addBufferModels(
             bufferBuilderStrategy.getBufferModels());
     }
     
+    /**
+     * Manually add an {@link AccessorModel}
+     * 
+     * TODO Experimental for EXT_mesh_features
+     * 
+     * @param accessorModel The {@link AccessorModel}
+     */
+    public void addAccessorModel(DefaultAccessorModel accessorModel)
+    {
+        manualAccessorModelsSet.add(accessorModel);
+    }
     
     
     
