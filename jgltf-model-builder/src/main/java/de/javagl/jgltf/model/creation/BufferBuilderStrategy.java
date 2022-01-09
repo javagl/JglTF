@@ -90,6 +90,23 @@ interface BufferBuilderStrategy
         Collection<? extends DefaultSkinModel> skinModels);
     
     /**
+     * Process all {@link AccessorModel} instances from the given collection
+     * by the given {@link SkinModel} instances
+     * 
+     * @param accessorModels The {@link AccessorModel} instances
+     */
+    void processAccessorModels(
+        Collection<? extends DefaultAccessorModel> accessorModels);
+    
+    /**
+     * Commit the accessor- and buffer view models that have been added
+     * until now, to create a buffer with the given URI
+     * 
+     * @param uri The buffer URI
+     */
+    void commitBuffer(String uri);
+    
+    /**
      * Finish the creation of the buffer structure, so that the results
      * may be obtained with {@link #getAccessorModels()}, 
      * {@link #getBufferViewModels()} and {@link #getBufferModels()}

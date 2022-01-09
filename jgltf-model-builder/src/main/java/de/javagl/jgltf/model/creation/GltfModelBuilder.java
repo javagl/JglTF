@@ -164,8 +164,12 @@ public class GltfModelBuilder
      */
     private final Set<DefaultShaderModel> shaderModelsSet;
 
-    
-    private final Set<DefaultAccessorModel> manualAccessorModelsSet;
+    /**
+     * A set of virtual {@link AccessorModel} instances that are
+     * only used to create buffer views and buffers, but will not
+     * appear in the output.
+     */
+    private final Set<DefaultAccessorModel> virtualAccessorModelsSet;
     
     /**
      * Private constructor
@@ -185,7 +189,7 @@ public class GltfModelBuilder
         this.programModelsSet = new LinkedHashSet<DefaultProgramModel>();
         this.shaderModelsSet = new LinkedHashSet<DefaultShaderModel>();
         
-        this.manualAccessorModelsSet = 
+        this.virtualAccessorModelsSet = 
             new LinkedHashSet<DefaultAccessorModel>();
     }
     
@@ -226,7 +230,7 @@ public class GltfModelBuilder
      */
     private void fill(DefaultGltfModel gltfModel)
     {
-        DefaultBufferBuilderStrategy bufferBuilderStrategy = 
+        BufferBuilderStrategy bufferBuilderStrategy = 
             new DefaultBufferBuilderStrategy();
         
         bufferBuilderStrategy.processMeshModels(meshModelsSet);
@@ -234,20 +238,13 @@ public class GltfModelBuilder
         bufferBuilderStrategy.processAnimationModels(animationModelsSet);
         bufferBuilderStrategy.processSkinModels(skinModelsSet);
         
-        bufferBuilderStrategy.commitBuffer("buffer", "buffer.bin");
+        bufferBuilderStrategy.commitBuffer("buffer.bin");
         
-        // TODO Experimental for EXT_mesh_features
-        if (!manualAccessorModelsSet.isEmpty())
+        if (!virtualAccessorModelsSet.isEmpty())
         {
-            String idPrefix = "_MANUAL_";
-            for (DefaultAccessorModel accessorModel : manualAccessorModelsSet)
-            {
-                bufferBuilderStrategy.addAccessorModel(
-                    idPrefix, accessorModel);
-            }
-            bufferBuilderStrategy.createArrayBufferViewModel("metadata");
-            bufferBuilderStrategy.commitBuffer(
-                "metadata", "metadataBuffer.bin");
+            bufferBuilderStrategy.processAccessorModels(
+                virtualAccessorModelsSet);
+            bufferBuilderStrategy.commitBuffer("additional.bin");
         }
         
         bufferBuilderStrategy.finish();
@@ -267,7 +264,7 @@ public class GltfModelBuilder
             bufferBuilderStrategy.getAccessorModels();
         List<DefaultAccessorModel> relevantAccessorModels =
             new ArrayList<DefaultAccessorModel>(accessorModels);
-        relevantAccessorModels.removeAll(manualAccessorModelsSet);
+        relevantAccessorModels.removeAll(virtualAccessorModelsSet);
         
         gltfModel.addAccessorModels(relevantAccessorModels);
         gltfModel.addBufferViewModels(
@@ -277,15 +274,18 @@ public class GltfModelBuilder
     }
     
     /**
-     * Manually add an {@link AccessorModel}
+     * Add a "virtual" accessor model. This is an accessor model that
+     * will not appear in the output, but only be used to create 
+     * buffer view and buffer data. 
      * 
-     * TODO Experimental for EXT_mesh_features
+     * This is mainly intended for extensions that require buffer views
+     * without corresponding accessors, like <code>EXT_mesh_features</code>.
      * 
      * @param accessorModel The {@link AccessorModel}
      */
-    public void addAccessorModel(DefaultAccessorModel accessorModel)
+    public void addVirtualAccessorModel(DefaultAccessorModel accessorModel)
     {
-        manualAccessorModelsSet.add(accessorModel);
+        virtualAccessorModelsSet.add(accessorModel);
     }
     
     
