@@ -116,8 +116,8 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
         {
             bufferStructureBuilder.addAccessorModel("attribute", 
                 (DefaultAccessorModel)attribute);
+            bufferStructureBuilder.createArrayBufferViewModel("attribute");
         }
-        bufferStructureBuilder.createArrayBufferViewModel("attributes");
     }
     
     @Override
