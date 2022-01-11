@@ -63,6 +63,12 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
     private BufferStructure bufferStructure;
     
     /**
+     * Whether the vertex attribute accessors should all refer to
+     * a single buffer view
+     */
+    private final boolean useSingleVertexAttributesBufferView = true;
+    
+    /**
      * Default constructor
      */
     DefaultBufferBuilderStrategy()
@@ -116,7 +122,14 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
         {
             bufferStructureBuilder.addAccessorModel("attribute", 
                 (DefaultAccessorModel)attribute);
-            bufferStructureBuilder.createArrayBufferViewModel("attribute");
+            if (!useSingleVertexAttributesBufferView)
+            {
+                bufferStructureBuilder.createArrayBufferViewModel("attribute");
+            }
+        }
+        if (useSingleVertexAttributesBufferView)
+        {
+            bufferStructureBuilder.createArrayBufferViewModel("attributes");
         }
     }
     
