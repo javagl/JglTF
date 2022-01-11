@@ -92,6 +92,55 @@ public enum ElementType
     }
     
     /**
+     * Obtains the byte stride that is implied for this element type with
+     * the given component type, <b>including</b> any padding bytes that
+     * may have to be inserted for matrix types.
+     * 
+     * According to the specification (section 3.6.2.4, Data Alignment),
+     * padding bytes may have to be inserted after each column of matrix:
+     * <ul>
+     *   <li>
+     *     For 1-byte component types and MAT2 elements, two padding bytes
+     *     have to be inserted after each column
+     *   </li>
+     *   <li>
+     *     For 1-byte component types and MAT3 elements, one padding byte
+     *     has to be inserted after each column
+     *   </li>
+     *   <li>
+     *     For 2-byte component types and MAT3 elements, two padding bytes
+     *     have to be inserted after each column
+     *   </li>
+     * </ul>
+     * 
+     * @param componentType The component type
+     * @return The byte stride
+     */
+    public int getByteStride(int componentType)
+    {
+        int n = Accessors.getNumBytesForAccessorComponentType(componentType);
+        if (n == 1)
+        {
+            if (this == MAT2)
+            {
+                return 8;
+            }
+            if (this == MAT3)
+            {
+                return 12;
+            }
+        }
+        if (n == 2)
+        {
+            if (this == MAT3)
+            {
+                return 24;
+            }
+        }
+        return numComponents * n;
+    }
+    
+    /**
      * Returns whether the given string is a valid element type name, and may be
      * passed to <code>ElementType.valueOf</code> without causing an exception.
      * 
