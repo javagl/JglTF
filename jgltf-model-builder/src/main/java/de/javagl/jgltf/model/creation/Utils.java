@@ -82,6 +82,19 @@ class Utils
     }
 
     /**
+     * Compute the smallest value that is a multiple of the given alignment,
+     * and at least as large as the given size.
+     * 
+     * @param size The size
+     * @param alignment The alignment
+     * @return The padded size
+     */
+    static int pad(int size, int alignment)
+    {
+        return size + computePadding(size, alignment);
+    }
+    
+    /**
      * Private constructor to prevent instantiation
      */
     private Utils()
