@@ -71,11 +71,39 @@ public interface AccessorModel extends NamedModelElement
     int getComponentSizeInBytes();
     
     /**
-     * Returns the size of one element, in bytes
+     * Returns the size of one element, in bytes.
+     * 
+     * This does <b>not</b> include any padding that may have to be inserted
+     * after the columns of certain matrix types (see section
+     * 3.6.2.4. "Data Alignment"). 
+     * 
+     * To obtain the padded size of the elements, 
+     * {@link #getPaddedElementSizeInBytes()} can be used. 
      * 
      * @return The element size, in bytes
      */
     int getElementSizeInBytes();
+    
+    /**
+     * Obtain the padded size of one element, in bytes.
+     * 
+     * This <b>does</b> include any padding that may have to be inserted
+     * after the columns of certain matrix types (see section
+     * 3.6.2.4. "Data Alignment"). 
+     * 
+     * For example, for a MAT2 with BYTE components, this will return 8,
+     * which is equivalent to calling 
+     * <pre><code>
+     * ElementType elementType = accessorModel.getElementType();
+     * int componentType = accessorModel.getComponentType(); 
+     * int sizeWithPadding = elementType.getByteStride(componentType);
+     * </code></pre>
+     * 
+     * See {@link ElementType#getByteStride(int)}.
+     * 
+     * @return The padded element size, in bytes
+     */
+    int getPaddedElementSizeInBytes();
     
     /**
      * Returns the byte offset of this accessor referring to its 
@@ -102,6 +130,12 @@ public interface AccessorModel extends NamedModelElement
     /**
      * Returns the byte stride between the starts of two consecutive elements
      * of this accessor.
+     * 
+     * If this is 0, then the elements are tightly packed. This means that
+     * the byte stride is equal to the {@link #getElementSizeInBytes() element 
+     * size}. Note that for glTF 2.0, the byte stride for vertex attributes
+     * must be a multiple 4. Callers must check whether the returned value
+     * is 0 or not a multiple of 4 accordingly.
      * 
      * @return The byte stride
      */

@@ -104,6 +104,7 @@ public final class DefaultAccessorModel extends AbstractNamedModelElement
         this.componentType = componentType;
         this.count = count;
         this.elementType = elementType;
+        this.byteStride = elementType.getByteStride(componentType);
     }
     
     /**
@@ -129,11 +130,6 @@ public final class DefaultAccessorModel extends AbstractNamedModelElement
     /**
      * Set the byte stride, indicating the number of bytes between the start
      * of one element and the start of the next element.
-     * 
-     * If this is set to 0, then the elements are tightly packed. This means 
-     * that the byte stride is equal to the {@link #getElementSizeInBytes() 
-     * element size}. Note that for glTF 2.0, the byte stride for vertex 
-     * attributes must be a multiple 4.
      * 
      * @param byteStride The byte stride
      */
@@ -187,6 +183,12 @@ public final class DefaultAccessorModel extends AbstractNamedModelElement
     public int getElementSizeInBytes()
     {
         return elementType.getNumComponents() * getComponentSizeInBytes();
+    }
+    
+    @Override
+    public int getPaddedElementSizeInBytes()
+    {
+        return elementType.getByteStride(componentType);
     }
     
     @Override

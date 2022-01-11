@@ -56,7 +56,7 @@ public final class AccessorShortData
      * @param bufferViewByteBuffer The byte buffer of the buffer view
      * @param byteOffset The byte offset in the buffer view 
      * @param numElements The number of elements
-     * @param numComponentsPerElement The number of components per element
+     * @param elementType The {@link ElementType}
      * @param byteStride The byte stride between two elements. If this
      * is <code>null</code> or <code>0</code>, then the stride will
      * be the size of one element.
@@ -70,10 +70,10 @@ public final class AccessorShortData
      */
     public AccessorShortData(int componentType,
         ByteBuffer bufferViewByteBuffer, int byteOffset, int numElements,
-        int numComponentsPerElement, Integer byteStride)
+        ElementType elementType, Integer byteStride)
     {
-        super(short.class, bufferViewByteBuffer, byteOffset, numElements, 
-            numComponentsPerElement, Short.BYTES, byteStride);
+        super(componentType, short.class, bufferViewByteBuffer, byteOffset, 
+            numElements, elementType, Short.BYTES, byteStride);
         AccessorDatas.validateShortType(componentType);
 
         this.unsigned = AccessorDatas.isUnsignedType(componentType);

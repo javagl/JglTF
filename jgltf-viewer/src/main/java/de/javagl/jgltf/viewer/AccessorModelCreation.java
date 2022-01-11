@@ -100,11 +100,6 @@ class AccessorModelCreation
         int elementSize = accessorModel.getElementSizeInBytes();
         accessorModel.setByteOffset(0);
         
-        // The byte stride must be a multiple of 4, but this method
-        // is only called for 'float' types, so that condition is
-        // fulfilled here:
-        accessorModel.setByteStride(elementSize);
-        
         ByteBuffer bufferData = Buffers.create(count * elementSize);
         accessorModel.setBufferViewModel(
             createBufferViewModel(bufferUriString, bufferData));

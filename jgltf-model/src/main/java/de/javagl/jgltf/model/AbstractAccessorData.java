@@ -57,9 +57,9 @@ abstract class AbstractAccessorData implements AccessorData
     private final int numElements;
     
     /**
-     * The number of components per element
+     * The {@link ElementType}
      */
-    private final int numComponentsPerElement;
+    private final ElementType elementType;
     
     /**
      * The number of bytes per component
@@ -74,11 +74,12 @@ abstract class AbstractAccessorData implements AccessorData
     /**
      * Default constructor
      * 
+     * @param accessorComponentType The accessor component type
      * @param componentType The component type
      * @param bufferViewByteBuffer The byte buffer of the buffer view
      * @param byteOffset The byte offset in the buffer view 
      * @param numElements The number of elements
-     * @param numComponentsPerElement The number of components per element
+     * @param elementType The {@link ElementType}
      * @param numBytesPerComponent The number of bytes per component
      * @param byteStride The byte stride between two elements. If this
      * is <code>null</code> or <code>0</code>, then the stride will
@@ -86,9 +87,9 @@ abstract class AbstractAccessorData implements AccessorData
      * @throws NullPointerException If the bufferViewByteBuffer is 
      * <code>null</code>
      */
-    AbstractAccessorData(Class<?> componentType, 
+    AbstractAccessorData(int accessorComponentType, Class<?> componentType, 
         ByteBuffer bufferViewByteBuffer, int byteOffset, 
-        int numElements, int numComponentsPerElement, 
+        int numElements, ElementType elementType, 
         int numBytesPerComponent, Integer byteStride)
     {
         Objects.requireNonNull(bufferViewByteBuffer, 
@@ -98,12 +99,12 @@ abstract class AbstractAccessorData implements AccessorData
         this.bufferViewByteBuffer = bufferViewByteBuffer;
         this.byteOffset = byteOffset;
         this.numElements = numElements;
-        this.numComponentsPerElement = numComponentsPerElement;
+        this.elementType = elementType;
         this.numBytesPerComponent = numBytesPerComponent;
         if (byteStride == null || byteStride == 0)
         {
             this.byteStridePerElement = 
-                numComponentsPerElement * numBytesPerComponent;
+                elementType.getByteStride(accessorComponentType);
         }
         else
         {
@@ -126,13 +127,13 @@ abstract class AbstractAccessorData implements AccessorData
     @Override
     public final int getNumComponentsPerElement()
     {
-        return numComponentsPerElement;
+        return elementType.getNumComponents();
     }
 
     @Override
     public final int getTotalNumComponents()
     {
-        return numElements * numComponentsPerElement;
+        return numElements * getNumComponentsPerElement();
     }
     
     /**
@@ -145,9 +146,38 @@ abstract class AbstractAccessorData implements AccessorData
      */
     protected final int getByteIndex(int elementIndex, int componentIndex)
     {
+        // Compute the byte index, including possible padding for 
+        // matrix columns, as specified in 3.6.2.4. Data Alignment
         int byteIndex = byteOffset 
-            + elementIndex * byteStridePerElement
-            + componentIndex * numBytesPerComponent;
+            + elementIndex * byteStridePerElement;
+        if (this.componentType == byte.class)
+        {
+            if (this.elementType == ElementType.MAT2)
+            {
+                int columnIndex = componentIndex / 2;
+                int rowIndex = componentIndex % 2;
+                byteIndex += columnIndex * 4 + rowIndex;
+            }
+            if (this.elementType == ElementType.MAT3)
+            {
+                int columnIndex = componentIndex / 3;
+                int rowIndex = componentIndex % 3;
+                byteIndex += columnIndex * 4 + rowIndex;
+            }
+        }
+        else if (this.componentType == short.class)
+        {
+            if (this.elementType == ElementType.MAT3)
+            {
+                int columnIndex = componentIndex / 3;
+                int rowIndex = componentIndex % 3;
+                byteIndex += columnIndex * 8 + rowIndex * 2;
+            }
+        }
+        else
+        {
+            byteIndex += componentIndex * numBytesPerComponent;
+        }
         return byteIndex;
     }
     

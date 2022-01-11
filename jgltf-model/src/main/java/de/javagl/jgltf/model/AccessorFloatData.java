@@ -51,7 +51,7 @@ public final class AccessorFloatData
      * @param bufferViewByteBuffer The byte buffer of the buffer view
      * @param byteOffset The byte offset in the buffer view 
      * @param numElements The number of elements
-     * @param numComponentsPerElement The number of components per element
+     * @param elementType The {@link ElementType}
      * @param byteStride The byte stride between two elements. If this
      * is <code>null</code> or <code>0</code>, then the stride will
      * be the size of one element.
@@ -65,10 +65,10 @@ public final class AccessorFloatData
      */
     public AccessorFloatData(int componentType,
         ByteBuffer bufferViewByteBuffer, int byteOffset, int numElements,
-        int numComponentsPerElement, Integer byteStride)
+        ElementType elementType, Integer byteStride)
     {
-        super(float.class, bufferViewByteBuffer, byteOffset, numElements, 
-            numComponentsPerElement, Float.BYTES, byteStride);
+        super(componentType, float.class, bufferViewByteBuffer, byteOffset, 
+            numElements, elementType, Float.BYTES, byteStride);
         AccessorDatas.validateFloatType(componentType);
 
         int numBytesPerElement = 

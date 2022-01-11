@@ -524,17 +524,11 @@ public class GltfModelCreatorV2
         
         BufferViewModel bufferViewModel = accessorModel.getBufferViewModel(); 
         Integer byteStride = bufferViewModel.getByteStride();
-        if (byteStride == null)
-        {
-            accessorModel.setByteStride(
-                accessorModel.getElementSizeInBytes());
-        }
-        else
+        if (byteStride != null)
         {
             accessorModel.setByteStride(byteStride);
         }
     }
-    
     
     /**
      * Initialize the given {@link AccessorModel} by setting its 
@@ -664,7 +658,7 @@ public class GltfModelCreatorV2
         AccessorData sparseValuesAccessorData =
             createSparseValuesAccessorData(accessorSparseValues, 
                 accessorModel.getComponentType(),
-                elementType.getNumComponents(), count);
+                elementType, count);
      
         AccessorSparseUtils.substituteAccessorData(
             denseAccessorData, 
@@ -692,7 +686,8 @@ public class GltfModelCreatorV2
         ByteBuffer bufferViewData = bufferViewModel.getBufferViewData();
         int byteOffset = Optionals.of(accessorSparseIndices.getByteOffset(), 0);
         return AccessorDatas.create(
-            componentType, bufferViewData, byteOffset, count, 1, null);
+            componentType, bufferViewData, byteOffset, 
+            count, ElementType.SCALAR, null);
     }
     
     /**
@@ -701,14 +696,14 @@ public class GltfModelCreatorV2
      * 
      * @param accessorSparseValues The {@link AccessorSparseValues}
      * @param componentType The component type of the {@link Accessor}
-     * @param numComponentsPerElement The number of components per element
+     * @param elementType The {@link ElementType}
      * of the {@link AccessorModel#getElementType() accessor element type}
      * @param count The count from the {@link AccessorSparse} 
      * @return The {@link AccessorData}
      */
     private AccessorData createSparseValuesAccessorData(
         AccessorSparseValues accessorSparseValues, 
-        int componentType, int numComponentsPerElement, int count)
+        int componentType, ElementType elementType, int count)
     {
         Integer bufferViewIndex = accessorSparseValues.getBufferView();
         BufferViewModel bufferViewModel = 
@@ -717,7 +712,7 @@ public class GltfModelCreatorV2
         int byteOffset = Optionals.of(accessorSparseValues.getByteOffset(), 0);
         return AccessorDatas.create(
             componentType, bufferViewData, byteOffset, count, 
-            numComponentsPerElement, null);
+            elementType, null);
     }
     
     /**

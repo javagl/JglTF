@@ -102,7 +102,7 @@ public class AccessorDatas
      * @param bufferViewData The buffer view data that the accessor refers to
      * @param byteOffset The byte offset for the accessor
      * @param count The count (number of elements) for the accessor
-     * @param numComponentsPerElement The number of components per element.
+     * @param elementType The {@link ElementType}
      * For example, if the accessor type is <code>"VEC3"</code>, then this
      * will be 3
      * @param byteStride The optional byte stride for the accessor data
@@ -112,31 +112,31 @@ public class AccessorDatas
      */
     public static AccessorData create(
         int componentType, ByteBuffer bufferViewData, int byteOffset, 
-        int count, int numComponentsPerElement, Integer byteStride)
+        int count, ElementType elementType, Integer byteStride)
     {
         if (isByteType(componentType))
         {
             return new AccessorByteData(
                 componentType, bufferViewData, byteOffset, count, 
-                numComponentsPerElement, byteStride);
+                elementType, byteStride);
         }
         if (isShortType(componentType))
         {
             return new AccessorShortData(
                 componentType, bufferViewData, byteOffset, count, 
-                numComponentsPerElement, byteStride);
+                elementType, byteStride);
         }
         if (isIntType(componentType))
         {
             return new AccessorIntData(
                 componentType, bufferViewData, byteOffset, count, 
-                numComponentsPerElement, byteStride);
+                elementType, byteStride);
         }
         if (isFloatType(componentType))
         {
             return new AccessorFloatData(
                 componentType, bufferViewData, byteOffset, count, 
-                numComponentsPerElement, byteStride);
+                elementType, byteStride);
         }
         throw new IllegalArgumentException(
             "Not a valid component type: " + componentType);
@@ -325,7 +325,7 @@ public class AccessorDatas
             bufferViewByteBuffer,
             accessorModel.getByteOffset(),
             accessorModel.getCount(),
-            accessorModel.getElementType().getNumComponents(),
+            accessorModel.getElementType(),
             accessorModel.getByteStride());
     }
     
@@ -365,7 +365,7 @@ public class AccessorDatas
             bufferViewByteBuffer,
             accessorModel.getByteOffset(),
             accessorModel.getCount(),
-            accessorModel.getElementType().getNumComponents(),
+            accessorModel.getElementType(),
             accessorModel.getByteStride());
     }
     
@@ -404,7 +404,7 @@ public class AccessorDatas
             bufferViewByteBuffer,
             accessorModel.getByteOffset(),
             accessorModel.getCount(),
-            accessorModel.getElementType().getNumComponents(),
+            accessorModel.getElementType(),
             accessorModel.getByteStride());
     }
     
@@ -440,7 +440,7 @@ public class AccessorDatas
             bufferViewByteBuffer,
             accessorModel.getByteOffset(),
             accessorModel.getCount(),
-            accessorModel.getElementType().getNumComponents(),
+            accessorModel.getElementType(),
             accessorModel.getByteStride());
     }
 

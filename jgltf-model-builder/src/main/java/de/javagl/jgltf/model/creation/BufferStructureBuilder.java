@@ -28,6 +28,7 @@ package de.javagl.jgltf.model.creation;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -146,7 +147,6 @@ public final class BufferStructureBuilder
         return bufferStructure.getBufferModels().size();
     }
 
-    
     /**
      * Create an {@link AccessorModel} in the {@link BufferStructure} that 
      * is currently being built.
@@ -172,10 +172,38 @@ public final class BufferStructureBuilder
             Buffers.createByteBufferFrom(FloatBuffer.wrap(data));        
         return createAccessorModel(idPrefix, componentType, type, byteBuffer);
     }
+    
+    /**
+     * Create an {@link AccessorModel} in the {@link BufferStructure} that 
+     * is currently being built, using the component type
+     * <code>GL_UNSIGNED_INT</code>
+     * 
+     * @param idPrefix The ID prefix of the {@link AccessorModel} 
+     * @param data The actual data
+     * @param type The type of the data, as a string corresponding to
+     * the {@link ElementType} of the accessor
+     * @return The {@link AccessorModel}
+     */
+    public AccessorModel createAccessorModel(
+        String idPrefix, int data[], String type)
+    {
+        ElementType elementType = ElementType.valueOf(type);
+        int numComponents = elementType.getNumComponents();
+        if (data.length % numComponents != 0)
+        {
+            throw new IllegalArgumentException("Invalid data for type " + type
+                + ". The data.length is not divisble by " + numComponents);
+        }
+        int componentType = GltfConstants.GL_UNSIGNED_INT;
+        ByteBuffer byteBuffer = 
+            Buffers.createByteBufferFrom(IntBuffer.wrap(data));        
+        return createAccessorModel(idPrefix, componentType, type, byteBuffer);
+    }
 
     /**
      * Create an {@link AccessorModel} in the {@link BufferStructure} that 
-     * is currently being built.
+     * is currently being built, using the component type
+     * <code>GL_UNSIGNED_SHORT</code>
      * 
      * @param idPrefix The ID prefix for the {@link AccessorModel} 
      * @param data The actual data
@@ -199,6 +227,33 @@ public final class BufferStructureBuilder
         return createAccessorModel(idPrefix, componentType, type, byteBuffer);
     }
 
+    /**
+     * Create an {@link AccessorModel} in the {@link BufferStructure} that 
+     * is currently being built, using the component type
+     * <code>GL_UNSIGNED_BYTE</code>
+     * 
+     * @param idPrefix The ID prefix for the {@link AccessorModel} 
+     * @param data The actual data
+     * @param type The type of the data, as a string corresponding to
+     * the {@link ElementType} of the accessor
+     * @return The {@link AccessorModel}
+     */
+    public AccessorModel createAccessorModel(
+        String idPrefix, byte data[], String type)
+    {
+        ElementType elementType = ElementType.valueOf(type);
+        int numComponents = elementType.getNumComponents();
+        if (data.length % numComponents != 0)
+        {
+            throw new IllegalArgumentException("Invalid data for type " + type
+                + ". The data.length is not divisble by " + numComponents);
+        }
+        int componentType = GltfConstants.GL_UNSIGNED_BYTE;
+        ByteBuffer byteBuffer = ByteBuffer.wrap(data);
+        return createAccessorModel(idPrefix, componentType, type, byteBuffer);
+    }
+
+    
     /**
      * Create an {@link AccessorModel} in the {@link BufferStructure} that 
      * is currently being built.
@@ -432,25 +487,31 @@ public final class BufferStructureBuilder
             Integer commonByteStride = null;
             Integer target = bufferViewModel.getTarget();
             
-            boolean targetIsElementArrayBuffer = 
-                Objects.equals(GltfConstants.GL_ELEMENT_ARRAY_BUFFER, target);
-            if (!targetIsElementArrayBuffer && accessorModels.size() > 1)
+            // When the target is a vertex attribute, then the elements
+            // of the accessor must be aligned to a multiple of 4. 
+            boolean targetIsVertexAttribute = !Objects.equals(
+                GltfConstants.GL_ELEMENT_ARRAY_BUFFER, target);
+            if (targetIsVertexAttribute)
             {
-                // Compute the byte stride based on the element sizes of
-                // all accessors, and assign it to the accessors as well
-                // as the buffer view
                 commonByteStride = 
-                    AccessorModels.computeCommonByteStride(accessorModels);
+                    AccessorModels.computeCommonVertexAttributeByteStride(
+                        accessorModels);
                 for (DefaultAccessorModel accessorModel : accessorModels)
                 {
-                    accessorModel.setByteStride(commonByteStride);
+                    int oldByteStride = accessorModel.getByteStride();
+                    if (oldByteStride != commonByteStride)
+                    {
+                        accessorModel.setByteStride(commonByteStride);
+                    }
                 }
                 
-                // The byte stride only has to be set in the buffer view
-                // when more than one accessor refers to the buffer view.
-                bufferViewModel.setByteStride(commonByteStride);
+                // When there are multiple vertex attribute accessors that refer 
+                // to the same buffer view, then the byte stride must be defined
+                if (accessorModels.size() > 1)
+                {
+                    bufferViewModel.setByteStride(commonByteStride);
+                }
             }
-            
             
             int accumulatedBufferViewBytes = 0;
             for (DefaultAccessorModel accessorModel : accessorModels)

@@ -216,10 +216,7 @@ public class AccessorModels
         ByteBuffer byteBuffer)
     {
         ElementType elementType = ElementType.valueOf(type);
-        int numComponents = elementType.getNumComponents();
-        int numBytesPerComponent = 
-            Accessors.getNumBytesForAccessorComponentType(componentType);
-        int numBytesPerElement = numComponents * numBytesPerComponent;
+        int numBytesPerElement = elementType.getByteStride(componentType);
         if (byteBuffer.capacity() % numBytesPerElement != 0)
         {
             throw new IllegalArgumentException(
@@ -270,14 +267,16 @@ public class AccessorModels
     
     /**
      * Compute the byte stride that is common for the given 
-     * {@link AccessorModel} instances. This is the maximum of the
-     * {@link AccessorModel#getElementSizeInBytes() element sizes}
-     * of the given models.
+     * {@link AccessorModel} instances.
+     * 
+     * This is the maximum of the {@link AccessorModel#getElementSizeInBytes() 
+     * element sizes} and the {@link AccessorModel#getByteStride() byte 
+     * strides} of the given models. 
      * 
      * @param accessorModels The {@link AccessorModel} instances
      * @return The common byte stride
      */
-    static int computeCommonByteStride(
+    private static int computeCommonByteStride(
         Iterable<? extends AccessorModel> accessorModels)
     {
         int commonByteStride = 1;
@@ -285,9 +284,33 @@ public class AccessorModels
         {
             int elementSize = accessorModel.getElementSizeInBytes();
             commonByteStride = Math.max(commonByteStride, elementSize);
+            
+            int byteStride = accessorModel.getByteStride();
+            commonByteStride = Math.max(commonByteStride, byteStride);
         }
         return commonByteStride;
     }
+
+    /**
+     * Compute the byte stride that is common for the given 
+     * {@link AccessorModel} instances when they are used as
+     * vertex attributes. 
+     * 
+     * The byte stride for vertex attributes must be a multiple of 4. So the 
+     * result of this function is the smallest multiple of 4 that is at least 
+     * as large as the {@link #computeCommonByteStride(Iterable) common byte 
+     * stride}. 
+     * 
+     * @param accessorModels The {@link AccessorModel} instances
+     * @return The common byte stride
+     */
+    static int computeCommonVertexAttributeByteStride(
+        Iterable<? extends AccessorModel> accessorModels)
+    {
+        int commonByteStride = computeCommonByteStride(accessorModels);
+        return Utils.pad(commonByteStride, 4);
+    }
+    
     
     /**
      * Private constructor to prevent instantiation
