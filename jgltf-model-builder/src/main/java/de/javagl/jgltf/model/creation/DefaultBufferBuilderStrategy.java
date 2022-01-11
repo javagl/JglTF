@@ -66,7 +66,7 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
      * Whether the vertex attribute accessors should all refer to
      * a single buffer view
      */
-    private final boolean useSingleVertexAttributesBufferView = true;
+    private final boolean useSingleVertexAttributesBufferView = false;
     
     /**
      * Default constructor

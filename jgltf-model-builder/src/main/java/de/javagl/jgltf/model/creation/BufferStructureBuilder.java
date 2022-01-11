@@ -502,6 +502,7 @@ public final class BufferStructureBuilder
                     if (oldByteStride != commonByteStride)
                     {
                         accessorModel.setByteStride(commonByteStride);
+                        bufferViewModel.setByteStride(commonByteStride);
                     }
                 }
                 
