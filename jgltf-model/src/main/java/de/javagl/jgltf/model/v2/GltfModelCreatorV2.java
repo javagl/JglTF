@@ -466,6 +466,7 @@ public class GltfModelCreatorV2
             Accessor accessor = accessors.get(i);
             DefaultAccessorModel accessorModel = 
                 gltfModel.getAccessorModel(i);
+            transferGltfChildOfRootPropertyElements(accessor, accessorModel);
             
             int byteOffset = Optionals.of(accessor.getByteOffset(), 0);
             accessorModel.setByteOffset(byteOffset);
@@ -726,6 +727,8 @@ public class GltfModelCreatorV2
             Animation animation = animations.get(i);
             DefaultAnimationModel animationModel = 
                 gltfModel.getAnimationModel(i);
+            transferGltfChildOfRootPropertyElements(animation, animationModel);
+            
             List<AnimationChannel> channels = 
                 Optionals.of(animation.getChannels());
             for (AnimationChannel animationChannel : channels)
@@ -908,6 +911,7 @@ public class GltfModelCreatorV2
             meshPrimitive.defaultMode());
         DefaultMeshPrimitiveModel meshPrimitiveModel = 
             new DefaultMeshPrimitiveModel(mode);
+        transferGltfPropertyElements(meshPrimitive, meshPrimitiveModel);
         
         Integer indicesIndex = meshPrimitive.getIndices();
         if (indicesIndex != null)

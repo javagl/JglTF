@@ -50,6 +50,8 @@ import de.javagl.jgltf.impl.v1.Camera;
 import de.javagl.jgltf.impl.v1.CameraOrthographic;
 import de.javagl.jgltf.impl.v1.CameraPerspective;
 import de.javagl.jgltf.impl.v1.GlTF;
+import de.javagl.jgltf.impl.v1.GlTFChildOfRootProperty;
+import de.javagl.jgltf.impl.v1.GlTFProperty;
 import de.javagl.jgltf.impl.v1.Image;
 import de.javagl.jgltf.impl.v1.Material;
 import de.javagl.jgltf.impl.v1.Mesh;
@@ -81,6 +83,8 @@ import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.MaterialModel;
 import de.javagl.jgltf.model.MeshModel;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
+import de.javagl.jgltf.model.ModelElement;
+import de.javagl.jgltf.model.NamedModelElement;
 import de.javagl.jgltf.model.NodeModel;
 import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.SceneModel;
@@ -316,6 +320,7 @@ public class GltfCreatorV1
     public GlTF create()
     {
         GlTF gltf = new GlTF();
+        transferGltfPropertyElements(gltfModel, gltf);
         
         gltf.setAccessors(map("accessor",
             gltfModel.getAccessorModels(), 
@@ -410,8 +415,7 @@ public class GltfCreatorV1
         AccessorModel accessorModel, String bufferViewId)
     {
         Accessor accessor = new Accessor();
-        accessor.setName(accessorModel.getName());
-        accessor.setExtensions(accessorModel.getExtensions());
+        transferGltfChildOfRootPropertyElements(accessorModel, accessor);
         
         accessor.setBufferView(bufferViewId);
         
@@ -437,8 +441,7 @@ public class GltfCreatorV1
     private Animation createAnimation(AnimationModel animationModel)
     {
         Animation animation = new Animation();
-        animation.setName(animationModel.getName());
-        animation.setExtensions(animationModel.getExtensions());
+        transferGltfChildOfRootPropertyElements(animationModel, animation);
         
         Map<Sampler, String> samplers = new LinkedHashMap<Sampler, String>();
         List<Channel> channels = animationModel.getChannels();
@@ -498,8 +501,7 @@ public class GltfCreatorV1
     public static Buffer createBuffer(BufferModel bufferModel)
     {
         Buffer buffer = new Buffer();
-        buffer.setName(bufferModel.getName());
-        buffer.setExtensions(bufferModel.getExtensions());
+        transferGltfChildOfRootPropertyElements(bufferModel, buffer);
 
         buffer.setUri(bufferModel.getUri());
         buffer.setByteLength(bufferModel.getByteLength());
@@ -531,8 +533,7 @@ public class GltfCreatorV1
         BufferViewModel bufferViewModel, String bufferId)
     {
         BufferView bufferView = new BufferView();
-        bufferView.setName(bufferViewModel.getName());
-        bufferView.setExtensions(bufferViewModel.getExtensions());
+        transferGltfChildOfRootPropertyElements(bufferViewModel, bufferView);
 
         bufferView.setBuffer(bufferId);
         bufferView.setByteOffset(bufferViewModel.getByteOffset());
@@ -552,8 +553,7 @@ public class GltfCreatorV1
     private Camera createCamera(CameraModel cameraModel)
     {
         Camera camera = new Camera();
-        camera.setName(cameraModel.getName());
-        camera.setExtensions(cameraModel.getExtensions());
+        transferGltfChildOfRootPropertyElements(cameraModel, camera);
         
         CameraPerspectiveModel cameraPerspectiveModel = 
             cameraModel.getCameraPerspectiveModel();
@@ -603,8 +603,7 @@ public class GltfCreatorV1
     private Image createImage(ImageModel imageModel)
     {
         Image image = new Image();
-        image.setName(imageModel.getName());
-        image.setExtensions(imageModel.getExtensions());
+        transferGltfChildOfRootPropertyElements(imageModel, image);
         
         String bufferView = 
             bufferViewIds.get(imageModel.getBufferViewModel());
@@ -647,8 +646,7 @@ public class GltfCreatorV1
     private Material createMaterialV1(MaterialModelV1 materialModel)
     {
         Material material = new Material();
-        material.setName(materialModel.getName());
-        material.setExtensions(materialModel.getExtensions());
+        transferGltfChildOfRootPropertyElements(materialModel, material);
         
         TechniqueModel techniqueModel = materialModel.getTechniqueModel();
         material.setTechnique(techniqueIds.get(techniqueModel));
@@ -683,8 +681,7 @@ public class GltfCreatorV1
     private Program createProgram(ProgramModel programModel)
     {
         Program program = new Program();
-        program.setName(programModel.getName());
-        program.setExtensions(programModel.getExtensions());
+        transferGltfChildOfRootPropertyElements(programModel, program);
         
         ShaderModel vertexShaderModel = 
             programModel.getVertexShaderModel();
@@ -712,8 +709,7 @@ public class GltfCreatorV1
     private Shader createShader(ShaderModel shaderModel)
     {
         Shader shader = new Shader();
-        shader.setName(shaderModel.getName());
-        shader.setExtensions(shaderModel.getExtensions());
+        transferGltfChildOfRootPropertyElements(shaderModel, shader);
         
         ShaderType shaderType = shaderModel.getShaderType();
         if (shaderType == ShaderType.VERTEX_SHADER)
@@ -741,8 +737,7 @@ public class GltfCreatorV1
     private Technique createTechnique(TechniqueModel techniqueModel)
     {
         Technique technique = new Technique();
-        technique.setName(techniqueModel.getName());
-        technique.setExtensions(techniqueModel.getExtensions());
+        transferGltfChildOfRootPropertyElements(techniqueModel, technique);
         
         ProgramModel programModel = techniqueModel.getProgramModel();
         technique.setProgram(programIds.get(programModel));
@@ -885,8 +880,7 @@ public class GltfCreatorV1
     private Mesh createMesh(MeshModel meshModel)
     {
         Mesh mesh = new Mesh();
-        mesh.setName(meshModel.getName());
-        mesh.setExtensions(meshModel.getExtensions());
+        transferGltfChildOfRootPropertyElements(meshModel, mesh);
         
         List<MeshPrimitive> meshPrimitives = new ArrayList<MeshPrimitive>();
         List<MeshPrimitiveModel> meshPrimitiveModels = 
@@ -916,6 +910,8 @@ public class GltfCreatorV1
         MeshPrimitiveModel meshPrimitiveModel)
     {
         MeshPrimitive meshPrimitive = new MeshPrimitive();
+        transferGltfPropertyElements(meshPrimitiveModel, meshPrimitive);
+
         meshPrimitive.setMode(meshPrimitiveModel.getMode());
         
         Map<String, String> attributes = resolveIds(
@@ -949,8 +945,7 @@ public class GltfCreatorV1
     private Node createNode(NodeModel nodeModel)
     {
         Node node = new Node();
-        node.setName(nodeModel.getName());
-        node.setExtensions(nodeModel.getExtensions());
+        transferGltfChildOfRootPropertyElements(nodeModel, node);
         
         if (!nodeModel.getChildren().isEmpty())
         {
@@ -997,8 +992,7 @@ public class GltfCreatorV1
     private Scene createScene(SceneModel sceneModel)
     {
         Scene scene = new Scene();
-        scene.setName(sceneModel.getName());
-        scene.setExtensions(sceneModel.getExtensions());
+        transferGltfChildOfRootPropertyElements(sceneModel, scene);
         
         scene.setNodes(map(
             sceneModel.getNodeModels(), nodeIds::get));
@@ -1014,8 +1008,7 @@ public class GltfCreatorV1
     private Skin createSkin(SkinModel skinModel)
     {
         Skin skin = new Skin();
-        skin.setName(skinModel.getName());
-        skin.setExtensions(skinModel.getExtensions());
+        transferGltfChildOfRootPropertyElements(skinModel, skin);
         
         String inverseBindMatrices = 
             accessorIds.get(skinModel.getInverseBindMatrices());
@@ -1106,8 +1099,7 @@ public class GltfCreatorV1
     private Texture createTexture(TextureModel textureModel)
     {
         Texture texture = new Texture();
-        texture.setName(textureModel.getName());
-        texture.setExtensions(textureModel.getExtensions());
+        transferGltfChildOfRootPropertyElements(textureModel, texture);
         
         SamplerInfo samplerInfo = new SamplerInfo(textureModel);
         String id = samplerIds.get(samplerInfo);
@@ -1118,6 +1110,34 @@ public class GltfCreatorV1
         return texture;
     }
 
+    /**
+     * Transfer the extensions and extras from the given model element to
+     * the given property
+     * 
+     * @param modelElement The model element
+     * @param property The property
+     */
+    private static void transferGltfPropertyElements(
+        ModelElement modelElement, GlTFProperty property)
+    {
+        property.setExtensions(modelElement.getExtensions());
+        property.setExtras(modelElement.getExtras());
+    }
+    
+    /**
+     * Transfer the name and extensions and extras from the given model
+     * element to the given property
+     * 
+     * @param modelElement The model element
+     * @param property The property
+     */
+    private static void transferGltfChildOfRootPropertyElements(
+        NamedModelElement modelElement,
+        GlTFChildOfRootProperty property)
+    {
+        property.setName(modelElement.getName());
+        transferGltfPropertyElements(modelElement, property);
+    }
     
     /**
      * Creates a map that maps (unspecified) strings starting with the 

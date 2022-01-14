@@ -884,13 +884,12 @@ class GltfModelCreatorV1
     private DefaultMeshPrimitiveModel createMeshPrimitiveModel(
         MeshPrimitive meshPrimitive)
     {
-        Integer mode = meshPrimitive.getMode();
-        if (mode == null)
-        {
-            mode = meshPrimitive.defaultMode();
-        }
+        Integer mode = Optionals.of(
+            meshPrimitive.getMode(), 
+            meshPrimitive.defaultMode());
         DefaultMeshPrimitiveModel meshPrimitiveModel = 
             new DefaultMeshPrimitiveModel(mode);
+        transferGltfPropertyElements(meshPrimitive, meshPrimitiveModel);
         
         String indicesId = meshPrimitive.getIndices();
         if (indicesId != null)
