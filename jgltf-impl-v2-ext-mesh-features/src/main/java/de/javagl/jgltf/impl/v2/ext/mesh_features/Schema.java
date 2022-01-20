@@ -24,6 +24,11 @@ public class Schema
 {
 
     /**
+     * Unique identifier for the schema. (optional) 
+     * 
+     */
+    private String id;
+    /**
      * The name of the schema, e.g. for display purposes. (optional) 
      * 
      */
@@ -52,6 +57,30 @@ public class Schema
      * 
      */
     private Map<String, MetadataEnum> enums;
+
+    /**
+     * Unique identifier for the schema. (optional) 
+     * 
+     * @param id The id to set
+     * 
+     */
+    public void setId(String id) {
+        if (id == null) {
+            this.id = id;
+            return ;
+        }
+        this.id = id;
+    }
+
+    /**
+     * Unique identifier for the schema. (optional) 
+     * 
+     * @return The id
+     * 
+     */
+    public String getId() {
+        return this.id;
+    }
 
     /**
      * The name of the schema, e.g. for display purposes. (optional) 
