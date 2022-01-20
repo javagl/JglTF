@@ -26,7 +26,6 @@
  */
 package de.javagl.jgltf.model.creation;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -56,6 +55,8 @@ import de.javagl.jgltf.model.gl.impl.DefaultShaderModel;
 import de.javagl.jgltf.model.gl.impl.DefaultTechniqueModel;
 import de.javagl.jgltf.model.impl.DefaultAccessorModel;
 import de.javagl.jgltf.model.impl.DefaultAnimationModel;
+import de.javagl.jgltf.model.impl.DefaultBufferModel;
+import de.javagl.jgltf.model.impl.DefaultBufferViewModel;
 import de.javagl.jgltf.model.impl.DefaultCameraModel;
 import de.javagl.jgltf.model.impl.DefaultGltfModel;
 import de.javagl.jgltf.model.impl.DefaultImageModel;
@@ -165,11 +166,25 @@ public class GltfModelBuilder
     private final Set<DefaultShaderModel> shaderModelsSet;
 
     /**
-     * A set of virtual {@link AccessorModel} instances that are
-     * only used to create buffer views and buffers, but will not
-     * appear in the output.
+     * A set of {@link AccessorModel} instances that are not created
+     * from the other models, but supposed to be added to the final
+     * model manually.
      */
-    private final Set<DefaultAccessorModel> virtualAccessorModelsSet;
+    private final Set<DefaultAccessorModel> accessorModelsSet;
+
+    /**
+     * A set of {@link BufferViewModel} instances that are not created
+     * from the other models, but supposed to be added to the final
+     * model manually.
+     */
+    private final Set<DefaultBufferViewModel> bufferViewModelsSet;
+
+    /**
+     * A set of {@link BufferModel} instances that are not created
+     * from the other models, but supposed to be added to the final
+     * model manually.
+     */
+    private final Set<DefaultBufferModel> bufferModelsSet;
     
     /**
      * Private constructor
@@ -188,9 +203,11 @@ public class GltfModelBuilder
         this.techniqueModelsSet = new LinkedHashSet<DefaultTechniqueModel>();
         this.programModelsSet = new LinkedHashSet<DefaultProgramModel>();
         this.shaderModelsSet = new LinkedHashSet<DefaultShaderModel>();
+
+        this.accessorModelsSet = new LinkedHashSet<DefaultAccessorModel>();
+        this.bufferViewModelsSet = new LinkedHashSet<DefaultBufferViewModel>();
+        this.bufferModelsSet = new LinkedHashSet<DefaultBufferModel>();
         
-        this.virtualAccessorModelsSet = 
-            new LinkedHashSet<DefaultAccessorModel>();
     }
     
     /**
@@ -239,14 +256,6 @@ public class GltfModelBuilder
         bufferBuilderStrategy.processSkinModels(skinModelsSet);
         
         bufferBuilderStrategy.commitBuffer("buffer.bin");
-        
-        if (!virtualAccessorModelsSet.isEmpty())
-        {
-            bufferBuilderStrategy.processAccessorModels(
-                virtualAccessorModelsSet);
-            bufferBuilderStrategy.commitBuffer("additional.bin");
-        }
-        
         bufferBuilderStrategy.finish();
         
         gltfModel.addAnimationModels(animationModelsSet);
@@ -259,36 +268,17 @@ public class GltfModelBuilder
         gltfModel.addSkinModels(skinModelsSet);
         gltfModel.addTextureModels(textureModelsSet);
         
-        // TODO Experimental for EXT_mesh_features
-        List<DefaultAccessorModel> accessorModels = 
-            bufferBuilderStrategy.getAccessorModels();
-        List<DefaultAccessorModel> relevantAccessorModels =
-            new ArrayList<DefaultAccessorModel>(accessorModels);
-        relevantAccessorModels.removeAll(virtualAccessorModelsSet);
-        
-        gltfModel.addAccessorModels(relevantAccessorModels);
+        gltfModel.addAccessorModels(
+            bufferBuilderStrategy.getAccessorModels());
         gltfModel.addBufferViewModels(
             bufferBuilderStrategy.getBufferViewModels());
         gltfModel.addBufferModels(
             bufferBuilderStrategy.getBufferModels());
+        
+        gltfModel.addAccessorModels(accessorModelsSet);
+        gltfModel.addBufferViewModels(bufferViewModelsSet);
+        gltfModel.addBufferModels(bufferModelsSet);
     }
-    
-    /**
-     * Add a "virtual" accessor model. This is an accessor model that
-     * will not appear in the output, but only be used to create 
-     * buffer view and buffer data. 
-     * 
-     * This is mainly intended for extensions that require buffer views
-     * without corresponding accessors, like <code>EXT_mesh_features</code>.
-     * 
-     * @param accessorModel The {@link AccessorModel}
-     */
-    public void addVirtualAccessorModel(DefaultAccessorModel accessorModel)
-    {
-        virtualAccessorModelsSet.add(accessorModel);
-    }
-    
-    
     
     /**
      * Add the given {@link AnimationModel}
@@ -719,5 +709,92 @@ public class GltfModelBuilder
             addShaderModel(shaderModel);
         }
     }
+    
+    
+    /**
+     * Add the given {@link AccessorModel} that will be added to the 
+     * final model manually.
+     * 
+     * @param accessorModel The {@link AccessorModel}
+     */
+    public void addAccessorModel(AccessorModel accessorModel)
+    {
+        DefaultAccessorModel defaultAccessorModel = 
+            (DefaultAccessorModel) accessorModel;
+        accessorModelsSet.add(defaultAccessorModel);
+    }
+    
+    /**
+     * Add the given {@link AccessorModel} instances that will be added
+     * to the final model manually.
+     * 
+     * @param accessorModels The {@link AccessorModel} instances
+     */
+    public void addAccessorModels(
+        Collection<? extends AccessorModel> accessorModels)
+    {
+        for (AccessorModel accessorModel : accessorModels)
+        {
+            addAccessorModel(accessorModel);
+        }
+    }
+    
+    /**
+     * Add the given {@link BufferViewModel} that will be added to the 
+     * final model manually.
+     * 
+     * @param bufferViewModel The {@link BufferViewModel}
+     */
+    public void addBufferViewModel(BufferViewModel bufferViewModel)
+    {
+        DefaultBufferViewModel defaultBufferViewModel = 
+            (DefaultBufferViewModel) bufferViewModel;
+        bufferViewModelsSet.add(defaultBufferViewModel);
+    }
+    
+    /**
+     * Add the given {@link BufferViewModel} instances that will be added
+     * to the final model manually.
+     * 
+     * @param bufferViewModels The {@link BufferViewModel} instances
+     */
+    public void addBufferViewModels(
+        Collection<? extends BufferViewModel> bufferViewModels)
+    {
+        for (BufferViewModel bufferViewModel : bufferViewModels)
+        {
+            addBufferViewModel(bufferViewModel);
+        }
+    }
+    
+    /**
+     * Add the given {@link BufferModel} that will be added to the 
+     * final model manually.
+     * 
+     * @param bufferModel The {@link BufferModel}
+     */
+    public void addBufferModel(BufferModel bufferModel)
+    {
+        DefaultBufferModel defaultBufferModel = 
+            (DefaultBufferModel) bufferModel;
+        bufferModelsSet.add(defaultBufferModel);
+    }
+    
+    /**
+     * Add the given {@link BufferModel} instances that will be added
+     * to the final model manually.
+     * 
+     * @param bufferModels The {@link BufferModel} instances
+     */
+    public void addBufferModels(
+        Collection<? extends BufferModel> bufferModels)
+    {
+        for (BufferModel bufferModel : bufferModels)
+        {
+            addBufferModel(bufferModel);
+        }
+    }
+    
+    
     
 }
