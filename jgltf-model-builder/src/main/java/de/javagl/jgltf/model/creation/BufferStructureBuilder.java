@@ -489,8 +489,8 @@ public final class BufferStructureBuilder
             
             // When the target is a vertex attribute, then the elements
             // of the accessor must be aligned to a multiple of 4. 
-            boolean targetIsVertexAttribute = !Objects.equals(
-                GltfConstants.GL_ELEMENT_ARRAY_BUFFER, target);
+            boolean targetIsVertexAttribute = Objects.equals(
+                GltfConstants.GL_ARRAY_BUFFER, target);
             if (targetIsVertexAttribute)
             {
                 commonByteStride = 
