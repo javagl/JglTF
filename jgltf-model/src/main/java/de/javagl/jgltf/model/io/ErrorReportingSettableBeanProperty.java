@@ -34,6 +34,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.PropertyName;
+import com.fasterxml.jackson.databind.deser.NullValueProvider;
 import com.fasterxml.jackson.databind.deser.SettableBeanProperty;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
 
@@ -141,4 +142,9 @@ class ErrorReportingSettableBeanProperty extends SettableBeanProperty
         }
         
     }
+
+	@Override
+	public SettableBeanProperty withNullProvider(NullValueProvider nva) {
+		return this;
+	}
 }

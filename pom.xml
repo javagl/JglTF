@@ -11,7 +11,7 @@
   <groupId>de.javagl</groupId>
   <artifactId>jgltf-parent</artifactId>
   <packaging>pom</packaging>
-  <version>2.0.0</version>
+  <version>2.0.1-SNAPSHOT</version>
 
   <scm>
     <connection>scm:git:git@github.com:javagl/JglTF.git</connection>
