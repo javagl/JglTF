@@ -7,8 +7,6 @@
 .idea
 *.iml
 
-
-/jgltf-model-builder
 /jgltf-obj-multimesh
 /jgltf-converter
 /jgltf-viewer-demo
@@ -31,6 +29,11 @@
 /jgltf-model/.settings
 /jgltf-model/target
 /jgltf-model/.classpath
+
+/jgltf-model-builder/.project
+/jgltf-model-builder/.settings
+/jgltf-model-builder/target
+/jgltf-model-builder/.classpath
 
 /jgltf-model/src/test/resources/testModels/testBox/output-glTF-to-glTF-Embedded
 /jgltf-model/src/test/resources/testModels/testBox/output-glTF-to-glTF
