@@ -70,6 +70,23 @@ public class AccessorModels
 
     /**
      * Creates a new {@link AccessorModel} with the component type
+     * <code>GL_INT</code> and the type <code>"SCALAR"</code>.
+     * 
+     * @param data The actual data
+     * @return The {@link AccessorModel}
+     * @throws IllegalArgumentException If the capacity of the given buffer
+     * (in bytes!) is not divisible by the element size that is implied by 
+     * the type and component type
+     */
+    public static DefaultAccessorModel createIntScalar(IntBuffer data)
+    {
+        return create(
+            GltfConstants.GL_INT, "SCALAR", false,
+            Buffers.createByteBufferFrom(data));
+    }
+    
+    /**
+     * Creates a new {@link AccessorModel} with the component type
      * <code>GL_UNSIGNED_BYTE</code> and the type <code>"SCALAR"</code>.<br>
      * <br>
      * The elements of the given buffer will be cast to <code>byte</code>.
@@ -102,6 +119,42 @@ public class AccessorModels
     {
         return create(  
             GltfConstants.GL_UNSIGNED_BYTE, "SCALAR", false, data);
+    }
+    
+    /**
+     * Creates a new {@link AccessorModel} with the component type
+     * <code>GL_BYTE</code> and the type <code>"SCALAR"</code>.<br>
+     * <br>
+     * The elements of the given buffer will be cast to <code>byte</code>.
+     * 
+     * @param data The actual data
+     * @return The {@link AccessorModel}
+     * @throws IllegalArgumentException If the capacity of the given buffer
+     * (in bytes!) is not divisible by the element size that is implied by 
+     * the type and component type
+     */
+    public static DefaultAccessorModel createByteScalar(IntBuffer data)
+    {
+        return create(  
+            GltfConstants.GL_BYTE, "SCALAR", false,
+            Buffers.castToByteBuffer(data));
+    }
+    
+    /**
+     * Creates a new {@link AccessorModel} with the component type
+     * <code>GL_BYTE</code> and the type <code>"SCALAR"</code>.
+     * 
+     * @param data The actual data
+     * @return The {@link AccessorModel}
+     * @throws IllegalArgumentException If the capacity of the given buffer
+     * (in bytes!) is not divisible by the element size that is implied by 
+     * the type and component type
+     */
+    public static DefaultAccessorModel createByteScalar(
+        ByteBuffer data)
+    {
+        return create(  
+            GltfConstants.GL_BYTE, "SCALAR", false, data);
     }
     
     /**
@@ -141,6 +194,44 @@ public class AccessorModels
             Buffers.createByteBufferFrom(data));
     }
 
+    /**
+     * Creates a new {@link AccessorModel} with the component type
+     * <code>GL_SHORT</code> and the type <code>"SCALAR"</code>.<br>
+     * <br>
+     * The elements of the given buffer will be cast to <code>short</code>.
+     * 
+     * @param data The actual data
+     * @return The {@link AccessorModel}
+     * @throws IllegalArgumentException If the capacity of the given buffer
+     * (in bytes!) is not divisible by the element size that is implied by 
+     * the type and component type
+     */
+    public static DefaultAccessorModel createShortScalar(IntBuffer data)
+    {
+        return create(  
+            GltfConstants.GL_SHORT, "SCALAR", false,
+            Buffers.castToShortByteBuffer(data));
+    }
+
+    /**
+     * Creates a new {@link AccessorModel} with the component type
+     * <code>GL_SHORT</code> and the type <code>"SCALAR"</code>.
+     * 
+     * @param data The actual data
+     * @return The {@link AccessorModel}
+     * @throws IllegalArgumentException If the capacity of the given buffer
+     * (in bytes!) is not divisible by the element size that is implied by 
+     * the type and component type
+     */
+    public static DefaultAccessorModel createShortScalar(
+        ShortBuffer data)
+    {
+        return create(  
+            GltfConstants.GL_SHORT, "SCALAR", false,
+            Buffers.createByteBufferFrom(data));
+    }
+    
+    
     /**
      * Creates a new {@link AccessorModel} with the component type
      * <code>GL_FLOAT</code> and the type <code>"VEC2"</code>.
