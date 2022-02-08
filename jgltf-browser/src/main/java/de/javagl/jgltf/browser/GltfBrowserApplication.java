@@ -358,8 +358,8 @@ class GltfBrowserApplication
         frame = new JFrame("GltfBrowser");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
-        GltfTransferHandler transferHandler = 
-            new GltfTransferHandler(this);
+        UriTransferHandler transferHandler = 
+            new UriTransferHandler(uri -> openUriInBackground(uri));
         frame.setTransferHandler(transferHandler);
 
         recentUrisMenu = new RecentUrisMenu(
