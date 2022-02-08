@@ -80,7 +80,7 @@ class RecentUrisMenu
     /**
      * The consumer that will receive the URIs that are selected in the menu
      */
-    private final Consumer<URI> uriConsumer;
+    private final Consumer<? super URI> uriConsumer;
     
     /**
      * Default constructor
@@ -89,7 +89,7 @@ class RecentUrisMenu
      * @param uriConsumer The consumer that will receive the URI when one
      * of the menu entries was selected
      */
-    RecentUrisMenu(String fileNamePrefix, Consumer<URI> uriConsumer)
+    RecentUrisMenu(String fileNamePrefix, Consumer<? super URI> uriConsumer)
     {
         this.fileNamePrefix = fileNamePrefix;
         this.uriConsumer = Objects.requireNonNull(
