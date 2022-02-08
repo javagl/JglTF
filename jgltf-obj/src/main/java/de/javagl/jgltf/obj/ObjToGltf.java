@@ -223,7 +223,7 @@ public class ObjToGltf
         System.out.println("Example: ");
         System.out.println("========");
         System.out.println("");
-        System.out.println("  ObjToGltf -b -s=part -i=C:/Input/Example.obj " 
+        System.out.println("  ObjToGltf -b -i=C:/Input/Example.obj " 
             + "-o=C:/Output/Example.glb");
     }
 }
