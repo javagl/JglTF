@@ -1,0 +1,13 @@
+newmtl material0
+Ka 1.0 0.0 0.0
+Kd 1.0 0.0 0.0
+Ks 1.0 1.0 1.0
+Ns 64.0
+d 1.0
+newmtl material1
+Ka 1.0 1.0 1.0
+Kd 1.0 1.0 1.0
+Ks 1.0 1.0 1.0
+map_Kd texture.png
+Ns 0.0
+d 0.5

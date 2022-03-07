@@ -1,0 +1,17 @@
+mtllib twoMaterials.mtl
+v 0.0 0.0 0.0
+v 4.0 0.0 0.0
+v 4.0 4.0 0.0
+v 0.0 4.0 0.0
+v 8.0 0.0 0.0
+v 8.0 4.0 0.0
+g group0 
+usemtl material0
+f 1 2 3
+usemtl material1
+f 1 3 4
+g group1 
+usemtl material0
+f 2 5 6
+usemtl material1
+f 2 6 3

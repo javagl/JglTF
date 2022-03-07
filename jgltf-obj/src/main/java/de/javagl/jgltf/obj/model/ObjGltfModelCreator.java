@@ -216,8 +216,6 @@ public class ObjGltfModelCreator
         URI baseUri = IO.getParent(objUri);
         String objFileName = IO.extractFileName(objUri);
         String baseName = stripFileNameExtension(objFileName);
-        String mtlFileName = baseName + ".mtl";
-        URI mtlUri = IO.makeAbsolute(baseUri, mtlFileName);
 
         if (techniqueBasedMaterials)
         {
@@ -230,10 +228,33 @@ public class ObjGltfModelCreator
         
         // Read the input data
         Obj obj = readObj(objUri);
-        Map<String, Mtl> mtls = Collections.emptyMap();
-        if (IO.existsUnchecked(mtlUri))
+
+        List<String> mtlFileNames =
+            new ArrayList<String>(obj.getMtlFileNames());
+
+        // If no MTL file name was contained in the OBJ file, then
+        // try to use an MTL file that has the same name as the OBJ
+        // file, but the extension ".mtl".
+        if (mtlFileNames.isEmpty())
         {
-            mtls = readMtls(mtlUri);
+            String mtlFileName = baseName + ".mtl";
+            logger.log(level, "Using default MTL file name " + mtlFileName);
+            mtlFileNames.add(mtlFileName);
+        }
+
+        // Collect all material definitions from the input MTL files.
+        // Note: Technically, there could be multiple MTL files referenced
+        // by one OBJ. The OBJ library only supports one MTL file, but the
+        // general case is handled here
+        Map<String, Mtl> mtls = new LinkedHashMap<String, Mtl>();
+        for (String mtlFileName : mtlFileNames)
+        {
+            URI mtlUri = IO.makeAbsolute(baseUri, mtlFileName);
+            if (IO.existsUnchecked(mtlUri))
+            {
+                Map<String, Mtl> fileMtls = readMtls(mtlUri);
+                mtls.putAll(fileMtls);
+            }
         }
         return convert(obj, mtls, baseName, baseUri);
     }

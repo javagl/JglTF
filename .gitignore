@@ -50,6 +50,8 @@
 /jgltf-obj/.project
 /jgltf-obj/target
 
+/jgltf-obj/src/test/resources/output
+
 /jgltf-viewer-lwjgl/.classpath
 /jgltf-viewer-lwjgl/.settings
 /jgltf-viewer-lwjgl/.project
