@@ -26,7 +26,9 @@
  */
 package de.javagl.jgltf.model.impl;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import de.javagl.jgltf.model.ModelElement;
 
@@ -46,7 +48,7 @@ public class AbstractModelElement implements ModelElement
     private Object extras;
     
     /**
-     * Set the extensions
+     * Set the extensions to be a reference to the given map.
      * 
      * @param extensions The extensions
      */
@@ -54,6 +56,46 @@ public class AbstractModelElement implements ModelElement
     {
         this.extensions = extensions;
     }
+    
+    /**
+     * Add the given extension to this object.
+     * 
+     * This will add the given key-value pair to the extensions map,
+     * creating it if it was <code>null</code>.
+     *  
+     * @param name The name of the extension
+     * @param extension The extension object
+     */
+    public void addExtension(String name, Object extension)
+    {
+        Objects.requireNonNull(name, "The name may not be null");
+        if (this.extensions == null)
+        {
+            this.extensions = new LinkedHashMap<String, Object>();
+        }
+        this.extensions.put(name, extension);
+    }
+
+    /**
+     * Remove the specified extension from this object.
+     * 
+     * If the extension map is empty after this call, then it will be
+     * set to <code>null</code>.
+     * 
+     * @param name The name of the extension
+     */
+    public void removeExtension(String name)
+    {
+        if (this.extensions != null)
+        {
+            this.extensions.remove(name);
+            if (this.extensions.isEmpty())
+            {
+                this.extensions = null;
+            }
+        }
+    }
+    
 
     /**
      * Set the extras
