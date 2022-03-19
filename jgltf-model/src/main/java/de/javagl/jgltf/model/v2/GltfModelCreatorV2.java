@@ -508,6 +508,7 @@ public class GltfModelCreatorV2
             BufferViewModel bufferViewModel = 
                 gltfModel.getBufferViewModel(bufferViewIndex);
             accessorModel.setBufferViewModel(bufferViewModel);
+            accessorModel.setAccessorData(AccessorDatas.create(accessorModel));
         }
         else
         {
@@ -521,6 +522,7 @@ public class GltfModelCreatorV2
             BufferViewModel bufferViewModel = 
                 createBufferViewModel(uriString, bufferData);
             accessorModel.setBufferViewModel(bufferViewModel);
+            accessorModel.setAccessorData(AccessorDatas.create(accessorModel));
         }
         
         BufferViewModel bufferViewModel = accessorModel.getBufferViewModel(); 

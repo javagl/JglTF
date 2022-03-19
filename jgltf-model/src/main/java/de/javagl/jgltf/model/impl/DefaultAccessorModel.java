@@ -228,10 +228,6 @@ public final class DefaultAccessorModel extends AbstractNamedModelElement
     @Override
     public AccessorData getAccessorData()
     {
-        if (accessorData == null)
-        {
-            accessorData = AccessorDatas.create(this);
-        }
         return accessorData;
     }
     
