@@ -158,11 +158,15 @@ abstract class AbstractAccessorData implements AccessorData
                 int rowIndex = componentIndex % 2;
                 byteIndex += columnIndex * 4 + rowIndex;
             }
-            if (this.elementType == ElementType.MAT3)
+            else if (this.elementType == ElementType.MAT3)
             {
                 int columnIndex = componentIndex / 3;
                 int rowIndex = componentIndex % 3;
                 byteIndex += columnIndex * 4 + rowIndex;
+            } 
+            else
+            {
+                byteIndex += componentIndex * numBytesPerComponent;
             }
         }
         else if (this.componentType == short.class)
@@ -172,6 +176,10 @@ abstract class AbstractAccessorData implements AccessorData
                 int columnIndex = componentIndex / 3;
                 int rowIndex = componentIndex % 3;
                 byteIndex += columnIndex * 8 + rowIndex * 2;
+            }
+            else
+            {
+                byteIndex += componentIndex * numBytesPerComponent;
             }
         }
         else

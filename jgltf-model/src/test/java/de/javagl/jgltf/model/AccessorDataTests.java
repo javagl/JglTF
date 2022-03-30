@@ -131,6 +131,76 @@ public class AccessorDataTests
         assertEquals(0, ad.get(1, 8));
     }
     
+    @Test
+    public void testVec2Byte()
+    {
+        // Make sure that the AccessorData for VEC2 with byte components
+        // computes the right byte offsets, fixing the issue reported
+        // at https://github.com/javagl/JglTF/issues/60
+        byte vec[] = new byte[] 
+        {
+            1, 2,
+            3, 4,
+            2, 3,
+            4, 5,
+        };
+        int numElements = 4;
+        int componentType = GltfConstants.GL_BYTE;
+        ElementType elementType = ElementType.VEC2;
+        AccessorByteData ad = (AccessorByteData) AccessorDatas.create(
+            componentType, ByteBuffer.wrap(vec), 0, 
+            numElements, elementType, null);
+        //System.out.println(AccessorDatas.createString(ad, 1));
+        
+        assertEquals(1, ad.get(0, 0));
+        assertEquals(2, ad.get(0, 1));
+
+        assertEquals(3, ad.get(1, 0));
+        assertEquals(4, ad.get(1, 1));
+        
+        assertEquals(2, ad.get(2, 0));
+        assertEquals(3, ad.get(2, 1));
+
+        assertEquals(4, ad.get(3, 0));
+        assertEquals(5, ad.get(3, 1));
+    }
+    
+    @Test
+    public void testVec2Short()
+    {
+        // Make sure that the AccessorData for VEC2 with short components
+        // computes the right byte offsets, fixing the issue reported
+        // at https://github.com/javagl/JglTF/issues/60
+        short vec[] = new short[] 
+        {
+            1, 2,
+            3, 4,
+            2, 3,
+            4, 5,
+        };
+        ByteBuffer bb = ByteBuffer.allocate(vec.length * 2);
+        bb.asShortBuffer().put(vec);
+        int numElements = 4;
+        int componentType = GltfConstants.GL_SHORT;
+        ElementType elementType = ElementType.VEC2;
+        AccessorShortData ad = (AccessorShortData) AccessorDatas.create(
+            componentType, bb, 0, 
+            numElements, elementType, null);
+        //System.out.println(AccessorDatas.createString(ad, 1));
+        
+        assertEquals(1, ad.get(0, 0));
+        assertEquals(2, ad.get(0, 1));
+        
+        assertEquals(3, ad.get(1, 0));
+        assertEquals(4, ad.get(1, 1));
+
+        assertEquals(2, ad.get(2, 0));
+        assertEquals(3, ad.get(2, 1));
+        
+        assertEquals(4, ad.get(3, 0));
+        assertEquals(5, ad.get(3, 1));
+    }
+    
     
     
     
