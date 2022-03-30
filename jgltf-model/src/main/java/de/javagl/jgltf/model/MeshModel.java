@@ -42,10 +42,11 @@ public interface MeshModel extends NamedModelElement
     List<MeshPrimitiveModel> getMeshPrimitiveModels();
     
     /**
-     * Returns a copy of the default morph target weights, or <code>null</code> 
-     * if no default morph target weights have been defined
+     * Returns a <b>reference</b> to the default morph target weights, 
+     * or <code>null</code> if no default morph target weights have 
+     * been defined
      * 
-     * @return A copy of the morph target weights
+     * @return The morph target weights
      */
     float[] getWeights();
 }

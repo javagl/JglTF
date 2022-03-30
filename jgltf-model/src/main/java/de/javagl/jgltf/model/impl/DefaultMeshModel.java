@@ -69,13 +69,14 @@ public class DefaultMeshModel extends AbstractNamedModelElement
     }
     
     /**
-     * Set the morph target weights
+     * Set the default morph target weights to be a <b>reference</b> to the 
+     * given array. 
      * 
      * @param weights The weights
      */
     public void setWeights(float[] weights)
     {
-        this.weights = Optionals.clone(weights);
+        this.weights = weights;
     }
     
     @Override
@@ -87,7 +88,7 @@ public class DefaultMeshModel extends AbstractNamedModelElement
     @Override
     public float[] getWeights()
     {
-        return Optionals.clone(weights);
+        return weights;
     }
 
 }
