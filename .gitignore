@@ -86,3 +86,13 @@
 /jgltf-impl-v2-ext-mesh-features/.settings
 /jgltf-impl-v2-ext-mesh-features/.project
 /jgltf-impl-v2-ext-mesh-features/target
+
+/jgltf-impl-v2-ext-structural-metadata/.classpath
+/jgltf-impl-v2-ext-structural-metadata/.settings
+/jgltf-impl-v2-ext-structural-metadata/.project
+/jgltf-impl-v2-ext-structural-metadata/target
+
+/jgltf-impl-v2-ext-mesh-gpu-instancing/.classpath
+/jgltf-impl-v2-ext-mesh-gpu-instancing/.settings
+/jgltf-impl-v2-ext-mesh-gpu-instancing/.project
+/jgltf-impl-v2-ext-mesh-gpu-instancing/target
