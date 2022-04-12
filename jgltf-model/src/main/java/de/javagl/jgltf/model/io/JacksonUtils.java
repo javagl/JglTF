@@ -167,7 +167,7 @@ public class JacksonUtils
     public static ObjectMapper createObjectMapper()
     {
         ObjectMapper objectMapper = new ObjectMapper();
-        configure(objectMapper, null);
+        configure(objectMapper, loggingJsonErrorConsumer());
         return objectMapper;
     }
 
