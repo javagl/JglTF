@@ -32,7 +32,6 @@ import java.util.List;
 
 import de.javagl.jgltf.model.MeshModel;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
-import de.javagl.jgltf.model.Optionals;
 
 /**
  * Implementation of a {@link MeshModel}
