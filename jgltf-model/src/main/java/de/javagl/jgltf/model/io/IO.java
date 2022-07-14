@@ -37,6 +37,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.FileSystemNotFoundException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.spi.FileSystemProvider;
 import java.util.Base64;
 
 /**
@@ -71,7 +75,59 @@ public class IO
             throw new IOException("Invalid URI string: " + uriString, e);
         }
     }
-    
+    /**
+     * Convert the given URI string into an absolute Path, resolving it
+     * against the given base Path if necessary
+     *
+     * @param basePath The base Path
+     * @param uriString The URI string
+     * @return The absolute Path
+     * @throws IOException If the URI string is not valid
+     */
+    public static Path makeAbsolute(Path basePath, String uriString)
+            throws IOException
+    {
+        try
+        {
+            String escapedUriString = uriString.replaceAll(" ", "%20");
+
+            URI uri = new URI(escapedUriString);
+            if (uri.isAbsolute())
+            {
+                return PathOf(uri).toAbsolutePath();
+            }
+            return basePath.resolve(escapedUriString).toAbsolutePath();
+        }
+        catch (URISyntaxException e)
+        {
+            throw new IOException("Invalid URI string: " + uriString, e);
+        }
+    }
+
+    /**
+     * from java 11
+     * @param uri
+     * @return
+     */
+    public static final Path PathOf(URI uri) {
+        String scheme =  uri.getScheme();
+        if (scheme == null)
+            throw new IllegalArgumentException("Missing scheme");
+
+        // check for default provider to avoid loading of installed providers
+        if (scheme.equalsIgnoreCase("file"))
+            return FileSystems.getDefault().provider().getPath(uri);
+
+        // try to find provider
+        for (FileSystemProvider provider: FileSystemProvider.installedProviders()) {
+            if (provider.getScheme().equalsIgnoreCase(scheme)) {
+                return provider.getPath(uri);
+            }
+        }
+
+        throw new FileSystemNotFoundException("Provider \"" + scheme + "\" not installed");
+    }
+
     /**
      * Returns the URI describing the parent of the given URI. If the 
      * given URI describes a file, this will return the URI of the 
@@ -88,6 +144,20 @@ public class IO
             return uri.resolve("..");        
         }
         return uri.resolve(".");
+    }
+
+    /**
+     * Returns the Path describing the parent of the given Path. If the
+     * given Path describes a file, this will return the Path of the
+     * directory. If the given Path describes a directory, this will
+     * return the Path of the parent directory
+     *
+     * @param path The Path
+     * @return The parent Path
+     */
+    public static Path getParent(Path path)
+    {
+        return path.getParent();
     }
 
     /**
@@ -235,7 +305,32 @@ public class IO
             throw new IOException(e);
         }
     }
-    
+
+    /**
+     * Creates an input stream from the given Path, which may either be
+     * an actual (absolute) Path, or a data Path with base64 encoded data
+     *
+     * @param path The Path
+     * @return The input stream
+     * @throws IOException If the stream can not be opened
+     */
+    public static InputStream createInputStream(Path path) throws IOException
+    {
+        if ("data".equalsIgnoreCase(path.toUri().getScheme()))
+        {
+            byte data[] = readDataUri(path.toUri().toString());
+            return new ByteArrayInputStream(data);
+        }
+        try
+        {
+            return path.toUri().toURL().openStream();
+        }
+        catch (MalformedURLException e)
+        {
+            throw new IOException(e);
+        }
+    }
+
     /**
      * Read the data from the given URI as a byte array. The data may either
      * be an actual URI, or a data URI with base64 encoded data.

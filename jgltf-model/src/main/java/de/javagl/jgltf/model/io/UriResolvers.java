@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.ByteBuffer;
+import java.nio.file.Path;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.logging.Logger;
@@ -83,7 +84,46 @@ public class UriResolvers
         };
         return reading(inputStreamFunction);
     }
-    
+
+    /**
+     * Creates a function that resolves Path strings against the given
+     * base Path, and returns a byte buffer containing the data from
+     * the resulting Path.<br>
+     * <br>
+     * The given Path strings may either be standard Path or data Path.<br>
+     * <br>
+     * If the returned function cannot read the data, then it will print a
+     * warning and return <code>null</code>.
+     *
+     * @param basePath The base Path to resolve against
+     * @return The function
+     */
+    public static Function<String, ByteBuffer> createBaseUriResolver(
+            Path basePath)
+    {
+        Objects.requireNonNull(basePath, "The baseUri may not be null");
+        Function<String, InputStream> inputStreamFunction =
+                new Function<String, InputStream>()
+                {
+                    @Override
+                    public InputStream apply(String uriString)
+                    {
+                        try
+                        {
+                            Path absolutePath = IO.makeAbsolute(basePath, uriString);
+                            return IO.createInputStream(absolutePath);
+                        }
+                        catch (IOException e)
+                        {
+                            logger.warning("Could not open input stream for URI "
+                                    + uriString + ":  " + e.getMessage());
+                            return null;
+                        }
+                    }
+                };
+        return reading(inputStreamFunction);
+    }
+
     /**
      * Create a function that maps a string to the input stream of a resource
      * of the given class.
