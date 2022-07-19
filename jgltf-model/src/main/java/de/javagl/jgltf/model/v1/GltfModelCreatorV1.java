@@ -605,7 +605,7 @@ class GltfModelCreatorV1
                 String bufferViewId = 
                     BinaryGltfV1.getBinaryGltfBufferViewId(image);
                 BufferViewModel bufferViewModel =
-                    get("bufferView", bufferViewId, 
+                    get("bufferViews", bufferViewId, 
                         gltfModel::getBufferViewModel);
                 imageModel.setBufferViewModel(bufferViewModel);
             }
@@ -1367,7 +1367,7 @@ class GltfModelCreatorV1
             
             Map<String, Object> modelValues = 
                 new LinkedHashMap<String, Object>();
-            Map<String, Object> values = material.getValues();
+            Map<String, Object> values = Optionals.of(material.getValues());
             for (Entry<String, Object> valueEntry : values.entrySet())
             {
                 String parameterName = valueEntry.getKey();
