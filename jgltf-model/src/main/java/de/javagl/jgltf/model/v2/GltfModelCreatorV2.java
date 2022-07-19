@@ -1085,9 +1085,15 @@ public class GltfModelCreatorV2
             DefaultTextureModel textureModel = gltfModel.getTextureModel(i);
             transferGltfChildOfRootPropertyElements(texture, textureModel);
             
+            // The source may be null when the image data is provided
+            // by an extension.
             Integer imageIndex = texture.getSource();
-            DefaultImageModel imageModel = gltfModel.getImageModel(imageIndex);
-            textureModel.setImageModel(imageModel);
+            if (imageIndex != null)
+            {
+                DefaultImageModel imageModel = 
+                    gltfModel.getImageModel(imageIndex);
+                textureModel.setImageModel(imageModel);
+            }
         }
     }
     
