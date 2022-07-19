@@ -78,7 +78,7 @@ public class GltfReferenceResolver
         Objects.requireNonNull(references, "The references may not be null");
         Objects.requireNonNull(basePath, "The basePath may not be null");
         Function<String, ByteBuffer> uriResolver =
-            UriResolvers.createBaseUriResolver(basePath);
+            UriResolvers.createBasePathResolver(basePath);
         resolveAll(references, uriResolver);
     }
 

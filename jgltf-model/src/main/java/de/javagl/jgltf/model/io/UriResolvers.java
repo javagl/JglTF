@@ -99,10 +99,10 @@ public class UriResolvers
      * @param basePath The base Path to resolve against
      * @return The function
      */
-    public static Function<String, ByteBuffer> createBaseUriResolver(
+    public static Function<String, ByteBuffer> createBasePathResolver(
         Path basePath)
     {
-        Objects.requireNonNull(basePath, "The baseUri may not be null");
+        Objects.requireNonNull(basePath, "The basePath may not be null");
         Function<String, InputStream> inputStreamFunction =
             new Function<String, InputStream>()
         {
