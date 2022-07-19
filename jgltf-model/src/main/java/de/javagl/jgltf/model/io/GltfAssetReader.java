@@ -104,9 +104,9 @@ public final class GltfAssetReader
     }
 
     /**
-     * Read the {@link GltfAsset} from the given Path
+     * Read the {@link GltfAsset} from the given path
      *
-     * @param path The Path
+     * @param path The path
      * @return The {@link GltfAsset}
      * @throws IOException If an IO error occurs
      */
@@ -117,7 +117,7 @@ public final class GltfAssetReader
             GltfAsset gltfAsset = readWithoutReferences(inputStream);
             Path basePath = IO.getParent(path);
             GltfReferenceResolver.resolveAll(
-                    gltfAsset.getReferences(), basePath);
+                gltfAsset.getReferences(), basePath);
             return gltfAsset;
         }
     }

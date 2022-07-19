@@ -37,10 +37,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.file.FileSystemNotFoundException;
-import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.nio.file.spi.FileSystemProvider;
+import java.nio.file.Paths;
 import java.util.Base64;
 
 /**
@@ -75,13 +73,14 @@ public class IO
             throw new IOException("Invalid URI string: " + uriString, e);
         }
     }
+    
     /**
-     * Convert the given URI string into an absolute Path, resolving it
-     * against the given base Path if necessary
+     * Convert the given URI string into an absolute path, resolving it
+     * against the given base path if necessary
      *
-     * @param basePath The base Path
+     * @param basePath The base path
      * @param uriString The URI string
-     * @return The absolute Path
+     * @return The absolute path
      * @throws IOException If the URI string is not valid
      */
     public static Path makeAbsolute(Path basePath, String uriString)
@@ -94,7 +93,7 @@ public class IO
             URI uri = new URI(escapedUriString);
             if (uri.isAbsolute())
             {
-                return PathOf(uri).toAbsolutePath();
+                return Paths.get(uri).toAbsolutePath();
             }
             return basePath.resolve(escapedUriString).toAbsolutePath();
         }
@@ -102,30 +101,6 @@ public class IO
         {
             throw new IOException("Invalid URI string: " + uriString, e);
         }
-    }
-
-    /**
-     * from java 11
-     * @param uri
-     * @return
-     */
-    public static final Path PathOf(URI uri) {
-        String scheme =  uri.getScheme();
-        if (scheme == null)
-            throw new IllegalArgumentException("Missing scheme");
-
-        // check for default provider to avoid loading of installed providers
-        if (scheme.equalsIgnoreCase("file"))
-            return FileSystems.getDefault().provider().getPath(uri);
-
-        // try to find provider
-        for (FileSystemProvider provider: FileSystemProvider.installedProviders()) {
-            if (provider.getScheme().equalsIgnoreCase(scheme)) {
-                return provider.getPath(uri);
-            }
-        }
-
-        throw new FileSystemNotFoundException("Provider \"" + scheme + "\" not installed");
     }
 
     /**
@@ -147,13 +122,13 @@ public class IO
     }
 
     /**
-     * Returns the Path describing the parent of the given Path. If the
-     * given Path describes a file, this will return the Path of the
-     * directory. If the given Path describes a directory, this will
-     * return the Path of the parent directory
+     * Returns the path describing the parent of the given path. If the
+     * given path describes a file, this will return the path of the
+     * directory. If the given path describes a directory, this will
+     * return the path of the parent directory
      *
-     * @param path The Path
-     * @return The parent Path
+     * @param path The path
+     * @return The parent path
      */
     public static Path getParent(Path path)
     {

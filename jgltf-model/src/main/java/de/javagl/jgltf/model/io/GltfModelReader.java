@@ -85,9 +85,9 @@ public final class GltfModelReader
     }
 
     /**
-     * Read the {@link GltfModel} from the given Path
+     * Read the {@link GltfModel} from the given path
      *
-     * @param path The Path
+     * @param path The path
      * @return The {@link GltfModel}
      * @throws IOException If an IO error occurs
      */

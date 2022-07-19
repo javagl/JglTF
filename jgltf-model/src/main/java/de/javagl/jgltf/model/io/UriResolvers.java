@@ -86,11 +86,12 @@ public class UriResolvers
     }
 
     /**
-     * Creates a function that resolves Path strings against the given
-     * base Path, and returns a byte buffer containing the data from
-     * the resulting Path.<br>
+     * Creates a function that resolves path strings against the given
+     * base path, and returns a byte buffer containing the data from
+     * the resulting path.<br>
      * <br>
-     * The given Path strings may either be standard Path or data Path.<br>
+     * If one of the path strings that is given to the function is a data
+     * URI string, then the data will be read from this data URI.<br>
      * <br>
      * If the returned function cannot read the data, then it will print a
      * warning and return <code>null</code>.
@@ -99,28 +100,32 @@ public class UriResolvers
      * @return The function
      */
     public static Function<String, ByteBuffer> createBaseUriResolver(
-            Path basePath)
+        Path basePath)
     {
         Objects.requireNonNull(basePath, "The baseUri may not be null");
         Function<String, InputStream> inputStreamFunction =
-                new Function<String, InputStream>()
+            new Function<String, InputStream>()
+        {
+            @Override
+            public InputStream apply(String uriString)
+            {
+                try
                 {
-                    @Override
-                    public InputStream apply(String uriString)
+                    if (IO.isDataUriString(uriString)) 
                     {
-                        try
-                        {
-                            Path absolutePath = IO.makeAbsolute(basePath, uriString);
-                            return IO.createInputStream(absolutePath);
-                        }
-                        catch (IOException e)
-                        {
-                            logger.warning("Could not open input stream for URI "
-                                    + uriString + ":  " + e.getMessage());
-                            return null;
-                        }
+                        return IO.createInputStream(URI.create(uriString));
                     }
-                };
+                    Path absolutePath = IO.makeAbsolute(basePath, uriString);
+                    return IO.createInputStream(absolutePath);
+                }
+                catch (IOException e)
+                {
+                    logger.warning("Could not open input stream for URI "
+                        + uriString + ":  " + e.getMessage());
+                    return null;
+                }
+            }
+        };
         return reading(inputStreamFunction);
     }
 

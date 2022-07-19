@@ -73,12 +73,12 @@ public class GltfReferenceResolver
      * @param basePath The base Path that references will be resolved against
      */
     public static void resolveAll(
-            Iterable<? extends GltfReference> references, Path basePath)
+        Iterable<? extends GltfReference> references, Path basePath)
     {
         Objects.requireNonNull(references, "The references may not be null");
         Objects.requireNonNull(basePath, "The basePath may not be null");
         Function<String, ByteBuffer> uriResolver =
-                UriResolvers.createBaseUriResolver(basePath);
+            UriResolvers.createBaseUriResolver(basePath);
         resolveAll(references, uriResolver);
     }
 
