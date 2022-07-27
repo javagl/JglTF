@@ -28,6 +28,7 @@ package de.javagl.jgltf.model.io;
 
 import java.net.URI;
 import java.nio.ByteBuffer;
+import java.nio.file.Path;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -62,7 +63,25 @@ public class GltfReferenceResolver
             UriResolvers.createBaseUriResolver(baseUri);
         resolveAll(references, uriResolver);
     }
-    
+
+    /**
+     * Calls {@link #resolve(GltfReference, Function)} with each
+     * {@link GltfReference} of the given list, resolving the
+     * Paths of the references against the given base Path
+     *
+     * @param references The {@link GltfReference} objects
+     * @param basePath The base Path that references will be resolved against
+     */
+    public static void resolveAll(
+        Iterable<? extends GltfReference> references, Path basePath)
+    {
+        Objects.requireNonNull(references, "The references may not be null");
+        Objects.requireNonNull(basePath, "The basePath may not be null");
+        Function<String, ByteBuffer> uriResolver =
+            UriResolvers.createBasePathResolver(basePath);
+        resolveAll(references, uriResolver);
+    }
+
     /**
      * Calls {@link #resolve(GltfReference, Function)} with each 
      * {@link GltfReference} of the given list

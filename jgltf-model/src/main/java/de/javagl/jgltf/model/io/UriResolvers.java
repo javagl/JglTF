@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.ByteBuffer;
+import java.nio.file.Path;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.logging.Logger;
@@ -83,7 +84,51 @@ public class UriResolvers
         };
         return reading(inputStreamFunction);
     }
-    
+
+    /**
+     * Creates a function that resolves path strings against the given
+     * base path, and returns a byte buffer containing the data from
+     * the resulting path.<br>
+     * <br>
+     * If one of the path strings that is given to the function is a data
+     * URI string, then the data will be read from this data URI.<br>
+     * <br>
+     * If the returned function cannot read the data, then it will print a
+     * warning and return <code>null</code>.
+     *
+     * @param basePath The base Path to resolve against
+     * @return The function
+     */
+    public static Function<String, ByteBuffer> createBasePathResolver(
+        Path basePath)
+    {
+        Objects.requireNonNull(basePath, "The basePath may not be null");
+        Function<String, InputStream> inputStreamFunction =
+            new Function<String, InputStream>()
+        {
+            @Override
+            public InputStream apply(String uriString)
+            {
+                try
+                {
+                    if (IO.isDataUriString(uriString)) 
+                    {
+                        return IO.createInputStream(URI.create(uriString));
+                    }
+                    Path absolutePath = IO.makeAbsolute(basePath, uriString);
+                    return IO.createInputStream(absolutePath);
+                }
+                catch (IOException e)
+                {
+                    logger.warning("Could not open input stream for URI "
+                        + uriString + ":  " + e.getMessage());
+                    return null;
+                }
+            }
+        };
+        return reading(inputStreamFunction);
+    }
+
     /**
      * Create a function that maps a string to the input stream of a resource
      * of the given class.

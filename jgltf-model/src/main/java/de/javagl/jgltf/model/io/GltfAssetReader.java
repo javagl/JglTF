@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.ByteBuffer;
+import java.nio.file.Path;
 import java.util.function.Consumer;
 
 import de.javagl.jgltf.model.GltfModel;
@@ -101,7 +102,26 @@ public final class GltfAssetReader
             return gltfAsset;
         }
     }
-    
+
+    /**
+     * Read the {@link GltfAsset} from the given path
+     *
+     * @param path The path
+     * @return The {@link GltfAsset}
+     * @throws IOException If an IO error occurs
+     */
+    public GltfAsset read(Path path) throws IOException
+    {
+        try (InputStream inputStream = path.toUri().toURL().openStream())
+        {
+            GltfAsset gltfAsset = readWithoutReferences(inputStream);
+            Path basePath = IO.getParent(path);
+            GltfReferenceResolver.resolveAll(
+                gltfAsset.getReferences(), basePath);
+            return gltfAsset;
+        }
+    }
+
     /**
      * Read the {@link GltfAsset} from the given URI.<br>
      * <br>

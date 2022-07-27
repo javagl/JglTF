@@ -37,6 +37,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Base64;
 
 /**
@@ -73,6 +75,35 @@ public class IO
     }
     
     /**
+     * Convert the given URI string into an absolute path, resolving it
+     * against the given base path if necessary
+     *
+     * @param basePath The base path
+     * @param uriString The URI string
+     * @return The absolute path
+     * @throws IOException If the URI string is not valid
+     */
+    public static Path makeAbsolute(Path basePath, String uriString)
+            throws IOException
+    {
+        try
+        {
+            String escapedUriString = uriString.replaceAll(" ", "%20");
+
+            URI uri = new URI(escapedUriString);
+            if (uri.isAbsolute())
+            {
+                return Paths.get(uri).toAbsolutePath();
+            }
+            return basePath.resolve(escapedUriString).toAbsolutePath();
+        }
+        catch (URISyntaxException e)
+        {
+            throw new IOException("Invalid URI string: " + uriString, e);
+        }
+    }
+
+    /**
      * Returns the URI describing the parent of the given URI. If the 
      * given URI describes a file, this will return the URI of the 
      * directory. If the given URI describes a directory, this will
@@ -88,6 +119,20 @@ public class IO
             return uri.resolve("..");        
         }
         return uri.resolve(".");
+    }
+
+    /**
+     * Returns the path describing the parent of the given path. If the
+     * given path describes a file, this will return the path of the
+     * directory. If the given path describes a directory, this will
+     * return the path of the parent directory
+     *
+     * @param path The path
+     * @return The parent path
+     */
+    public static Path getParent(Path path)
+    {
+        return path.getParent();
     }
 
     /**
@@ -235,7 +280,32 @@ public class IO
             throw new IOException(e);
         }
     }
-    
+
+    /**
+     * Creates an input stream from the given Path, which may either be
+     * an actual (absolute) Path, or a data Path with base64 encoded data
+     *
+     * @param path The Path
+     * @return The input stream
+     * @throws IOException If the stream can not be opened
+     */
+    public static InputStream createInputStream(Path path) throws IOException
+    {
+        if ("data".equalsIgnoreCase(path.toUri().getScheme()))
+        {
+            byte data[] = readDataUri(path.toUri().toString());
+            return new ByteArrayInputStream(data);
+        }
+        try
+        {
+            return path.toUri().toURL().openStream();
+        }
+        catch (MalformedURLException e)
+        {
+            throw new IOException(e);
+        }
+    }
+
     /**
      * Read the data from the given URI as a byte array. The data may either
      * be an actual URI, or a data URI with base64 encoded data.
