@@ -358,7 +358,11 @@ public final class BufferStructureBuilder
     
     /**
      * Create a {@link BufferModel} in the {@link BufferStructure} that 
-     * is currently being built. 
+     * is currently being built.
+     * 
+     * If no buffer view models have been created (at all, or after
+     * this method has previously been called), then this call will
+     * not have any effect, and <code>null</code> will be returned.
      * 
      * @param idPrefix The ID prefix for the {@link BufferModel}
      * @param uri The {@link BufferModel#getUri()}
@@ -366,6 +370,10 @@ public final class BufferStructureBuilder
      */
     public BufferModel createBufferModel(String idPrefix, String uri) 
     {
+        if (currentBufferViewModels.isEmpty())
+        {
+            return null;
+        }
         DefaultBufferModel bufferModel = new DefaultBufferModel();
         bufferModel.setUri(uri);
         addBufferModel(idPrefix, bufferModel);
