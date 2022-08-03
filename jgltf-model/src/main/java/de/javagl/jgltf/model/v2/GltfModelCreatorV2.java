@@ -508,6 +508,11 @@ public class GltfModelCreatorV2
             BufferViewModel bufferViewModel = 
                 gltfModel.getBufferViewModel(bufferViewIndex);
             accessorModel.setBufferViewModel(bufferViewModel);
+            Integer byteStride = bufferViewModel.getByteStride();
+            if (byteStride != null)
+            {
+                accessorModel.setByteStride(byteStride);
+            }
             accessorModel.setAccessorData(AccessorDatas.create(accessorModel));
         }
         else
@@ -523,13 +528,6 @@ public class GltfModelCreatorV2
                 createBufferViewModel(uriString, bufferData);
             accessorModel.setBufferViewModel(bufferViewModel);
             accessorModel.setAccessorData(AccessorDatas.create(accessorModel));
-        }
-        
-        BufferViewModel bufferViewModel = accessorModel.getBufferViewModel(); 
-        Integer byteStride = bufferViewModel.getByteStride();
-        if (byteStride != null)
-        {
-            accessorModel.setByteStride(byteStride);
         }
     }
     
