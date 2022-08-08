@@ -96,3 +96,8 @@
 /jgltf-impl-v2-ext-mesh-gpu-instancing/.settings
 /jgltf-impl-v2-ext-mesh-gpu-instancing/.project
 /jgltf-impl-v2-ext-mesh-gpu-instancing/target
+
+/jgltf-impl-v2-ext-instance-features/.classpath
+/jgltf-impl-v2-ext-instance-features/.settings
+/jgltf-impl-v2-ext-instance-features/.project
+/jgltf-impl-v2-ext-instance-features/target
