@@ -30,7 +30,16 @@
       <artifactId>jgltf-model</artifactId>
       <version>2.0.3-SNAPSHOT</version>
     </dependency>
-
+    <dependency>
+      <groupId>de.javagl</groupId>
+      <artifactId>jgltf-impl-v1</artifactId>
+      <version>2.0.3-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>de.javagl</groupId>
+      <artifactId>jgltf-impl-v2</artifactId>
+      <version>2.0.3-SNAPSHOT</version>
+    </dependency>
     <dependency>
       <groupId>de.javagl</groupId>
       <artifactId>jgltf-validator</artifactId>
