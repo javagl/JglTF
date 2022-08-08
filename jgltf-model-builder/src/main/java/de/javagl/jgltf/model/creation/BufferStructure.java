@@ -60,6 +60,11 @@ public final class BufferStructure
     private final Map<DefaultAccessorModel, String> accessorIds;
 
     /**
+     * The set of values in the {@link #accessorIds}
+     */
+    private final Set<String> accessorIdValues;
+    
+    /**
      * The mapping from {@link AccessorModel} instances to their indices
      */
     private final Map<DefaultAccessorModel, Integer> accessorIndices;
@@ -74,6 +79,11 @@ public final class BufferStructure
      */
     private final Map<DefaultBufferViewModel, String> bufferViewIds;
 
+    /**
+     * The set of values in the {@link #bufferViewIds}
+     */
+    private final Set<String> bufferViewIdValues;
+    
     /**
      * The mapping from {@link BufferViewModel} instances to their indices
      */
@@ -97,6 +107,12 @@ public final class BufferStructure
     private final Map<DefaultBufferModel, String> bufferIds;
     
     /**
+     * The set of values in the {@link #bufferIds}
+     */
+    private final Set<String> bufferIdValues;
+    
+    
+    /**
      * The mapping from {@link BufferModel} instances to their indices
      */
     private final Map<DefaultBufferModel, Integer> bufferIndices;
@@ -115,17 +131,25 @@ public final class BufferStructure
     private final Map<DefaultBufferModel, Set<Integer>> paddingByteIndices;
     
     /**
+     * A mapping from prefixes for IDs to the next number that can be appended
+     * to a given prefix in order to create a new ID. 
+     */
+    private final Map<String, Integer> idSuffixes;
+    
+    /**
      * Default constructor
      */
     public BufferStructure()
     {
         this.accessorIds = new LinkedHashMap<DefaultAccessorModel, String>();
+        this.accessorIdValues = new LinkedHashSet<String>();
         this.accessorIndices = 
             new LinkedHashMap<DefaultAccessorModel, Integer>();
 
         this.bufferViewModels = new ArrayList<DefaultBufferViewModel>();
         this.bufferViewIds = 
             new LinkedHashMap<DefaultBufferViewModel, String>();
+        this.bufferViewIdValues = new LinkedHashSet<String>();
         this.bufferViewIndices = 
             new LinkedHashMap<DefaultBufferViewModel, Integer>();
         this.bufferViewAccessorModels = 
@@ -134,6 +158,7 @@ public final class BufferStructure
         
         this.bufferModels = new ArrayList<DefaultBufferModel>();
         this.bufferIds = new LinkedHashMap<DefaultBufferModel, String>();
+        this.bufferIdValues = new LinkedHashSet<String>();
         this.bufferIndices = 
             new LinkedHashMap<DefaultBufferModel, Integer>();
         this.bufferBufferViewModels = 
@@ -142,6 +167,8 @@ public final class BufferStructure
         
         this.paddingByteIndices = 
             new LinkedHashMap<DefaultBufferModel, Set<Integer>>();
+        
+        this.idSuffixes = new LinkedHashMap<String, Integer>();
     }
     
     /**
@@ -150,11 +177,13 @@ public final class BufferStructure
      * @param accessorModel The {@link AccessorModel}
      * @param idPrefix The ID prefix
      */
-    public void addAccessorModel(DefaultAccessorModel accessorModel, String idPrefix)
+    public void addAccessorModel(
+        DefaultAccessorModel accessorModel, String idPrefix)
     {
-        String id = createId(idPrefix, accessorIds.values());
+        String id = createId(idPrefix, accessorIdValues);
         this.accessorIndices.put(accessorModel, accessorIndices.size());
         this.accessorIds.put(accessorModel, id);
+        this.accessorIdValues.add(id);
     }
     
     /**
@@ -171,8 +200,9 @@ public final class BufferStructure
         Collection<? extends DefaultAccessorModel> accessorModels)
     {
         this.bufferViewModels.add(bufferViewModel);
-        String id = createId(idPrefix, bufferViewIds.values());
+        String id = createId(idPrefix, bufferViewIdValues);
         this.bufferViewIds.put(bufferViewModel, id);
+        this.bufferViewIdValues.add(id);
         this.bufferViewIndices.put(bufferViewModel, bufferViewIndices.size());
         this.bufferViewAccessorModels.put(bufferViewModel, 
             new ArrayList<DefaultAccessorModel>(accessorModels));
@@ -191,8 +221,9 @@ public final class BufferStructure
         Collection<? extends DefaultBufferViewModel> bufferViewModels)
     {
         this.bufferModels.add(bufferModel);
-        String id = createId(idPrefix, bufferIds.values());
+        String id = createId(idPrefix, bufferIdValues);
         this.bufferIds.put(bufferModel, id);
+        this.bufferIdValues.add(id);
         this.bufferIndices.put(bufferModel, bufferIndices.size());
         this.bufferBufferViewModels.put(bufferModel, 
             new ArrayList<DefaultBufferViewModel>(bufferViewModels));
@@ -400,16 +431,17 @@ public final class BufferStructure
      * @param existingIds The existing URI strings
      * @return The new URI string
      */
-    private static String createId(String prefix,
+    private String createId(String prefix,
         Collection<? extends String> existingIds)
     {
-        int counter = 0;
+        int counter = idSuffixes.getOrDefault(prefix, 0);
         String id = prefix;
         while (existingIds.contains(id)) 
         {
             id = prefix + "_" + counter;
             counter++;
         }
+        idSuffixes.put(prefix, counter);
         return id;
     }
     
