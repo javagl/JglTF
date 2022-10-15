@@ -36,6 +36,7 @@ import de.javagl.jgltf.model.AnimationModel;
 import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.CameraModel;
+import de.javagl.jgltf.model.ExtensionsModel;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.MaterialModel;
@@ -109,6 +110,11 @@ public class DefaultGltfModel extends AbstractModelElement implements GltfModel
      * The {@link TextureModel} instances
      */
     private final List<DefaultTextureModel> textureModels;
+    
+    /**
+     * The {@link ExtensionsModel}
+     */
+    private final DefaultExtensionsModel extensionsModel;
 
     /**
      * Creates a new model 
@@ -127,6 +133,7 @@ public class DefaultGltfModel extends AbstractModelElement implements GltfModel
         this.sceneModels = new ArrayList<DefaultSceneModel>();
         this.skinModels = new ArrayList<DefaultSkinModel>();
         this.textureModels = new ArrayList<DefaultTextureModel>();
+        this.extensionsModel = new DefaultExtensionsModel();
     }
     
     /**
@@ -835,5 +842,11 @@ public class DefaultGltfModel extends AbstractModelElement implements GltfModel
     public List<TextureModel> getTextureModels()
     {
         return Collections.unmodifiableList(textureModels);
+    }
+    
+    @Override
+    public DefaultExtensionsModel getExtensionsModel()
+    {
+        return extensionsModel;
     }
 }

@@ -75,6 +75,7 @@ import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.CameraModel;
 import de.javagl.jgltf.model.ElementType;
+import de.javagl.jgltf.model.ExtensionsModel;
 import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.ImageModel;
@@ -97,6 +98,7 @@ import de.javagl.jgltf.model.impl.DefaultBufferViewModel;
 import de.javagl.jgltf.model.impl.DefaultCameraModel;
 import de.javagl.jgltf.model.impl.DefaultCameraOrthographicModel;
 import de.javagl.jgltf.model.impl.DefaultCameraPerspectiveModel;
+import de.javagl.jgltf.model.impl.DefaultExtensionsModel;
 import de.javagl.jgltf.model.impl.DefaultGltfModel;
 import de.javagl.jgltf.model.impl.DefaultImageModel;
 import de.javagl.jgltf.model.impl.DefaultMeshModel;
@@ -201,6 +203,8 @@ public class GltfModelCreatorV2
         initSkinModels();
         initTextureModels();
         initMaterialModels();
+        
+        initExtensionsModel();
     }
     
     /**
@@ -1260,6 +1264,19 @@ public class GltfModelCreatorV2
             material.getEmissiveFactor(),
             material.defaultEmissiveFactor());
         materialModel.setEmissiveFactor(emissiveFactor);
+    }
+    
+    /**
+     * Initialize the {@link ExtensionsModel} with the extensions that
+     * are used or required in the glTF.
+     */
+    private void initExtensionsModel() 
+    {
+        List<String> extensionsUsed = gltf.getExtensionsUsed();
+        List<String> extensionsRequired = gltf.getExtensionsRequired();
+        DefaultExtensionsModel extensionsModel = gltfModel.getExtensionsModel();
+        extensionsModel.addExtensionsUsed(extensionsUsed);
+        extensionsModel.addExtensionsRequired(extensionsRequired);
     }
 
     /**

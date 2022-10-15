@@ -74,6 +74,7 @@ import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.CameraModel;
 import de.javagl.jgltf.model.CameraOrthographicModel;
 import de.javagl.jgltf.model.CameraPerspectiveModel;
+import de.javagl.jgltf.model.ExtensionsModel;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.MaterialModel;
@@ -317,6 +318,19 @@ public class GltfCreatorV2
         asset.setVersion("2.0");
         asset.setGenerator("JglTF from https://github.com/javagl/JglTF");
         gltf.setAsset(asset);
+        
+        ExtensionsModel extensionsModel = gltfModel.getExtensionsModel();
+        List<String> extensionsUsed = extensionsModel.getExtensionsUsed();
+        if (!extensionsUsed.isEmpty()) 
+        {
+            gltf.setExtensionsUsed(extensionsUsed);
+        }
+        List<String> extensionsRequired = 
+            extensionsModel.getExtensionsRequired();
+        if (!extensionsRequired.isEmpty()) 
+        {
+            gltf.setExtensionsRequired(extensionsRequired);
+        }
         
         return gltf;
     }
