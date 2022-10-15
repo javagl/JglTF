@@ -42,6 +42,7 @@ import de.javagl.jgltf.impl.v1.Animation;
 import de.javagl.jgltf.impl.v1.AnimationChannel;
 import de.javagl.jgltf.impl.v1.AnimationChannelTarget;
 import de.javagl.jgltf.impl.v1.AnimationSampler;
+import de.javagl.jgltf.impl.v1.Asset;
 import de.javagl.jgltf.impl.v1.Buffer;
 import de.javagl.jgltf.impl.v1.BufferView;
 import de.javagl.jgltf.impl.v1.Camera;
@@ -71,6 +72,7 @@ import de.javagl.jgltf.model.Accessors;
 import de.javagl.jgltf.model.AnimationModel;
 import de.javagl.jgltf.model.AnimationModel.Channel;
 import de.javagl.jgltf.model.AnimationModel.Interpolation;
+import de.javagl.jgltf.model.AssetModel;
 import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.CameraModel;
@@ -105,6 +107,7 @@ import de.javagl.jgltf.model.impl.DefaultAccessorModel;
 import de.javagl.jgltf.model.impl.DefaultAnimationModel;
 import de.javagl.jgltf.model.impl.DefaultAnimationModel.DefaultChannel;
 import de.javagl.jgltf.model.impl.DefaultAnimationModel.DefaultSampler;
+import de.javagl.jgltf.model.impl.DefaultAssetModel;
 import de.javagl.jgltf.model.impl.DefaultBufferModel;
 import de.javagl.jgltf.model.impl.DefaultBufferViewModel;
 import de.javagl.jgltf.model.impl.DefaultCameraModel;
@@ -234,6 +237,7 @@ public class GltfModelCreatorV1
         initProgramModels();
         
         initExtensionsModel();
+        initAssetModel();
     }
     
     /**
@@ -1426,6 +1430,23 @@ public class GltfModelCreatorV1
         DefaultExtensionsModel extensionsModel = gltfModel.getExtensionsModel();
         extensionsModel.addExtensionsUsed(extensionsUsed);
     }
+    
+    /**
+     * Initialize the {@link AssetModel} with the asset information that
+     * was given in the glTF.
+     */
+    private void initAssetModel() 
+    {
+        Asset asset = gltf.getAsset();
+        if (asset != null)
+        {
+            DefaultAssetModel assetModel = gltfModel.getAssetModel();
+            transferGltfPropertyElements(asset, assetModel);
+            assetModel.setCopyright(asset.getCopyright());
+            assetModel.setGenerator(asset.getGenerator());
+        }
+    }
+    
     
     /**
      * Transfer the extensions and extras from the given property to

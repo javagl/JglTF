@@ -137,5 +137,13 @@ public interface GltfModel extends ModelElement
      */
     ExtensionsModel getExtensionsModel();
     
+    /**
+     * Returns the {@link AssetModel} that contains information
+     * about the asset that is represented with this model.
+     * 
+     * @return The {@link AssetModel}
+     */
+    AssetModel getAssetModel();
+    
 }
 

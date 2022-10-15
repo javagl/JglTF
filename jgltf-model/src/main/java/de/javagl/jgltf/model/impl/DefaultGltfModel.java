@@ -33,6 +33,7 @@ import java.util.List;
 
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.AnimationModel;
+import de.javagl.jgltf.model.AssetModel;
 import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.CameraModel;
@@ -115,6 +116,11 @@ public class DefaultGltfModel extends AbstractModelElement implements GltfModel
      * The {@link ExtensionsModel}
      */
     private final DefaultExtensionsModel extensionsModel;
+    
+    /**
+     * The {@link AssetModel}
+     */
+    private final DefaultAssetModel assetModel;
 
     /**
      * Creates a new model 
@@ -134,6 +140,7 @@ public class DefaultGltfModel extends AbstractModelElement implements GltfModel
         this.skinModels = new ArrayList<DefaultSkinModel>();
         this.textureModels = new ArrayList<DefaultTextureModel>();
         this.extensionsModel = new DefaultExtensionsModel();
+        this.assetModel = new DefaultAssetModel();
     }
     
     /**
@@ -848,5 +855,11 @@ public class DefaultGltfModel extends AbstractModelElement implements GltfModel
     public DefaultExtensionsModel getExtensionsModel()
     {
         return extensionsModel;
+    }
+    
+    @Override
+    public DefaultAssetModel getAssetModel()
+    {
+        return assetModel;
     }
 }
