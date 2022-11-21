@@ -34,9 +34,9 @@ public class TestShortAccessorByteStride
         AccessorShortData accessorData = 
             (AccessorShortData) accessorModel.getAccessorData();
         
-        System.out.println(accessorData.get(0));
-        System.out.println(accessorData.get(1));
-        System.out.println(accessorData.get(2));
+        //System.out.println(accessorData.get(0));
+        //System.out.println(accessorData.get(1));
+        //System.out.println(accessorData.get(2));
 
         assertEquals(12, accessorData.get(0));
         assertEquals(23, accessorData.get(1));

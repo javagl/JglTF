@@ -38,6 +38,7 @@ import java.util.logging.Logger;
 
 import de.javagl.jgltf.impl.v2.GlTFChildOfRootProperty;
 import de.javagl.jgltf.impl.v2.GlTFProperty;
+import de.javagl.jgltf.impl.v2.Asset;
 import de.javagl.jgltf.impl.v2.Accessor;
 import de.javagl.jgltf.impl.v2.AccessorSparse;
 import de.javagl.jgltf.impl.v2.AccessorSparseIndices;
@@ -69,12 +70,14 @@ import de.javagl.jgltf.model.AccessorData;
 import de.javagl.jgltf.model.AccessorDatas;
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.AnimationModel;
+import de.javagl.jgltf.model.AssetModel;
 import de.javagl.jgltf.model.AnimationModel.Channel;
 import de.javagl.jgltf.model.AnimationModel.Interpolation;
 import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.CameraModel;
 import de.javagl.jgltf.model.ElementType;
+import de.javagl.jgltf.model.ExtensionsModel;
 import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.ImageModel;
@@ -90,6 +93,7 @@ import de.javagl.jgltf.model.impl.AbstractModelElement;
 import de.javagl.jgltf.model.impl.AbstractNamedModelElement;
 import de.javagl.jgltf.model.impl.DefaultAccessorModel;
 import de.javagl.jgltf.model.impl.DefaultAnimationModel;
+import de.javagl.jgltf.model.impl.DefaultAssetModel;
 import de.javagl.jgltf.model.impl.DefaultAnimationModel.DefaultChannel;
 import de.javagl.jgltf.model.impl.DefaultAnimationModel.DefaultSampler;
 import de.javagl.jgltf.model.impl.DefaultBufferModel;
@@ -97,6 +101,7 @@ import de.javagl.jgltf.model.impl.DefaultBufferViewModel;
 import de.javagl.jgltf.model.impl.DefaultCameraModel;
 import de.javagl.jgltf.model.impl.DefaultCameraOrthographicModel;
 import de.javagl.jgltf.model.impl.DefaultCameraPerspectiveModel;
+import de.javagl.jgltf.model.impl.DefaultExtensionsModel;
 import de.javagl.jgltf.model.impl.DefaultGltfModel;
 import de.javagl.jgltf.model.impl.DefaultImageModel;
 import de.javagl.jgltf.model.impl.DefaultMeshModel;
@@ -201,6 +206,9 @@ public class GltfModelCreatorV2
         initSkinModels();
         initTextureModels();
         initMaterialModels();
+        
+        initExtensionsModel();
+        initAssetModel();
     }
     
     /**
@@ -1261,7 +1269,36 @@ public class GltfModelCreatorV2
             material.defaultEmissiveFactor());
         materialModel.setEmissiveFactor(emissiveFactor);
     }
+    
+    /**
+     * Initialize the {@link ExtensionsModel} with the extensions that
+     * are used or required in the glTF.
+     */
+    private void initExtensionsModel() 
+    {
+        List<String> extensionsUsed = gltf.getExtensionsUsed();
+        List<String> extensionsRequired = gltf.getExtensionsRequired();
+        DefaultExtensionsModel extensionsModel = gltfModel.getExtensionsModel();
+        extensionsModel.addExtensionsUsed(extensionsUsed);
+        extensionsModel.addExtensionsRequired(extensionsRequired);
+    }
 
+    /**
+     * Initialize the {@link AssetModel} with the asset information that
+     * was given in the glTF.
+     */
+    private void initAssetModel() 
+    {
+        Asset asset = gltf.getAsset();
+        if (asset != null)
+        {
+            DefaultAssetModel assetModel = gltfModel.getAssetModel();
+            transferGltfPropertyElements(asset, assetModel);
+            assetModel.setCopyright(asset.getCopyright());
+            assetModel.setGenerator(asset.getGenerator());
+        }
+    }
+    
     /**
      * Transfer the extensions and extras from the given property to
      * the given target

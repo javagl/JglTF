@@ -129,5 +129,21 @@ public interface GltfModel extends ModelElement
      */
     List<TextureModel> getTextureModels();
     
+    /**
+     * Returns the {@link ExtensionsModel} that summarizes information
+     * about the extensions that are used in the glTF.
+     * 
+     * @return The {@link ExtensionsModel}
+     */
+    ExtensionsModel getExtensionsModel();
+    
+    /**
+     * Returns the {@link AssetModel} that contains information
+     * about the asset that is represented with this model.
+     * 
+     * @return The {@link AssetModel}
+     */
+    AssetModel getAssetModel();
+    
 }
 

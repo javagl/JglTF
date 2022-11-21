@@ -67,6 +67,7 @@ import de.javagl.jgltf.model.AccessorData;
 import de.javagl.jgltf.model.AccessorDatas;
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.AnimationModel;
+import de.javagl.jgltf.model.AssetModel;
 import de.javagl.jgltf.model.AnimationModel.Channel;
 import de.javagl.jgltf.model.AnimationModel.Sampler;
 import de.javagl.jgltf.model.BufferModel;
@@ -74,6 +75,7 @@ import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.CameraModel;
 import de.javagl.jgltf.model.CameraOrthographicModel;
 import de.javagl.jgltf.model.CameraPerspectiveModel;
+import de.javagl.jgltf.model.ExtensionsModel;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.MaterialModel;
@@ -313,9 +315,20 @@ public class GltfCreatorV2
             gltf.setScene(0);
         }
         
-        Asset asset = new Asset();
-        asset.setVersion("2.0");
-        asset.setGenerator("JglTF from https://github.com/javagl/JglTF");
+        ExtensionsModel extensionsModel = gltfModel.getExtensionsModel();
+        List<String> extensionsUsed = extensionsModel.getExtensionsUsed();
+        if (!extensionsUsed.isEmpty()) 
+        {
+            gltf.setExtensionsUsed(extensionsUsed);
+        }
+        List<String> extensionsRequired = 
+            extensionsModel.getExtensionsRequired();
+        if (!extensionsRequired.isEmpty()) 
+        {
+            gltf.setExtensionsRequired(extensionsRequired);
+        }
+        
+        Asset asset = createAsset(gltfModel.getAssetModel());
         gltf.setAsset(asset);
         
         return gltf;
@@ -951,6 +964,31 @@ public class GltfCreatorV2
         texture.setSource(imageIndices.get(textureModel.getImageModel()));
         
         return texture;
+    }
+    
+    /**
+     * Creates an asset for the given {@link AssetModel}
+     * 
+     * @param assetModel The {@link AssetModel}
+     * @return The {@link Asset}
+     */
+    private Asset createAsset(AssetModel assetModel)
+    {
+        Asset asset = new Asset();
+        asset.setVersion("2.0");
+        asset.setGenerator("JglTF from https://github.com/javagl/JglTF");
+        
+        transferGltfPropertyElements(assetModel, asset);
+        
+        if (assetModel.getCopyright() != null)
+        {
+            asset.setCopyright(assetModel.getCopyright());
+        }
+        if (assetModel.getGenerator() != null)
+        {
+            asset.setGenerator(assetModel.getGenerator());
+        }
+        return asset;
     }
     
     /**
