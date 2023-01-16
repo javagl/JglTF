@@ -182,7 +182,7 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
         }
         if (!animationModel.getChannels().isEmpty())
         {
-            bufferStructureBuilder.createArrayBufferViewModel("animation");
+            bufferStructureBuilder.createBufferViewModel("animation", null);
         }
     }
     
@@ -207,7 +207,7 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
         AccessorModel ibm = skinModel.getInverseBindMatrices();
         bufferStructureBuilder.addAccessorModel(
             "inverse bind matrices", (DefaultAccessorModel) ibm);
-        bufferStructureBuilder.createArrayBufferViewModel("skin");
+        bufferStructureBuilder.createBufferViewModel("skin", null);
     }
     
     @Override
