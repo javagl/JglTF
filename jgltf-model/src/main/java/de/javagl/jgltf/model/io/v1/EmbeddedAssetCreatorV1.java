@@ -41,7 +41,6 @@ import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.gl.ShaderModel;
 import de.javagl.jgltf.model.io.GltfAsset;
-import de.javagl.jgltf.model.io.IO;
 import de.javagl.jgltf.model.io.MimeTypes;
 import de.javagl.jgltf.model.v1.BinaryGltfV1;
 import de.javagl.jgltf.model.v1.GltfCreatorV1;
@@ -124,11 +123,6 @@ final class EmbeddedAssetCreatorV1
         GltfModelV1 gltfModel, String id, Buffer buffer, 
         Function<? super String, ? extends BufferModel> lookup)
     {
-        String uriString = buffer.getUri();
-        if (IO.isDataUriString(uriString))
-        {
-            return;
-        }
         BufferModel bufferModel = lookup.apply(id);
         ByteBuffer bufferData = bufferModel.getBufferData();
         
@@ -156,11 +150,6 @@ final class EmbeddedAssetCreatorV1
         GltfModelV1 gltfModel, String id, Image image, 
         Function<? super String, ? extends ImageModel> lookup)
     {
-        String uriString = image.getUri();
-        if (IO.isDataUriString(uriString))
-        {
-            return;
-        }
         ImageModel imageModel = lookup.apply(id);
         ByteBuffer imageData = imageModel.getImageData();
         
@@ -196,11 +185,6 @@ final class EmbeddedAssetCreatorV1
         GltfModelV1 gltfModel, String id, Shader shader, 
         Function<? super String, ? extends ShaderModel> lookup)
     {
-        String uriString = shader.getUri();
-        if (IO.isDataUriString(uriString))
-        {
-            return;
-        }
         ShaderModel shaderModel = lookup.apply(id);
         ByteBuffer shaderData = shaderModel.getShaderData();
         
