@@ -37,6 +37,7 @@ import de.javagl.jgltf.model.TextureModel;
 import de.javagl.jgltf.model.gl.TechniqueModel;
 import de.javagl.jgltf.model.v1.MaterialModelV1;
 import de.javagl.obj.FloatTuple;
+import de.javagl.obj.FloatTuples;
 import de.javagl.obj.Mtl;
 
 /**
@@ -59,23 +60,48 @@ class MtlMaterialValues
     static Map<String, Object> createMaterialValues(
         Mtl mtl, TextureModel textureModel)
     {
+        FloatTuple ka = FloatTuples.create(0, 0, 0);
+        FloatTuple kd = FloatTuples.create(0, 0, 0);
+        FloatTuple ks = FloatTuples.create(0, 0, 0);
+        float d = 1.0f;
+        float ns = 100.0f;
+        if (mtl.getKa() != null)
+        {
+            ka = mtl.getKa();
+        }
+        if (mtl.getKd() != null)
+        {
+            kd = mtl.getKd();
+        }
+        if (mtl.getKs() != null)
+        {
+            ks = mtl.getKs();
+        }
+        if (mtl.getD() != null)
+        {
+            d = mtl.getD();
+        }
+        if (mtl.getNs() != null)
+        {
+            ns = mtl.getNs();
+        }
         Map<String, Object> materialValues = 
             new LinkedHashMap<String, Object>();
         materialValues.put(ObjTechniqueModels.AMBIENT_NAME, 
-            createMaterialValue(mtl.getKa()));
+            createMaterialValue(ka));
         if (textureModel == null)
         {
             materialValues.put(ObjTechniqueModels.DIFFUSE_NAME, 
-                createMaterialValue(mtl.getKd(), mtl.getD()));
+                createMaterialValue(kd, d));
         }
         else
         {
             materialValues.put(ObjTechniqueModels.DIFFUSE_NAME, textureModel);
         }
         materialValues.put(ObjTechniqueModels.SPECULAR_NAME, 
-            createMaterialValue(mtl.getKs()));
+            createMaterialValue(ks));
         materialValues.put(ObjTechniqueModels.SHININESS_NAME, 
-            Collections.singletonList(mtl.getNs()));
+            Collections.singletonList(ns));
         return materialValues;
     }
 

@@ -74,20 +74,30 @@ class MtlMaterialHandlerV2 implements MtlMaterialHandler
 
         // If there is an MTL, try to translate some of the MTL
         // information into reasonable PBR information
-
+        float baseColorFactor[] = new float[] { 1.0f, 1.0f, 1.0f, 1.0f };
         FloatTuple ambientColor = mtl.getKd();
-        float r = ambientColor.get(0);
-        float g = ambientColor.get(1);
-        float b = ambientColor.get(2);
-        float opacity = mtl.getD();
-        if (opacity < 1.0f)
+        if (ambientColor != null)
         {
-            material.setAlphaMode(AlphaMode.BLEND);
+            baseColorFactor[0] = ambientColor.get(0);
+            baseColorFactor[1] = ambientColor.get(1);
+            baseColorFactor[2] = ambientColor.get(2);
         }
-        material.setBaseColorFactor(new float[] { r, g, b, opacity });
+        Float opacity = mtl.getD();
+        if (opacity != null)
+        {
+            baseColorFactor[3] = opacity;
+            if (opacity < 1.0f)
+            {
+                material.setAlphaMode(AlphaMode.BLEND);
+            }
+        }
+        material.setBaseColorFactor(baseColorFactor);
 
-        float shininess = mtl.getNs();
-        material.setMetallicFactor(shininess / 128f);
+        Float shininess = mtl.getNs();
+        if (shininess != null)
+        {
+            material.setMetallicFactor(shininess / 128f);
+        }
 
         material.setDoubleSided(true);
         return material;

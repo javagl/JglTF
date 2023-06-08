@@ -1,0 +1,4 @@
+# A material that does not specify any properties,
+# used for checking the handling of incomplete 
+# material information in the `gltf-obj` library
+newmtl material0
