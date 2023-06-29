@@ -528,7 +528,8 @@ public class GltfModelCreatorV2
             // When there is no BufferView referenced from the accessor,
             // then a NEW BufferViewModel (and Buffer) have to be created
             int count = accessorModel.getCount();
-            int elementSizeInBytes = accessorModel.getElementSizeInBytes();
+            int elementSizeInBytes = 
+                accessorModel.getPaddedElementSizeInBytes();
             int byteLength = elementSizeInBytes * count;
             ByteBuffer bufferData = Buffers.create(byteLength);
             String uriString = "buffer_for_accessor" + accessorIndex + ".bin";
@@ -556,7 +557,7 @@ public class GltfModelCreatorV2
         // then this BufferView has to be replaced with a new one,
         // to which the data substitution will be applied 
         int count = accessorModel.getCount();
-        int elementSizeInBytes = accessorModel.getElementSizeInBytes();
+        int elementSizeInBytes = accessorModel.getPaddedElementSizeInBytes();
         int byteLength = elementSizeInBytes * count;
         ByteBuffer bufferData = Buffers.create(byteLength);
         String uriString = "buffer_for_accessor" + accessorIndex + ".bin";
