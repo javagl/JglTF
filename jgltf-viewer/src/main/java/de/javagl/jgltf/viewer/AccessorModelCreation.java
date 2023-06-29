@@ -97,7 +97,7 @@ class AccessorModelCreation
     {
         DefaultAccessorModel accessorModel =
             new DefaultAccessorModel(componentType, count, elementType);
-        int elementSize = accessorModel.getElementSizeInBytes();
+        int elementSize = accessorModel.getPaddedElementSizeInBytes();
         accessorModel.setByteOffset(0);
         
         ByteBuffer bufferData = Buffers.create(count * elementSize);

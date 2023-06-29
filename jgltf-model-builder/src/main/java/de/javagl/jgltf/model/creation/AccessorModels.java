@@ -373,7 +373,7 @@ public class AccessorModels
         int commonByteStride = 1;
         for (AccessorModel accessorModel : accessorModels)
         {
-            int elementSize = accessorModel.getElementSizeInBytes();
+            int elementSize = accessorModel.getPaddedElementSizeInBytes();
             commonByteStride = Math.max(commonByteStride, elementSize);
             
             int byteStride = accessorModel.getByteStride();

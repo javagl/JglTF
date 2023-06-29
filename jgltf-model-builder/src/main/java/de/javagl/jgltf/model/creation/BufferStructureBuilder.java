@@ -39,6 +39,7 @@ import java.util.logging.Logger;
 
 import de.javagl.jgltf.model.AccessorData;
 import de.javagl.jgltf.model.AccessorModel;
+import de.javagl.jgltf.model.Accessors;
 import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.ElementType;
@@ -549,30 +550,25 @@ public final class BufferStructureBuilder
                 accessorModel.setByteOffset(
                     accumulatedBufferViewBytes);
                 
+                int targetByteStride =  
+                    accessorModel.getPaddedElementSizeInBytes(); 
+                if (commonByteStride == null)
+                {
+                    accessorModel.setByteStride(targetByteStride);
+                }
+                
                 // Compute the byte buffer for the accessor data. This
-                // may have to be restructured by inserting padding bytes,
-                // if the element size of the accessor does not match the
-                // common byte stride
+                // may have to be restructured by inserting padding bytes
                 ByteBuffer rawAccessorByteBuffer =
                     rawAccessorModelByteBuffers.get(accessorModel);
                 ByteBuffer accessorByteBuffer = rawAccessorByteBuffer;
                 
-                if (commonByteStride != null)
-                {
-                    int elementSizeInBytes = 
-                        accessorModel.getElementSizeInBytes();
-                    if (elementSizeInBytes != commonByteStride) 
-                    {
-                        accessorByteBuffer = applyByteStride(
-                            rawAccessorByteBuffer, elementSizeInBytes, 
-                            commonByteStride);
-                    }
-                } 
-                else
-                {
-                    int elementSize = accessorModel.getElementSizeInBytes();
-                    accessorModel.setByteStride(elementSize);
-                }
+                int count = accessorModel.getCount();
+                ElementType elementType = accessorModel.getElementType();
+                int componentType = accessorModel.getComponentType();
+                accessorByteBuffer = applyPadding(
+                    rawAccessorByteBuffer, count, elementType, 
+                    componentType, targetByteStride);
                 
                 accumulatedBufferViewBytes += accessorByteBuffer.capacity();
 
@@ -595,38 +591,116 @@ public final class BufferStructureBuilder
     }
     
     /**
-     * Apply the given byte stride to the given buffer and return the result
-     * as a new buffer. The directness or byte order of the result are not
-     * specified.<br>
-     * <br>
-     * This is supposed to be applied to accessor byte buffers. For example:
-     * For an an accessor with 2D float elements, the old byte stride will 
-     * be 2 * 4, and the old byte buffer may contain 24 bytes. Calling this
-     * method with a new byte stride of 3 * 4 will cause padding bytes to
-     * be inserted in the returned buffer: 
-     * <pre><code>
-     * oldByteBuffer: |X0|Y0|X1|Y1|X2|Y2|
-     * newByteBuffer: |X0|Y0|..|X1|Y1|..|X2|Y2|..|
-     * </code></pre>
-     *  
-     * @param oldByteBuffer The old byte buffer 
-     * @param oldByteStride The old byte stride
-     * @param newByteStride The new byte stride
-     * @return The new byte buffer
+     * Read the data from the byte buffer that was created with 
+     * {@link AccessorData#createByteBuffer()} and that contains
+     * the data in packed form, and write it into a new buffer,
+     * with the padding bytes that are required according to the
+     * specification.
+     * 
+     * @param packedByteBuffer The packed byte buffer
+     * @param count The number of elements in the accessor
+     * @param elementType The accessor element type
+     * @param componentType The component type
+     * @param byteStride The target byte stride (that must at least
+     * be equal to the {@link ElementType#getByteStride(int)}, but may be 
+     * larger)
+     * @return The buffer, with the padding applied
      */
-    private static ByteBuffer applyByteStride(
-        ByteBuffer oldByteBuffer, int oldByteStride, int newByteStride)
+    private static ByteBuffer applyPadding(
+        ByteBuffer packedByteBuffer, int count, ElementType elementType, 
+        int componentType, int byteStride)
     {
-        int count = oldByteBuffer.capacity() / oldByteStride;
-        ByteBuffer newByteBuffer = ByteBuffer.allocate(count * newByteStride);
+        ByteBuffer newByteBuffer = ByteBuffer.allocate(count * byteStride);
+        int numComponents = elementType.getNumComponents();
+        int numBytesPerComponent = 
+            Accessors.getNumBytesForAccessorComponentType(componentType);
+        int sourceIndex = 0;
+        int targetIndex = 0;
+        int padddingForByteStride = 
+            byteStride - elementType.getByteStride(componentType);
         for (int i = 0; i < count; i++)
         {
-            int srcPos = i * oldByteStride;
-            int dstPos = i * newByteStride;
-            Buffers.bufferCopy(oldByteBuffer, srcPos, 
-                newByteBuffer, dstPos, oldByteStride);
+            for (int c = 0; c < numComponents; c++)
+            {
+                for (int b = 0; b < numBytesPerComponent; b++)
+                {
+                    byte value = packedByteBuffer.get(sourceIndex);
+                    newByteBuffer.put(targetIndex, value);
+                    sourceIndex++;
+                    targetIndex++;
+                }
+                int padding = computePaddingBytesAfterComponent(elementType,
+                    componentType, c);
+                targetIndex += padding;
+            }
+            targetIndex += padddingForByteStride;
         }
         return newByteBuffer;
+    }
+    
+    /**
+     * Compute the number of padding bytes that have to be inserted after the
+     * specified component.
+     * 
+     * https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#data-alignment
+     * 
+     * @param elementType The element type
+     * @param componentType The component type
+     * @param componentIndex The component index
+     * @return The padding bytes
+     */
+    private static int computePaddingBytesAfterComponent(
+        ElementType elementType, int componentType, int componentIndex)
+    {
+        int n = Accessors.getNumBytesForAccessorComponentType(componentType);
+        if (n == 1)
+        {
+            if (elementType == ElementType.MAT2)
+            {
+                if (componentIndex == 1)
+                {
+                    return 2;
+                }
+                if (componentIndex == 3)
+                {
+                    return 2;
+                }
+            }
+            if (elementType == ElementType.MAT3)
+            {
+                if (componentIndex == 2)
+                {
+                    return 1;
+                }
+                if (componentIndex == 5)
+                {
+                    return 1;
+                }
+                if (componentIndex == 9)
+                {
+                    return 1;
+                }
+            }
+        }
+        if (n == 2)
+        {
+            if (elementType == ElementType.MAT3)
+            {
+                if (componentIndex == 2)
+                {
+                    return 2;
+                }
+                if (componentIndex == 5)
+                {
+                    return 2;
+                }
+                if (componentIndex == 9)
+                {
+                    return 2;
+                }
+            }
+        }
+        return 0;
     }
     
     
