@@ -555,6 +555,10 @@ public final class BufferStructureBuilder
                 if (commonByteStride == null)
                 {
                     accessorModel.setByteStride(targetByteStride);
+                } 
+                else 
+                {
+                    targetByteStride = commonByteStride;
                 }
                 
                 // Compute the byte buffer for the accessor data. This
