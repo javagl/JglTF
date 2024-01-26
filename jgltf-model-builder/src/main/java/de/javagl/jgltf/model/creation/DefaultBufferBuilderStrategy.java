@@ -28,6 +28,7 @@ package de.javagl.jgltf.model.creation;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.AnimationModel;
@@ -130,6 +131,20 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
         if (useSingleVertexAttributesBufferView)
         {
             bufferStructureBuilder.createArrayBufferViewModel("attributes");
+        }
+        List<Map<String, AccessorModel>> targets =
+            meshPrimitiveModel.getTargets();
+        if (!targets.isEmpty())
+        {
+            for (Map<String, AccessorModel> target : targets)
+            {
+                for (AccessorModel targetValue : target.values())
+                {
+                    bufferStructureBuilder.addAccessorModel("target",
+                        (DefaultAccessorModel) targetValue);
+                }
+            }
+            bufferStructureBuilder.createArrayBufferViewModel("targets");
         }
     }
     
