@@ -231,6 +231,23 @@ public class AccessorModels
             Buffers.createByteBufferFrom(data));
     }
     
+    /**
+     * Creates a new {@link AccessorModel} with the component type
+     * <code>GL_FLOAT</code> and the type <code>"SCALAR"</code>.
+     * 
+     * @param data The actual data
+     * @return The {@link AccessorModel}
+     * @throws IllegalArgumentException If the capacity of the given buffer
+     * (in bytes!) is not divisible by the element size that is implied by 
+     * the type and component type
+     */
+    public static DefaultAccessorModel createFloatScalar(FloatBuffer data)
+    {
+        return create(
+            GltfConstants.GL_FLOAT, "SCALAR", false,
+            Buffers.createByteBufferFrom(data));
+    }
+    
     
     /**
      * Creates a new {@link AccessorModel} with the component type
