@@ -39,7 +39,6 @@ import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.io.GltfAsset;
-import de.javagl.jgltf.model.io.IO;
 import de.javagl.jgltf.model.io.MimeTypes;
 import de.javagl.jgltf.model.v2.GltfCreatorV2;
 
@@ -106,11 +105,6 @@ final class EmbeddedAssetCreatorV2
     private static void convertBufferToEmbedded(
         GltfModel gltfModel, int index, Buffer buffer)
     {
-        String uriString = buffer.getUri();
-        if (IO.isDataUriString(uriString))
-        {
-            return;
-        }
         BufferModel bufferModel = gltfModel.getBufferModels().get(index);
         ByteBuffer bufferData = bufferModel.getBufferData();
         
@@ -136,11 +130,6 @@ final class EmbeddedAssetCreatorV2
     private static void convertImageToEmbedded(
         GltfModel gltfModel, int index, Image image)
     {
-        String uriString = image.getUri();
-        if (IO.isDataUriString(uriString))
-        {
-            return;
-        }
         ImageModel imageModel = gltfModel.getImageModels().get(index);
         ByteBuffer imageData = imageModel.getImageData();
         
