@@ -902,6 +902,7 @@ public class GltfModelCreatorV2
                     createMeshPrimitiveModel(meshPrimitive);
                 meshModel.addMeshPrimitiveModel(meshPrimitiveModel);
             }
+            meshModel.setWeights(toArray(mesh.getWeights()));
         }
     }
     
@@ -1018,16 +1019,7 @@ public class GltfModelCreatorV2
             nodeModel.setRotation(Optionals.clone(rotation));
             nodeModel.setScale(Optionals.clone(scale));
             
-            List<Float> weights = node.getWeights();
-            if (weights != null)
-            {
-                float weightsArray[] = new float[weights.size()];
-                for (int j = 0; j < weights.size(); j++)
-                {
-                    weightsArray[j] = weights.get(j);
-                }
-                nodeModel.setWeights(weightsArray);
-            }
+            nodeModel.setWeights(toArray(node.getWeights()));
         }
     }
     
@@ -1328,5 +1320,25 @@ public class GltfModelCreatorV2
         modelElement.setName(property.getName());
         transferGltfPropertyElements(property, modelElement);
     }
-    
+
+    /**
+     * Returns an array containing the float representations of the given
+     * numbers, or <code>null</code> if the given list is <code>null</code>.
+     * 
+     * @param numbers The numbers
+     * @return The array
+     */
+    private static float[] toArray(List<? extends Number> numbers)
+    {
+        if (numbers == null)
+        {
+            return null;
+        }
+        float array[] = new float[numbers.size()];
+        for (int j = 0; j < numbers.size(); j++)
+        {
+            array[j] = numbers.get(j).floatValue();
+        }
+        return array;
+    }
 }
