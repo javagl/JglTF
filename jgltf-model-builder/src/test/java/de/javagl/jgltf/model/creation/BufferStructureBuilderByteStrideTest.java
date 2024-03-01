@@ -9,8 +9,6 @@ import java.util.List;
 
 import org.junit.Test;
 
-import de.javagl.jgltf.model.AccessorData;
-import de.javagl.jgltf.model.AccessorDatas;
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.impl.DefaultAccessorModel;
