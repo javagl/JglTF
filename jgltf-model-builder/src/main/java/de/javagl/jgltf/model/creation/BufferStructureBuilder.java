@@ -44,6 +44,7 @@ import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.ElementType;
 import de.javagl.jgltf.model.GltfConstants;
+import de.javagl.jgltf.model.GltfException;
 import de.javagl.jgltf.model.impl.DefaultAccessorModel;
 import de.javagl.jgltf.model.impl.DefaultBufferModel;
 import de.javagl.jgltf.model.impl.DefaultBufferViewModel;
@@ -281,10 +282,18 @@ public final class BufferStructureBuilder
      * 
      * @param idPrefix The ID prefix of the {@link AccessorModel}
      * @param accessorModel The {@link AccessorModel}
+     * @throws GltfException If the given accessor model already has an
+     * associated buffer view
      */
     public void addAccessorModel(
         String idPrefix, DefaultAccessorModel accessorModel)
     {
+        BufferViewModel bufferViewModel = accessorModel.getBufferViewModel();
+        if (bufferViewModel != null)
+        {
+            throw new GltfException(
+                "The accessor already contains a buffer view");
+        }
         bufferStructure.addAccessorModel(accessorModel, idPrefix);
         currentAccessorModels.add(accessorModel);
     }
