@@ -82,10 +82,12 @@ public class GltfModelCreationExample
         MaterialBuilder materialBuilder =  MaterialBuilder.create();
 
         materialBuilder.setBaseColorTexture(
-            "./data/testTexture.png", "testTexture.png", null);
+            "./src/test/resources/testTexture.jpg", "testTexture.jpg", null);
         
         DefaultImageModel emissiveImageModel = ImageModels.create(
-            "./data/testTexture.png", "testTexture.jpg", "image/jpeg");
+            "./src/test/resources/testTexture.jpg",
+            "testTexture.jpg", "image/jpeg");
+
         DefaultTextureModel emissiveTexture = new DefaultTextureModel();
         emissiveTexture.setImageModel(emissiveImageModel);
         materialBuilder.setEmissiveTexture(emissiveTexture, 1, 1, 1, null);
