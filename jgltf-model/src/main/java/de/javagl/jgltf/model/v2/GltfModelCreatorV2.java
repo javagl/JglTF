@@ -954,8 +954,7 @@ public class GltfModelCreatorV2
                     gltfModel.getAccessorModel(accessorIndex);
                 morphTargetModel.put(attribute, accessorModel);
             }
-            meshPrimitiveModel.addTarget(
-                Collections.unmodifiableMap(morphTargetModel));
+            meshPrimitiveModel.addTarget(morphTargetModel);
         }
         
         Integer materialIndex = meshPrimitive.getMaterial();
