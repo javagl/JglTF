@@ -63,13 +63,23 @@ public class PixelDatas
             logger.warning("Could not read image from image data");
             return null;
         }
-            
+        return create(textureImage);
+    }
+
+    /**
+     * Create a {@link PixelData} from the given image
+     *
+     * @param image The image
+     * @return The {@link PixelData}
+     */
+    public static PixelData create(BufferedImage image)
+    {
         ByteBuffer pixelDataARGB = 
-            ImageUtils.getImagePixelsARGB(textureImage, false);
+            ImageUtils.getImagePixelsARGB(image, false);
         ByteBuffer pixelDataRGBA =
             ImageUtils.swizzleARGBtoRGBA(pixelDataARGB);
-        int width = textureImage.getWidth();
-        int height = textureImage.getHeight();
+        int width = image.getWidth();
+        int height = image.getHeight();
         return new DefaultPixelData(width, height, pixelDataRGBA);
     }
     
