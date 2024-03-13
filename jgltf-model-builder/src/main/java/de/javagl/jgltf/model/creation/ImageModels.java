@@ -26,6 +26,10 @@
  */
 package de.javagl.jgltf.model.creation;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,6 +38,8 @@ import java.nio.ByteBuffer;
 import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.swing.JLabel;
 
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.image.ImageUtils;
@@ -122,7 +128,7 @@ public class ImageModels
     /**
      * Creates a new {@link ImageModel} with the given URI, that contains
      * a buffer containing the image data that was read from the given 
-     * source URI.<br>
+     * input URI.<br>
      * <br>
      * The MIME type will be detected from the input file name (i.e. from
      * its extension). If this is not possible, it will be detected from
@@ -134,7 +140,7 @@ public class ImageModels
      * is not absolute, it will be assumed to be a path description
      * that is resolved against the default file system.
      * 
-     * @param inputUri The source file name
+     * @param inputUri The input file name
      * @param uri The URI that will be assigned to the {@link ImageModel}
      * @return The instance
      */
@@ -172,6 +178,85 @@ public class ImageModels
         return imageModel;
     }
     
+    /**
+     * Create a simple "label" image with the given size that just shows
+     * the given text.
+     * 
+     * The given text may be a HTML string.
+     * 
+     * @param uri The URI for the image model
+     * @param sizeX The size of the image in x-direction
+     * @param sizeY The size of the image in y-direction
+     * @param fontSize The font size
+     * @param text The text
+     * @return The image model
+     */
+    public static DefaultImageModel createLabel(
+        String uri, int sizeX, int sizeY, int fontSize, String text) 
+    {
+        BufferedImage image = createImageWithText(sizeX, sizeY, fontSize, text);
+        PixelData pixelData = PixelDatas.create(image);
+        DefaultImageModel imageModel = create(uri, "image/png", pixelData);
+        return imageModel;
+    }
+
+    /**
+     * Creates a buffered image with the given size that shows the given
+     * text.<br>
+     * <br>
+     * The given text may be HTML. Further details about the image are
+     * not specified.
+     *
+     * @param sizeX The size of the image in x-direction
+     * @param sizeY The size of the image in x-direction
+     * @param fontSize The size of the font
+     * @param text The text
+     * @return The buffered image
+     */
+    private static BufferedImage createImageWithText(
+        int sizeX, int sizeY,
+        int fontSize, String text)
+    {
+        Font font = new Font("Monospaced", Font.PLAIN, fontSize);
+        return createImageWithText(sizeX, sizeY, font, text,
+            Color.BLACK, Color.WHITE);
+    }
+
+    /**
+     * Creates a buffered image with the given size that shows the given
+     * text.<br>
+     * <br>
+     * The given text may be HTML. Further details about the image are
+     * not specified.
+     *
+     * @param sizeX The size of the image in x-direction
+     * @param sizeY The size of the image in x-direction
+     * @param font The font
+     * @param text The text
+     * @param foregroundColor The foreground color
+     * @param backgroundColor The background color
+     * @return The buffered image
+     */
+    private static BufferedImage createImageWithText(
+        int sizeX, int sizeY,
+        Font font, String text,
+        Color foregroundColor,
+        Color backgroundColor)
+    {
+        JLabel label = new JLabel(text);
+        label.setBackground(backgroundColor);
+        label.setForeground(foregroundColor);
+        label.setFont(font);
+        label.setOpaque(true);
+        label.setSize(sizeX, sizeY);
+        BufferedImage image = new BufferedImage(
+            sizeX, sizeY, BufferedImage.TYPE_INT_ARGB);
+        Graphics g = image.getGraphics();
+        label.paint(g);
+        g.dispose();
+        return image;
+    }
+
     /**
      * Private constructor to prevent instantiation
      */

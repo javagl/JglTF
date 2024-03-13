@@ -10,9 +10,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +17,6 @@ import org.junit.Test;
 
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
-import de.javagl.jgltf.model.impl.DefaultAccessorModel;
 import de.javagl.jgltf.model.impl.DefaultGltfModel;
 import de.javagl.jgltf.model.impl.DefaultMeshModel;
 import de.javagl.jgltf.model.impl.DefaultMeshPrimitiveModel;
@@ -88,34 +84,22 @@ public class MorphTargetsBuildingTest
     private static DefaultMeshPrimitiveModel createMeshPrimitive()
     {
         int indices[] =
-        { 0, 1, 2, };
+            { 0, 1, 2, };
         float positions[] =
-        { 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.5f, 0.5f, 0.0f, };
+            { 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.5f, 0.5f, 0.0f, };
 
-        MeshPrimitiveBuilder meshPrimitiveBuilder =
-            MeshPrimitiveBuilder.create();
-        meshPrimitiveBuilder.setIntIndicesAsShort(IntBuffer.wrap(indices));
-        meshPrimitiveBuilder.addPositions3D(FloatBuffer.wrap(positions));
         DefaultMeshPrimitiveModel meshPrimitiveModel =
-            meshPrimitiveBuilder.build();
+            MeshPrimitiveModels.create(indices, positions, null, null);
 
         float positionsDispacements0[] =
-        { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, };
-        DefaultAccessorModel positionsDisplacementsAccessor0 = AccessorModels
-            .createFloat3D(FloatBuffer.wrap(positionsDispacements0));
-        Map<String, AccessorModel> target0 =
-            new LinkedHashMap<String, AccessorModel>();
-        target0.put("POSITION", positionsDisplacementsAccessor0);
-        meshPrimitiveModel.addTarget(target0);
-
+            { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, };
+        MeshPrimitiveModels.addMorphTarget(meshPrimitiveModel, 
+            0, "POSITION", positionsDispacements0);
+        
         float positionsDispacements1[] =
-        { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, };
-        DefaultAccessorModel positionsDisplacementsAccessor1 = AccessorModels
-            .createFloat3D(FloatBuffer.wrap(positionsDispacements1));
-        Map<String, AccessorModel> target1 =
-            new LinkedHashMap<String, AccessorModel>();
-        target1.put("POSITION", positionsDisplacementsAccessor1);
-        meshPrimitiveModel.addTarget(target1);
+            { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, };
+        MeshPrimitiveModels.addMorphTarget(meshPrimitiveModel, 
+            1, "POSITION", positionsDispacements1);
 
         return meshPrimitiveModel;
     }

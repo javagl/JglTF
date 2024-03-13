@@ -28,8 +28,6 @@ package de.javagl.jgltf.model.creation;
 
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.TextureModel;
-import de.javagl.jgltf.model.impl.DefaultImageModel;
-import de.javagl.jgltf.model.impl.DefaultTextureModel;
 import de.javagl.jgltf.model.v2.MaterialModelV2;
 import de.javagl.jgltf.model.v2.MaterialModelV2.AlphaMode;
 
@@ -89,9 +87,8 @@ public class MaterialBuilder
     public MaterialBuilder setBaseColorTexture(
         String fileName, String uri, Integer texCoord)
     {
-        DefaultImageModel imageModel = ImageModels.create(fileName, uri);
-        DefaultTextureModel textureModel = new DefaultTextureModel();
-        textureModel.setImageModel(imageModel);
+        TextureModel textureModel = 
+            TextureModels.createFromImageFile(fileName, uri);
         return setBaseColorTexture(textureModel, texCoord);
     }
     
@@ -137,9 +134,8 @@ public class MaterialBuilder
     public MaterialBuilder setMetallicRoughnessTexture(
         String fileName, String uri, Integer texCoord)
     {
-        DefaultImageModel imageModel = ImageModels.create(fileName, uri);
-        DefaultTextureModel textureModel = new DefaultTextureModel();
-        textureModel.setImageModel(imageModel);
+        TextureModel textureModel = 
+            TextureModels.createFromImageFile(fileName, uri);
         return setMetallicRoughnessTexture(textureModel, texCoord);
     }
     
@@ -172,9 +168,8 @@ public class MaterialBuilder
         String fileName, String uri, 
         float scale, Integer texCoord)
     {
-        DefaultImageModel imageModel = ImageModels.create(fileName, uri);
-        DefaultTextureModel textureModel = new DefaultTextureModel();
-        textureModel.setImageModel(imageModel);
+        TextureModel textureModel = 
+            TextureModels.createFromImageFile(fileName, uri);
         return setNormalTexture(textureModel, scale, texCoord);
     }
     
@@ -209,9 +204,8 @@ public class MaterialBuilder
         String fileName, String uri, 
         float strength, Integer texCoord)
     {
-        DefaultImageModel imageModel = ImageModels.create(fileName, uri);
-        DefaultTextureModel textureModel = new DefaultTextureModel();
-        textureModel.setImageModel(imageModel);
+        TextureModel textureModel = 
+            TextureModels.createFromImageFile(fileName, uri);
         return setOcclusionTexture(textureModel, strength, texCoord);
     }
     
@@ -248,9 +242,8 @@ public class MaterialBuilder
         String fileName, String uri, 
         float r, float g, float b, Integer texCoord)
     {
-        DefaultImageModel imageModel = ImageModels.create(fileName, uri);
-        DefaultTextureModel textureModel = new DefaultTextureModel();
-        textureModel.setImageModel(imageModel);
+        TextureModel textureModel = 
+            TextureModels.createFromImageFile(fileName, uri);
         return setEmissiveTexture(textureModel, r, g, b, texCoord);
     }
     
