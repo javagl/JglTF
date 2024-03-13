@@ -30,12 +30,17 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 
 import de.javagl.jgltf.model.AccessorModel;
+import de.javagl.jgltf.model.ElementType;
 import de.javagl.jgltf.model.GltfConstants;
+import de.javagl.jgltf.model.GltfException;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
 import de.javagl.jgltf.model.impl.DefaultAccessorModel;
 import de.javagl.jgltf.model.impl.DefaultMeshPrimitiveModel;
@@ -46,6 +51,12 @@ import de.javagl.jgltf.model.io.Buffers;
  */
 public final class MeshPrimitiveBuilder 
 {
+    /**
+     * The logger used in this class
+     */
+    private static final Logger logger =
+        Logger.getLogger(MeshPrimitiveBuilder.class.getName());
+
     /**
      * Create a new {@link MeshPrimitiveBuilder}
      * 
@@ -73,6 +84,11 @@ public final class MeshPrimitiveBuilder
     private final Map<String, DefaultAccessorModel> attributeAccessorModels;
     
     /**
+     * The list of morph target definitions
+     */
+    private final List<Map<String, DefaultAccessorModel>> targets;
+
+    /**
      * Private constructor
      */
     private MeshPrimitiveBuilder()
@@ -80,6 +96,7 @@ public final class MeshPrimitiveBuilder
         this.mode = GltfConstants.GL_TRIANGLES;
         this.attributeAccessorModels = 
             new LinkedHashMap<String, DefaultAccessorModel>();
+        this.targets = new ArrayList<Map<String, DefaultAccessorModel>>();
     }
     
     /**
@@ -374,7 +391,123 @@ public final class MeshPrimitiveBuilder
         attributeAccessorModels.put(attributeName, attribute);
         return this;
     }
-    
+
+    /**
+     * Add the specified morph target to the {@link MeshPrimitiveModel} that
+     * is currently being built.
+     *
+     * If the morph target with the given index does not yet exist, then
+     * it is created. If the index is larger than the number of morph
+     * targets that have been created, then a warning will be printed,
+     * and the necessary (empty) morph targets will be created.
+     *
+     * If the specified target entry already existed, then a warning will
+     * be printed, and it will be overwritten with the given data.
+     *
+     * @param index The index of the morph target
+     * @param attributeName The attribute name
+     * @param data The morph target data
+     * @return This builder
+     * @throws GltfException If the mesh primitive does not already contain
+     * an attribute with the given name
+     */
+    public MeshPrimitiveBuilder addMorphTarget(
+        int index, String attributeName,
+        ByteBuffer data)
+    {
+        DefaultAccessorModel attribute =
+            attributeAccessorModels.get(attributeName);
+        if (attribute == null)
+        {
+            throw new GltfException("The mesh primitive does not contain a "
+                + attributeName + " attribute");
+        }
+        int componentType = attribute.getComponentType();
+        ElementType elementType = attribute.getElementType();
+        DefaultAccessorModel accessorModel = AccessorModels.create(
+            componentType, elementType.toString(), false, data);
+        return addMorphTarget(index, attributeName, accessorModel);
+    }
+
+    /**
+     * Add the specified morph target to the {@link MeshPrimitiveModel} that
+     * is currently being built.
+     *
+     * If the morph target with the given index does not yet exist, then
+     * it is created. If the index is larger than the number of morph
+     * targets that have been created, then a warning will be printed,
+     * and the necessary (empty) morph targets will be created.
+     *
+     * If the specified target entry already existed, then a warning will
+     * be printed, and it will be overwritten with the given data.
+     *
+     * @param index The index of the morph target
+     * @param attributeName The attribute name
+     * @param morphAccessorModel The accessor model containing the morph data
+     * @return This builder
+     * @throws GltfException If the mesh primitive does not already contain
+     * an attribute with the given name, or if there is an attribute that
+     * uses a different component- or element type than the given accessor
+     * model.
+     */
+    public MeshPrimitiveBuilder addMorphTarget(
+        int index, String attributeName,
+        DefaultAccessorModel morphAccessorModel)
+    {
+        DefaultAccessorModel attribute =
+            attributeAccessorModels.get(attributeName);
+        if (attribute == null)
+        {
+            throw new GltfException("The mesh primitive does not contain a "
+                + attributeName + " attribute");
+        }
+        int componentType = attribute.getComponentType();
+        int morphComponentType = morphAccessorModel.getComponentType();
+
+        if (componentType != morphComponentType)
+        {
+            throw new GltfException(
+                "Attribute " + attributeName + " has component type "
+                + GltfConstants.stringFor(componentType)
+                + ", but the morphed attribute data has component type "
+                + GltfConstants.stringFor(morphComponentType));
+        }
+
+        ElementType elementType = attribute.getElementType();
+        ElementType morphElementType = morphAccessorModel.getElementType();
+        if (elementType != morphElementType)
+        {
+            throw new GltfException(
+                "Attribute " + attributeName + " has element type "
+                + elementType + ", but the morphed attribute data "
+                + "has element type " + morphElementType);
+        }
+
+        if (index == targets.size())
+        {
+            targets.add(new LinkedHashMap<String, DefaultAccessorModel>());
+        }
+        else if (index > targets.size() - 1)
+        {
+            logger.warning("Setting attribute in morph target " + index
+                + ", even " + "though only " + targets.size()
+                + " targets have " + "been created until now");
+            int targetsToAdd = index - targets.size() + 1;
+            for (int i = 0; i < targetsToAdd; i++)
+            {
+                targets.add(
+                    new LinkedHashMap<String, DefaultAccessorModel>());
+            }
+        }
+        Map<String, DefaultAccessorModel> target = targets.get(index);
+        if (target.containsKey(attributeName))
+        {
+            logger.warning("Overwriting existing " + attributeName
+                + " in morph target " + index);
+        }
+        target.put(attributeName, morphAccessorModel);
+        return this;
+    }
     
     /**
      * Create the {@link MeshPrimitiveModel} containing the indices and
@@ -403,6 +536,16 @@ public final class MeshPrimitiveBuilder
                 result.putAttribute(name, accessorModel);
             }
             attributeAccessorModels.clear();
+        }
+
+        if (!targets.isEmpty())
+        {
+            for (Map<String, DefaultAccessorModel> target : targets)
+            {
+                result.addTarget(
+                    new LinkedHashMap<String, AccessorModel>(target));
+            }
+            targets.clear();
         }
         return result;
     }
