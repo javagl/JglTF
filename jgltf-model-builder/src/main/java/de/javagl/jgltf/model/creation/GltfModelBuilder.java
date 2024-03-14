@@ -416,6 +416,7 @@ public class GltfModelBuilder
                 addTextureModel(materialModelV2.getOcclusionTexture());
                 addTextureModel(materialModelV2.getMetallicRoughnessTexture());
                 addTextureModel(materialModelV2.getEmissiveTexture());
+                addTextureModel(materialModelV2.getNormalTexture());
             }
         }
     }
