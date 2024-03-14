@@ -26,6 +26,8 @@
  */
 package de.javagl.jgltf.model.creation;
 
+import java.awt.image.BufferedImage;
+
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.TextureModel;
 import de.javagl.jgltf.model.impl.DefaultTextureModel;
@@ -35,23 +37,6 @@ import de.javagl.jgltf.model.impl.DefaultTextureModel;
  */
 public class TextureModels
 {
-    /**
-     * Creates a {@link TextureModel} with an image that was created from the 
-     * specified image file.
-     * 
-     * @param imageFileName The image file name
-     * @param uri The URI to set for the {@link ImageModel}
-     * @return The texture model
-     */
-    public static DefaultTextureModel createFromImageFile(
-        String imageFileName, String uri) 
-    {
-        ImageModel imageModel = ImageModels.create(imageFileName, uri);
-        DefaultTextureModel result = new DefaultTextureModel();
-        result.setImageModel(imageModel);
-        return result;
-    }
-
     /**
      * Creates a {@link TextureModel} from the given image model.
      * 
@@ -64,6 +49,37 @@ public class TextureModels
         DefaultTextureModel result = new DefaultTextureModel();
         result.setImageModel(imageModel);
         return result;
+    }
+
+    /**
+     * Creates a {@link TextureModel} with an image that was created from the 
+     * specified image file.
+     * 
+     * @param imageFileName The image file name
+     * @param uri The URI to set for the {@link ImageModel}
+     * @return The texture model
+     */
+    public static DefaultTextureModel createFromImageFile(
+        String imageFileName, String uri) 
+    {
+        ImageModel imageModel = ImageModels.create(imageFileName, uri);
+        return createFromImage(imageModel);
+    }
+
+    /**
+     * Creates a {@link TextureModel} from the given buffered image.
+     * 
+     * @param bufferedImage The buffered image
+     * @param uri The URI for the underlying image model
+     * @param mimeType The MIME type for the image
+     * @return The texture model
+     */
+    public static DefaultTextureModel createFromBufferedImage(
+        BufferedImage bufferedImage, String uri, String mimeType) 
+    {
+        ImageModel imageModel = ImageModels.createFromBufferedImage(
+            uri, mimeType, bufferedImage);
+        return createFromImage(imageModel);
     }
 
     /**

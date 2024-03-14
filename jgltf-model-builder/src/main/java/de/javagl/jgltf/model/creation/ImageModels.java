@@ -177,6 +177,23 @@ public class ImageModels
         imageModel.setMimeType(mimeType);
         return imageModel;
     }
+
+    /**
+     * Create a simple image model from the given buffered image.
+     * 
+     * @param uri The URI for the image model
+     * @param mimeType The MIME type for the image
+     * @param bufferedImage The buffered image
+     * @return The image model
+     */
+    public static DefaultImageModel createFromBufferedImage(
+        String uri, String mimeType, BufferedImage bufferedImage) 
+    {
+        PixelData pixelData = PixelDatas.create(bufferedImage);
+        DefaultImageModel imageModel = create(uri, mimeType, pixelData);
+        return imageModel;
+    }
+
     
     /**
      * Create a simple "label" image with the given size that just shows
@@ -195,9 +212,7 @@ public class ImageModels
         String uri, int sizeX, int sizeY, int fontSize, String text) 
     {
         BufferedImage image = createImageWithText(sizeX, sizeY, fontSize, text);
-        PixelData pixelData = PixelDatas.create(image);
-        DefaultImageModel imageModel = create(uri, "image/png", pixelData);
-        return imageModel;
+        return createFromBufferedImage(uri, "image/png", image);
     }
 
     /**
