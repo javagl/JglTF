@@ -38,6 +38,7 @@ import de.javagl.jgltf.model.AnimationModel.Channel;
 import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.CameraModel;
+import de.javagl.jgltf.model.GltfException;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.MaterialModel;
@@ -716,10 +717,21 @@ public class GltfModelBuilder
      * Add the given {@link AccessorModel} that will be added to the 
      * final model manually.
      * 
+     * This accessor model will not be considered when building the internal
+     * buffer structures, so it must already have an associated 
+     * {@link BufferViewModel}.
+     * 
      * @param accessorModel The {@link AccessorModel}
+     * @throws GltfException If the given accessor model does not have an
+     * associated {@link BufferViewModel}
      */
     public void addAccessorModel(AccessorModel accessorModel)
     {
+        if (accessorModel.getBufferViewModel() == null)
+        {
+            throw new GltfException(
+                "The accessor model does not have a buffer view model");
+        }
         DefaultAccessorModel defaultAccessorModel = 
             (DefaultAccessorModel) accessorModel;
         accessorModelsSet.add(defaultAccessorModel);
@@ -729,7 +741,13 @@ public class GltfModelBuilder
      * Add the given {@link AccessorModel} instances that will be added
      * to the final model manually.
      * 
+     * These accessor models will not be considered when building the internal
+     * buffer structures, so they must already have an associated 
+     * {@link BufferViewModel}.
+     * 
      * @param accessorModels The {@link AccessorModel} instances
+     * @throws GltfException If a given accessor model does not have an
+     * associated {@link BufferViewModel}
      */
     public void addAccessorModels(
         Collection<? extends AccessorModel> accessorModels)
@@ -744,10 +762,22 @@ public class GltfModelBuilder
      * Add the given {@link BufferViewModel} that will be added to the 
      * final model manually.
      * 
+     * This buffer view model will not be considered when building the 
+     * internal buffer structures, so it must already have an associated 
+     * {@link BufferModel}.
+     * 
      * @param bufferViewModel The {@link BufferViewModel}
+     * @throws GltfException If the given buffer view model does not have an
+     * associated {@link BufferModel}
      */
     public void addBufferViewModel(BufferViewModel bufferViewModel)
     {
+        if (bufferViewModel.getBufferModel() == null)
+        {
+            throw new GltfException(
+                "The buffer view model does not have a buffer model");
+        }
+        
         DefaultBufferViewModel defaultBufferViewModel = 
             (DefaultBufferViewModel) bufferViewModel;
         bufferViewModelsSet.add(defaultBufferViewModel);
@@ -757,7 +787,13 @@ public class GltfModelBuilder
      * Add the given {@link BufferViewModel} instances that will be added
      * to the final model manually.
      * 
+     * These buffer view model will not be considered when building the 
+     * internal buffer structures, so they must already have an associated 
+     * {@link BufferModel}.
+     * 
      * @param bufferViewModels The {@link BufferViewModel} instances
+     * @throws GltfException If a given buffer view model does not have an
+     * associated {@link BufferModel}
      */
     public void addBufferViewModels(
         Collection<? extends BufferViewModel> bufferViewModels)
