@@ -379,7 +379,7 @@ public class AccessorModels
             throw new IllegalArgumentException(
                 "Invalid data for type " + type + " accessor with "
                 + Accessors.getDataTypeForAccessorComponentType(componentType)
-                + "components: The data length is " + byteBuffer.capacity() 
+                + " components: The data length is " + byteBuffer.capacity()
                 + " which is not divisble by " + numBytesPerElement);
         }
         int count = byteBuffer.capacity() / numBytesPerElement;
