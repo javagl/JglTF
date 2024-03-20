@@ -148,6 +148,30 @@ public final class BufferStructureBuilder
     {
         return bufferStructure.getBufferModels().size();
     }
+    
+    /**
+     * Returns the number of {@link AccessorModel} instances that have been 
+     * added, but for which no {@link BufferViewModel} has been created
+     * yet.
+     * 
+     * @return The number of pending {@link AccessorModel} instances
+     */
+    public int getNumCurrentAccessorModels() 
+    {
+        return currentAccessorModels.size();
+    }
+    
+    /**
+     * Returns the number of {@link BufferViewModel} instances that have been 
+     * added, but for which no {@link BufferModel} has been created
+     * yet.
+     * 
+     * @return The number of pending {@link BufferViewModel} instances
+     */
+    public int getNumCurrentBufferViewModels() 
+    {
+        return currentBufferViewModels.size();
+    }
 
     /**
      * Create an {@link AccessorModel} in the {@link BufferStructure} that 
