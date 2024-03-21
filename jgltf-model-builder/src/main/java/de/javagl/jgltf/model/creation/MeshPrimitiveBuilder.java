@@ -490,8 +490,8 @@ public final class MeshPrimitiveBuilder
         else if (index > targets.size() - 1)
         {
             logger.warning("Setting attribute in morph target " + index
-                + ", even " + "though only " + targets.size()
-                + " targets have " + "been created until now");
+                + ", even though only " + targets.size()
+                + " targets have been created until now");
             int targetsToAdd = index - targets.size() + 1;
             for (int i = 0; i < targetsToAdd; i++)
             {
