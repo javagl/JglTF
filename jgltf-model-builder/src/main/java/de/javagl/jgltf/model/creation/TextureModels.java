@@ -83,6 +83,31 @@ public class TextureModels
     }
 
     /**
+     * Create a simple "label" texture with the given size that just shows
+     * the given text.
+     * 
+     * The given text may be a HTML string.
+     * 
+     * Note: Many details (like the font or background- or foreground
+     * color of the label) are not set specified and may change or
+     * become configurable in future releases.
+     * 
+     * @param uri The URI for the image model
+     * @param sizeX The size of the image in x-direction
+     * @param sizeY The size of the image in y-direction
+     * @param fontSize The font size
+     * @param text The text
+     * @return The texture model
+     */
+    public static DefaultTextureModel createLabel(
+        String uri, int sizeX, int sizeY, int fontSize, String text) 
+    {
+        ImageModel imageModel = 
+            ImageModels.createLabel(uri, sizeX, sizeY, fontSize, text);
+        return createFromImage(imageModel);
+    }
+    
+    /**
      * Private constructor to prevent instantiation
      */
     private TextureModels()

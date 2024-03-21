@@ -201,6 +201,10 @@ public class ImageModels
      * 
      * The given text may be a HTML string.
      * 
+     * Note: Many details (like the font or background- or foreground
+     * color of the label) are not set specified and may change or
+     * become configurable in future releases.
+     * 
      * @param uri The URI for the image model
      * @param sizeX The size of the image in x-direction
      * @param sizeY The size of the image in y-direction
@@ -232,7 +236,7 @@ public class ImageModels
         int sizeX, int sizeY,
         int fontSize, String text)
     {
-        Font font = new Font("Monospaced", Font.PLAIN, fontSize);
+        Font font = new Font("Monospaced", Font.BOLD, fontSize);
         return createImageWithText(sizeX, sizeY, font, text,
             Color.BLACK, Color.WHITE);
     }
