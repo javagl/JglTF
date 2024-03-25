@@ -270,6 +270,24 @@ public class ImageUtils
     }
     
     /**
+     * Create an RGB buffered image from the given image
+     *
+     * @param inputImage The input image
+     * @return The buffered image
+     */
+    public static BufferedImage createBufferedImageRGB(BufferedImage inputImage)
+    {
+        int w = inputImage.getWidth();
+        int h = inputImage.getHeight();
+        BufferedImage image = new BufferedImage(
+            w, h, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = image.createGraphics();
+        g.drawImage(inputImage, 0, 0, null);
+        g.dispose();
+        return image;
+    }
+
+    /**
      * Creates the byte buffer containing the image data for the given
      * pixel data, with the given MIME type.<br>
      * <br>
@@ -289,18 +307,23 @@ public class ImageUtils
     public static ByteBuffer createImageDataBuffer(
         PixelData pixelData, String mimeType)
     {
+        BufferedImage image;
         String formatName = null;
         if ("image/gif".equals(mimeType))
         {
             formatName = "gif";
+            image = ImageUtils.createBufferedImage(pixelData);
         }
         else if ("image/jpeg".equals(mimeType))
         {
             formatName = "jpg";
+            BufferedImage argbImage = ImageUtils.createBufferedImage(pixelData);
+            image = ImageUtils.createBufferedImageRGB(argbImage);
         }
         else if ("image/png".equals(mimeType))
         {
             formatName = "png";
+            image = ImageUtils.createBufferedImage(pixelData);
         }
         else
         {
@@ -308,7 +331,6 @@ public class ImageUtils
                 "The MIME type string must be \"image/gif\", "
                 + "\"image/jpeg\" or \"image/png\", but is " + mimeType);
         }
-        BufferedImage image = ImageUtils.createBufferedImage(pixelData);
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream())
         {
             ImageIO.write(image, formatName, baos);
@@ -320,7 +342,6 @@ public class ImageUtils
             return null;
         }
     }
-    
     
     // Only a basic test for the swizzling
     @SuppressWarnings("javadoc")

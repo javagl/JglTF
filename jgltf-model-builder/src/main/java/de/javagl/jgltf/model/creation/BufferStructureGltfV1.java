@@ -43,7 +43,10 @@ import de.javagl.jgltf.model.v1.GltfCreatorV1;
 
 /**
  * Utility methods for creating the glTF 1.0 elements that correspond to
- * a {@link BufferStructure}
+ * a {@link BufferStructure}.<br>
+ * <br>
+ * This class is only intended for internal use, and may be removed in
+ * the future.
  */
 public class BufferStructureGltfV1
 {

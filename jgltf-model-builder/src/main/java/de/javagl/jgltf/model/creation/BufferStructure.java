@@ -428,8 +428,8 @@ public final class BufferStructure
      * contained in the given collection
      * 
      * @param prefix The prefix for the ID
-     * @param existingIds The existing URI strings
-     * @return The new URI string
+     * @param existingIds The existing ID strings
+     * @return The new ID string
      */
     private String createId(String prefix,
         Collection<? extends String> existingIds)

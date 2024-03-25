@@ -67,9 +67,13 @@ public interface MeshPrimitiveModel extends ModelElement
     MaterialModel getMaterialModel();
     
     /**
-     * Returns an unmodifiable view on the list of morph targets. Each element
-     * of this list will be an unmodifiable map. Each map maps the attribute
-     * name to the {@link AccessorModel} that provides the morph target data.
+     * Returns an unmodifiable view on the list of morph targets. Each map 
+     * maps the attribute name to the {@link AccessorModel} that provides 
+     * the morph target data.
+     * 
+     * Clients should usually not modify the maps directly. If they do,
+     * they are responsible for the consistency of the morph targets
+     * and the attributes.
      * 
      * @return The morph targets
      */

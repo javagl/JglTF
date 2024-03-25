@@ -128,7 +128,25 @@ public final class DefaultMeshPrimitiveModel extends AbstractModelElement
         this.targets.add(target);
     }
     
-
+    /**
+     * Put the given {@link AccessorModel} into the specified morph target, 
+     * under the given name
+     * 
+     * @param index The morph target index
+     * @param name The name
+     * @param accessorModel The {@link AccessorModel}
+     * @return The old value that was stored under the given name
+     */
+    public AccessorModel putTarget(
+        int index, String name, AccessorModel accessorModel)
+    {
+        Objects.requireNonNull(
+            accessorModel, "The accessorModel may not be null");
+        Map<String, AccessorModel> target = this.targets.get(index);
+        return target.put(name, accessorModel);
+    }
+    
+    
     @Override
     public Map<String, AccessorModel> getAttributes()
     {

@@ -31,12 +31,15 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
+import de.javagl.jgltf.model.AccessorData;
 import de.javagl.jgltf.model.AccessorDatas;
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.Accessors;
 import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.ElementType;
 import de.javagl.jgltf.model.GltfConstants;
+import de.javagl.jgltf.model.GltfModel;
+import de.javagl.jgltf.model.MeshPrimitiveModel;
 import de.javagl.jgltf.model.impl.DefaultAccessorModel;
 import de.javagl.jgltf.model.io.Buffers;
 
@@ -47,10 +50,56 @@ import de.javagl.jgltf.model.io.Buffers;
  * {@link AccessorModel#getAccessorData() accessor data} that
  * simply represents the data that was given at construction time.
  * The instances do <b>not</b> have an associated {@link BufferViewModel}
- * instance. 
+ * instance.<br>
+ * <br>
+ * The instances of accessor models that are created by this class
+ * are supposed to be used during the construction of a glTF model,
+ * using the {@link GltfModelBuilder}: They hold the data of the
+ * model elements (for example, attributes in a {@link MeshPrimitiveModel}).<br>
+ * <br>
+ * The {@link GltfModelBuilder} will use the accessor data internally,
+ * in order to build the associated buffers and buffer views.<br>
+ * <br>
+ * This class offers some convenience methods for commonly used accessor
+ * model types - for example, 3D floating point vectors (positions and
+ * normals), or unsigned int scalar values (for indices).<br>
+ * <br>
+ * Arbitrary (more specific) accessor model types can be constructed with
+ * the {@link #create(int, String, boolean, ByteBuffer)} method, which
+ * receives all information that is required for the accessor model.
+ * This method expects the data to be given as a byte buffer. When the
+ * input data is a <code>FloatBuffer</code>, then the byte buffer can be
+ * created with the utility methods in the {@link Buffers} class - for
+ * example, {@link Buffers#createByteBufferFrom(FloatBuffer)}.
  */
 public class AccessorModels 
 {
+    /**
+     * Creates a copy of the given accessor model, only based on its
+     * {@link AccessorData}.<br>
+     * <br>
+     * This will return a model that has the same data type and data
+     * as the given model, but without an associated buffer view.<br>
+     * <br>
+     * This may be used to create a copy of an accessor model from
+     * one {@link GltfModel}, and pass it to a {@link GltfModelBuilder}
+     * for the construction of a new {@link GltfModel}.
+     *
+     * @param input The input
+     * @return The copy
+     */
+    public static DefaultAccessorModel copy(AccessorModel input)
+    {
+        AccessorData inputAccessorData = input.getAccessorData();
+        ByteBuffer byteBuffer = inputAccessorData.createByteBuffer();
+        DefaultAccessorModel copy = AccessorModels.create(
+            input.getComponentType(),
+            input.getElementType().toString(),
+            input.isNormalized(),
+            byteBuffer);
+        return copy;
+    }
+
     /**
      * Creates a new {@link AccessorModel} with the component type
      * <code>GL_UNSIGNED_INT</code> and the type <code>"SCALAR"</code>.
@@ -330,7 +379,7 @@ public class AccessorModels
             throw new IllegalArgumentException(
                 "Invalid data for type " + type + " accessor with "
                 + Accessors.getDataTypeForAccessorComponentType(componentType)
-                + "components: The data length is " + byteBuffer.capacity() 
+                + " components: The data length is " + byteBuffer.capacity()
                 + " which is not divisble by " + numBytesPerElement);
         }
         int count = byteBuffer.capacity() / numBytesPerElement;

@@ -75,26 +75,27 @@ public class RawBinaryGltfDataReaderV2
     public static RawGltfData readBinaryGltf(ByteBuffer data) 
         throws IOException
     {
+        ByteBuffer d = data;
         int headerLength = BINARY_GLTF_VERSION_2_HEADER_LENGTH_IN_BYTES;
-        if (data.capacity() < headerLength)
+        if (d.capacity() < headerLength)
         {
             throw new IOException("Expected header of size " + headerLength
-                + ", but only found " + data.capacity() + " bytes");
+                + ", but only found " + d.capacity() + " bytes");
         }
-        int length = data.getInt(8);
-        if (length > data.capacity())
+        int length = d.getInt(8);
+        if (length > d.capacity())
         {
             throw new IOException(
-                "Data length is " + data.capacity() + ", expected " + length);
+                "Data length is " + d.capacity() + ", expected " + length);
         }
-        if (length < data.capacity())
+        if (length < d.capacity())
         {
-            logger.info("Data length is " + data.capacity() + ", expected "
+            logger.info("Data length is " + d.capacity() + ", expected "
                 + length + " - truncating");
-            data = Buffers.createSlice(data, 0, length);
+            d = Buffers.createSlice(d, 0, length);
         }
         
-        List<Chunk> chunks = readChunks(data);
+        List<Chunk> chunks = readChunks(d);
         if (chunks.isEmpty())
         {
             throw new IOException(
