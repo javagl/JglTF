@@ -29,6 +29,7 @@ package de.javagl.jgltf.model.creation;
 import java.awt.image.BufferedImage;
 
 import de.javagl.jgltf.model.MaterialModel;
+import de.javagl.jgltf.model.TextureModel;
 import de.javagl.jgltf.model.impl.DefaultTextureModel;
 import de.javagl.jgltf.model.v2.MaterialModelV2;
 
@@ -52,6 +53,25 @@ public class MaterialModels
     {
         MaterialBuilder builder = MaterialBuilder.create();
         builder.setBaseColorFactor(r, g, b, a);
+        builder.setDoubleSided(true);
+        builder.setMetallicRoughnessFactors(0.0f, 1.0f);
+        MaterialModelV2 result = builder.build();
+        return result;
+    }
+
+    /**
+     * Creates a simple, double-sided material with a roughness value of 1.0
+     * and a metallic value of 0.0, with the given base color texture
+     * 
+     * @param baseColorTexture The base color texture
+     * @param texCoord The optional texture coordinate index
+     * @return The material model
+     */
+    public static MaterialModelV2 createFromBaseColorTexture(
+        TextureModel baseColorTexture, Integer texCoord)
+    {
+        MaterialBuilder builder = MaterialBuilder.create();
+        builder.setBaseColorTexture(baseColorTexture, texCoord);
         builder.setDoubleSided(true);
         builder.setMetallicRoughnessFactors(0.0f, 1.0f);
         MaterialModelV2 result = builder.build();
