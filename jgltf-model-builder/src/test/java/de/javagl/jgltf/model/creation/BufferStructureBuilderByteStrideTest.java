@@ -12,6 +12,8 @@ import org.junit.Test;
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.impl.DefaultAccessorModel;
+import de.javagl.jgltf.model.structure.BufferStructure;
+import de.javagl.jgltf.model.structure.BufferStructureBuilder;
 
 @SuppressWarnings("javadoc")
 public class BufferStructureBuilderByteStrideTest

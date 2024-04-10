@@ -66,6 +66,8 @@ import de.javagl.jgltf.model.impl.DefaultNodeModel;
 import de.javagl.jgltf.model.impl.DefaultSceneModel;
 import de.javagl.jgltf.model.impl.DefaultSkinModel;
 import de.javagl.jgltf.model.impl.DefaultTextureModel;
+import de.javagl.jgltf.model.structure.BufferBuilderStrategies;
+import de.javagl.jgltf.model.structure.BufferBuilderStrategy;
 import de.javagl.jgltf.model.v1.GltfModelV1;
 import de.javagl.jgltf.model.v1.MaterialModelV1;
 import de.javagl.jgltf.model.v2.MaterialModelV2;
@@ -249,7 +251,7 @@ public class GltfModelBuilder
     private void fill(DefaultGltfModel gltfModel)
     {
         BufferBuilderStrategy bufferBuilderStrategy = 
-            new DefaultBufferBuilderStrategy();
+            BufferBuilderStrategies.createDefault();
         
         bufferBuilderStrategy.processMeshModels(meshModelsSet);
         bufferBuilderStrategy.processImageModels(imageModelsSet);

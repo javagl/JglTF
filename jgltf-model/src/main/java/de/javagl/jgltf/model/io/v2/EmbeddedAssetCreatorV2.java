@@ -26,20 +26,16 @@
  */
 package de.javagl.jgltf.model.io.v2;
 
-import java.nio.ByteBuffer;
-import java.util.Base64;
 import java.util.List;
 
 import de.javagl.jgltf.impl.v2.Buffer;
 import de.javagl.jgltf.impl.v2.GlTF;
 import de.javagl.jgltf.impl.v2.Image;
 import de.javagl.jgltf.model.BufferModel;
-import de.javagl.jgltf.model.GltfException;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.io.GltfAsset;
-import de.javagl.jgltf.model.io.MimeTypes;
 import de.javagl.jgltf.model.v2.GltfCreatorV2;
 
 /**
@@ -78,77 +74,35 @@ final class EmbeddedAssetCreatorV2
         GlTF outputGltf = GltfCreatorV2.create(gltfModel);
 
         List<Buffer> buffers = Optionals.of(outputGltf.getBuffers());
+        List<BufferModel> bufferModels = gltfModel.getBufferModels();
         for (int i = 0; i < buffers.size(); i++)
         {
             Buffer buffer = buffers.get(i);
-            convertBufferToEmbedded(gltfModel, i, buffer);
+            BufferModel bufferModel = bufferModels.get(i);
+            String dataUri = DataUris.createBufferDataUri(bufferModel);
+            buffer.setUri(dataUri);
         }
         
         List<Image> images = Optionals.of(outputGltf.getImages());
+        List<ImageModel> imageModels = gltfModel.getImageModels();
         for (int i = 0; i < images.size(); i++)
         {
             Image image = images.get(i);
-            convertImageToEmbedded(gltfModel, i, image);
+            String currentUri = image.getUri();
+            ImageModel imageModel = imageModels.get(i);
+            
+            // If the image refers to a buffer view, then its data is
+            // already part of the data URI that has been written for
+            // one of the buffers. Otherwise, its URI will be set
+            // to be a data URI for its image data.
+            if (imageModel.getBufferViewModel() == null)
+            {
+                String dataUri = DataUris.createImageDataUri(
+                    currentUri, imageModel);
+                image.setUri(dataUri);
+            } 
         }
-
         return new GltfAssetV2(outputGltf, null);
-    }
-
-    /**
-     * Convert the given {@link Buffer} into an embedded buffer, by replacing 
-     * its URI with a data URI, if the URI is not already a data URI
-     * 
-     * @param gltfModel The {@link GltfModel}
-     * @param index The index of the {@link Buffer}
-     * @param buffer The {@link Buffer}
-     */
-    private static void convertBufferToEmbedded(
-        GltfModel gltfModel, int index, Buffer buffer)
-    {
-        BufferModel bufferModel = gltfModel.getBufferModels().get(index);
-        ByteBuffer bufferData = bufferModel.getBufferData();
-        
-        byte data[] = new byte[bufferData.capacity()];
-        bufferData.slice().get(data);
-        String encodedData = Base64.getEncoder().encodeToString(data);
-        String dataUriString = 
-            "data:application/gltf-buffer;base64," + encodedData;
-        
-        buffer.setUri(dataUriString);
-    }
-
-    /**
-     * Convert the given {@link Image} into an embedded image, by replacing 
-     * its URI with a data URI, if the URI is not already a data URI
-     * 
-     * @param gltfModel The {@link GltfModel}
-     * @param index The index of the {@link Image}
-     * @param image The {@link Image}
-     * @throws GltfException If the image format (and thus, the MIME type)
-     * can not be determined from the image data  
-     */
-    private static void convertImageToEmbedded(
-        GltfModel gltfModel, int index, Image image)
-    {
-        ImageModel imageModel = gltfModel.getImageModels().get(index);
-        ByteBuffer imageData = imageModel.getImageData();
-        
-        String uri = image.getUri();
-        String imageMimeTypeString =
-            MimeTypes.guessImageMimeTypeString(uri, imageData);
-        if (imageMimeTypeString == null)
-        {
-            throw new GltfException(
-                "Could not detect MIME type of image " + index);
-        }
-
-        byte data[] = new byte[imageData.capacity()];
-        imageData.slice().get(data);
-        String encodedData = Base64.getEncoder().encodeToString(data);
-        String dataUriString =
-            "data:" + imageMimeTypeString + ";base64," + encodedData;
-        
-        image.setUri(dataUriString);
     }
 
 

@@ -171,15 +171,17 @@ final class DefaultAssetCreatorV2
      * Store the given {@link Image} with the given index in the current 
      * output asset. <br>
      * <br>
+     * If the {@link Image#getBufferView()} is not <code>null</code>, then
+     * nothing will be done: The image will be written out as part of
+     * the buffer.<br>
+     * <br>
      * If the {@link Image#getUri() image URI} is <code>null</code> or a 
      * data URI, it will receive a new URI, which refers to the image data, 
      * which is then stored as {@link GltfAsset#getReferenceData(String) 
      * reference data} in the asset.<br>
      * <br>
      * The given {@link Image} object will be modified accordingly, if 
-     * necessary: Its URI will be set to be the new URI. If it referred
-     * to a {@link Image#getBufferView() image buffer view}, then this
-     * reference will be set to be <code>null</code>.
+     * necessary: Its URI will be set to be the new URI. 
      *  
      * @param gltfModel The {@link GltfModel} 
      * @param index The index of the {@link Image}
@@ -191,22 +193,19 @@ final class DefaultAssetCreatorV2
         ImageModel imageModel = gltfModel.getImageModels().get(index);
         ByteBuffer imageData = imageModel.getImageData();
 
-        String oldUriString = image.getUri();
-        String newUriString = oldUriString;
-        if (oldUriString == null || IO.isDataUriString(oldUriString))
+        if (image.getBufferView() == null)
         {
-            newUriString = UriStrings.createImageUriString(
-                imageModel, existingImageUriStrings);
-            image.setUri(newUriString);
-            existingImageUriStrings.add(newUriString);
+            String oldUriString = image.getUri();
+            String newUriString = oldUriString;
+            if (oldUriString == null || IO.isDataUriString(oldUriString))
+            {
+                newUriString = UriStrings.createImageUriString(
+                    imageModel, existingImageUriStrings);
+                image.setUri(newUriString);
+                existingImageUriStrings.add(newUriString);
+            }
+            gltfAsset.putReferenceData(newUriString, imageData);
         }
-        
-        if (image.getBufferView() != null)
-        {
-            image.setBufferView(null);
-        }
-        
-        gltfAsset.putReferenceData(newUriString, imageData);
     }
 
 }
