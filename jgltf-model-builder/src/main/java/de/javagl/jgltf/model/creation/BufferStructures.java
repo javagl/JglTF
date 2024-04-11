@@ -38,7 +38,8 @@ import de.javagl.jgltf.model.impl.DefaultBufferModel;
 import de.javagl.jgltf.model.io.GltfReference;
 
 /**
- * Utility methods related to {@link BufferStructure} instances.
+ * Utility methods related to {@link BufferStructure} instances.<br>
+ * <br>
  * Only intended for internal use.
  */
 public class BufferStructures

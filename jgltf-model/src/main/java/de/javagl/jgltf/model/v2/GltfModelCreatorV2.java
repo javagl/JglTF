@@ -27,7 +27,6 @@
 package de.javagl.jgltf.model.v2;
 
 import java.nio.ByteBuffer;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,9 +35,6 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
-import de.javagl.jgltf.impl.v2.GlTFChildOfRootProperty;
-import de.javagl.jgltf.impl.v2.GlTFProperty;
-import de.javagl.jgltf.impl.v2.Asset;
 import de.javagl.jgltf.impl.v2.Accessor;
 import de.javagl.jgltf.impl.v2.AccessorSparse;
 import de.javagl.jgltf.impl.v2.AccessorSparseIndices;
@@ -47,12 +43,15 @@ import de.javagl.jgltf.impl.v2.Animation;
 import de.javagl.jgltf.impl.v2.AnimationChannel;
 import de.javagl.jgltf.impl.v2.AnimationChannelTarget;
 import de.javagl.jgltf.impl.v2.AnimationSampler;
+import de.javagl.jgltf.impl.v2.Asset;
 import de.javagl.jgltf.impl.v2.Buffer;
 import de.javagl.jgltf.impl.v2.BufferView;
 import de.javagl.jgltf.impl.v2.Camera;
 import de.javagl.jgltf.impl.v2.CameraOrthographic;
 import de.javagl.jgltf.impl.v2.CameraPerspective;
 import de.javagl.jgltf.impl.v2.GlTF;
+import de.javagl.jgltf.impl.v2.GlTFChildOfRootProperty;
+import de.javagl.jgltf.impl.v2.GlTFProperty;
 import de.javagl.jgltf.impl.v2.Image;
 import de.javagl.jgltf.impl.v2.Material;
 import de.javagl.jgltf.impl.v2.MaterialNormalTextureInfo;
@@ -70,9 +69,9 @@ import de.javagl.jgltf.model.AccessorData;
 import de.javagl.jgltf.model.AccessorDatas;
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.AnimationModel;
-import de.javagl.jgltf.model.AssetModel;
 import de.javagl.jgltf.model.AnimationModel.Channel;
 import de.javagl.jgltf.model.AnimationModel.Interpolation;
+import de.javagl.jgltf.model.AssetModel;
 import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.CameraModel;
@@ -93,9 +92,9 @@ import de.javagl.jgltf.model.impl.AbstractModelElement;
 import de.javagl.jgltf.model.impl.AbstractNamedModelElement;
 import de.javagl.jgltf.model.impl.DefaultAccessorModel;
 import de.javagl.jgltf.model.impl.DefaultAnimationModel;
-import de.javagl.jgltf.model.impl.DefaultAssetModel;
 import de.javagl.jgltf.model.impl.DefaultAnimationModel.DefaultChannel;
 import de.javagl.jgltf.model.impl.DefaultAnimationModel.DefaultSampler;
+import de.javagl.jgltf.model.impl.DefaultAssetModel;
 import de.javagl.jgltf.model.impl.DefaultBufferModel;
 import de.javagl.jgltf.model.impl.DefaultBufferViewModel;
 import de.javagl.jgltf.model.impl.DefaultCameraModel;
@@ -902,6 +901,7 @@ public class GltfModelCreatorV2
                     createMeshPrimitiveModel(meshPrimitive);
                 meshModel.addMeshPrimitiveModel(meshPrimitiveModel);
             }
+            meshModel.setWeights(toArray(mesh.getWeights()));
         }
     }
     
@@ -953,8 +953,7 @@ public class GltfModelCreatorV2
                     gltfModel.getAccessorModel(accessorIndex);
                 morphTargetModel.put(attribute, accessorModel);
             }
-            meshPrimitiveModel.addTarget(
-                Collections.unmodifiableMap(morphTargetModel));
+            meshPrimitiveModel.addTarget(morphTargetModel);
         }
         
         Integer materialIndex = meshPrimitive.getMaterial();
@@ -1018,16 +1017,7 @@ public class GltfModelCreatorV2
             nodeModel.setRotation(Optionals.clone(rotation));
             nodeModel.setScale(Optionals.clone(scale));
             
-            List<Float> weights = node.getWeights();
-            if (weights != null)
-            {
-                float weightsArray[] = new float[weights.size()];
-                for (int j = 0; j < weights.size(); j++)
-                {
-                    weightsArray[j] = weights.get(j);
-                }
-                nodeModel.setWeights(weightsArray);
-            }
+            nodeModel.setWeights(toArray(node.getWeights()));
         }
     }
     
@@ -1328,5 +1318,25 @@ public class GltfModelCreatorV2
         modelElement.setName(property.getName());
         transferGltfPropertyElements(property, modelElement);
     }
-    
+
+    /**
+     * Returns an array containing the float representations of the given
+     * numbers, or <code>null</code> if the given list is <code>null</code>.
+     * 
+     * @param numbers The numbers
+     * @return The array
+     */
+    private static float[] toArray(List<? extends Number> numbers)
+    {
+        if (numbers == null)
+        {
+            return null;
+        }
+        float array[] = new float[numbers.size()];
+        for (int j = 0; j < numbers.size(); j++)
+        {
+            array[j] = numbers.get(j).floatValue();
+        }
+        return array;
+    }
 }

@@ -27,7 +27,10 @@
 package de.javagl.jgltf.model.creation;
 
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.AnimationModel;
@@ -69,11 +72,54 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
     private final boolean useSingleVertexAttributesBufferView = false;
     
     /**
+     * The set of {@link MeshModel} instances that have already been 
+     * processed
+     */
+    private final Set<MeshModel> processedMeshModels;
+    
+    /**
+     * The set of {@link MeshPrimitiveModel} instances that have already been 
+     * processed
+     */
+    private final Set<MeshPrimitiveModel> processedMeshPrimitiveModels;
+    
+    /**
+     * The set of {@link ImageModel} instances that have already been 
+     * processed
+     */
+    private final Set<ImageModel> processedImageModels;
+    
+    /**
+     * The set of {@link AnimationModel} instances that have already been 
+     * processed
+     */
+    private final Set<AnimationModel> processedAnimationModels;
+    
+    /**
+     * The set of {@link SkinModel} instances that have already been 
+     * processed
+     */
+    private final Set<SkinModel> processedSkinModels;
+    
+    /**
+     * The set of {@link AccessorModel} instances that have already been 
+     * processed
+     */
+    private final Set<AccessorModel> processedAccessorModels;
+    
+    
+    /**
      * Default constructor
      */
     DefaultBufferBuilderStrategy()
     {
         bufferStructureBuilder = new BufferStructureBuilder(); 
+        processedMeshModels = new LinkedHashSet<MeshModel>();
+        processedMeshPrimitiveModels = new LinkedHashSet<MeshPrimitiveModel>();
+        processedImageModels = new LinkedHashSet<ImageModel>();
+        processedAnimationModels = new LinkedHashSet<AnimationModel>();
+        processedSkinModels = new LinkedHashSet<SkinModel>();
+        processedAccessorModels = new LinkedHashSet<AccessorModel>();
     }
     
     @Override
@@ -93,6 +139,12 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
      */
     private void processMeshModel(MeshModel meshModel)
     {
+        if (processedMeshModels.contains(meshModel))
+        {
+            return;
+        }
+        processedMeshModels.add(meshModel);
+        
         List<MeshPrimitiveModel> meshPrimitives = 
             meshModel.getMeshPrimitiveModels();
         for (MeshPrimitiveModel meshPrimitiveModel : meshPrimitives)
@@ -109,27 +161,70 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
     private void processMeshPrimitiveModel(
         MeshPrimitiveModel meshPrimitiveModel)
     {
+        if (processedMeshPrimitiveModels.contains(meshPrimitiveModel))
+        {
+            return;
+        }
+        processedMeshPrimitiveModels.add(meshPrimitiveModel);
+        
         AccessorModel indices = meshPrimitiveModel.getIndices();
         if (indices != null)
         {
-            bufferStructureBuilder.addAccessorModel("indices", 
-                (DefaultAccessorModel)indices);
-            bufferStructureBuilder.createArrayElementBufferViewModel("indices");
+            if (!processedAccessorModels.contains(indices))
+            {
+                bufferStructureBuilder.addAccessorModel("indices", 
+                    (DefaultAccessorModel)indices);
+                processedAccessorModels.add(indices);
+                bufferStructureBuilder.createArrayElementBufferViewModel(
+                    "indices");
+            }
         }
         Collection<AccessorModel> attributes = 
             meshPrimitiveModel.getAttributes().values();
         for (AccessorModel attribute : attributes)
         {
-            bufferStructureBuilder.addAccessorModel("attribute", 
-                (DefaultAccessorModel)attribute);
-            if (!useSingleVertexAttributesBufferView)
+            if (!processedAccessorModels.contains(attribute))
             {
-                bufferStructureBuilder.createArrayBufferViewModel("attribute");
+                bufferStructureBuilder.addAccessorModel("attribute", 
+                    (DefaultAccessorModel)attribute);
+                processedAccessorModels.add(attribute);
+            }
+            if (bufferStructureBuilder.getNumCurrentAccessorModels() > 0) 
+            {
+                if (!useSingleVertexAttributesBufferView)
+                {
+                    bufferStructureBuilder.createArrayBufferViewModel(
+                        "attribute");
+                }
             }
         }
-        if (useSingleVertexAttributesBufferView)
+        if (bufferStructureBuilder.getNumCurrentAccessorModels() > 0)
         {
-            bufferStructureBuilder.createArrayBufferViewModel("attributes");
+            if (useSingleVertexAttributesBufferView)
+            {
+                bufferStructureBuilder.createArrayBufferViewModel("attributes");
+            }
+        }
+        List<Map<String, AccessorModel>> targets =
+            meshPrimitiveModel.getTargets();
+        if (!targets.isEmpty())
+        {
+            for (Map<String, AccessorModel> target : targets)
+            {
+                for (AccessorModel targetValue : target.values())
+                {
+                    if (!processedAccessorModels.contains(targetValue))
+                    {
+                        bufferStructureBuilder.addAccessorModel("target",
+                            (DefaultAccessorModel) targetValue);
+                        processedAccessorModels.add(targetValue);
+                    }
+                }
+            }
+            if (bufferStructureBuilder.getNumCurrentAccessorModels() > 0)
+            {
+                bufferStructureBuilder.createArrayBufferViewModel("targets");
+            }
         }
     }
     
@@ -150,6 +245,11 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
      */
     private void processImageModel(ImageModel imageModel)
     {
+        if (processedImageModels.contains(imageModel))
+        {
+            return;
+        }
+        processedImageModels.add(imageModel);
         // By default, the data of each image will be stored under its URI
     }
 
@@ -170,15 +270,29 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
      */
     private void processAnimationModel(AnimationModel animationModel)
     {
+        if (processedAnimationModels.contains(animationModel))
+        {
+            return;
+        }
+        processedAnimationModels.add(animationModel);
+        
         for (Channel channel : animationModel.getChannels())
         {
             Sampler sampler = channel.getSampler();
             AccessorModel input = sampler.getInput();
             AccessorModel output = sampler.getOutput();
-            bufferStructureBuilder.addAccessorModel(
-                "animation input", (DefaultAccessorModel) input);
-            bufferStructureBuilder.addAccessorModel(
-                "animation output", (DefaultAccessorModel) output);
+            if (!processedAccessorModels.contains(input))
+            {
+                bufferStructureBuilder.addAccessorModel(
+                    "animation input", (DefaultAccessorModel) input);
+                processedAccessorModels.add(input);
+            }
+            if (!processedAccessorModels.contains(output))
+            {
+                bufferStructureBuilder.addAccessorModel(
+                    "animation output", (DefaultAccessorModel) output);
+                processedAccessorModels.add(output);
+            }
         }
         if (!animationModel.getChannels().isEmpty())
         {
@@ -204,12 +318,22 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
      */
     private void processSkinModel(SkinModel skinModel)
     {
+        if (processedSkinModels.contains(skinModel))
+        {
+            return;
+        }
+        processedSkinModels.add(skinModel);
+        
         AccessorModel ibm = skinModel.getInverseBindMatrices();
         if (ibm != null) 
         {
-            bufferStructureBuilder.addAccessorModel(
-                "inverse bind matrices", (DefaultAccessorModel) ibm);
-            bufferStructureBuilder.createBufferViewModel("skin", null);
+            if (!processedAccessorModels.contains(ibm))
+            {
+                bufferStructureBuilder.addAccessorModel(
+                    "inverse bind matrices", (DefaultAccessorModel) ibm);
+                processedAccessorModels.add(ibm);
+                bufferStructureBuilder.createBufferViewModel("skin", null);
+            }
         }
     }
     
@@ -219,17 +343,24 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
     {
         for (DefaultAccessorModel accessorModel : accessorModels)
         {
-            bufferStructureBuilder.addAccessorModel(
-                "additional", accessorModel);
-            bufferStructureBuilder.createArrayBufferViewModel(
-                "additional");
+            if (!processedAccessorModels.contains(accessorModel))
+            {
+                bufferStructureBuilder.addAccessorModel(
+                    "additional", accessorModel);
+                processedAccessorModels.add(accessorModel);
+                bufferStructureBuilder.createArrayBufferViewModel(
+                    "additional");
+            }
         }
     }
     
     @Override
     public void commitBuffer(String uri)
     {
-        bufferStructureBuilder.createBufferModel("buffer", uri);
+        if (bufferStructureBuilder.getNumCurrentBufferViewModels() > 0)
+        {
+            bufferStructureBuilder.createBufferModel("buffer", uri);
+        }
     }
     
     @Override

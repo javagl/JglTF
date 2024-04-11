@@ -67,24 +67,25 @@ public class RawBinaryGltfDataReaderV1
     public static RawGltfData readBinaryGltf(ByteBuffer data) 
         throws IOException
     {
+        ByteBuffer d = data;
         int headerLength = BINARY_GLTF_VERSION_1_HEADER_LENGTH_IN_BYTES;
-        if (data.capacity() < headerLength)
+        if (d.capacity() < headerLength)
         {
             throw new IOException("Expected header of size " + headerLength
-                + ", but only found " + data.capacity() + " bytes");
+                + ", but only found " + d.capacity() + " bytes");
         }
-        IntBuffer intData = data.asIntBuffer();
+        IntBuffer intData = d.asIntBuffer();
         int length = intData.get(2);
-        if (length > data.capacity())
+        if (length > d.capacity())
         {
             throw new IOException(
-                "Data length is " + data.capacity() + ", expected " + length);
+                "Data length is " + d.capacity() + ", expected " + length);
         }
-        if (length < data.capacity())
+        if (length < d.capacity())
         {
-            logger.info("Data length is " + data.capacity() + ", expected "
+            logger.info("Data length is " + d.capacity() + ", expected "
                 + length + " - truncating");
-            data = Buffers.createSlice(data, 0, length);
+            d = Buffers.createSlice(d, 0, length);
         }
         
         int contentLength = intData.get(3); 
@@ -95,14 +96,14 @@ public class RawBinaryGltfDataReaderV1
                 + CONTENT_FORMAT_JSON + "), but found " + contentFormat);
         }
         ByteBuffer contentData = Buffers.createSlice(
-            data, headerLength, contentLength);
+            d, headerLength, contentLength);
         int bodyByteOffset = headerLength + contentLength;
         int bodyByteLength = length - bodyByteOffset;
         ByteBuffer bodyData = null;
         if (bodyByteLength > 0)
         {
             bodyData = Buffers.createSlice(
-                data, bodyByteOffset, bodyByteLength);
+                d, bodyByteOffset, bodyByteLength);
         }
         
         return new RawGltfData(contentData, bodyData);

@@ -91,7 +91,6 @@ interface BufferBuilderStrategy
     
     /**
      * Process all {@link AccessorModel} instances from the given collection
-     * by the given {@link SkinModel} instances
      * 
      * @param accessorModels The {@link AccessorModel} instances
      */
