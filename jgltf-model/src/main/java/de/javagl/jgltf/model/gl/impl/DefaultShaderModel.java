@@ -41,7 +41,7 @@ public class DefaultShaderModel extends AbstractNamedModelElement
     /**
      * The URI 
      */
-    private final String uri;
+    private String uri;
     
     /**
      * The actual raw shader data
@@ -51,8 +51,16 @@ public class DefaultShaderModel extends AbstractNamedModelElement
     /**
      * The {@link de.javagl.jgltf.model.gl.ShaderModel.ShaderType}
      */
-    private final ShaderType shaderType;
+    private ShaderType shaderType;
     
+    /**
+     * Default constructor 
+     */
+    public DefaultShaderModel()
+    {
+        // Default constructor
+    }
+
     /**
      * Default constructor 
      * 
@@ -63,6 +71,26 @@ public class DefaultShaderModel extends AbstractNamedModelElement
     public DefaultShaderModel(String uri, ShaderType shaderType)
     {
         this.uri = uri;
+        this.shaderType = shaderType;
+    }
+    
+    /**
+     * Set the URI
+     * 
+     * @param uri The URI
+     */
+    public void setUri(String uri)
+    {
+        this.uri = uri;
+    }
+    
+    /**
+     * Set the shader type
+     * 
+     * @param shaderType The shader type
+     */
+    public void setShaderType(ShaderType shaderType)
+    {
         this.shaderType = shaderType;
     }
     
