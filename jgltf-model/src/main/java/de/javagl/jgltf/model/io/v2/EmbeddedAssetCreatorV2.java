@@ -101,6 +101,10 @@ final class EmbeddedAssetCreatorV2
                     currentUri, imageModel);
                 image.setUri(dataUri);
             } 
+            else 
+            {
+                image.setUri(null);
+            }
         }
         return new GltfAssetV2(outputGltf, null);
     }

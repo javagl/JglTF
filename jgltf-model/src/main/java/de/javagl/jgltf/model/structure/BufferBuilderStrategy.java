@@ -26,24 +26,17 @@
  */
 package de.javagl.jgltf.model.structure;
 
-import java.util.Collection;
 import java.util.List;
 
 import de.javagl.jgltf.model.AccessorModel;
-import de.javagl.jgltf.model.AnimationModel;
 import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.ImageModel;
-import de.javagl.jgltf.model.MeshModel;
-import de.javagl.jgltf.model.SkinModel;
 import de.javagl.jgltf.model.impl.DefaultAccessorModel;
-import de.javagl.jgltf.model.impl.DefaultAnimationModel;
 import de.javagl.jgltf.model.impl.DefaultBufferModel;
 import de.javagl.jgltf.model.impl.DefaultBufferViewModel;
 import de.javagl.jgltf.model.impl.DefaultImageModel;
-import de.javagl.jgltf.model.impl.DefaultMeshModel;
-import de.javagl.jgltf.model.impl.DefaultSkinModel;
 
 /**
  * Interface for classes that can collect the data from elements of a 
@@ -58,67 +51,15 @@ public interface BufferBuilderStrategy
 {
     /**
      * Process all {@link AccessorModel} instances that are referred to
-     * by the given {@link MeshModel} instances
+     * by the given {@link GltfModel}
      * 
-     * @param meshModels The {@link MeshModel} instances
+     * @param gltfModel {@link GltfModel}
      */
-    void processMeshModels(
-        Collection<? extends DefaultMeshModel> meshModels);
+    void process(GltfModel gltfModel);
 
-    /**
-     * Process all data blocks that are referred to
-     * by the given {@link ImageModel} instances
-     * 
-     * @param imageModels The {@link ImageModel} instances
-     */
-    void processImageModels(
-        Collection<? extends DefaultImageModel> imageModels);
-
-    /**
-     * Process all {@link AccessorModel} instances that are referred to
-     * by the given {@link AnimationModel} instances
-     * 
-     * @param animationModels The {@link AnimationModel} instances
-     */
-    void processAnimationModels(
-        Collection<? extends DefaultAnimationModel> animationModels);
-
-    /**
-     * Process all {@link AccessorModel} instances that are referred to
-     * by the given {@link SkinModel} instances
-     * 
-     * @param skinModels The {@link SkinModel} instances
-     */
-    void processSkinModels(
-        Collection<? extends DefaultSkinModel> skinModels);
-    
-    /**
-     * Process all {@link AccessorModel} instances from the given collection
-     * 
-     * @param accessorModels The {@link AccessorModel} instances
-     */
-    void processAccessorModels(
-        Collection<? extends DefaultAccessorModel> accessorModels);
-    
-    /**
-     * Commit the accessor- and buffer view models that have been added
-     * until now, to create a buffer with the given URI
-     * 
-     * @param uri The buffer URI
-     */
-    void commitBuffer(String uri);
-    
-    /**
-     * Finish the creation of the buffer structure, so that the results
-     * may be obtained with {@link #getAccessorModels()}, 
-     * {@link #getBufferViewModels()} and {@link #getBufferModels()}
-     */
-    void finish();
-    
     /**
      * Returns a list containing all {@link AccessorModel} instances that
-     * have been created. This method may only be called after the 
-     * {@link #finish()} method was called.
+     * have been created.
      * 
      * @return The {@link AccessorModel} instances
      */
@@ -126,8 +67,7 @@ public interface BufferBuilderStrategy
 
     /**
      * Returns a list containing all {@link BufferViewModel} instances that
-     * have been created. This method may only be called after the 
-     * {@link #finish()} method was called.
+     * have been created.
      * 
      * @return The {@link BufferViewModel} instances
      */
@@ -135,10 +75,29 @@ public interface BufferBuilderStrategy
 
     /**
      * Returns a list containing all {@link BufferModel} instances that
-     * have been created. This method may only be called after the 
-     * {@link #finish()} method was called.
+     * have been created.
      * 
      * @return The {@link BufferModel} instances
      */
     List<DefaultBufferModel> getBufferModels();
+
+    /**
+     * Update the given image model based on the structures that have 
+     * been built by this class.<br>
+     * <br>
+     * This means that the {@link ImageModel#getBufferViewModel()} and
+     * the {@link ImageModel#getUri()} will be updated depending on whether
+     * the image was stored in a buffer view or not:<br>
+     * <br>
+     * When the image data is stored in a buffer view, then it will set
+     * the corresponding buffer view for the given model, and set its
+     * URI to <code>null</code>.<br>
+     * <br>
+     * Otherwise, it will set the buffer view to <code>null</code>, and
+     * the URI to either its original value, or an auto-generated or
+     * disambiguated URI.
+     * 
+     * @param imageModel The {@link ImageModel} to update
+     */
+    void validateImageModel(DefaultImageModel imageModel);
 }

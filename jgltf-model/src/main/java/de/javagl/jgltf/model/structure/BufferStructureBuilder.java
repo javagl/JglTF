@@ -31,6 +31,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,6 +95,13 @@ public final class BufferStructureBuilder
     private final List<DefaultBufferViewModel> currentBufferViewModels;
     
     /**
+     * The mapping from buffer view objects that are intended for images
+     * (and do not have associated accessors) to their data
+     */
+    private final Map<DefaultBufferViewModel, ByteBuffer> 
+        imageBufferViewDataMap;
+    
+    /**
      * Default constructor
      */
     public BufferStructureBuilder()
@@ -101,6 +109,8 @@ public final class BufferStructureBuilder
         this.bufferStructure = new BufferStructure();
         this.currentAccessorModels = new ArrayList<DefaultAccessorModel>();
         this.currentBufferViewModels = new ArrayList<DefaultBufferViewModel>();
+        this.imageBufferViewDataMap = 
+            new LinkedHashMap<DefaultBufferViewModel, ByteBuffer>();
     }
     
     /**
@@ -391,6 +401,40 @@ public final class BufferStructureBuilder
         currentAccessorModels.clear();
     }
     
+    /**
+     * Create a {@link BufferViewModel} in the {@link BufferStructure} that 
+     * is currently being built.<br>
+     * <br>
+     * This is intended for buffer view models that do not have associated
+     * accessors (i.e. buffer view models that are used for images) 
+     * 
+     * @param idPrefix The ID prefix for the {@link BufferViewModel}
+     * @param imageData The iamge data 
+     * @return The {@link BufferViewModel}
+     * @throws IllegalStateException When there are pending accessor models
+     */
+    public BufferViewModel createImageBufferViewModel(
+        String idPrefix, ByteBuffer imageData)
+    {
+        Objects.requireNonNull(imageData, "The imageData may not be null");
+        if (!currentAccessorModels.isEmpty())
+        {
+            throw new IllegalStateException(
+                "Cannot create an image buffer view model with "
+                + currentAccessorModels.size() + " pending accessors");
+        }
+        
+        DefaultBufferViewModel bufferViewModel =
+            new DefaultBufferViewModel(null);
+        bufferViewModel.setByteLength(imageData.capacity());
+
+        imageBufferViewDataMap.put(bufferViewModel, imageData);
+        bufferStructure.addBufferViewModel(
+            bufferViewModel, idPrefix, Collections.emptyList());
+        currentBufferViewModels.add(bufferViewModel);
+        return bufferViewModel;
+    }
+    
     
     /**
      * Create a {@link BufferModel} in the {@link BufferStructure} that 
@@ -499,7 +543,7 @@ public final class BufferStructureBuilder
             ByteBuffer byteBuffer = accessorData.createByteBuffer();
             rawAccessorModelByteBuffers.put(accessorModel, byteBuffer);
         }
-        
+
         // The sequence of accessor data buffers and paddings that
         // eventually will be combined to create the buffer data
         List<ByteBuffer> bufferElements = new ArrayList<ByteBuffer>();
@@ -558,68 +602,81 @@ public final class BufferStructureBuilder
                 }
             }
             
-            int accumulatedBufferViewBytes = 0;
-            for (DefaultAccessorModel accessorModel : accessorModels)
+            // Handle buffer view models that do not have associated
+            // accessors, and are only used for images
+            if (accessorModels.isEmpty())
             {
-                // Handle the padding that may have to be inserted 
-                // into the buffer view before the start of the 
-                // accessor: 
-                // The accessor has to be aligned to its component size.  
-                int accessorAlignmentBytes = 
-                    Alignment.computeAlignmentBytes(accessorModel);
-                int paddingBytesForBufferView = Alignment.computePadding(
-                    accumulatedBufferViewBytes, accessorAlignmentBytes);
-                if (paddingBytesForBufferView != 0)
+                ByteBuffer bufferViewData = 
+                    imageBufferViewDataMap.get(bufferViewModel);
+                bufferViewModel.setByteLength(bufferViewData.capacity());
+                accumulatedBufferBytes += bufferViewData.capacity();
+                bufferElements.add(bufferViewData);
+            } 
+            else
+            {
+                int accumulatedBufferViewBytes = 0;
+                for (DefaultAccessorModel accessorModel : accessorModels)
                 {
-                    // Note: The padding here should always be 0,
-                    // because the buffer view was already padded                        
-                    logger.warning("Inserting " + paddingBytesForBufferView
-                        + " padding bytes for buffer view, due to accessor "
-                        + accessorModel);
+                    // Handle the padding that may have to be inserted 
+                    // into the buffer view before the start of the 
+                    // accessor: 
+                    // The accessor has to be aligned to its component size.  
+                    int accessorAlignmentBytes = 
+                        Alignment.computeAlignmentBytes(accessorModel);
+                    int paddingBytesForBufferView = Alignment.computePadding(
+                        accumulatedBufferViewBytes, accessorAlignmentBytes);
+                    if (paddingBytesForBufferView != 0)
+                    {
+                        // Note: The padding here should always be 0,
+                        // because the buffer view was already padded                        
+                        logger.warning("Inserting " + paddingBytesForBufferView
+                            + " padding bytes for buffer view, due to accessor "
+                            + accessorModel);
+                    }
+                    bufferStructure.addPaddingByteIndices(
+                        bufferModel, accumulatedBufferBytes, 
+                        paddingBytesForBufferView);
+                    accumulatedBufferViewBytes += paddingBytesForBufferView;
+                    
+                    accessorModel.setByteOffset(
+                        accumulatedBufferViewBytes);
+                    
+                    int targetByteStride =  
+                        accessorModel.getPaddedElementSizeInBytes(); 
+                    if (commonByteStride == null)
+                    {
+                        accessorModel.setByteStride(targetByteStride);
+                    } 
+                    else 
+                    {
+                        targetByteStride = commonByteStride;
+                    }
+                    
+                    // Compute the byte buffer for the accessor data. This
+                    // may have to be restructured by inserting padding bytes
+                    ByteBuffer rawAccessorByteBuffer =
+                        rawAccessorModelByteBuffers.get(accessorModel);
+                    ByteBuffer accessorByteBuffer = rawAccessorByteBuffer;
+                    
+                    int count = accessorModel.getCount();
+                    ElementType elementType = accessorModel.getElementType();
+                    int componentType = accessorModel.getComponentType();
+                    accessorByteBuffer = applyPadding(
+                        rawAccessorByteBuffer, count, elementType, 
+                        componentType, targetByteStride);
+                    
+                    accumulatedBufferViewBytes += accessorByteBuffer.capacity();
+    
+                    accumulatedBufferBytes += paddingBytesForBufferView;
+                    bufferElements.add(
+                        ByteBuffer.allocate(paddingBytesForBufferView));
+                    accumulatedBufferBytes += accessorByteBuffer.capacity();
+                    bufferElements.add(accessorByteBuffer);
+    
                 }
-                bufferStructure.addPaddingByteIndices(
-                    bufferModel, accumulatedBufferBytes, 
-                    paddingBytesForBufferView);
-                accumulatedBufferViewBytes += paddingBytesForBufferView;
-                
-                accessorModel.setByteOffset(
+                bufferViewModel.setByteLength(
                     accumulatedBufferViewBytes);
-                
-                int targetByteStride =  
-                    accessorModel.getPaddedElementSizeInBytes(); 
-                if (commonByteStride == null)
-                {
-                    accessorModel.setByteStride(targetByteStride);
-                } 
-                else 
-                {
-                    targetByteStride = commonByteStride;
-                }
-                
-                // Compute the byte buffer for the accessor data. This
-                // may have to be restructured by inserting padding bytes
-                ByteBuffer rawAccessorByteBuffer =
-                    rawAccessorModelByteBuffers.get(accessorModel);
-                ByteBuffer accessorByteBuffer = rawAccessorByteBuffer;
-                
-                int count = accessorModel.getCount();
-                ElementType elementType = accessorModel.getElementType();
-                int componentType = accessorModel.getComponentType();
-                accessorByteBuffer = applyPadding(
-                    rawAccessorByteBuffer, count, elementType, 
-                    componentType, targetByteStride);
-                
-                accumulatedBufferViewBytes += accessorByteBuffer.capacity();
-
-                accumulatedBufferBytes += paddingBytesForBufferView;
-                bufferElements.add(
-                    ByteBuffer.allocate(paddingBytesForBufferView));
-                accumulatedBufferBytes += accessorByteBuffer.capacity();
-                bufferElements.add(accessorByteBuffer);
-
             }
-            bufferViewModel.setByteLength(
-                accumulatedBufferViewBytes);
         }
         
         validatePadding(bufferModel);

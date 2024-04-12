@@ -250,17 +250,6 @@ public class GltfModelBuilder
      */
     private void fill(DefaultGltfModel gltfModel)
     {
-        BufferBuilderStrategy bufferBuilderStrategy = 
-            BufferBuilderStrategies.createDefault();
-        
-        bufferBuilderStrategy.processMeshModels(meshModelsSet);
-        bufferBuilderStrategy.processImageModels(imageModelsSet);
-        bufferBuilderStrategy.processAnimationModels(animationModelsSet);
-        bufferBuilderStrategy.processSkinModels(skinModelsSet);
-        
-        bufferBuilderStrategy.commitBuffer("buffer.bin");
-        bufferBuilderStrategy.finish();
-        
         gltfModel.addAnimationModels(animationModelsSet);
         gltfModel.addCameraModels(cameraModelsSet);
         gltfModel.addImageModels(imageModelsSet);
@@ -270,6 +259,10 @@ public class GltfModelBuilder
         gltfModel.addSceneModels(sceneModelsSet);
         gltfModel.addSkinModels(skinModelsSet);
         gltfModel.addTextureModels(textureModelsSet);
+
+        BufferBuilderStrategy bufferBuilderStrategy = 
+            BufferBuilderStrategies.createDefault();
+        bufferBuilderStrategy.process(gltfModel);
         
         gltfModel.addAccessorModels(
             bufferBuilderStrategy.getAccessorModels());

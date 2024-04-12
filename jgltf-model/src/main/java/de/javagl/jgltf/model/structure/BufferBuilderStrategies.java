@@ -41,7 +41,26 @@ public class BufferBuilderStrategies
      */
     public static BufferBuilderStrategy createDefault() 
     {
-        return new DefaultBufferBuilderStrategy();
+        DefaultBufferBuilderStrategy.Config config = 
+            new DefaultBufferBuilderStrategy.Config();
+        
+        config.imagesInBufferViews = false;
+        config.bufferForAnimations = true;
+        config.bufferForSkins = true;
+        return new DefaultBufferBuilderStrategy(config);
+    }
+    
+    /**
+     * Create a default {@link BufferBuilderStrategy} with the given 
+     * configuration.
+     * 
+     * @param config The configuration
+     * @return The {@link BufferBuilderStrategy}
+     */
+    static BufferBuilderStrategy create(
+        DefaultBufferBuilderStrategy.Config config) 
+    {
+        return new DefaultBufferBuilderStrategy(config);
     }
     
     /**
