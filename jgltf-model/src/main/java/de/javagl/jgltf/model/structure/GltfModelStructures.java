@@ -35,6 +35,8 @@ import java.util.Map.Entry;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import de.javagl.jgltf.impl.v2.CameraOrthographic;
+import de.javagl.jgltf.impl.v2.CameraPerspective;
 import de.javagl.jgltf.model.AccessorData;
 import de.javagl.jgltf.model.AccessorDatas;
 import de.javagl.jgltf.model.AccessorModel;
@@ -45,6 +47,8 @@ import de.javagl.jgltf.model.AnimationModel.Sampler;
 import de.javagl.jgltf.model.AssetModel;
 import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.CameraModel;
+import de.javagl.jgltf.model.CameraOrthographicModel;
+import de.javagl.jgltf.model.CameraPerspectiveModel;
 import de.javagl.jgltf.model.ElementType;
 import de.javagl.jgltf.model.ExtensionsModel;
 import de.javagl.jgltf.model.GltfConstants;
@@ -78,6 +82,8 @@ import de.javagl.jgltf.model.impl.DefaultAnimationModel.DefaultChannel;
 import de.javagl.jgltf.model.impl.DefaultAnimationModel.DefaultSampler;
 import de.javagl.jgltf.model.impl.DefaultAssetModel;
 import de.javagl.jgltf.model.impl.DefaultCameraModel;
+import de.javagl.jgltf.model.impl.DefaultCameraOrthographicModel;
+import de.javagl.jgltf.model.impl.DefaultCameraPerspectiveModel;
 import de.javagl.jgltf.model.impl.DefaultExtensionsModel;
 import de.javagl.jgltf.model.impl.DefaultGltfModel;
 import de.javagl.jgltf.model.impl.DefaultImageModel;
@@ -294,6 +300,7 @@ public class GltfModelStructures
         initSkinModels();
         initTextureModels();
         initMaterialModels();
+        initCameraModels();
         
         if (sourceV1 != null && targetV1 != null) 
         {
@@ -304,7 +311,7 @@ public class GltfModelStructures
         initExtensionsModel();
         initAssetModel();
     }
-    
+
     /**
      * Create a restructured version of the glTF model that was last given
      * to {@link #prepare(GltfModel)}.
@@ -315,6 +322,13 @@ public class GltfModelStructures
     {
         DefaultBufferBuilderStrategy.Config config = 
             new DefaultBufferBuilderStrategy.Config();
+        
+        config.bufferForAnimations = true;
+        config.bufferForMeshes = true;
+        config.bufferPerMesh = true;
+        config.bufferPerMeshPrimitive = true;
+        config.bufferForAnimations = true;
+        
         return create(config);
     }
     
@@ -1063,6 +1077,62 @@ public class GltfModelStructures
             Optionals.clone(emissiveFactor));
     }
     
+    
+    /**
+     * Initialize the {@link ShaderModel} instances
+     */
+    private void initCameraModels()
+    {
+        List<CameraModel> sourceCameraModels = source.getCameraModels();
+        for (int i = 0; i < sourceCameraModels.size(); i++)
+        {
+            DefaultCameraModel sourceCameraModel = 
+                (DefaultCameraModel) sourceCameraModels.get(i);
+            DefaultCameraModel targetCameraModel = 
+                cameraModelsMap.get(sourceCameraModel);
+            copyGltfChildOfRootPropertyElements(
+                sourceCameraModel, targetCameraModel);
+            
+            CameraPerspectiveModel sourceCameraPerspectiveModel = 
+                sourceCameraModel.getCameraPerspectiveModel();
+            if (sourceCameraPerspectiveModel != null) 
+            {
+                DefaultCameraPerspectiveModel targetCameraPerspectiveModel = 
+                    new DefaultCameraPerspectiveModel();
+                targetCameraPerspectiveModel.setAspectRatio(
+                    sourceCameraPerspectiveModel.getAspectRatio());
+                targetCameraPerspectiveModel.setYfov(
+                    sourceCameraPerspectiveModel.getYfov());
+                targetCameraPerspectiveModel.setZfar(
+                    sourceCameraPerspectiveModel.getZfar());
+                targetCameraPerspectiveModel.setZnear(
+                    sourceCameraPerspectiveModel.getZnear());
+                
+                targetCameraModel.setCameraPerspectiveModel(
+                    targetCameraPerspectiveModel);
+            }
+            
+            CameraOrthographicModel sourceCameraOrthographicModel = 
+                sourceCameraModel.getCameraOrthographicModel();
+            if (sourceCameraOrthographicModel != null) 
+            {
+                DefaultCameraOrthographicModel targetCameraOrthographicModel = 
+                    new DefaultCameraOrthographicModel();
+                
+                targetCameraOrthographicModel.setXmag(
+                    sourceCameraOrthographicModel.getXmag());
+                targetCameraOrthographicModel.setYmag(
+                    sourceCameraOrthographicModel.getYmag());
+                targetCameraOrthographicModel.setZfar(
+                    sourceCameraOrthographicModel.getZfar());
+                targetCameraOrthographicModel.setZnear(
+                    sourceCameraOrthographicModel.getZnear());
+                
+                targetCameraModel.setCameraOrthographicModel(
+                    targetCameraOrthographicModel);
+            }
+        }
+    }
     
     
     /**

@@ -43,10 +43,6 @@ public class BufferBuilderStrategies
     {
         DefaultBufferBuilderStrategy.Config config = 
             new DefaultBufferBuilderStrategy.Config();
-        
-        config.imagesInBufferViews = false;
-        config.bufferForAnimations = true;
-        config.bufferForSkins = true;
         return new DefaultBufferBuilderStrategy(config);
     }
     
