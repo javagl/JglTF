@@ -26,7 +26,6 @@
  */
 package de.javagl.jgltf.model.io.v2;
 
-import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -81,7 +80,9 @@ final class BinaryAssetCreatorV2
         if (hasBinaryStructure) 
         {
             logger.fine("The model has a binary structure - creating asset");
-            return createBinaryFromDefault(gltfModel);
+            DirectAssetCreatorV2 delegate = new DirectAssetCreatorV2();
+            GltfAssetV2 binaryAsset = delegate.createBinary(gltfModel);
+            return binaryAsset;
         }
 
         logger.fine("Converting model into binary structure");
@@ -91,7 +92,9 @@ final class BinaryAssetCreatorV2
         GltfModelStructures g = new GltfModelStructures();
         g.prepare(gltfModel);
         DefaultGltfModel binaryGltfModel = g.createBinary();
-        return createBinaryFromDefault(binaryGltfModel);
+        DirectAssetCreatorV2 delegate = new DirectAssetCreatorV2();
+        GltfAssetV2 binaryAsset = delegate.createBinary(binaryGltfModel);
+        return binaryAsset;
     }
     
     /**
@@ -123,39 +126,5 @@ final class BinaryAssetCreatorV2
         return true;
     }
     
-    /**
-     * Returns a {@link GltfAssetsV2} from the given {@link GltfModel},
-     * assuming that the given model has a structure that is suitable
-     * for writing it as a binary glTF, according to 
-     * {@link #hasBinaryStructure(GltfModel)}.
-     * 
-     * @param gltfModel The {@link GltfModel}
-     * @return The {@link GltfAssetV2}
-     */
-    private static GltfAssetV2 createBinaryFromDefault(GltfModel gltfModel)
-    {
-        DefaultAssetCreatorV2 delegate = new DefaultAssetCreatorV2();
-        GltfAssetV2 defaultAsset = delegate.createDirectly(gltfModel);
-
-        ByteBuffer resultBinaryBuffer = null;
-        GlTF resultGltf = defaultAsset.getGltf();
-        
-        // Set the URI of the buffer to null, and use its data
-        // as the binary buffer data
-        List<Buffer> resultBuffers = resultGltf.getBuffers();
-        if (resultBuffers != null && !resultBuffers.isEmpty())
-        {
-            Buffer resultBuffer = resultBuffers.get(0);
-            String resultBufferUri = resultBuffer.getUri();
-            
-            resultBinaryBuffer = 
-                defaultAsset.getReferenceData(resultBufferUri);
-            resultBuffer.setUri(null);
-        }
-        GltfAssetV2 binaryAsset = new GltfAssetV2(
-            resultGltf, resultBinaryBuffer);
-        return binaryAsset;
-        
-    }
 
 }
