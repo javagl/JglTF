@@ -32,18 +32,22 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import de.javagl.jgltf.impl.v2.Buffer;
 import de.javagl.jgltf.impl.v2.GlTF;
 import de.javagl.jgltf.impl.v2.Image;
 import de.javagl.jgltf.model.BufferModel;
+import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.Optionals;
+import de.javagl.jgltf.model.impl.DefaultGltfModel;
 import de.javagl.jgltf.model.impl.UriStrings;
 import de.javagl.jgltf.model.io.GltfAsset;
 import de.javagl.jgltf.model.io.IO;
+import de.javagl.jgltf.model.structure.GltfModelStructures;
 import de.javagl.jgltf.model.v2.GltfCreatorV2;
 
 /**
@@ -51,12 +55,18 @@ import de.javagl.jgltf.model.v2.GltfCreatorV2;
  * representation from a {@link GltfModel}.<br>
  * <br>
  * In the default data representation, elements are referred to via URIs. 
- * Data elements like {@link Buffer} or {@link Image}
- * objects that used the binary glTF extension or data URIs will be 
- * converted to refer to their data using URIs.
+ * The data of {@link Buffer} and {@link Image} objects in the model will be
+ * written to external files, and their {@link Buffer#getUri()} and
+ * {@link Image#getUri()} will be set to refer to these external files.
  */
 final class DefaultAssetCreatorV2
 {
+    /**
+     * The logger used in this class
+     */
+    private static final Logger logger =
+        Logger.getLogger(DefaultAssetCreatorV2.class.getName());
+    
     /**
      * The {@link GltfAssetV2} that is currently being created
      */
@@ -88,6 +98,67 @@ final class DefaultAssetCreatorV2
      */
     GltfAssetV2 create(GltfModel gltfModel)
     {
+        // When the model already has a structure that is suitable for
+        // writing it as a default glTF, then create that default glTF
+        // directly from the model
+        boolean hasDefaultStructure = hasDefaultStructure(gltfModel);
+        if (hasDefaultStructure) 
+        {
+            logger.fine("The model has a default structure - creating asset");
+            return createDirectly(gltfModel);
+        }
+
+        logger.fine("Converting model into default structure");
+        
+        // Otherwise, convert the structure of the model, so that it
+        // is suitable to be written as a default glTF
+        GltfModelStructures g = new GltfModelStructures();
+        g.prepare(gltfModel);
+        DefaultGltfModel binaryGltfModel = g.createDefault();
+        return createDirectly(binaryGltfModel);
+    }
+    
+    /**
+     * Check if the given model has a structure that is suitable for 
+     * writing it as a default glTF. This is the case when none of 
+     * the existing images refers to a buffer view.
+     * 
+     * @param gltfModel The {@link GltfModel}
+     * @return Whether the model has a structure suitable for a default glTF
+     */
+    private static boolean hasDefaultStructure(GltfModel gltfModel)
+    {
+        List<ImageModel> imageModels = gltfModel.getImageModels();
+        for (ImageModel imageModel : imageModels)
+        {
+            BufferViewModel imageBufferViewModel = 
+                imageModel.getBufferViewModel();
+            if (imageBufferViewModel != null)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    
+    /**
+     * Create a {@link GltfAssetV2} from the given {@link GltfModel}.<br>
+     * <br>
+     * This will not perform any structural modifications.<br>
+     * <br>
+     * It will write the given model as-it-is. For models in "default" 
+     * representation, this usually means that the images in the given 
+     * model do NOT refer to buffer views (but use external- or data URIs 
+     * for their data instead). For models in "binary" representation,
+     * this means that the images refer to buffer views of a single 
+     * buffer. 
+     *  
+     * @param gltfModel The input {@link GltfModel}
+     * @return The default {@link GltfAssetV2}
+     */
+    GltfAssetV2 createDirectly(GltfModel gltfModel)
+    {
         GlTF outputGltf = GltfCreatorV2.create(gltfModel);
 
         List<Buffer> buffers = Optionals.of(outputGltf.getBuffers());
@@ -110,6 +181,7 @@ final class DefaultAssetCreatorV2
         }
 
         return gltfAsset;
+       
     }
 
     /**

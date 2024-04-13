@@ -35,8 +35,6 @@ import java.util.Map.Entry;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import de.javagl.jgltf.impl.v2.CameraOrthographic;
-import de.javagl.jgltf.impl.v2.CameraPerspective;
 import de.javagl.jgltf.model.AccessorData;
 import de.javagl.jgltf.model.AccessorDatas;
 import de.javagl.jgltf.model.AccessorModel;
@@ -182,7 +180,7 @@ public class GltfModelStructures
     /**
      * Default constructor
      */
-    GltfModelStructures()
+    public GltfModelStructures()
     {
         // Default constructor
     }
@@ -192,7 +190,7 @@ public class GltfModelStructures
      * 
      * @param sourceGltfModel The {@link GltfModel}
      */
-    void prepare(GltfModel sourceGltfModel)
+    public void prepare(GltfModel sourceGltfModel)
     {
         this.source = (DefaultGltfModel) sourceGltfModel;
         
@@ -314,11 +312,47 @@ public class GltfModelStructures
 
     /**
      * Create a restructured version of the glTF model that was last given
+     * to {@link #prepare(GltfModel)}.<br>
+     * <br>
+     * The resulting model will have a structure that is suitable for
+     * writing it as a default glTF. None of its images will refer to 
+     * a buffer view (so they will be stored via URIs, either as external 
+     * files or data URIs) 
+     * 
+     * @return The restructured model
+     */
+    public DefaultGltfModel createDefault()
+    {
+        DefaultBufferBuilderStrategy.Config config = 
+            new DefaultBufferBuilderStrategy.Config();
+        return create(config);
+    }
+    
+    /**
+     * Create a restructured version of the glTF model that was last given
+     * to {@link #prepare(GltfModel)}.<br>
+     * <br>
+     * The resulting model will have a structure that is suitable for
+     * writing it as a binary glTF: It will have a single buffer, and
+     * all images will refer to a buffer view within that buffer. 
+     * 
+     * @return The restructured model
+     */
+    public DefaultGltfModel createBinary()
+    {
+        DefaultBufferBuilderStrategy.Config config = 
+            new DefaultBufferBuilderStrategy.Config();
+        config.imagesInBufferViews = true;
+        return create(config);
+    }
+
+    /**
+     * Create a restructured version of the glTF model that was last given
      * to {@link #prepare(GltfModel)}.
      * 
      * @return The restructured model
      */
-    DefaultGltfModel createDefault()
+    public DefaultGltfModel createCustom()
     {
         DefaultBufferBuilderStrategy.Config config = 
             new DefaultBufferBuilderStrategy.Config();
@@ -332,19 +366,6 @@ public class GltfModelStructures
         return create(config);
     }
     
-    /**
-     * Create a restructured version of the glTF model that was last given
-     * to {@link #prepare(GltfModel)}.
-     * 
-     * @return The restructured model
-     */
-    DefaultGltfModel createBinary()
-    {
-        DefaultBufferBuilderStrategy.Config config = 
-            new DefaultBufferBuilderStrategy.Config();
-        config.imagesInBufferViews = true;
-        return create(config);
-    }
     
 
     /**

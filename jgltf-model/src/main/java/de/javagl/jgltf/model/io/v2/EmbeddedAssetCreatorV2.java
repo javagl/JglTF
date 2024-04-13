@@ -42,8 +42,9 @@ import de.javagl.jgltf.model.v2.GltfCreatorV2;
  * A class for creating a {@link GltfAssetV2} with an "embedded" data 
  * representation from a {@link GltfModel}.<br>
  * <br>
- * In the "embedded" data representation, the data of elements like 
- * {@link Buffer} or {@link Image} objects is stored in data URIs.
+ * In the "embedded" data representation, the data of {@link Buffer} and
+ * {@link Image} objects is stored as data URIs in the {@link Buffer#getUri()}
+ * and {@link Image#getUri()}, respectively.
  */
 final class EmbeddedAssetCreatorV2
 {
@@ -61,7 +62,8 @@ final class EmbeddedAssetCreatorV2
      * <br>
      * The returned {@link GltfAssetV2} will contain a {@link GlTF} where the
      * the URIs that appear in {@link Buffer} and {@link Image} instances are 
-     * replaced with data URIs that contain the corresponding data. 
+     * replaced with data URIs that contain the corresponding data.<br>
+     * <br> 
      * Its {@link GltfAsset#getBinaryData() binary data} will be
      * <code>null</code>, and its {@link GltfAsset#getReferenceDatas() 
      * reference data elements} will be empty.
@@ -88,7 +90,6 @@ final class EmbeddedAssetCreatorV2
         for (int i = 0; i < images.size(); i++)
         {
             Image image = images.get(i);
-            String currentUri = image.getUri();
             ImageModel imageModel = imageModels.get(i);
             
             // If the image refers to a buffer view, then its data is
@@ -97,6 +98,7 @@ final class EmbeddedAssetCreatorV2
             // to be a data URI for its image data.
             if (imageModel.getBufferViewModel() == null)
             {
+                String currentUri = image.getUri();
                 String dataUri = DataUris.createImageDataUri(
                     currentUri, imageModel);
                 image.setUri(dataUri);

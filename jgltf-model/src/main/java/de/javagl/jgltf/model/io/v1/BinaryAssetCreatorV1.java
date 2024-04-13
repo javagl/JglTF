@@ -76,6 +76,12 @@ final class BinaryAssetCreatorV1
      */
     GltfAssetV1 create(GltfModelV1 gltfModel)
     {
+        // NOTE: The whole handling of glTF 1.0, and the binary glTF extension
+        // of glTF 1.0 in particular, has some legacy aspects. The specification
+        // actually contained a few alignment requirements for the resulting
+        // binary buffer. These requirements are NOT ensured here (although
+        // they will likely be met in most cases). Pull requests welcome.
+        
         GlTF outputGltf = GltfCreatorV1.create(gltfModel);
         
         // Create the new byte buffer for the data of the "binary_glTF" Buffer
