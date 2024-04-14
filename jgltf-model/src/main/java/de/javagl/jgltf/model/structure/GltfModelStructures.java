@@ -34,6 +34,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import de.javagl.jgltf.model.AccessorData;
 import de.javagl.jgltf.model.AccessorDatas;
@@ -102,6 +104,12 @@ import de.javagl.jgltf.model.v2.MaterialModelV2;
  */
 public class GltfModelStructures
 {
+    /**
+     * The logger used in this class
+     */
+    private static final Logger logger = 
+        Logger.getLogger(GltfModelStructures.class.getName());
+    
     /**
      * The source model
      */
@@ -380,6 +388,23 @@ public class GltfModelStructures
         if (this.target == null)
         {
             throw new GltfException("The 'prepare' method has not bee called");
+        }
+        Level level = Level.INFO;
+        if (logger.isLoggable(level)) 
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Creating model with configuration:\n");
+            sb.append("  bufferPerMeshPrimitive : " + config.bufferPerMeshPrimitive + "\n");
+            sb.append("  bufferPerMesh : " + config.bufferPerMesh + "\n");
+            sb.append("  bufferForMeshes : " + config.bufferForMeshes + "\n");
+            sb.append("  bufferPerAnimation : " + config.bufferPerAnimation + "\n");
+            sb.append("  bufferForAnimations : " + config.bufferForAnimations + "\n");
+            sb.append("  bufferPerSkin : " + config.bufferPerSkin + "\n");
+            sb.append("  bufferForSkins : " + config.bufferForSkins + "\n");
+            sb.append("  bufferPerImage : " + config.bufferPerImage + "\n");
+            sb.append("  bufferForImages : " + config.bufferForImages + "\n");
+            sb.append("  imagesInBufferViews : " + config.imagesInBufferViews + "\n");
+            logger.log(level, sb.toString());
         }
         
         BufferBuilderStrategy bbs = BufferBuilderStrategies.create(config);

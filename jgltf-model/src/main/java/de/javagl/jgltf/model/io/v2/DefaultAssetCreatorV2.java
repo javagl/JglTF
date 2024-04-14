@@ -87,10 +87,10 @@ final class DefaultAssetCreatorV2
         // is suitable to be written as a default glTF
         GltfModelStructures g = new GltfModelStructures();
         g.prepare(gltfModel);
-        DefaultGltfModel binaryGltfModel = g.createDefault();
+        DefaultGltfModel defaultGltfModel = g.createDefault();
 
         DirectAssetCreatorV2 delegate = new DirectAssetCreatorV2();
-        return delegate.createDefault(binaryGltfModel);
+        return delegate.createDefault(defaultGltfModel);
     }
     
     /**

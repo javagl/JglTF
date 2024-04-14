@@ -28,20 +28,26 @@ package de.javagl.jgltf.model.io.v1;
 
 import java.nio.ByteBuffer;
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 import de.javagl.jgltf.impl.v1.Buffer;
 import de.javagl.jgltf.impl.v1.GlTF;
 import de.javagl.jgltf.impl.v1.Image;
 import de.javagl.jgltf.impl.v1.Shader;
 import de.javagl.jgltf.model.BufferModel;
+import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.GltfException;
+import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.gl.ShaderModel;
+import de.javagl.jgltf.model.impl.DefaultGltfModel;
 import de.javagl.jgltf.model.io.GltfAsset;
 import de.javagl.jgltf.model.io.MimeTypes;
+import de.javagl.jgltf.model.structure.GltfModelStructures;
 import de.javagl.jgltf.model.v1.BinaryGltfV1;
 import de.javagl.jgltf.model.v1.GltfCreatorV1;
 import de.javagl.jgltf.model.v1.GltfModelV1;
@@ -56,6 +62,12 @@ import de.javagl.jgltf.model.v1.GltfModelV1;
  */
 final class EmbeddedAssetCreatorV1
 {
+    /**
+     * The logger used in this class
+     */
+    private static final Logger logger =
+        Logger.getLogger(EmbeddedAssetCreatorV1.class.getName());
+    
     /**
      * Creates a new asset creator
      */
@@ -79,6 +91,38 @@ final class EmbeddedAssetCreatorV1
      * @return The embedded {@link GltfAssetV1}
      */
     GltfAssetV1 create(GltfModelV1 gltfModel)
+    {
+        // In glTF 1.0, images could only refer to a buffer view as part
+        // of a binary glTF. So in order to write out a model as an
+        // embedded model, it has to have the "default" structure (where
+        // no image refers to a buffer view). This is ensured here:
+        // When the model already has a structure that is suitable for
+        // writing it as a default glTF, then create that default glTF
+        // directly from the model
+        boolean hasDefaultStructure = hasDefaultStructure(gltfModel);
+        if (hasDefaultStructure) 
+        {
+            logger.fine("The model has a default structure - creating asset");
+            return createInternal(gltfModel);
+        }
+
+        logger.fine("Converting model into default structure");
+        
+        // Otherwise, convert the structure of the model, so that it
+        // is suitable to be written as an embedded glTF 1.0
+        GltfModelStructures g = new GltfModelStructures();
+        g.prepare(gltfModel);
+        DefaultGltfModel defaultGltfModel = g.createDefault();
+        return createInternal((GltfModelV1) defaultGltfModel);
+    }
+    
+    /**
+     * Internal method for {@link #create(GltfModelV1)}
+     *  
+     * @param gltfModel The input {@link GltfModelV1}
+     * @return The embedded {@link GltfAssetV1}
+     */
+    private GltfAssetV1 createInternal(GltfModelV1 gltfModel)
     {
         GlTF outputGltf = GltfCreatorV1.create(gltfModel);
 
@@ -108,8 +152,32 @@ final class EmbeddedAssetCreatorV1
                 gltfModel, id, value, shaderIdToShader::get));
 
         return new GltfAssetV1(outputGltf, null);
+        
     }
 
+    /**
+     * Check if the given model has a structure that is suitable for 
+     * writing it as a default glTF. This is the case when none of 
+     * the existing images refers to a buffer view.
+     * 
+     * @param gltfModel The {@link GltfModel}
+     * @return Whether the model has a structure suitable for a default glTF
+     */
+    private static boolean hasDefaultStructure(GltfModel gltfModel)
+    {
+        List<ImageModel> imageModels = gltfModel.getImageModels();
+        for (ImageModel imageModel : imageModels)
+        {
+            BufferViewModel imageBufferViewModel = 
+                imageModel.getBufferViewModel();
+            if (imageBufferViewModel != null)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    
     /**
      * Convert the given {@link Buffer} into an embedded buffer, by replacing 
      * its URI with a data URI, if the URI is not already a data URI

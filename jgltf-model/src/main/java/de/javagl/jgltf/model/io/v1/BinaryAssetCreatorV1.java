@@ -192,6 +192,7 @@ final class BinaryAssetCreatorV1
             // Let the image refer to the BufferView via its extension object
             BinaryGltfV1.setBinaryGltfBufferViewId(
                 newImage, generatedBufferViewId);
+            newImage.setUri("image_"+id);
 
             // Set the width, height and mimeType properties for the
             // extension object
