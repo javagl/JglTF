@@ -149,6 +149,11 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
          * Whether to create one buffer for all images
          */
         boolean bufferForImages = false;
+
+        /**
+         * Whether to create one buffer for all additional accessors
+         */
+        boolean bufferForAdditionalAccessors = false;
     }
     
     /**
@@ -181,6 +186,7 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
         processAnimationModels(gltfModel.getAnimationModels());
         processSkinModels(gltfModel.getSkinModels());
         processImageModels(gltfModel.getImageModels());
+        processAccessorModels(gltfModel.getAccessorModels());
         commitBuffer();
         bufferStructure = bufferStructureBuilder.build();
     }
@@ -469,6 +475,47 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
             commitBuffer();
         }
     }
+    
+    
+    /**
+     * Process the given {@link AccessorModel} instances
+     * 
+     * @param accessorModels The {@link AccessorModel} instances
+     */
+    private void processAccessorModels(
+        Collection<? extends AccessorModel> accessorModels)
+    {
+        if (config.bufferForAdditionalAccessors)
+        {
+            commitBuffer();
+        }
+        for (AccessorModel accessorModel : accessorModels)
+        {
+            processAccessorModel(accessorModel);
+        }
+        if (config.bufferForAdditionalAccessors)
+        {
+            commitBuffer();
+        }
+    }
+
+    /**
+     * Process the given {@link AccessorModel} 
+     * 
+     * @param accessorModel The {@link AccessorModel}
+     */
+    private void processAccessorModel(AccessorModel accessorModel)
+    {
+        if (processedAccessorModels.contains(accessorModel))
+        {
+            return;
+        }
+        processedAccessorModels.add(accessorModel);
+        bufferStructureBuilder.addAccessorModel("additional", 
+            (DefaultAccessorModel) accessorModel);
+        bufferStructureBuilder.createBufferViewModel("additional", null); 
+    }
+    
     
     /**
      * Commit the currently pending buffer view models into a buffer
