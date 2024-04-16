@@ -111,7 +111,7 @@ final class BinaryAssetCreatorV2
         List<BufferModel> bufferModels = gltfModel.getBufferModels();
         if (bufferModels.size() >= 2) 
         {
-            return true;
+            return false;
         } 
         List<ImageModel> imageModels = gltfModel.getImageModels();
         for (ImageModel imageModel : imageModels)
