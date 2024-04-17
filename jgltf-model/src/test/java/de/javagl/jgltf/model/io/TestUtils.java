@@ -6,17 +6,59 @@
 package de.javagl.jgltf.model.io;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 /**
  * Utility methods for the test package
  */
 class TestUtils
 {
+    /**
+     * Asserts that the files in the given directories are equal, byte-wise,
+     * except for the line separators. <br>
+     * <br>
+     * This will compare the number of files in the specified directories,
+     * and then compare each file with 
+     * {@link #assertFileEquals(String, String, String, String)}.
+     * 
+     * @param directoryExpected The directory of the expected file
+     * @param directoryActual The directory of the actual file
+     * @throws IOException If any file cannot be read
+     * @throws AssertionError If the directories are not equal 
+     */
+    static void assertDirectoriesEqual(
+        String directoryExpected, 
+        String directoryActual) throws IOException 
+    {
+        File[] filesExpected = 
+            Paths.get(directoryExpected).toFile().listFiles();
+        assertNotNull("The expected files do not exist", filesExpected);
+        File[] filesActual = 
+            Paths.get(directoryActual).toFile().listFiles();
+        assertNotNull("The actual files do not exist", filesActual);
+        Arrays.sort(filesExpected);
+        Arrays.sort(filesActual);
+        assertEquals("Expected " + filesExpected.length + " files but found "
+            + filesActual.length, filesExpected.length, filesActual.length);
+        
+        for (int i = 0; i < filesExpected.length; i++)
+        {
+            String fileNameExpected = filesExpected[i].getName();
+            String fileNameActual = filesActual[i].getName();
+            assertFileEquals(
+                directoryExpected, fileNameExpected, 
+                directoryActual, fileNameActual);
+        }
+        
+    }
+    
     /**
      * Asserts that the files at the given locations are equal, byte-wise,
      * except for the line separators. <br>
