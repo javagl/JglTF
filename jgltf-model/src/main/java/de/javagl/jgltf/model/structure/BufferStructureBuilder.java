@@ -308,6 +308,7 @@ public final class BufferStructureBuilder
         accessorModel.setNormalized(normalized);
         accessorModel.setAccessorData(
             AccessorDatas.create(accessorModel, byteBuffer));
+        addAccessorModel(idPrefix, accessorModel);
         return accessorModel;
     }
         
