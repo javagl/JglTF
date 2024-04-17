@@ -389,7 +389,7 @@ public class GltfModelStructures
         {
             throw new GltfException("The 'prepare' method has not bee called");
         }
-        Level level = Level.INFO;
+        Level level = Level.FINE;
         if (logger.isLoggable(level)) 
         {
             StringBuilder sb = new StringBuilder();
