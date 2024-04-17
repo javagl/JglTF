@@ -28,6 +28,7 @@ package de.javagl.jgltf.model.gl.impl;
 
 import java.nio.ByteBuffer;
 
+import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.gl.ShaderModel;
 import de.javagl.jgltf.model.impl.AbstractNamedModelElement;
 import de.javagl.jgltf.model.io.Buffers;
@@ -42,6 +43,11 @@ public class DefaultShaderModel extends AbstractNamedModelElement
      * The URI 
      */
     private String uri;
+    
+    /**
+     * The {@link BufferViewModel}
+     */
+    private BufferViewModel bufferViewModel;
     
     /**
      * The actual raw shader data
@@ -95,6 +101,16 @@ public class DefaultShaderModel extends AbstractNamedModelElement
     }
     
     /**
+     * Set the {@link BufferViewModel} 
+     * 
+     * @param bufferViewModel The {@link BufferViewModel}
+     */
+    public void setBufferViewModel(BufferViewModel bufferViewModel)
+    {
+        this.bufferViewModel = bufferViewModel;
+    }
+    
+    /**
      * Set the data of this shader
      * 
      * @param shaderData The shader data
@@ -111,15 +127,25 @@ public class DefaultShaderModel extends AbstractNamedModelElement
     }
 
     @Override
+    public BufferViewModel getBufferViewModel()
+    {
+        return bufferViewModel;
+    }
+    
+    @Override
     public ByteBuffer getShaderData()
     {
+        if (shaderData == null)
+        {
+            return bufferViewModel.getBufferViewData();
+        }
         return Buffers.createSlice(shaderData);
     }
 
     @Override
     public String getShaderSource()
     {
-        return Buffers.readAsString(shaderData);
+        return Buffers.readAsString(getShaderData());
     }
     
     @Override
