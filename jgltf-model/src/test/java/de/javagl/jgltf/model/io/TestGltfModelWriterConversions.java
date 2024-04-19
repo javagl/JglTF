@@ -10,8 +10,6 @@ import java.util.logging.Level;
 
 import org.junit.Test;
 
-import de.javagl.jgltf.model.structure._LoggerUtil;
-
 /**
  * Tests for the {@link GltfModelWriter} class for glTF 2.0.<br>
  * <br>
@@ -25,7 +23,6 @@ public class TestGltfModelWriterConversions
 {
     public static void main(String[] args) throws IOException
     {
-        _LoggerUtil.initLogging();
         GltfModelWriterConversions.level = Level.INFO;
         String testModelName = "unitCubeTextured";
         String versionString = "v1";
