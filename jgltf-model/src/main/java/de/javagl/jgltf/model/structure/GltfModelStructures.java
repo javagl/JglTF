@@ -403,6 +403,7 @@ public class GltfModelStructures
             sb.append("  bufferForSkins : " + config.bufferForSkins + "\n");
             sb.append("  bufferPerImage : " + config.bufferPerImage + "\n");
             sb.append("  bufferForImages : " + config.bufferForImages + "\n");
+            sb.append("  bufferForAdditionalAccessors : " + config.bufferForAdditionalAccessors + "\n");
             sb.append("  imagesInBufferViews : " + config.imagesInBufferViews + "\n");
             logger.log(level, sb.toString());
         }
