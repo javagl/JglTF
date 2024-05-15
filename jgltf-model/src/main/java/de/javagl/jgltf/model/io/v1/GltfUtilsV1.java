@@ -109,7 +109,10 @@ class GltfUtilsV1
         copy.setExtensions(image.getExtensions());
         copy.setExtras(image.getExtras());
         copy.setName(image.getName());
-        copy.setUri(image.getUri());
+        if (image.getUri() != null)
+        {
+            copy.setUri(image.getUri());
+        }
         return copy;
     }
     

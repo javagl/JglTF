@@ -113,8 +113,7 @@ public final class DefaultMeshPrimitiveModel extends AbstractModelElement
      */
     public void setMaterialModel(MaterialModel materialModel)
     {
-        this.materialModel = Objects.requireNonNull(
-            materialModel, "The materialModel may not be null");
+        this.materialModel = materialModel;
     }
     
     /**

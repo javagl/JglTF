@@ -1,4 +1,4 @@
-package de.javagl.jgltf.model.creation;
+package de.javagl.jgltf.model.structure;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;

@@ -14,6 +14,10 @@
 /jgltf2-experiments
 /AccessorVis
 /JglTF
+/jgltf-jgltfifier
+/jgltf-impl-v2-khr-lights-punctual
+/jgltf-model-khr-lights-punctual
+/jgltf-asset-creator
 
 /jgltf-browser/.classpath
 /jgltf-browser/.settings
@@ -35,15 +39,10 @@
 /jgltf-model-builder/target
 /jgltf-model-builder/.classpath
 
-/jgltf-model/src/test/resources/testModels/testBox/output-glTF-to-glTF-Embedded
-/jgltf-model/src/test/resources/testModels/testBox/output-glTF-to-glTF
-/jgltf-model/src/test/resources/testModels/testBox/output-glTF-to-glTF-Binary
-/jgltf-model/src/test/resources/testModels/v1/testBox/output-glTF-to-glTF-Embedded
-/jgltf-model/src/test/resources/testModels/v1/testBox/output-glTF-to-glTF
-/jgltf-model/src/test/resources/testModels/v1/testBox/output-glTF-to-glTF-Binary
-/jgltf-model/src/test/resources/testModels/v2/testBox/output-glTF-to-glTF
-/jgltf-model/src/test/resources/testModels/v2/testBox/output-glTF-to-glTF-Binary
-/jgltf-model/src/test/resources/testModels/v2/testBox/output-glTF-to-glTF-Embedded
+/jgltf-model/src/test/resources/testModels/v1/testBox/output-*
+/jgltf-model/src/test/resources/testModels/v2/testBox/output-*
+/jgltf-model/src/test/resources/testModels/v1/unitCubeTextured/output-*
+/jgltf-model/src/test/resources/testModels/v2/unitCubeTextured/output-*
 
 /jgltf-obj/.classpath
 /jgltf-obj/.settings

@@ -66,6 +66,8 @@ import de.javagl.jgltf.model.impl.DefaultNodeModel;
 import de.javagl.jgltf.model.impl.DefaultSceneModel;
 import de.javagl.jgltf.model.impl.DefaultSkinModel;
 import de.javagl.jgltf.model.impl.DefaultTextureModel;
+import de.javagl.jgltf.model.structure.BufferBuilderStrategies;
+import de.javagl.jgltf.model.structure.BufferBuilderStrategy;
 import de.javagl.jgltf.model.v1.GltfModelV1;
 import de.javagl.jgltf.model.v1.MaterialModelV1;
 import de.javagl.jgltf.model.v2.MaterialModelV2;
@@ -248,17 +250,6 @@ public class GltfModelBuilder
      */
     private void fill(DefaultGltfModel gltfModel)
     {
-        BufferBuilderStrategy bufferBuilderStrategy = 
-            new DefaultBufferBuilderStrategy();
-        
-        bufferBuilderStrategy.processMeshModels(meshModelsSet);
-        bufferBuilderStrategy.processImageModels(imageModelsSet);
-        bufferBuilderStrategy.processAnimationModels(animationModelsSet);
-        bufferBuilderStrategy.processSkinModels(skinModelsSet);
-        
-        bufferBuilderStrategy.commitBuffer("buffer.bin");
-        bufferBuilderStrategy.finish();
-        
         gltfModel.addAnimationModels(animationModelsSet);
         gltfModel.addCameraModels(cameraModelsSet);
         gltfModel.addImageModels(imageModelsSet);
@@ -268,6 +259,10 @@ public class GltfModelBuilder
         gltfModel.addSceneModels(sceneModelsSet);
         gltfModel.addSkinModels(skinModelsSet);
         gltfModel.addTextureModels(textureModelsSet);
+
+        BufferBuilderStrategy bufferBuilderStrategy = 
+            BufferBuilderStrategies.createDefault();
+        bufferBuilderStrategy.process(gltfModel);
         
         gltfModel.addAccessorModels(
             bufferBuilderStrategy.getAccessorModels());

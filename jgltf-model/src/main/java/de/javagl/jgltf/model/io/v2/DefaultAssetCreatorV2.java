@@ -26,52 +26,34 @@
  */
 package de.javagl.jgltf.model.io.v2;
 
-import java.nio.ByteBuffer;
-import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.logging.Logger;
 
 import de.javagl.jgltf.impl.v2.Buffer;
-import de.javagl.jgltf.impl.v2.GlTF;
 import de.javagl.jgltf.impl.v2.Image;
-import de.javagl.jgltf.model.BufferModel;
+import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.ImageModel;
-import de.javagl.jgltf.model.Optionals;
-import de.javagl.jgltf.model.impl.UriStrings;
-import de.javagl.jgltf.model.io.GltfAsset;
-import de.javagl.jgltf.model.io.IO;
-import de.javagl.jgltf.model.v2.GltfCreatorV2;
+import de.javagl.jgltf.model.impl.DefaultGltfModel;
+import de.javagl.jgltf.model.structure.GltfModelStructures;
 
 /**
  * A class for creating a {@link GltfAssetV2} with a default data 
  * representation from a {@link GltfModel}.<br>
  * <br>
  * In the default data representation, elements are referred to via URIs. 
- * Data elements like {@link Buffer} or {@link Image}
- * objects that used the binary glTF extension or data URIs will be 
- * converted to refer to their data using URIs.
+ * The data of {@link Buffer} and {@link Image} objects in the model will be
+ * written to external files, and their {@link Buffer#getUri()} and
+ * {@link Image#getUri()} will be set to refer to these external files.
  */
 final class DefaultAssetCreatorV2
 {
     /**
-     * The {@link GltfAssetV2} that is currently being created
+     * The logger used in this class
      */
-    private GltfAssetV2 gltfAsset;
+    private static final Logger logger =
+        Logger.getLogger(DefaultAssetCreatorV2.class.getName());
     
-    /**
-     * The set of {@link Buffer} URI strings that are already used
-     */
-    private Set<String> existingBufferUriStrings;
-
-    /**
-     * The set of {@link Image} URI strings that are already used
-     */
-    private Set<String> existingImageUriStrings;
-
     /**
      * Creates a new asset creator
      */
@@ -88,125 +70,49 @@ final class DefaultAssetCreatorV2
      */
     GltfAssetV2 create(GltfModel gltfModel)
     {
-        GlTF outputGltf = GltfCreatorV2.create(gltfModel);
-
-        List<Buffer> buffers = Optionals.of(outputGltf.getBuffers());
-        List<Image> images = Optionals.of(outputGltf.getImages());
-        
-        existingBufferUriStrings = collectUriStrings(buffers, Buffer::getUri);
-        existingImageUriStrings = collectUriStrings(images, Image::getUri);
-
-        this.gltfAsset = new GltfAssetV2(outputGltf, null);
-        
-        for (int i = 0; i < buffers.size(); i++)
+        // When the model already has a structure that is suitable for
+        // writing it as a default glTF, then create that default glTF
+        // directly from the model
+        boolean hasDefaultStructure = hasDefaultStructure(gltfModel);
+        if (hasDefaultStructure) 
         {
-            Buffer buffer = buffers.get(i);
-            storeBufferAsDefault(gltfModel, i, buffer);
-        }
-        for (int i = 0; i < images.size(); i++)
-        {
-            Image image = images.get(i);
-            storeImageAsDefault(gltfModel, i, image);
+            logger.fine("The model has a default structure - creating asset");
+            DirectAssetCreatorV2 delegate = new DirectAssetCreatorV2();
+            return delegate.createDefault(gltfModel);
         }
 
-        return gltfAsset;
-    }
+        logger.fine("Converting model into default structure");
+        
+        // Otherwise, convert the structure of the model, so that it
+        // is suitable to be written as a default glTF
+        GltfModelStructures g = new GltfModelStructures();
+        g.prepare(gltfModel);
+        DefaultGltfModel defaultGltfModel = g.createDefault();
 
-    /**
-     * Collect all strings that are obtained from the given elements by 
-     * applying the given function, if these strings are not <code>null</code>
-     * and no data URI strings
-     * 
-     * @param elements The elements
-     * @param uriFunction The function to obtain the string
-     * @return The strings
-     */
-    private static <T> Set<String> collectUriStrings(Collection<T> elements, 
-        Function<? super T, ? extends String> uriFunction)
-    {
-        return elements.stream()
-            .map(uriFunction)
-            .filter(Objects::nonNull)
-            .filter(uriString -> !IO.isDataUriString(uriString))
-            .collect(Collectors.toSet());
+        DirectAssetCreatorV2 delegate = new DirectAssetCreatorV2();
+        return delegate.createDefault(defaultGltfModel);
     }
     
     /**
-     * Store the given {@link Buffer} with the given index in the current 
-     * output asset. <br>
-     * <br>
-     * If the {@link Buffer#getUri() buffer URI} is <code>null</code> or a 
-     * data URI, it will receive a new URI, which refers to the buffer data, 
-     * which is then stored as {@link GltfAsset#getReferenceData(String) 
-     * reference data} in the asset.<br>
-     * <br>
-     * The given {@link Buffer} object will be modified accordingly, if 
-     * necessary: Its URI will be set to be the new URI. 
+     * Check if the given model has a structure that is suitable for 
+     * writing it as a default glTF. This is the case when none of 
+     * the existing images refers to a buffer view.
      * 
-     * @param gltfModel The {@link GltfModel} 
-     * @param index The index of the {@link Buffer}
-     * @param buffer The {@link Buffer}
+     * @param gltfModel The {@link GltfModel}
+     * @return Whether the model has a structure suitable for a default glTF
      */
-    private void storeBufferAsDefault(
-        GltfModel gltfModel, int index, Buffer buffer)
+    private static boolean hasDefaultStructure(GltfModel gltfModel)
     {
-        BufferModel bufferModel = gltfModel.getBufferModels().get(index);
-        ByteBuffer bufferData = bufferModel.getBufferData();
-
-        String oldUriString = buffer.getUri();
-        String newUriString = oldUriString;
-        if (oldUriString == null || IO.isDataUriString(oldUriString))
+        List<ImageModel> imageModels = gltfModel.getImageModels();
+        for (ImageModel imageModel : imageModels)
         {
-            newUriString = UriStrings.createBufferUriString(
-                existingBufferUriStrings);
-            buffer.setUri(newUriString);
-            existingBufferUriStrings.add(newUriString);
+            BufferViewModel imageBufferViewModel = 
+                imageModel.getBufferViewModel();
+            if (imageBufferViewModel != null)
+            {
+                return false;
+            }
         }
-        
-        gltfAsset.putReferenceData(newUriString, bufferData);
+        return true;
     }
-
-    
-    /**
-     * Store the given {@link Image} with the given index in the current 
-     * output asset. <br>
-     * <br>
-     * If the {@link Image#getUri() image URI} is <code>null</code> or a 
-     * data URI, it will receive a new URI, which refers to the image data, 
-     * which is then stored as {@link GltfAsset#getReferenceData(String) 
-     * reference data} in the asset.<br>
-     * <br>
-     * The given {@link Image} object will be modified accordingly, if 
-     * necessary: Its URI will be set to be the new URI. If it referred
-     * to a {@link Image#getBufferView() image buffer view}, then this
-     * reference will be set to be <code>null</code>.
-     *  
-     * @param gltfModel The {@link GltfModel} 
-     * @param index The index of the {@link Image}
-     * @param image The {@link Image}
-     */
-    private void storeImageAsDefault(
-        GltfModel gltfModel, int index, Image image)
-    {
-        ImageModel imageModel = gltfModel.getImageModels().get(index);
-        ByteBuffer imageData = imageModel.getImageData();
-
-        String oldUriString = image.getUri();
-        String newUriString = oldUriString;
-        if (oldUriString == null || IO.isDataUriString(oldUriString))
-        {
-            newUriString = UriStrings.createImageUriString(
-                imageModel, existingImageUriStrings);
-            image.setUri(newUriString);
-            existingImageUriStrings.add(newUriString);
-        }
-        
-        if (image.getBufferView() != null)
-        {
-            image.setBufferView(null);
-        }
-        
-        gltfAsset.putReferenceData(newUriString, imageData);
-    }
-
 }

@@ -28,6 +28,7 @@ package de.javagl.jgltf.model.gl;
 
 import java.nio.ByteBuffer;
 
+import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.NamedModelElement;
 
 /**
@@ -58,6 +59,14 @@ public interface ShaderModel extends NamedModelElement
      */
     String getUri();
 
+    /**
+     * Returns the (optional) {@link BufferViewModel} that contains
+     * the shader data
+     * 
+     * @return The {@link BufferViewModel}
+     */
+    BufferViewModel getBufferViewModel();
+    
     /**
      * Returns the actual shader data. This will return a slice of the
      * buffer that is stored internally. Thus, changes to the contents

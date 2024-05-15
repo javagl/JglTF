@@ -26,26 +26,19 @@
  */
 package de.javagl.jgltf.model.io.v2;
 
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import de.javagl.jgltf.impl.v2.Buffer;
 import de.javagl.jgltf.impl.v2.BufferView;
 import de.javagl.jgltf.impl.v2.GlTF;
 import de.javagl.jgltf.impl.v2.Image;
 import de.javagl.jgltf.model.BufferModel;
+import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.ImageModel;
-import de.javagl.jgltf.model.Optionals;
-import de.javagl.jgltf.model.io.Buffers;
-import de.javagl.jgltf.model.io.MimeTypes;
-import de.javagl.jgltf.model.v2.GltfCreatorV2;
+import de.javagl.jgltf.model.impl.DefaultGltfModel;
+import de.javagl.jgltf.model.structure.GltfModelStructures;
 
 /**
  * A class for creating a binary {@link GltfAssetV2} from a 
@@ -69,7 +62,8 @@ final class BinaryAssetCreatorV2
     }
     
     /**
-     * Create a binary {@link GltfAssetV2} from the given {@link GltfModel}.
+     * Create a binary {@link GltfAssetV2} from the given {@link GltfModel}.<br>
+     * <br>
      * The resulting asset will have a {@link GlTF} that uses references to
      * {@link BufferView} objects in its {@link Buffer} and {@link Image}
      * elements. 
@@ -79,175 +73,57 @@ final class BinaryAssetCreatorV2
      */
     GltfAssetV2 create(GltfModel gltfModel)
     {
-        GlTF outputGltf = GltfCreatorV2.create(gltfModel);
+        // When the model already has a structure that is suitable for
+        // writing it as a binary glTF, then create that binary glTF
+        // directly from the model
+        boolean hasBinaryStructure = hasBinaryStructure(gltfModel);
+        if (hasBinaryStructure) 
+        {
+            logger.fine("The model has a binary structure - creating asset");
+            DirectAssetCreatorV2 delegate = new DirectAssetCreatorV2();
+            GltfAssetV2 binaryAsset = delegate.createBinary(gltfModel);
+            return binaryAsset;
+        }
+
+        logger.fine("Converting model into binary structure");
         
-        // Create the new byte buffer for the data of the "binary_glTF" Buffer
-        int binaryGltfBufferSize = 
-            computeBinaryGltfBufferSize(gltfModel);
-        ByteBuffer binaryGltfByteBuffer = 
-            Buffers.create(binaryGltfBufferSize);
-
-        // Create the binary Buffer, 
-        Buffer binaryGltfBuffer = new Buffer();
-        binaryGltfBuffer.setByteLength(binaryGltfBufferSize);
-        outputGltf.setBuffers(Collections.singletonList(binaryGltfBuffer));
-
-        // Create a defensive copy of the original image list
-        List<Image> oldImages = copy(outputGltf.getImages());
-
-        // Place the data from buffers and images into the new binary glTF 
-        // buffer. The mappings from IDs to offsets inside the resulting 
-        // buffer will be used to compute the offsets for the buffer views
-        List<ByteBuffer> bufferDatas = 
-            gltfModel.getBufferModels().stream()
-            .map(BufferModel::getBufferData)
-            .collect(Collectors.toList());
-        Map<Integer, Integer> bufferOffsets = concatBuffers(
-            bufferDatas, binaryGltfByteBuffer);
-        List<ByteBuffer> imageDatas = 
-            gltfModel.getImageModels().stream()
-            .map(ImageModel::getImageData)
-            .collect(Collectors.toList());
-        Map<Integer, Integer> imageOffsets = concatBuffers(
-            imageDatas, binaryGltfByteBuffer);
-        binaryGltfByteBuffer.position(0);
-
-        // For all existing BufferViews, create new ones that are updated to 
-        // refer to the new binary glTF buffer, with the appropriate offset
-        List<BufferView> oldBufferViews = 
-            copy(outputGltf.getBufferViews());
-        List<BufferView> newBufferViews = 
-            new ArrayList<BufferView>();
-        for (int i = 0; i < oldBufferViews.size(); i++)
-        {
-            BufferView oldBufferView = oldBufferViews.get(i);
-            BufferView newBufferView = GltfUtilsV2.copy(oldBufferView);
-
-            newBufferView.setBuffer(0);
-            Integer oldBufferIndex = oldBufferView.getBuffer();
-            int oldByteOffset = Optionals.of(oldBufferView.getByteOffset(), 0);
-            int bufferOffset = bufferOffsets.get(oldBufferIndex);
-            int newByteOffset = oldByteOffset + bufferOffset;
-            newBufferView.setByteOffset(newByteOffset);
-
-            newBufferViews.add(newBufferView);
-        }
-
-        // For all existing Images, create new ones that are updated to 
-        // refer to the new binary glTF buffer, using a bufferView 
-        // index that refers to a newly created BufferView
-        List<Image> newImages = new ArrayList<Image>();
-        for (int i = 0; i < oldImages.size(); i++)
-        {
-            Image oldImage = oldImages.get(i);
-            Image newImage = GltfUtilsV2.copy(oldImage);
-
-            // Create the BufferView for the image
-            ImageModel imageModel = gltfModel.getImageModels().get(i);
-            ByteBuffer imageData = imageModel.getImageData();
-            int byteLength = imageData.capacity();
-            int byteOffset = imageOffsets.get(i);
-            BufferView imageBufferView = new BufferView();
-            imageBufferView.setBuffer(0);
-            imageBufferView.setByteOffset(byteOffset);
-            imageBufferView.setByteLength(byteLength);
-
-            int newBufferViewIndex = newBufferViews.size();
-            newImage.setBufferView(newBufferViewIndex);
-            newImage.setUri(null);
-            
-            String imageMimeTypeString =
-                MimeTypes.guessImageMimeTypeString(
-                    oldImage.getUri(), imageData);
-            if (imageMimeTypeString == null)
-            {
-                logger.warning("Could not detect MIME type of image");
-            }
-            else
-            {
-                newImage.setMimeType(imageMimeTypeString);
-            }
-            
-            newBufferViews.add(imageBufferView);
-            newImages.add(newImage);
-        }
-
-        // Place the newly created lists into the output glTF,
-        // if there have been non-null lists for them in the input
-        if (!oldImages.isEmpty())
-        {
-            outputGltf.setImages(newImages);
-        }
-        if (!newBufferViews.isEmpty())
-        {
-            outputGltf.setBufferViews(newBufferViews);
-        }
-        return new GltfAssetV2(outputGltf, binaryGltfByteBuffer);
+        // Otherwise, convert the structure of the model, so that it
+        // is suitable to be written as a binary glTF
+        GltfModelStructures g = new GltfModelStructures();
+        g.prepare(gltfModel);
+        DefaultGltfModel binaryGltfModel = g.createBinary();
+        DirectAssetCreatorV2 delegate = new DirectAssetCreatorV2();
+        GltfAssetV2 binaryAsset = delegate.createBinary(binaryGltfModel);
+        return binaryAsset;
     }
-
-
+    
     /**
-     * Compute the total size that is required for the binary glTF buffer
-     * for the given {@link GltfModel}, which is the sum of all buffer
-     * sizes of all buffers and images
+     * Check if the given model has a structure that is suitable for 
+     * writing it as a binary glTF. This is the case when there is 
+     * at most one buffer, and all of the existing images already
+     * refer to a buffer view within that buffer.
      * 
      * @param gltfModel The {@link GltfModel}
-     * @return The total size for the binary glTF buffer
+     * @return Whether the model has a structure suitable for a binary glTF
      */
-    private static int computeBinaryGltfBufferSize(GltfModel gltfModel)
+    private static boolean hasBinaryStructure(GltfModel gltfModel)
     {
-        int binaryGltfBufferSize = 0;
-        for (BufferModel bufferModel : gltfModel.getBufferModels())
+        List<BufferModel> bufferModels = gltfModel.getBufferModels();
+        if (bufferModels.size() >= 2) 
         {
-            ByteBuffer bufferData = bufferModel.getBufferData();
-            binaryGltfBufferSize += bufferData.capacity();
-        }
-        for (ImageModel imageModel : gltfModel.getImageModels())
+            return false;
+        } 
+        List<ImageModel> imageModels = gltfModel.getImageModels();
+        for (ImageModel imageModel : imageModels)
         {
-            ByteBuffer imageData = imageModel.getImageData();
-            binaryGltfBufferSize += imageData.capacity();
+            BufferViewModel imageBufferViewModel = 
+                imageModel.getBufferViewModel();
+            if (imageBufferViewModel == null)
+            {
+                return false;
+            }
         }
-        return binaryGltfBufferSize;
-    }
-
-    /**
-     * Put the contents of all byte buffers of the given list into the given 
-     * target buffer. This method assumes that the target buffer has a 
-     * sufficient capacity to hold all buffers.
-     * 
-     * @param buffers The buffers
-     * @param targetBuffer The target buffer
-     * @return A mapping from each key to the offset inside the target buffer
-     */
-    private static Map<Integer, Integer> concatBuffers(
-        List<? extends ByteBuffer> buffers, ByteBuffer targetBuffer)
-    {
-        Map<Integer, Integer> offsets = new LinkedHashMap<Integer, Integer>();
-        for (int i = 0; i < buffers.size(); i++)
-        {
-            ByteBuffer oldByteBuffer = buffers.get(i);
-            int offset = targetBuffer.position();
-            offsets.put(i, offset);
-            targetBuffer.put(oldByteBuffer.slice());
-        }
-        return offsets;
-    }
-
-
-    /**
-     * Creates a copy of the given list. If the given list is <code>null</code>, 
-     * then an unmodifiable empty list will be returned
-     * 
-     * @param list The input list
-     * @return The copy
-     */
-    private static <T> List<T> copy(List<T> list)
-    {
-        if (list == null)
-        {
-            return Collections.emptyList();
-        }
-        return new ArrayList<T>(list);
+        return true;
     }
     
 

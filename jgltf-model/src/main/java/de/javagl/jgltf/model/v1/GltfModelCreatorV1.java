@@ -1136,8 +1136,7 @@ public class GltfModelCreatorV1
                 BufferViewModel bufferViewModel =
                     get("bufferViews", bufferViewId, 
                         gltfModel::getBufferViewModel);
-                
-                shaderModel.setShaderData(bufferViewModel.getBufferViewData());
+                shaderModel.setBufferViewModel(bufferViewModel);
             }
             else
             {

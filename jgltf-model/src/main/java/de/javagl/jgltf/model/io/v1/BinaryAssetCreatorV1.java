@@ -29,6 +29,7 @@ package de.javagl.jgltf.model.io.v1;
 import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Function;
@@ -39,6 +40,7 @@ import de.javagl.jgltf.impl.v1.GlTF;
 import de.javagl.jgltf.impl.v1.Image;
 import de.javagl.jgltf.impl.v1.Shader;
 import de.javagl.jgltf.model.BufferModel;
+import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.gl.ShaderModel;
@@ -76,6 +78,12 @@ final class BinaryAssetCreatorV1
      */
     GltfAssetV1 create(GltfModelV1 gltfModel)
     {
+        // NOTE: The whole handling of glTF 1.0, and the binary glTF extension
+        // of glTF 1.0 in particular, has some legacy aspects. The specification
+        // actually contained a few alignment requirements for the resulting
+        // binary buffer. These requirements are NOT ensured here (although
+        // they will likely be met in most cases). Pull requests welcome.
+        
         GlTF outputGltf = GltfCreatorV1.create(gltfModel);
         
         // Create the new byte buffer for the data of the "binary_glTF" Buffer
@@ -125,11 +133,27 @@ final class BinaryAssetCreatorV1
             binaryGltfByteBuffer);
         Map<String, Integer> imageOffsets = concatBuffers(
             oldImages.keySet(), 
-            id -> imageIdToImage.get(id).getImageData(), 
+            id -> 
+            {
+                ImageModel image = imageIdToImage.get(id);
+                if (image.getBufferViewModel() != null)
+                {
+                    return ByteBuffer.allocate(0);
+                }
+                return image.getImageData(); 
+            },
             binaryGltfByteBuffer);
         Map<String, Integer> shaderOffsets = concatBuffers(
             oldShaders.keySet(), 
-            id -> shaderIdToShader.get(id).getShaderData(), 
+            id -> 
+            {
+                ShaderModel shader = shaderIdToShader.get(id);
+                if (shader.getBufferViewModel() != null)
+                {
+                    return ByteBuffer.allocate(0);
+                }
+                return shader.getShaderData(); 
+            },
             binaryGltfByteBuffer);
         binaryGltfByteBuffer.position(0);
 
@@ -167,29 +191,50 @@ final class BinaryAssetCreatorV1
             Image oldImage = oldEntry.getValue();
             Image newImage = GltfUtilsV1.copy(oldImage);
 
-            // Create the BufferView for the image
-            ByteBuffer imageData = 
-                imageIdToImage.get(id).getImageData();
-            int byteLength = imageData.capacity();
-            int byteOffset = imageOffsets.get(id);
-            BufferView imageBufferView = new BufferView();
-            imageBufferView.setBuffer(BinaryGltfV1.getBinaryGltfBufferId());
-            imageBufferView.setByteOffset(byteOffset);
-            imageBufferView.setByteLength(byteLength);
+            if (!BinaryGltfV1.hasBinaryGltfExtension(oldImage))
+            {
+                // Create the BufferView for the image
+                ByteBuffer imageData = 
+                    imageIdToImage.get(id).getImageData();
+                int byteLength = imageData.capacity();
+                int byteOffset = imageOffsets.get(id);
+                BufferView imageBufferView = new BufferView();
+                imageBufferView.setBuffer(BinaryGltfV1.getBinaryGltfBufferId());
+                imageBufferView.setByteOffset(byteOffset);
+                imageBufferView.setByteLength(byteLength);
 
-            // Store the BufferView under a newly generated ID
-            String generatedBufferViewId = 
-                GltfIds.generateId("bufferView_for_image_" + id, 
-                    oldBufferViews.keySet());
-            newBufferViews.put(generatedBufferViewId, imageBufferView);
+                // Store the BufferView under a newly generated ID
+                String generatedBufferViewId = 
+                    GltfIds.generateId("bufferView_for_image_" + id, 
+                        oldBufferViews.keySet());
+                newBufferViews.put(generatedBufferViewId, imageBufferView);
 
-            // Let the image refer to the BufferView via its extension object
-            BinaryGltfV1.setBinaryGltfBufferViewId(
-                newImage, generatedBufferViewId);
+                // Let the image refer to the BufferView via its 
+                // extension object
+                BinaryGltfV1.setBinaryGltfBufferViewId(
+                    newImage, generatedBufferViewId);
+                newImage.setUri("image_"+id);
 
-            // Set the width, height and mimeType properties for the
-            // extension object
-            BinaryGltfV1.setBinaryGltfImageProperties(newImage, imageData);
+                // Set the width, height and mimeType properties for the
+                // extension object
+                BinaryGltfV1.setBinaryGltfImageProperties(newImage, imageData);
+            }
+            else
+            {
+                // This is quirky: When the image already referred to
+                // a buffer view, then obtain the index of that 
+                // buffer view, and generate the new ID, based on
+                // the pattern that is used in  GltfCreatorV1.create:
+                List<BufferViewModel> bufferViewModels = 
+                    gltfModel.getBufferViewModels();
+                ImageModel imageModel = imageIdToImage.get(id);
+                BufferViewModel imageBufferViewModel = 
+                    imageModel.getBufferViewModel();
+                int index = bufferViewModels.indexOf(imageBufferViewModel);
+                String newId = "bufferView_" + index;
+                BinaryGltfV1.setBinaryGltfBufferViewId(
+                    newImage, newId);
+            }
 
             newImages.put(id, newImage);
         }
@@ -206,25 +251,46 @@ final class BinaryAssetCreatorV1
             Shader oldShader = oldEntry.getValue();
             Shader newShader = GltfUtilsV1.copy(oldShader);
 
-            // Create the BufferView for the shader
-            ByteBuffer shaderData = 
-                shaderIdToShader.get(id).getShaderData();
-            int byteLength = shaderData.capacity();
-            int byteOffset = shaderOffsets.get(id);
-            BufferView shaderBufferView = new BufferView();
-            shaderBufferView.setBuffer(BinaryGltfV1.getBinaryGltfBufferId());
-            shaderBufferView.setByteOffset(byteOffset);
-            shaderBufferView.setByteLength(byteLength);
-
-            // Store the BufferView under a newly generated ID
-            String generatedBufferViewId =
-                GltfIds.generateId("bufferView_for_shader_" + id, 
-                    oldBufferViews.keySet());
-            newBufferViews.put(generatedBufferViewId, shaderBufferView);
-
-            // Let the shader refer to the BufferView via its extension object
-            BinaryGltfV1.setBinaryGltfBufferViewId(
-                newShader, generatedBufferViewId);
+            if (!BinaryGltfV1.hasBinaryGltfExtension(oldShader))
+            {
+                // Create the BufferView for the shader
+                ByteBuffer shaderData = 
+                    shaderIdToShader.get(id).getShaderData();
+                int byteLength = shaderData.capacity();
+                int byteOffset = shaderOffsets.get(id);
+                BufferView shaderBufferView = new BufferView();
+                shaderBufferView.setBuffer(
+                    BinaryGltfV1.getBinaryGltfBufferId());
+                shaderBufferView.setByteOffset(byteOffset);
+                shaderBufferView.setByteLength(byteLength);
+    
+                // Store the BufferView under a newly generated ID
+                String generatedBufferViewId =
+                    GltfIds.generateId("bufferView_for_shader_" + id, 
+                        oldBufferViews.keySet());
+                newBufferViews.put(generatedBufferViewId, shaderBufferView);
+    
+                // Let the shader refer to the BufferView via its 
+                // extension object
+                BinaryGltfV1.setBinaryGltfBufferViewId(
+                    newShader, generatedBufferViewId);
+            }
+            else
+            {
+                // This is quirky: When the shader already referred to
+                // a buffer view, then obtain the index of that 
+                // buffer view, and generate the new ID, based on
+                // the pattern that is used in  GltfCreatorV1.create:
+                List<BufferViewModel> bufferViewModels = 
+                    gltfModel.getBufferViewModels();
+                ShaderModel shaderModel = shaderIdToShader.get(id);
+                BufferViewModel shaderBufferViewModel = 
+                    shaderModel.getBufferViewModel();
+                int index = bufferViewModels.indexOf(shaderBufferViewModel);
+                String newId = "bufferView_" + index;
+                BinaryGltfV1.setBinaryGltfBufferViewId(
+                    newShader, newId);
+            }
 
             newShaders.put(id, newShader);
         }
@@ -269,13 +335,19 @@ final class BinaryAssetCreatorV1
         }
         for (ImageModel imageModel : gltfModel.getImageModels())
         {
-            ByteBuffer imageData = imageModel.getImageData();
-            binaryGltfBufferSize += imageData.capacity();
+            if (imageModel.getBufferViewModel() == null)
+            {
+                ByteBuffer imageData = imageModel.getImageData();
+                binaryGltfBufferSize += imageData.capacity();
+            }
         }
         for (ShaderModel shaderModel : gltfModel.getShaderModels())
         {
-            ByteBuffer shaderData = shaderModel.getShaderData();
-            binaryGltfBufferSize += shaderData.capacity();
+            if (shaderModel.getBufferViewModel() == null)
+            {
+                ByteBuffer shaderData = shaderModel.getShaderData();
+                binaryGltfBufferSize += shaderData.capacity();
+            }
         }
         return binaryGltfBufferSize;
     }

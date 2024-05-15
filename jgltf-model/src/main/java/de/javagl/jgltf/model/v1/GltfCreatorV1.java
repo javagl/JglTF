@@ -616,11 +616,12 @@ public class GltfCreatorV1
             bufferViewIds.get(imageModel.getBufferViewModel());
         if (bufferView != null)
         {
-            logger.severe(
-                "Images with BufferView are not supported in glTF 1.0");
+            BinaryGltfV1.setBinaryGltfBufferViewId(image, bufferView);            
+        } 
+        else
+        {
+            image.setUri(imageModel.getUri());
         }
-        image.setUri(imageModel.getUri());
-        
         return image;
     }
     

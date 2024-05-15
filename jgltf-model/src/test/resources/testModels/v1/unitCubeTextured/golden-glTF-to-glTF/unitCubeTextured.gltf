@@ -1,0 +1,235 @@
+{
+  "accessors" : {
+    "accessor_0" : {
+      "bufferView" : "bufferView_0",
+      "byteOffset" : 0,
+      "byteStride" : 2,
+      "componentType" : 5123,
+      "count" : 36,
+      "type" : "SCALAR",
+      "max" : [ 23 ],
+      "min" : [ 0 ]
+    },
+    "accessor_1" : {
+      "bufferView" : "bufferView_1",
+      "byteOffset" : 0,
+      "byteStride" : 12,
+      "componentType" : 5126,
+      "count" : 24,
+      "type" : "VEC3",
+      "max" : [ 1.0, 1.0, 1.0 ],
+      "min" : [ 0.0, 0.0, 0.0 ]
+    },
+    "accessor_2" : {
+      "bufferView" : "bufferView_2",
+      "byteOffset" : 0,
+      "byteStride" : 12,
+      "componentType" : 5126,
+      "count" : 24,
+      "type" : "VEC3",
+      "max" : [ 1.0, 1.0, 1.0 ],
+      "min" : [ -1.0, -1.0, -1.0 ]
+    },
+    "accessor_3" : {
+      "bufferView" : "bufferView_3",
+      "byteOffset" : 0,
+      "byteStride" : 8,
+      "componentType" : 5126,
+      "count" : 24,
+      "type" : "VEC2",
+      "max" : [ 1.0, 1.0 ],
+      "min" : [ 0.0, 0.0 ]
+    }
+  },
+  "asset" : {
+    "generator" : "JglTF from https://github.com/javagl/JglTF",
+    "version" : "1.0"
+  },
+  "buffers" : {
+    "buffer_0" : {
+      "uri" : "buffer.bin",
+      "byteLength" : 840
+    }
+  },
+  "bufferViews" : {
+    "bufferView_0" : {
+      "buffer" : "buffer_0",
+      "byteOffset" : 0,
+      "byteLength" : 72,
+      "target" : 34963
+    },
+    "bufferView_1" : {
+      "buffer" : "buffer_0",
+      "byteOffset" : 72,
+      "byteLength" : 288,
+      "target" : 34962
+    },
+    "bufferView_2" : {
+      "buffer" : "buffer_0",
+      "byteOffset" : 360,
+      "byteLength" : 288,
+      "target" : 34962
+    },
+    "bufferView_3" : {
+      "buffer" : "buffer_0",
+      "byteOffset" : 648,
+      "byteLength" : 192,
+      "target" : 34962
+    }
+  },
+  "images" : {
+    "image_0" : {
+      "uri" : "texture.png"
+    }
+  },
+  "materials" : {
+    "material_0" : {
+      "technique" : "technique_0",
+      "values" : {
+        "ambient" : [ 0.0, 0.0, 0.0, 0.0 ],
+        "diffuse" : "texture_0",
+        "specular" : [ 0.0, 0.0, 0.0, 1.0 ],
+        "shininess" : [ 100.0 ]
+      }
+    }
+  },
+  "meshes" : {
+    "mesh_0" : {
+      "primitives" : [ {
+        "attributes" : {
+          "POSITION" : "accessor_1",
+          "NORMAL" : "accessor_2",
+          "TEXCOORD_0" : "accessor_3"
+        },
+        "indices" : "accessor_0",
+        "material" : "material_0",
+        "mode" : 4
+      } ]
+    }
+  },
+  "nodes" : {
+    "node_0" : {
+      "meshes" : [ "mesh_0" ]
+    }
+  },
+  "programs" : {
+    "program_0" : {
+      "attributes" : [ "a_position", "a_texcoord0", "a_normal" ],
+      "fragmentShader" : "shader_1",
+      "vertexShader" : "shader_0"
+    }
+  },
+  "samplers" : {
+    "sampler_0" : {
+      "magFilter" : 9729,
+      "minFilter" : 9986,
+      "wrapS" : 10497,
+      "wrapT" : 10497
+    }
+  },
+  "scene" : "scene_0",
+  "scenes" : {
+    "scene_0" : {
+      "nodes" : [ "node_0" ]
+    }
+  },
+  "shaders" : {
+    "shader_0" : {
+      "uri" : "shader.vs",
+      "type" : 35633
+    },
+    "shader_1" : {
+      "uri" : "shader.fs",
+      "type" : 35632
+    }
+  },
+  "techniques" : {
+    "technique_0" : {
+      "parameters" : {
+        "position" : {
+          "count" : 1,
+          "type" : 35665,
+          "semantic" : "POSITION"
+        },
+        "texcoord0" : {
+          "count" : 1,
+          "type" : 35664,
+          "semantic" : "TEXCOORD_0"
+        },
+        "normal" : {
+          "count" : 1,
+          "type" : 35665,
+          "semantic" : "NORMAL"
+        },
+        "modelViewMatrix" : {
+          "count" : 1,
+          "type" : 35676,
+          "semantic" : "MODELVIEW"
+        },
+        "normalMatrix" : {
+          "count" : 1,
+          "type" : 35675,
+          "semantic" : "MODELVIEWINVERSETRANSPOSE"
+        },
+        "projectionMatrix" : {
+          "count" : 1,
+          "type" : 35676,
+          "semantic" : "PROJECTION"
+        },
+        "ambient" : {
+          "count" : 1,
+          "type" : 35666
+        },
+        "diffuse" : {
+          "count" : 1,
+          "type" : 35678
+        },
+        "specular" : {
+          "count" : 1,
+          "type" : 35666
+        },
+        "shininess" : {
+          "count" : 1,
+          "type" : 5126
+        }
+      },
+      "attributes" : {
+        "a_position" : "position",
+        "a_texcoord0" : "texcoord0",
+        "a_normal" : "normal"
+      },
+      "program" : "program_0",
+      "uniforms" : {
+        "u_ambient" : "ambient",
+        "u_diffuse" : "diffuse",
+        "u_specular" : "specular",
+        "u_shininess" : "shininess",
+        "u_modelViewMatrix" : "modelViewMatrix",
+        "u_normalMatrix" : "normalMatrix",
+        "u_projectionMatrix" : "projectionMatrix"
+      },
+      "states" : {
+        "enable" : [ 2929, 2884 ],
+        "functions" : {
+          "blendColor" : [ 0.0, 0.0, 0.0, 0.0 ],
+          "blendEquationSeparate" : [ 32774, 32774 ],
+          "blendFuncSeparate" : [ 1, 0, 1, 0 ],
+          "colorMask" : [ true, true, true, true ],
+          "cullFace" : [ 1029 ],
+          "depthFunc" : [ 513 ],
+          "depthMask" : [ true ],
+          "depthRange" : [ 0.0, 1.0 ],
+          "frontFace" : [ 2305 ],
+          "lineWidth" : [ 1.0 ],
+          "polygonOffset" : [ 0.0, 0.0 ]
+        }
+      }
+    }
+  },
+  "textures" : {
+    "texture_0" : {
+      "sampler" : "sampler_0",
+      "source" : "image_0"
+    }
+  }
+}

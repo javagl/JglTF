@@ -28,6 +28,7 @@ package de.javagl.jgltf.model.gl.impl;
 
 import java.nio.ByteBuffer;
 
+import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.gl.ShaderModel;
 import de.javagl.jgltf.model.impl.AbstractNamedModelElement;
 import de.javagl.jgltf.model.io.Buffers;
@@ -41,7 +42,12 @@ public class DefaultShaderModel extends AbstractNamedModelElement
     /**
      * The URI 
      */
-    private final String uri;
+    private String uri;
+    
+    /**
+     * The {@link BufferViewModel}
+     */
+    private BufferViewModel bufferViewModel;
     
     /**
      * The actual raw shader data
@@ -51,8 +57,16 @@ public class DefaultShaderModel extends AbstractNamedModelElement
     /**
      * The {@link de.javagl.jgltf.model.gl.ShaderModel.ShaderType}
      */
-    private final ShaderType shaderType;
+    private ShaderType shaderType;
     
+    /**
+     * Default constructor 
+     */
+    public DefaultShaderModel()
+    {
+        // Default constructor
+    }
+
     /**
      * Default constructor 
      * 
@@ -64,6 +78,36 @@ public class DefaultShaderModel extends AbstractNamedModelElement
     {
         this.uri = uri;
         this.shaderType = shaderType;
+    }
+    
+    /**
+     * Set the URI
+     * 
+     * @param uri The URI
+     */
+    public void setUri(String uri)
+    {
+        this.uri = uri;
+    }
+    
+    /**
+     * Set the shader type
+     * 
+     * @param shaderType The shader type
+     */
+    public void setShaderType(ShaderType shaderType)
+    {
+        this.shaderType = shaderType;
+    }
+    
+    /**
+     * Set the {@link BufferViewModel} 
+     * 
+     * @param bufferViewModel The {@link BufferViewModel}
+     */
+    public void setBufferViewModel(BufferViewModel bufferViewModel)
+    {
+        this.bufferViewModel = bufferViewModel;
     }
     
     /**
@@ -83,15 +127,25 @@ public class DefaultShaderModel extends AbstractNamedModelElement
     }
 
     @Override
+    public BufferViewModel getBufferViewModel()
+    {
+        return bufferViewModel;
+    }
+    
+    @Override
     public ByteBuffer getShaderData()
     {
+        if (shaderData == null)
+        {
+            return bufferViewModel.getBufferViewData();
+        }
         return Buffers.createSlice(shaderData);
     }
 
     @Override
     public String getShaderSource()
     {
-        return Buffers.readAsString(shaderData);
+        return Buffers.readAsString(getShaderData());
     }
     
     @Override
