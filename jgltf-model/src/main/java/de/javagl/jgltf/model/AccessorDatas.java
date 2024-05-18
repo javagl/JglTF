@@ -86,6 +86,10 @@ public class AccessorDatas
         {
             return createFloat(accessorModel, byteBuffer);
         }
+        if (accessorModel.getComponentDataType() == double.class)
+        {
+            return createDouble(accessorModel, byteBuffer);
+        }
         // Should never happen
         logger.severe("Invalid component data type: "
             + accessorModel.getComponentDataType());
@@ -135,6 +139,12 @@ public class AccessorDatas
         if (isFloatType(componentType))
         {
             return new AccessorFloatData(
+                componentType, bufferViewData, byteOffset, count, 
+                elementType, byteStride);
+        }
+        if (isDoubleType(componentType))
+        {
+            return new AccessorDoubleData(
                 componentType, bufferViewData, byteOffset, count, 
                 elementType, byteStride);
         }
@@ -195,6 +205,17 @@ public class AccessorDatas
     public static boolean isFloatType(int type)
     {
         return type == GltfConstants.GL_FLOAT;
+    }
+
+    /**
+     * Returns whether the given constant is <code>GL_DOUBLE</code>.
+     * 
+     * @param type The type constant
+     * @return Whether the type is a <code>double</code> type
+     */
+    public static boolean isDoubleType(int type)
+    {
+        return type == GltfConstants.GL_DOUBLE;
     }
 
     /**
@@ -284,6 +305,24 @@ public class AccessorDatas
         {
             throw new IllegalArgumentException(
                 "The type is not GL_FLOAT, but " + 
+                GltfConstants.stringFor(type));
+        }
+    }
+    
+    /**
+     * Make sure that the given type is <code>GL_DOUBLE</code>, and throw an 
+     * <code>IllegalArgumentException</code> if this is not the case.
+     * 
+     * @param type The type constant
+     * @throws IllegalArgumentException If the given type is not 
+     * <code>GL_DOUBLE</code>
+     */
+    static void validateDoubleType(int type)
+    {
+        if (!isDoubleType(type))
+        {
+            throw new IllegalArgumentException(
+                "The type is not GL_DOUBLE, but " + 
                 GltfConstants.stringFor(type));
         }
     }
@@ -432,6 +471,8 @@ public class AccessorDatas
      * @return The {@link AccessorFloatData}
      * @throws NullPointerException If any argument is <code>null</code>
      * @throws IllegalArgumentException If the 
+     * {@link AccessorModel#getComponentType() component type} of the given
+     * accessorModel is not <code>GL_FLOAT</code>
      */
     private static AccessorFloatData createFloat(
         AccessorModel accessorModel, ByteBuffer bufferViewByteBuffer)
@@ -444,6 +485,29 @@ public class AccessorDatas
             accessorModel.getByteStride());
     }
 
+    /**
+     * Creates an {@link AccessorDoubleData} for the given {@link AccessorModel}
+     * 
+     * @param accessorModel The {@link AccessorModel}
+     * @param bufferViewByteBuffer The byte buffer of the 
+     * {@link BufferViewModel} referenced by the {@link AccessorModel}
+     * @return The {@link AccessorDoubleData}
+     * @throws NullPointerException If any argument is <code>null</code>
+     * @throws IllegalArgumentException If the 
+     * {@link AccessorModel#getComponentType() component type} of the given
+     * accessorModel is not <code>GL_DOUBLE</code>
+     */
+    private static AccessorDoubleData createDouble(
+        AccessorModel accessorModel, ByteBuffer bufferViewByteBuffer)
+    {
+        return new AccessorDoubleData(accessorModel.getComponentType(), 
+            bufferViewByteBuffer,
+            accessorModel.getByteOffset(),
+            accessorModel.getCount(),
+            accessorModel.getElementType(),
+            accessorModel.getByteStride());
+    }
+    
     /**
      * Validate that the given {@link AccessorModel} parameters are valid for
      * accessing a buffer with the given capacity
@@ -512,6 +576,13 @@ public class AccessorDatas
             return NumberArrays.asNumbers(
                 accessorFloatData.computeMin());
         }
+        if (accessorData instanceof AccessorDoubleData) 
+        {
+            AccessorDoubleData accessorDoubleData = 
+                (AccessorDoubleData) accessorData;
+            return NumberArrays.asNumbers(
+                accessorDoubleData.computeMin());
+        }
         throw new IllegalArgumentException(
             "Invalid data type: " + accessorData);
     }
@@ -554,6 +625,13 @@ public class AccessorDatas
             return NumberArrays.asNumbers(
                 accessorFloatData.computeMax());
         }
+        if (accessorData instanceof AccessorDoubleData) 
+        {
+            AccessorDoubleData accessorDoubleData = 
+                (AccessorDoubleData) accessorData;
+            return NumberArrays.asNumbers(
+                accessorDoubleData.computeMax());
+        }
         throw new IllegalArgumentException(
             "Invalid data type: " + accessorData);
     }
@@ -565,6 +643,7 @@ public class AccessorDatas
      * {@link AccessorShortData#createString(Locale, String, int)},
      * {@link AccessorIntData#createString(Locale, String, int)} or
      * {@link AccessorFloatData#createString(Locale, String, int)},
+     * {@link AccessorDoubleData#createString(Locale, String, int)},
      * depending on the type of the given data, with an unspecified
      * format string.
      * 

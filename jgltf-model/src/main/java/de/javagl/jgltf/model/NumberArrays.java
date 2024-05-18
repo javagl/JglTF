@@ -79,6 +79,22 @@ class NumberArrays
         return result;
     }
     
+    /**
+     * Convert the given array into a Number array
+     * 
+     * @param array The array
+     * @return The result
+     */
+    static Number[] asNumbers(double array[])
+    {
+        Number result[] = new Number[array.length];
+        for (int i = 0; i < array.length; i++)
+        {
+            result[i] = array[i];
+        }
+        return result;
+    }
+    
 
     /**
      * Private constructor to prevent instantiation
