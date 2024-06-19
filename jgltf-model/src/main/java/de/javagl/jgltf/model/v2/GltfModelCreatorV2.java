@@ -112,6 +112,7 @@ import de.javagl.jgltf.model.impl.DefaultTextureModel;
 import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.model.io.GltfAsset;
 import de.javagl.jgltf.model.io.IO;
+import de.javagl.jgltf.model.io.MimeTypes;
 import de.javagl.jgltf.model.io.v2.GltfAssetV2;
 import de.javagl.jgltf.model.v2.MaterialModelV2.AlphaMode;
 import de.javagl.jgltf.model.v2.gl.Materials;
@@ -1127,6 +1128,16 @@ public class GltfModelCreatorV2
                     ByteBuffer imageData = gltfAsset.getReferenceData(uri);
                     imageModel.setImageData(imageData);
                 }
+            }
+            
+            // If the MIME type was not set, then detect it from the image data
+            String mimeType = imageModel.getMimeType();
+            if (mimeType == null)
+            {
+                ByteBuffer imageData = imageModel.getImageData();
+                mimeType =
+                    MimeTypes.guessImageMimeTypeStringUnchecked(imageData);
+                imageModel.setMimeType(mimeType);
             }
         }
     }
