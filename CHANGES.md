@@ -1,6 +1,9 @@
 
+### 2.0.5-SNAPSHOT
 
-### 2.0.4-SNAPSHOT
+  - ...
+
+### 2.0.4 (2024-07-16)
 
   - Information about the `extensionsUsed`/`extensionsRequired` and the `asset` that had been found in the input glTF JSON had not been passed on to the `...Model` classes. Now, there now is an `ExtensionsModel` and an `AssetModel` that are both part of the `GltfModel` and that keep track of this information. See [#77](https://github.com/javagl/JglTF/pull/77)
   - The buffer views for skin- and animation data had their `target` property set, although it must remain undefined. This caused validation errors. This was fixed in [#85](https://github.com/javagl/JglTF/pull/85)
