@@ -89,7 +89,10 @@ public class GltfConstants
      */
     public static final int GL_FLOAT = 5126;
     
-
+    /**
+     * The GL_DOUBLE constant (5130)
+     */
+    public static final int GL_DOUBLE = 5130;
     
     /**
      * The GL_FLOAT_VEC2 constant (35664)
@@ -510,6 +513,7 @@ public class GltfConstants
             case GL_INT : return "GL_INT";
             case GL_UNSIGNED_INT : return "GL_UNSIGNED_INT";
             case GL_FLOAT : return "GL_FLOAT";
+            case GL_DOUBLE : return "GL_DOUBLE";
             
             case GL_FLOAT_VEC2 : return "GL_FLOAT_VEC2";
             case GL_FLOAT_VEC3 : return "GL_FLOAT_VEC3";
