@@ -30,6 +30,7 @@ import java.nio.ByteBuffer;
 
 import de.javagl.jgltf.impl.v2.BufferView;
 import de.javagl.jgltf.model.AccessorData;
+import de.javagl.jgltf.model.AccessorDatas;
 import de.javagl.jgltf.model.AccessorFloatData;
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.BufferModel;
@@ -101,6 +102,8 @@ class AccessorModelCreation
         accessorModel.setByteOffset(0);
         
         ByteBuffer bufferData = Buffers.create(count * elementSize);
+        accessorModel.setAccessorData(
+            AccessorDatas.create(accessorModel, bufferData));
         accessorModel.setBufferViewModel(
             createBufferViewModel(bufferUriString, bufferData));
         return accessorModel;
