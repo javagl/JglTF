@@ -100,6 +100,7 @@ public class Accessors
             case GltfConstants.GL_INT: return 4;
             case GltfConstants.GL_UNSIGNED_INT: return 4;
             case GltfConstants.GL_FLOAT: return 4;
+            case GltfConstants.GL_DOUBLE: return 8;
             default:
                 break;
         }
@@ -118,6 +119,7 @@ public class Accessors
      * GL_INT            : int.class 
      * GL_UNSIGNED_INT   : int.class
      * GL_FLOAT          : float.class
+     * GL_DOUBLE         : double.class
      * </code></pre>
      *  
      * @param componentType The component type
@@ -137,6 +139,7 @@ public class Accessors
             case GltfConstants.GL_INT: return int.class;
             case GltfConstants.GL_UNSIGNED_INT: return int.class;
             case GltfConstants.GL_FLOAT: return float.class;
+            case GltfConstants.GL_DOUBLE: return double.class;
             default:
                 break;
         }
