@@ -848,6 +848,9 @@ public class GltfModelCreatorV2
                         logger.warning("Buffer " + i + " does not have "
                             + "a uri. Binary chunks that are not the main GLB "
                             + "buffer are not supported.");
+                        ByteBuffer fallbackBuffer =
+                            ByteBuffer.allocate(buffer.getByteLength());
+                        bufferModel.setBufferData(fallbackBuffer);
                     }
                     else
                     {
