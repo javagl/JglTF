@@ -706,10 +706,10 @@ public class GltfModelStructures
             DefaultCameraModel targetCamera = cameraModelsMap.get(sourceCamera);
             targetNodeModel.setCameraModel(targetCamera);
 
-            float matrix[] = sourceNodeModel.getMatrix();
-            float translation[] = sourceNodeModel.getTranslation();
-            float rotation[] = sourceNodeModel.getRotation();
-            float scale[] = sourceNodeModel.getScale();
+            double matrix[] = sourceNodeModel.getMatrix();
+            double translation[] = sourceNodeModel.getTranslation();
+            double rotation[] = sourceNodeModel.getRotation();
+            double scale[] = sourceNodeModel.getScale();
             float weights[] = sourceNodeModel.getWeights();
             
             targetNodeModel.setMatrix(Optionals.clone(matrix));

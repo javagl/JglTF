@@ -57,18 +57,18 @@ class UniformGetterFactory
     /**
      * A supplier for the view matrix.  
      */
-    private final Supplier<float[]> viewMatrixSupplier;
+    private final Supplier<double[]> viewMatrixSupplier;
     
     /**
      * A supplier for the projection matrix.
      */
-    private final Supplier<float[]> projectionMatrixSupplier;
+    private final Supplier<double[]> projectionMatrixSupplier;
     
     /**
      * A supplier that supplies the viewport, as 4 float elements, 
      * [x, y, width, height]
      */
-    private final Supplier<float[]> viewportSupplier;
+    private final Supplier<double[]> viewportSupplier;
     
     /**
      * The set of uniform names for which a <code>null</code> value 
@@ -79,7 +79,7 @@ class UniformGetterFactory
     /**
      * The RTC center point for the CESIUM_RTC extension
      */
-    private float rtcCenter[];
+    private double rtcCenter[];
     
     /**
      * Creates a new instance
@@ -95,10 +95,10 @@ class UniformGetterFactory
      * extension
      */
     public UniformGetterFactory(
-        Supplier<float[]> viewportSupplier,
-        Supplier<float[]> viewMatrixSupplier,
-        Supplier<float[]> projectionMatrixSupplier,
-        float rtcCenter[])
+        Supplier<double[]> viewportSupplier,
+        Supplier<double[]> viewMatrixSupplier,
+        Supplier<double[]> projectionMatrixSupplier,
+        double rtcCenter[])
     {
         this.viewportSupplier = Objects.requireNonNull(viewportSupplier, 
             "The viewportSupplier may not be null");
@@ -107,7 +107,7 @@ class UniformGetterFactory
         this.projectionMatrixSupplier = 
             Objects.requireNonNull(projectionMatrixSupplier, 
                 "The projectionMatrixSupplier may not be null");
-        this.rtcCenter = rtcCenter == null ? new float[3] : rtcCenter.clone();
+        this.rtcCenter = rtcCenter == null ? new double[3] : rtcCenter.clone();
         this.reportedNullUniformNames = new LinkedHashSet<String>();
     }
     
@@ -233,7 +233,7 @@ class UniformGetterFactory
      *   </li>
      * </ul>
      * The actual contents of these joint matrices is computed from the
-     * {@link SkinModel#getBindShapeMatrix(float[]) bind shape matrix}, the
+     * {@link SkinModel#getBindShapeMatrix(double[]) bind shape matrix}, the
      * {@link SkinModel#getInverseBindMatrices() inverse bind matrices} and 
      * the global transform of the given node and the joint node. See the glTF 
      * specification for details.<br>
@@ -308,7 +308,7 @@ class UniformGetterFactory
             
             case MODELVIEW:
             {
-                Supplier<float[]> modelMatrixSupplier = 
+                Supplier<double[]> modelMatrixSupplier =
                     nodeModel.createGlobalTransformSupplier();
                 return MatrixOps
                     .create4x4(viewMatrixSupplier)
@@ -319,7 +319,7 @@ class UniformGetterFactory
             
             case MODELVIEWPROJECTION:
             {
-                Supplier<float[]> modelMatrixSupplier = 
+                Supplier<double[]> modelMatrixSupplier =
                     nodeModel.createGlobalTransformSupplier();
                 return MatrixOps
                     .create4x4(projectionMatrixSupplier)
@@ -331,7 +331,7 @@ class UniformGetterFactory
             
             case MODELINVERSE:
             {
-                Supplier<float[]> modelMatrixSupplier = 
+                Supplier<double[]> modelMatrixSupplier =
                     nodeModel.createGlobalTransformSupplier();
                 return MatrixOps
                     .create4x4(modelMatrixSupplier)
@@ -351,7 +351,7 @@ class UniformGetterFactory
 
             case MODELVIEWINVERSE:
             {
-                Supplier<float[]> modelMatrixSupplier = 
+                Supplier<double[]> modelMatrixSupplier =
                     nodeModel.createGlobalTransformSupplier();
                 return MatrixOps
                     .create4x4(viewMatrixSupplier)
@@ -372,7 +372,7 @@ class UniformGetterFactory
             
             case MODELVIEWPROJECTIONINVERSE:
             {
-                Supplier<float[]> modelMatrixSupplier = 
+                Supplier<double[]> modelMatrixSupplier =
                     nodeModel.createGlobalTransformSupplier();
                 return MatrixOps
                     .create4x4(projectionMatrixSupplier)
@@ -385,7 +385,7 @@ class UniformGetterFactory
 
             case MODELINVERSETRANSPOSE:
             {
-                Supplier<float[]> modelMatrixSupplier = 
+                Supplier<double[]> modelMatrixSupplier =
                     nodeModel.createGlobalTransformSupplier();
                 return MatrixOps
                     .create4x4(modelMatrixSupplier)
@@ -398,7 +398,7 @@ class UniformGetterFactory
             
             case MODELVIEWINVERSETRANSPOSE:
             {
-                Supplier<float[]> modelMatrixSupplier = 
+                Supplier<double[]> modelMatrixSupplier =
                     nodeModel.createGlobalTransformSupplier();
                 return MatrixOps
                     .create4x4(viewMatrixSupplier)
@@ -435,15 +435,15 @@ class UniformGetterFactory
      * @param nodeModel The {@link NodeModel} 
      * @return The supplier
      */
-    private static Supplier<float[]> createJointMatrixSupplier(
+    private static Supplier<double[]> createJointMatrixSupplier(
         NodeModel nodeModel)
     {
         SkinModel skinModel = nodeModel.getSkinModel();
 
         // Create the supplier for the bind shape matrix (or a supplier
         // of the identity matrix, if the bind shape matrix is null)
-        float bindShapeMatrix[] = skinModel.getBindShapeMatrix(null);
-        Supplier<float[]> bindShapeMatrixSupplier = 
+        double bindShapeMatrix[] = skinModel.getBindShapeMatrix(null);
+        Supplier<double[]> bindShapeMatrixSupplier =
             MatrixOps.create4x4(() -> bindShapeMatrix)
             .log("bindShapeMatrix", Level.FINE)
             .build();
@@ -454,18 +454,18 @@ class UniformGetterFactory
         // Create one supplier for each inverse bind matrix. Each of them will 
         // extract one element of the inverse bind matrix accessor data and 
         // provide it as a single float[16] array, representing a 4x4 matrix
-        List<Supplier<float[]>> inverseBindMatrixSuppliers =
-            new ArrayList<Supplier<float[]>>();
+        List<Supplier<double[]>> inverseBindMatrixSuppliers =
+            new ArrayList<Supplier<double[]>>();
         for (int i = 0; i < numJoints; i++)
         {
             final int currentJointIndex = i;
-            float inverseBindMatrix[] = new float[16];
-            Supplier<float[]> inverseBindMatrixSupplier = () ->
+            double inverseBindMatrix[] = new double[16];
+            Supplier<double[]> inverseBindMatrixSupplier = () ->
             {
                 return skinModel.getInverseBindMatrix(
                     currentJointIndex, inverseBindMatrix);
             };
-            Supplier<float[]> loggingInverseBindMatrixSupplier =
+            Supplier<double[]> loggingInverseBindMatrixSupplier =
                 MatrixOps.create4x4(inverseBindMatrixSupplier)
                     .log("inverseBindMatrix "+i, Level.FINE)
                     .build();
@@ -479,16 +479,16 @@ class UniformGetterFactory
         //     [globalTransformOfJointNode] *
         //     [inverseBindMatrix(j)] *
         //     [bindShapeMatrix]
-        List<Supplier<float[]>> jointMatrixSuppliers = 
-            new ArrayList<Supplier<float[]>>();
+        List<Supplier<double[]>> jointMatrixSuppliers =
+            new ArrayList<Supplier<double[]>>();
         for (int j = 0; j < numJoints; j++)
         {
             NodeModel jointNodeModel = joints.get(j);
             
-            Supplier<float[]> inverseBindMatrixSupplier = 
+            Supplier<double[]> inverseBindMatrixSupplier =
                 inverseBindMatrixSuppliers.get(j);
             
-            Supplier<float[]> jointMatrixSupplier = MatrixOps
+            Supplier<double[]> jointMatrixSupplier = MatrixOps
                 .create4x4(nodeModel.createGlobalTransformSupplier())
                 .invert4x4()
                 .multiply4x4(jointNodeModel.createGlobalTransformSupplier())
@@ -502,14 +502,14 @@ class UniformGetterFactory
         // Create a supplier for the joint matrices, which combines the
         // joint matrices of the individual joint matrix suppliers 
         // into one array
-        float jointMatrices[] = new float[jointMatrixSuppliers.size() * 16];
+        double jointMatrices[] = new double[jointMatrixSuppliers.size() * 16];
         return () -> 
         {
             for (int i=0; i<jointMatrixSuppliers.size(); i++)
             {
-                Supplier<float[]> jointMatrixSupplier = 
+                Supplier<double[]> jointMatrixSupplier =
                     jointMatrixSuppliers.get(i);
-                float[] jointMatrix = jointMatrixSupplier.get();
+                double[] jointMatrix = jointMatrixSupplier.get();
                 System.arraycopy(jointMatrix, 0, jointMatrices, i * 16, 16);
             }
             return jointMatrices;

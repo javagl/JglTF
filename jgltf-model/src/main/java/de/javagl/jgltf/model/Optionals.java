@@ -131,6 +131,22 @@ public class Optionals
         }
         return map.get(key);
     }
+
+    /**
+     * Returns a clone of the given array, or <code>null</code> if the
+     * given array is <code>null</code>
+     *
+     * @param array The array
+     * @return The result
+     */
+    public static double[] clone(double array[])
+    {
+        if (array == null)
+        {
+            return null;
+        }
+        return array.clone();
+    }
     
     /**
      * Returns a clone of the given array, or <code>null</code> if the

@@ -905,7 +905,7 @@ public class GltfModelCreatorV2
                     createMeshPrimitiveModel(meshPrimitive);
                 meshModel.addMeshPrimitiveModel(meshPrimitiveModel);
             }
-            meshModel.setWeights(toArray(mesh.getWeights()));
+            meshModel.setWeights(toFloatArray(mesh.getWeights()));
         }
     }
     
@@ -1011,17 +1011,17 @@ public class GltfModelCreatorV2
                 CameraModel cameraModel = gltfModel.getCameraModel(cameraIndex);
                 nodeModel.setCameraModel(cameraModel);
             }
-            
-            float matrix[] = node.getMatrix();
-            float translation[] = node.getTranslation();
-            float rotation[] = node.getRotation();
-            float scale[] = node.getScale();
+
+            double matrix[] = node.getMatrix();
+            double translation[] = node.getTranslation();
+            double rotation[] = node.getRotation();
+            double scale[] = node.getScale();
             nodeModel.setMatrix(Optionals.clone(matrix));
             nodeModel.setTranslation(Optionals.clone(translation));
             nodeModel.setRotation(Optionals.clone(rotation));
             nodeModel.setScale(Optionals.clone(scale));
             
-            nodeModel.setWeights(toArray(node.getWeights()));
+            nodeModel.setWeights(toFloatArray(node.getWeights()));
         }
     }
     
@@ -1336,11 +1336,11 @@ public class GltfModelCreatorV2
     /**
      * Returns an array containing the float representations of the given
      * numbers, or <code>null</code> if the given list is <code>null</code>.
-     * 
+     *
      * @param numbers The numbers
      * @return The array
      */
-    private static float[] toArray(List<? extends Number> numbers)
+    private static float[] toFloatArray(List<? extends Number> numbers)
     {
         if (numbers == null)
         {
@@ -1350,6 +1350,27 @@ public class GltfModelCreatorV2
         for (int j = 0; j < numbers.size(); j++)
         {
             array[j] = numbers.get(j).floatValue();
+        }
+        return array;
+    }
+
+    /**
+     * Returns an array containing the float representations of the given
+     * numbers, or <code>null</code> if the given list is <code>null</code>.
+     * 
+     * @param numbers The numbers
+     * @return The array
+     */
+    private static double[] toDoubleArray(List<? extends Number> numbers)
+    {
+        if (numbers == null)
+        {
+            return null;
+        }
+        double array[] = new double[numbers.size()];
+        for (int j = 0; j < numbers.size(); j++)
+        {
+            array[j] = numbers.get(j).doubleValue();
         }
         return array;
     }

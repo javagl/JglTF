@@ -61,12 +61,12 @@ public class DuplicateMeshesTest
         
         // Add the same mesh to the scene twice
         DefaultNodeModel nodeModel0 = new DefaultNodeModel();
-        nodeModel0.setTranslation(new float[] { -1.0f, 0, 0 });
+        nodeModel0.setTranslation(new double[] { -1.0, 0, 0 });
         nodeModel0.addMeshModel(meshModel);
         sceneModel.addNode(nodeModel0);
 
         DefaultNodeModel nodeModel1 = new DefaultNodeModel();
-        nodeModel1.setTranslation(new float[] { 1.0f, 0, 0 });
+        nodeModel1.setTranslation(new double[] { 1.0, 0, 0 });
         nodeModel1.addMeshModel(meshModel);
         sceneModel.addNode(nodeModel1);
         
