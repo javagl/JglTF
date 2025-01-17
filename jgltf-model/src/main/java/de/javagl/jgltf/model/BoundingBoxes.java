@@ -43,15 +43,15 @@ public class BoundingBoxes
      * @param gltfModel The {@link GltfModel}
      * @return The bounding box
      */
-    public static float[] computeBoundingBoxMinMax(GltfModel gltfModel)
+    public static double[] computeBoundingBoxMinMax(GltfModel gltfModel)
     {
         Objects.requireNonNull(gltfModel, "The gltfModel may not be null");
         
         BoundingBoxComputer boundingBoxComputer =
             new BoundingBoxComputer(gltfModel);
         BoundingBox boundingBox = boundingBoxComputer.compute();
-        
-        float result[] = {
+
+        double result[] = {
             boundingBox.getMinX(),
             boundingBox.getMinY(),
             boundingBox.getMinZ(),
