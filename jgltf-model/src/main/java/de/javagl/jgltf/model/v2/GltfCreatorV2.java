@@ -1105,26 +1105,4 @@ public class GltfCreatorV2
         }
         return list;
     }
-    
-    
-    /**
-     * Returns a new list containing the elements of the given array,
-     * or <code>null</code> if the given array is <code>null</code>
-     * 
-     * @param array The array
-     * @return The list
-     */
-    private static List<Double> toList(double array[])
-    {
-        if (array == null)
-        {
-            return null;
-        }
-        List<Double> list = new ArrayList<Double>();
-        for (double f : array)
-        {
-            list.add(f);
-        }
-        return list;
-    }
 }
