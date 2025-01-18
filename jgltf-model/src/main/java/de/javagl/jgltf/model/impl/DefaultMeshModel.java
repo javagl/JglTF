@@ -68,6 +68,16 @@ public class DefaultMeshModel extends AbstractNamedModelElement
     }
     
     /**
+     * Remove the given {@link MeshPrimitiveModel}
+     * 
+     * @param meshPrimitiveModel The {@link MeshPrimitiveModel}
+     */
+    public void removeMeshPrimitiveModel(MeshPrimitiveModel meshPrimitiveModel)
+    {
+        this.meshPrimitiveModels.remove(meshPrimitiveModel);
+    }
+    
+    /**
      * Set the default morph target weights to be a <b>reference</b> to the 
      * given array. 
      * 
