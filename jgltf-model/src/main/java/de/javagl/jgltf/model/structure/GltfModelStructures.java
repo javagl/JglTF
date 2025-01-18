@@ -387,7 +387,7 @@ public class GltfModelStructures
     {
         if (this.target == null)
         {
-            throw new GltfException("The 'prepare' method has not bee called");
+            throw new GltfException("The 'prepare' method has not been called");
         }
         Level level = Level.FINE;
         if (logger.isLoggable(level)) 
