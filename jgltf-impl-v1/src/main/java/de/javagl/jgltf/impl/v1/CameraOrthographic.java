@@ -3,7 +3,7 @@
  * 
  * Do not modify this class. It is automatically generated
  * with JsonModelGen (https://github.com/javagl/JsonModelGen)
- * Copyright (c) 2016 Marco Hutter - http://www.javagl.de
+ * Copyright (c) 2016-2021 Marco Hutter - http://www.javagl.de
  */
 
 package de.javagl.jgltf.impl.v1;
@@ -25,24 +25,24 @@ public class CameraOrthographic
      * The floating-point horizontal magnification of the view. (required) 
      * 
      */
-    private Float xmag;
+    private Double xmag;
     /**
      * The floating-point vertical magnification of the view. (required) 
      * 
      */
-    private Float ymag;
+    private Double ymag;
     /**
      * The floating-point distance to the far clipping plane. (required)<br> 
      * Minimum: 0.0 (inclusive) 
      * 
      */
-    private Float zfar;
+    private Double zfar;
     /**
      * The floating-point distance to the near clipping plane. (required)<br> 
      * Minimum: 0.0 (inclusive) 
      * 
      */
-    private Float znear;
+    private Double znear;
 
     /**
      * The floating-point horizontal magnification of the view. (required) 
@@ -51,7 +51,7 @@ public class CameraOrthographic
      * @throws NullPointerException If the given value is <code>null</code>
      * 
      */
-    public void setXmag(Float xmag) {
+    public void setXmag(Double xmag) {
         if (xmag == null) {
             throw new NullPointerException((("Invalid value for xmag: "+ xmag)+", may not be null"));
         }
@@ -64,7 +64,7 @@ public class CameraOrthographic
      * @return The xmag
      * 
      */
-    public Float getXmag() {
+    public Double getXmag() {
         return this.xmag;
     }
 
@@ -75,7 +75,7 @@ public class CameraOrthographic
      * @throws NullPointerException If the given value is <code>null</code>
      * 
      */
-    public void setYmag(Float ymag) {
+    public void setYmag(Double ymag) {
         if (ymag == null) {
             throw new NullPointerException((("Invalid value for ymag: "+ ymag)+", may not be null"));
         }
@@ -88,7 +88,7 @@ public class CameraOrthographic
      * @return The ymag
      * 
      */
-    public Float getYmag() {
+    public Double getYmag() {
         return this.ymag;
     }
 
@@ -102,7 +102,7 @@ public class CameraOrthographic
      * the given constraints
      * 
      */
-    public void setZfar(Float zfar) {
+    public void setZfar(Double zfar) {
         if (zfar == null) {
             throw new NullPointerException((("Invalid value for zfar: "+ zfar)+", may not be null"));
         }
@@ -119,7 +119,7 @@ public class CameraOrthographic
      * @return The zfar
      * 
      */
-    public Float getZfar() {
+    public Double getZfar() {
         return this.zfar;
     }
 
@@ -133,7 +133,7 @@ public class CameraOrthographic
      * the given constraints
      * 
      */
-    public void setZnear(Float znear) {
+    public void setZnear(Double znear) {
         if (znear == null) {
             throw new NullPointerException((("Invalid value for znear: "+ znear)+", may not be null"));
         }
@@ -150,7 +150,7 @@ public class CameraOrthographic
      * @return The znear
      * 
      */
-    public Float getZnear() {
+    public Double getZnear() {
         return this.znear;
     }
 
