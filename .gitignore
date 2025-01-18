@@ -7,7 +7,6 @@
 .idea
 *.iml
 
-/jgltf-obj-multimesh
 /jgltf-converter
 /jgltf-viewer-demo
 /jgltf-viewer-lwjgl3
@@ -15,9 +14,62 @@
 /AccessorVis
 /JglTF
 /jgltf-jgltfifier
-/jgltf-impl-v2-khr-lights-punctual
-/jgltf-model-khr-lights-punctual
 /jgltf-asset-creator
+/jgltf-impl-v2-ext-draco-mesh-compression
+/jgltf-draco-test
+
+# Preliminary for extension experiments:
+# ---
+/jgltf-impl-v2-khr-lights-punctual
+/jgltf-impl-v2-khr-materials-variants
+/jgltf-impl-v2-khr-materials-clearcoat
+/jgltf-impl-v2-khr-texture-transform
+
+/jgltf-model-khr-lights-punctual
+/jgltf-model-khr-materials-variants
+/jgltf-model-khr-materials-clearcoat/
+/jgltf-model-khr-texture-transform
+# ---
+
+/jgltf-impl-v2-khr-lights-punctual/.classpath
+/jgltf-impl-v2-khr-lights-punctual/.settings
+/jgltf-impl-v2-khr-lights-punctual/.project
+/jgltf-impl-v2-khr-lights-punctual/target
+
+/jgltf-impl-v2-khr-materials-variants/.classpath
+/jgltf-impl-v2-khr-materials-variants/.settings
+/jgltf-impl-v2-khr-materials-variants/.project
+/jgltf-impl-v2-khr-materials-variants/target
+
+/jgltf-impl-v2-khr-materials-clearcoat/.classpath
+/jgltf-impl-v2-khr-materials-clearcoat/.settings
+/jgltf-impl-v2-khr-materials-clearcoat/.project
+/jgltf-impl-v2-khr-materials-clearcoat/target
+
+/jgltf-impl-v2-khr-texture-transform/.classpath
+/jgltf-impl-v2-khr-texture-transform/.settings
+/jgltf-impl-v2-khr-texture-transform/.project
+/jgltf-impl-v2-khr-texture-transform/target
+
+/jgltf-model-khr-lights-punctual/.classpath
+/jgltf-model-khr-lights-punctual/.settings
+/jgltf-model-khr-lights-punctual/.project
+/jgltf-model-khr-lights-punctual/target
+
+/jgltf-model-khr-materials-variants/.classpath
+/jgltf-model-khr-materials-variants/.settings
+/jgltf-model-khr-materials-variants/.project
+/jgltf-model-khr-materials-variants/target
+
+/jgltf-model-khr-materials-clearcoat/.classpath
+/jgltf-model-khr-materials-clearcoat/.settings
+/jgltf-model-khr-materials-clearcoat/.project
+/jgltf-model-khr-materials-clearcoat/target
+
+/jgltf-model-khr-texture-transform/.classpath
+/jgltf-model-khr-texture-transform/.settings
+/jgltf-model-khr-texture-transform/.project
+/jgltf-model-khr-texture-transform/target
 
 /jgltf-browser/.classpath
 /jgltf-browser/.settings
