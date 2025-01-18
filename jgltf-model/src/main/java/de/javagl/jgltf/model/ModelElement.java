@@ -36,7 +36,14 @@ public interface ModelElement
 {
     /**
      * Returns the extensions of this element. This is a mapping from
-     * property names to the JSON objects.
+     * property names (extension names) to the JSON objects.
+     * 
+     * This will be a reference to the map that is stored internally.
+     * Clients should usually not access or modify this map. Library
+     * developers may access this map, for example, to remove extension
+     * information, but are then responsible for ensuring consistency
+     * by updating other model elements, or the extension model of
+     * the root glTF model. 
      * 
      * @return The extensions
      */
@@ -48,4 +55,34 @@ public interface ModelElement
      * @return The extras
      */
     Object getExtras();
+    
+    /**
+     * Returns an unmodifiable map containing the extension models of this 
+     * element, or <code>null</code> if this object does not have any
+     * extension models.
+     * 
+     * This is a mapping from property names (extension names)
+     * to the model objects that have been created from the extension 
+     * information.
+     * 
+     * @return The extension models
+     */
+    Map<String, Object> getExtensionModels();
+    
+    /**
+     * Returns the model object that is stored for the given extension name.
+     * 
+     * If this object does not have an object for the specified extension,
+     * then <code>null</code> is returned.
+     * 
+     * If the extension object is not an instance of the given type, then
+     * a warning is printed and <code>null</code> is returned.
+     * 
+     * @param <T> The model object type
+     * @param extensionName The extension name
+     * @param type The expected model type
+     * @return The model object
+     */
+    <T> T getExtensionModel(String extensionName, Class<? extends T> type);
+    
 }
