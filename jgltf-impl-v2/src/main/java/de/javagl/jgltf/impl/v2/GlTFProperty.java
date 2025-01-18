@@ -19,18 +19,18 @@ import java.util.Map;
 public class GlTFProperty {
 
     /**
-     * JSON object with extension-specific objects. (optional) 
+     * The extensions of this GlTFProperty (optional) 
      * 
      */
     private Map<String, Object> extensions;
     /**
-     * Application-specific data. (optional) 
+     * The extras of this GlTFProperty (optional) 
      * 
      */
     private Object extras;
 
     /**
-     * JSON object with extension-specific objects. (optional) 
+     * The extensions of this GlTFProperty (optional) 
      * 
      * @param extensions The extensions to set
      * 
@@ -44,7 +44,7 @@ public class GlTFProperty {
     }
 
     /**
-     * JSON object with extension-specific objects. (optional) 
+     * The extensions of this GlTFProperty (optional) 
      * 
      * @return The extensions
      * 
@@ -108,7 +108,7 @@ public class GlTFProperty {
     }
 
     /**
-     * Application-specific data. (optional) 
+     * The extras of this GlTFProperty (optional) 
      * 
      * @param extras The extras to set
      * 
@@ -122,7 +122,7 @@ public class GlTFProperty {
     }
 
     /**
-     * Application-specific data. (optional) 
+     * The extras of this GlTFProperty (optional) 
      * 
      * @return The extras
      * 

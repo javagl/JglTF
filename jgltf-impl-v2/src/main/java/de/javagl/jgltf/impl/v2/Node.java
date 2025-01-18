@@ -60,7 +60,7 @@ public class Node
      * &nbsp;&nbsp;The elements of this array (optional) 
      * 
      */
-    private float[] matrix;
+    private double[] matrix;
     /**
      * The index of the mesh in this node. (optional) 
      * 
@@ -77,7 +77,7 @@ public class Node
      * &nbsp;&nbsp;Maximum: 1.0 (inclusive) 
      * 
      */
-    private float[] rotation;
+    private double[] rotation;
     /**
      * The node's non-uniform scale, given as the scaling factors along the 
      * x, y, and z axes. (optional)<br> 
@@ -87,7 +87,7 @@ public class Node
      * &nbsp;&nbsp;The elements of this array (optional) 
      * 
      */
-    private float[] scale;
+    private double[] scale;
     /**
      * The node's translation along the x, y, and z axes. (optional)<br> 
      * Default: [0.0,0.0,0.0]<br> 
@@ -96,7 +96,7 @@ public class Node
      * &nbsp;&nbsp;The elements of this array (optional) 
      * 
      */
-    private float[] translation;
+    private double[] translation;
     /**
      * The weights of the instantiated morph target. The number of array 
      * elements **MUST** match the number of morph targets of the referenced 
@@ -106,7 +106,7 @@ public class Node
      * &nbsp;&nbsp;The elements of this array (optional) 
      * 
      */
-    private List<Float> weights;
+    private List<Double> weights;
 
     /**
      * The index of the camera referenced by this node. (optional) 
@@ -262,7 +262,7 @@ public class Node
      * the given constraints
      * 
      */
-    public void setMatrix(float[] matrix) {
+    public void setMatrix(double[] matrix) {
         if (matrix == null) {
             this.matrix = matrix;
             return ;
@@ -288,7 +288,7 @@ public class Node
      * @return The matrix
      * 
      */
-    public float[] getMatrix() {
+    public double[] getMatrix() {
         return this.matrix;
     }
 
@@ -299,8 +299,8 @@ public class Node
      * @return The default matrix
      * 
      */
-    public float[] defaultMatrix() {
-        return new float[] { 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F };
+    public double[] defaultMatrix() {
+        return new double[] { 1.0D, 0.0D, 0.0D, 0.0D, 0.0D, 1.0D, 0.0D, 0.0D, 0.0D, 0.0D, 1.0D, 0.0D, 0.0D, 0.0D, 0.0D, 1.0D };
     }
 
     /**
@@ -342,7 +342,7 @@ public class Node
      * the given constraints
      * 
      */
-    public void setRotation(float[] rotation) {
+    public void setRotation(double[] rotation) {
         if (rotation == null) {
             this.rotation = rotation;
             return ;
@@ -353,7 +353,7 @@ public class Node
         if (rotation.length > 4) {
             throw new IllegalArgumentException("Number of rotation elements is > 4");
         }
-        for (float rotationElement: rotation) {
+        for (double rotationElement: rotation) {
             if (rotationElement > 1.0D) {
                 throw new IllegalArgumentException("rotationElement > 1.0");
             }
@@ -377,7 +377,7 @@ public class Node
      * @return The rotation
      * 
      */
-    public float[] getRotation() {
+    public double[] getRotation() {
         return this.rotation;
     }
 
@@ -388,8 +388,8 @@ public class Node
      * @return The default rotation
      * 
      */
-    public float[] defaultRotation() {
-        return new float[] { 0.0F, 0.0F, 0.0F, 1.0F };
+    public double[] defaultRotation() {
+        return new double[] { 0.0D, 0.0D, 0.0D, 1.0D };
     }
 
     /**
@@ -405,7 +405,7 @@ public class Node
      * the given constraints
      * 
      */
-    public void setScale(float[] scale) {
+    public void setScale(double[] scale) {
         if (scale == null) {
             this.scale = scale;
             return ;
@@ -430,7 +430,7 @@ public class Node
      * @return The scale
      * 
      */
-    public float[] getScale() {
+    public double[] getScale() {
         return this.scale;
     }
 
@@ -441,8 +441,8 @@ public class Node
      * @return The default scale
      * 
      */
-    public float[] defaultScale() {
-        return new float[] { 1.0F, 1.0F, 1.0F };
+    public double[] defaultScale() {
+        return new double[] { 1.0D, 1.0D, 1.0D };
     }
 
     /**
@@ -457,7 +457,7 @@ public class Node
      * the given constraints
      * 
      */
-    public void setTranslation(float[] translation) {
+    public void setTranslation(double[] translation) {
         if (translation == null) {
             this.translation = translation;
             return ;
@@ -481,7 +481,7 @@ public class Node
      * @return The translation
      * 
      */
-    public float[] getTranslation() {
+    public double[] getTranslation() {
         return this.translation;
     }
 
@@ -492,8 +492,8 @@ public class Node
      * @return The default translation
      * 
      */
-    public float[] defaultTranslation() {
-        return new float[] { 0.0F, 0.0F, 0.0F };
+    public double[] defaultTranslation() {
+        return new double[] { 0.0D, 0.0D, 0.0D };
     }
 
     /**
@@ -509,7 +509,7 @@ public class Node
      * the given constraints
      * 
      */
-    public void setWeights(List<Float> weights) {
+    public void setWeights(List<Double> weights) {
         if (weights == null) {
             this.weights = weights;
             return ;
@@ -531,7 +531,7 @@ public class Node
      * @return The weights
      * 
      */
-    public List<Float> getWeights() {
+    public List<Double> getWeights() {
         return this.weights;
     }
 
@@ -544,12 +544,12 @@ public class Node
      * @throws NullPointerException If the given element is <code>null</code>
      * 
      */
-    public void addWeights(Float element) {
+    public void addWeights(Double element) {
         if (element == null) {
             throw new NullPointerException("The element may not be null");
         }
-        List<Float> oldList = this.weights;
-        List<Float> newList = new ArrayList<Float>();
+        List<Double> oldList = this.weights;
+        List<Double> newList = new ArrayList<Double>();
         if (oldList!= null) {
             newList.addAll(oldList);
         }
@@ -568,12 +568,12 @@ public class Node
      * @throws NullPointerException If the given element is <code>null</code>
      * 
      */
-    public void removeWeights(Float element) {
+    public void removeWeights(Double element) {
         if (element == null) {
             throw new NullPointerException("The element may not be null");
         }
-        List<Float> oldList = this.weights;
-        List<Float> newList = new ArrayList<Float>();
+        List<Double> oldList = this.weights;
+        List<Double> newList = new ArrayList<Double>();
         if (oldList!= null) {
             newList.addAll(oldList);
         }
