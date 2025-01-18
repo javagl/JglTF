@@ -1012,10 +1012,10 @@ public class GltfModelCreatorV2
                 nodeModel.setCameraModel(cameraModel);
             }
             
-            float matrix[] = node.getMatrix();
-            float translation[] = node.getTranslation();
-            float rotation[] = node.getRotation();
-            float scale[] = node.getScale();
+            double matrix[] = node.getMatrix();
+            double translation[] = node.getTranslation();
+            double rotation[] = node.getRotation();
+            double scale[] = node.getScale();
             nodeModel.setMatrix(Optionals.clone(matrix));
             nodeModel.setTranslation(Optionals.clone(translation));
             nodeModel.setRotation(Optionals.clone(rotation));
@@ -1186,7 +1186,7 @@ public class GltfModelCreatorV2
             materialModel.setAlphaMode(AlphaMode.valueOf(alphaModeString));
         }
         materialModel.setAlphaCutoff(
-            Optionals.of(material.getAlphaCutoff(), 0.5f));
+            Optionals.of(material.getAlphaCutoff(), 0.5));
         
         materialModel.setDoubleSided(
             Boolean.TRUE.equals(material.isDoubleSided()));
@@ -1201,7 +1201,7 @@ public class GltfModelCreatorV2
             materialModel.setBaseColorTexcoord(
                 baseColorTextureInfo.getTexCoord());
         }
-        float[] baseColorFactor = Optionals.of(
+        double[] baseColorFactor = Optionals.of(
             pbrMetallicRoughness.getBaseColorFactor(),
             pbrMetallicRoughness.defaultBaseColorFactor());
         materialModel.setBaseColorFactor(baseColorFactor);
@@ -1216,12 +1216,12 @@ public class GltfModelCreatorV2
             materialModel.setMetallicRoughnessTexcoord(
                 metallicRoughnessTextureInfo.getTexCoord());
         }
-        float metallicFactor = Optionals.of(
+        double metallicFactor = Optionals.of(
             pbrMetallicRoughness.getMetallicFactor(),
             pbrMetallicRoughness.defaultMetallicFactor());
         materialModel.setMetallicFactor(metallicFactor);
         
-        float roughnessFactor = Optionals.of(
+        double roughnessFactor = Optionals.of(
             pbrMetallicRoughness.getRoughnessFactor(),
             pbrMetallicRoughness.defaultRoughnessFactor());
         materialModel.setRoughnessFactor(roughnessFactor);
@@ -1236,7 +1236,7 @@ public class GltfModelCreatorV2
             materialModel.setNormalTexcoord(
                 normalTextureInfo.getTexCoord());
             
-            float normalScale = Optionals.of(
+            double normalScale = Optionals.of(
                 normalTextureInfo.getScale(),
                 normalTextureInfo.defaultScale());
             materialModel.setNormalScale(normalScale);
@@ -1252,7 +1252,7 @@ public class GltfModelCreatorV2
             materialModel.setOcclusionTexcoord(
                 occlusionTextureInfo.getTexCoord());
             
-            float occlusionStrength = Optionals.of(
+            double occlusionStrength = Optionals.of(
                 occlusionTextureInfo.getStrength(),
                 occlusionTextureInfo.defaultStrength());
             materialModel.setOcclusionStrength(occlusionStrength);
@@ -1269,7 +1269,7 @@ public class GltfModelCreatorV2
                 emissiveTextureInfo.getTexCoord());
         }
         
-        float[] emissiveFactor = Optionals.of(
+        double[] emissiveFactor = Optionals.of(
             material.getEmissiveFactor(),
             material.defaultEmissiveFactor());
         materialModel.setEmissiveFactor(emissiveFactor);
@@ -1334,22 +1334,22 @@ public class GltfModelCreatorV2
     }
 
     /**
-     * Returns an array containing the float representations of the given
+     * Returns an array containing the double representations of the given
      * numbers, or <code>null</code> if the given list is <code>null</code>.
      * 
      * @param numbers The numbers
      * @return The array
      */
-    private static float[] toArray(List<? extends Number> numbers)
+    private static double[] toArray(List<? extends Number> numbers)
     {
         if (numbers == null)
         {
             return null;
         }
-        float array[] = new float[numbers.size()];
+        double array[] = new double[numbers.size()];
         for (int j = 0; j < numbers.size(); j++)
         {
-            array[j] = numbers.get(j).floatValue();
+            array[j] = numbers.get(j).doubleValue();
         }
         return array;
     }

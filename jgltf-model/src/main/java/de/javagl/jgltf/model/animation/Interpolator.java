@@ -28,7 +28,7 @@ package de.javagl.jgltf.model.animation;
 
 /**
  * Package-private interface for classes that can interpolate between 
- * (equal-length) arrays of <code>float</code> values
+ * (equal-length) arrays of <code>double</code> values
  */
 interface Interpolator
 {
@@ -46,5 +46,5 @@ interface Interpolator
      * @throws IndexOutOfBoundsException May be thrown if the arrays do not 
      * have the same length
      */
-    void interpolate(float a[], float b[], float alpha, float result[]);
+    void interpolate(double a[], double b[], double alpha, double result[]);
 }

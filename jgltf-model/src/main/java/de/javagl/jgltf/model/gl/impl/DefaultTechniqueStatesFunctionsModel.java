@@ -41,7 +41,7 @@ public class DefaultTechniqueStatesFunctionsModel
     /**
      * The BlendColor
      */
-    private float[] blendColor;
+    private double[] blendColor;
 
     /**
      * The BlendEquationSeparate
@@ -76,7 +76,7 @@ public class DefaultTechniqueStatesFunctionsModel
     /**
      * The DepthRange
      */
-    private float[] depthRange;
+    private double[] depthRange;
 
     /**
      * The FrontFace
@@ -86,12 +86,12 @@ public class DefaultTechniqueStatesFunctionsModel
     /**
      * The LineWidth
      */
-    private float[] lineWidth;
+    private double[] lineWidth;
 
     /**
      * The PolygonOffset
      */
-    private float[] polygonOffset;
+    private double[] polygonOffset;
 
     /**
      * Default constructor
@@ -102,7 +102,7 @@ public class DefaultTechniqueStatesFunctionsModel
     }
 
     @Override
-    public float[] getBlendColor()
+    public double[] getBlendColor()
     {
         return blendColor;
     }
@@ -112,7 +112,7 @@ public class DefaultTechniqueStatesFunctionsModel
      *
      * @param blendColor The BlendColor
      */
-    public void setBlendColor(float[] blendColor)
+    public void setBlendColor(double[] blendColor)
     {
         this.blendColor = blendColor;
     }
@@ -214,7 +214,7 @@ public class DefaultTechniqueStatesFunctionsModel
     }
 
     @Override
-    public float[] getDepthRange()
+    public double[] getDepthRange()
     {
         return depthRange;
     }
@@ -224,7 +224,7 @@ public class DefaultTechniqueStatesFunctionsModel
      *
      * @param depthRange The DepthRange
      */
-    public void setDepthRange(float[] depthRange)
+    public void setDepthRange(double[] depthRange)
     {
         this.depthRange = depthRange;
     }
@@ -246,7 +246,7 @@ public class DefaultTechniqueStatesFunctionsModel
     }
 
     @Override
-    public float[] getLineWidth()
+    public double[] getLineWidth()
     {
         return lineWidth;
     }
@@ -256,13 +256,13 @@ public class DefaultTechniqueStatesFunctionsModel
      *
      * @param lineWidth The LineWidth
      */
-    public void setLineWidth(float[] lineWidth)
+    public void setLineWidth(double[] lineWidth)
     {
         this.lineWidth = lineWidth;
     }
 
     @Override
-    public float[] getPolygonOffset()
+    public double[] getPolygonOffset()
     {
         return polygonOffset;
     }
@@ -272,7 +272,7 @@ public class DefaultTechniqueStatesFunctionsModel
      *
      * @param polygonOffset The PolygonOffset
      */
-    public void setPolygonOffset(float[] polygonOffset)
+    public void setPolygonOffset(double[] polygonOffset)
     {
         this.polygonOffset = polygonOffset;
     }

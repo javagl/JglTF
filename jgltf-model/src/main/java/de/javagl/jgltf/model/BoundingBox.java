@@ -36,32 +36,32 @@ class BoundingBox
     /**
      * The minimum x coordinate
      */
-    private float minX;
+    private double minX;
     
     /**
      * The minimum y coordinate
      */
-    private float minY;
+    private double minY;
     
     /**
      * The minimum z coordinate
      */
-    private float minZ;
+    private double minZ;
     
     /**
      * The maximum x coordinate
      */
-    private float maxX;
+    private double maxX;
     
     /**
      * The maximum y coordinate
      */
-    private float maxY;
+    private double maxY;
     
     /**
      * The maximum z coordinate
      */
-    private float maxZ;
+    private double maxZ;
 
     /**
      * Creates a bounding box  
@@ -83,7 +83,7 @@ class BoundingBox
      * @param y The y-coordinate
      * @param z The z-coordinate
      */
-    void combine(float x, float y, float z)
+    void combine(double x, double y, double z)
     {
         minX = Math.min(minX, x);
         minY = Math.min(minY, y);
@@ -114,9 +114,9 @@ class BoundingBox
      *
      * @return The x-coordinate of the center
      */
-    float getCenterX()
+    double getCenterX()
     {
-        return getMinX() + getSizeX() * 0.5f;
+        return getMinX() + getSizeX() * 0.5;
     }
 
     /**
@@ -124,9 +124,9 @@ class BoundingBox
      *
      * @return The y-coordinate of the center
      */
-    float getCenterY()
+    double getCenterY()
     {
-        return getMinY() + getSizeY() * 0.5f;
+        return getMinY() + getSizeY() * 0.5;
     }
 
     /**
@@ -134,9 +134,9 @@ class BoundingBox
      *
      * @return The z-coordinate of the center
      */
-    float getCenterZ()
+    double getCenterZ()
     {
-        return getMinZ() + getSizeZ() * 0.5f;
+        return getMinZ() + getSizeZ() * 0.5;
     }
 
     /**
@@ -144,7 +144,7 @@ class BoundingBox
      *
      * @return The size in x-direction
      */
-    float getSizeX()
+    double getSizeX()
     {
         return getMaxX() - getMinX();
     }
@@ -154,7 +154,7 @@ class BoundingBox
      *
      * @return The size in y-direction
      */
-    float getSizeY()
+    double getSizeY()
     {
         return getMaxY() - getMinY();
     }
@@ -164,7 +164,7 @@ class BoundingBox
      *
      * @return The size in z-direction
      */
-    float getSizeZ()
+    double getSizeZ()
     {
         return getMaxZ() - getMinZ();
     }
@@ -174,7 +174,7 @@ class BoundingBox
      *
      * @return The minimum x coordinate
      */
-    float getMinX()
+    double getMinX()
     {
         return minX;
     }
@@ -184,7 +184,7 @@ class BoundingBox
      *
      * @return The minimum y coordinate
      */
-    float getMinY()
+    double getMinY()
     {
         return minY;
     }
@@ -194,7 +194,7 @@ class BoundingBox
      *
      * @return The minimum z coordinate
      */
-    float getMinZ()
+    double getMinZ()
     {
         return minZ;
     }
@@ -204,7 +204,7 @@ class BoundingBox
      *
      * @return The maximum x coordinate
      */
-    float getMaxX()
+    double getMaxX()
     {
         return maxX;
     }
@@ -214,7 +214,7 @@ class BoundingBox
      *
      * @return The maximum y coordinate
      */
-    float getMaxY()
+    double getMaxY()
     {
         return maxY;
     }
@@ -224,7 +224,7 @@ class BoundingBox
      *
      * @return The maximum z coordinate
      */
-    float getMaxZ()
+    double getMaxZ()
     {
         return maxZ;
     }
