@@ -451,6 +451,9 @@ public class GltfModelStructures
     private static void copyGltfPropertyElements(
         AbstractModelElement source, AbstractModelElement target)
     {
+        // TODO TODO_EXTENSIONS Extension handling
+        logger.warning("Have to copy extension models in GltfModelStructures");
+
         target.setExtensions(source.getExtensions());
         target.setExtras(source.getExtras());
     }

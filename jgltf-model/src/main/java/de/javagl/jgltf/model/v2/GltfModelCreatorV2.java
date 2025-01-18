@@ -88,6 +88,7 @@ import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.SceneModel;
 import de.javagl.jgltf.model.SkinModel;
 import de.javagl.jgltf.model.TextureModel;
+import de.javagl.jgltf.model.extensions.ExtensionModels;
 import de.javagl.jgltf.model.impl.AbstractModelElement;
 import de.javagl.jgltf.model.impl.AbstractNamedModelElement;
 import de.javagl.jgltf.model.impl.DefaultAccessorModel;
@@ -209,6 +210,13 @@ public class GltfModelCreatorV2
         
         initExtensionsModel();
         initAssetModel();
+        
+        // TODO TODO_EXTENSIONS Experiments for extension handling
+        logger.warning(
+            "Experimental extension processing in GltfModelCreatorV2");
+        processModel();
+        processMaterialModels();
+        processMeshModels();
     }
     
     /**
@@ -1305,6 +1313,49 @@ public class GltfModelCreatorV2
     }
     
     /**
+     * Process the {@link GltfModel} object
+     */
+    private void processModel()
+    {
+        ExtensionModels.process(
+            gltfModel, gltfModel, GltfModel.class);
+    }
+
+    /**
+     * Process the {@link MaterialModel} instances
+     */
+    private void processMaterialModels()
+    {
+        List<MaterialModel> materialModels = gltfModel.getMaterialModels();
+        for (MaterialModel materialModel : materialModels)
+        {
+            ExtensionModels.process(
+                gltfModel, materialModel, MaterialModel.class);
+        }
+    }
+    
+    /**
+     * Process the {@link MeshModel} instances
+     */
+    private void processMeshModels()
+    {
+        List<MeshModel> meshModels = gltfModel.getMeshModels();
+        for (MeshModel meshModel : meshModels)
+        {
+            ExtensionModels.process(
+                gltfModel, meshModel, MeshModel.class);
+            
+            List<MeshPrimitiveModel> meshPrimitiveModels = 
+                meshModel.getMeshPrimitiveModels();
+            for (MeshPrimitiveModel meshPrimitiveModel : meshPrimitiveModels)
+            {
+                ExtensionModels.process(
+                    gltfModel, meshPrimitiveModel, MeshPrimitiveModel.class);
+            }
+        }
+    }
+    
+    /**
      * Transfer the extensions and extras from the given property to
      * the given target
      * 
@@ -1332,7 +1383,7 @@ public class GltfModelCreatorV2
         modelElement.setName(property.getName());
         transferGltfPropertyElements(property, modelElement);
     }
-
+    
     /**
      * Returns an array containing the float representations of the given
      * numbers, or <code>null</code> if the given list is <code>null</code>.
