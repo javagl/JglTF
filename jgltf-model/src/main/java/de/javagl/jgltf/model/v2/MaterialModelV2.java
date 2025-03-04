@@ -30,10 +30,13 @@ import de.javagl.jgltf.model.MaterialModel;
 import de.javagl.jgltf.model.TextureModel;
 import de.javagl.jgltf.model.impl.AbstractNamedModelElement;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 /**
  * Implementation of a {@link MaterialModel} for glTF 2.0.<br>
  * <br>
- * Note: This class might be renamed to "PbrBasedMaterialModel" and moved to 
+ * Note: This class might be renamed to "PbrBasedMaterialModel" and moved to
  * a different package in the future.
  */
 public final class MaterialModelV2 extends AbstractNamedModelElement
@@ -48,53 +51,53 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
          * Opaque mode
          */
         OPAQUE,
-        
+
         /**
          * Masking mode
          */
         MASK,
-        
+
         /**
          * Blend mode
          */
-        BLEND        
+        BLEND
     }
-    
+
     /**
      * The base color factor
      */
     private float[] baseColorFactor;
-    
+
     /**
      * The base color texture
      */
     private TextureModel baseColorTexture;
-    
+
     /**
      * The texture coordinate set for the base color texture
      */
     private Integer baseColorTexcoord;
-    
+
     /**
      * The metallic factor
      */
     private float metallicFactor;
-    
+
     /**
      * The roughness factor
      */
     private float roughnessFactor;
-    
+
     /**
      * The metallic-roughness texture
      */
     private TextureModel metallicRoughnessTexture;
-    
+
     /**
      * The texture coordinate set for the metallic-roughness texture
      */
     private Integer metallicRoughnessTexcoord;
-    
+
     /**
      * The normal texture
      */
@@ -104,7 +107,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * The texture coordinate set for the normal texture
      */
     private Integer normalTexcoord;
-    
+
     /**
      * The normal scale
      */
@@ -119,22 +122,22 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * The texture coordinate set for the occlusion texture
      */
     private Integer occlusionTexcoord;
-    
+
     /**
      * The occlusion strength
      */
     private float occlusionStrength;
-    
+
     /**
      * The emissive texture
      */
     private TextureModel emissiveTexture;
-    
+
     /**
      * The texture coordinate set for the emissive texture
      */
     private Integer emissiveTexcoord;
-    
+
     /**
      * The emissive factor
      */
@@ -144,18 +147,18 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * The alpha mode
      */
     private AlphaMode alphaMode;
-    
+
     /**
      * The alpha cutoff
      */
     private float alphaCutoff;
-    
+
     /**
      * Whether the material is double sided
      */
     private boolean doubleSided;
-    
-    
+
+
     /**
      * Creates a new instance with default values
      */
@@ -164,33 +167,33 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
         baseColorFactor = new float[]{ 1.0f, 1.0f, 1.0f, 1.0f };
         baseColorTexture = null;
         baseColorTexcoord = null;
-        
+
         metallicFactor = 1.0f;
         roughnessFactor = 1.0f;
         metallicRoughnessTexture = null;
         metallicRoughnessTexcoord = null;
-        
+
         normalScale = 1.0f;
         normalTexture = null;
         normalTexcoord = null;
-        
+
         occlusionTexture = null;
         occlusionTexcoord = null;
         occlusionStrength = 1.0f;
-        
+
         emissiveTexture = null;
         emissiveTexcoord = null;
         emissiveFactor = new float[]{0.0f, 0.0f, 0.0f };
 
         alphaMode = AlphaMode.OPAQUE;
         alphaCutoff = 0.5f;
-        
+
         doubleSided = false;
     }
-    
+
     /**
      * Returns the base color factor
-     * 
+     *
      * @return The base color factor
      */
     public float[] getBaseColorFactor()
@@ -200,7 +203,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
 
     /**
      * Set the base color factor
-     * 
+     *
      * @param baseColorFactor The base color factor
      */
     public void setBaseColorFactor(float[] baseColorFactor)
@@ -210,7 +213,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
 
     /**
      * Returns the base color texture
-     * 
+     *
      * @return The base color texture
      */
     public TextureModel getBaseColorTexture()
@@ -220,27 +223,27 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
 
     /**
      * Set the base color texture
-     * 
+     *
      * @param baseColorTexture The base color texture
      */
     public void setBaseColorTexture(TextureModel baseColorTexture)
     {
         this.baseColorTexture = baseColorTexture;
     }
-    
+
     /**
      * Return the base color texture coordinate set
-     * 
+     *
      * @return The texture coordinate set
      */
     public Integer getBaseColorTexcoord()
     {
         return baseColorTexcoord;
     }
-    
+
     /**
      * Set the base color texture coordinate set
-     * 
+     *
      * @param baseColorTexcoord The texture coordinate set
      */
     public void setBaseColorTexcoord(Integer baseColorTexcoord)
@@ -250,7 +253,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
 
     /**
      * Returns the metallic factor
-     * 
+     *
      * @return The metallic factor
      */
     public float getMetallicFactor()
@@ -260,7 +263,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
 
     /**
      * Set the metallic factor
-     * 
+     *
      * @param metallicFactor The metallic factor
      */
     public void setMetallicFactor(float metallicFactor)
@@ -270,7 +273,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
 
     /**
      * Returns the roughness factor
-     * 
+     *
      * @return The roughness factor
      */
     public float getRoughnessFactor()
@@ -280,7 +283,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
 
     /**
      * Set the roughness factor
-     * 
+     *
      * @param roughnessFactor The roughness factor
      */
     public void setRoughnessFactor(float roughnessFactor)
@@ -290,7 +293,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
 
     /**
      * Returns the metallic-roughness-texture
-     * 
+     *
      * @return The metallic-roughness texture
      */
     public TextureModel getMetallicRoughnessTexture()
@@ -300,7 +303,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
 
     /**
      * Set the metallic-roughness-texture
-     * 
+     *
      * @param metallicRoughnessTexture The metallic-roughness-texture
      */
     public void setMetallicRoughnessTexture(
@@ -308,20 +311,20 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
     {
         this.metallicRoughnessTexture = metallicRoughnessTexture;
     }
-    
+
     /**
      * Returns the metallic-roughness texture coordinate set
-     * 
+     *
      * @return The texture coordinate set
      */
     public Integer getMetallicRoughnessTexcoord()
     {
         return metallicRoughnessTexcoord;
     }
-    
+
     /**
      * Set the metallic-roughness texture coordinate set
-     * 
+     *
      * @param metallicRoughnessTexcoord The texture coordinate set
      */
     public void setMetallicRoughnessTexcoord(Integer metallicRoughnessTexcoord)
@@ -331,7 +334,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
 
     /**
      * Returns the normal texture
-     * 
+     *
      * @return The normal texture
      */
     public TextureModel getNormalTexture()
@@ -341,27 +344,27 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
 
     /**
      * Set the normal texture
-     * 
+     *
      * @param normalTexture The normal texture
      */
     public void setNormalTexture(TextureModel normalTexture)
     {
         this.normalTexture = normalTexture;
     }
-    
+
     /**
      * Returns the normal texture coordinate set
-     * 
+     *
      * @return The texture coordinate set
      */
     public Integer getNormalTexcoord()
     {
         return normalTexcoord;
     }
-    
+
     /**
      * Set the normal texture coordinate set
-     * 
+     *
      * @param normalTexcoord The texture coordinate set
      */
     public void setNormalTexcoord(Integer normalTexcoord)
@@ -371,7 +374,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
 
     /**
      * Returns the normal scale
-     * 
+     *
      * @return The normal scale
      */
     public float getNormalScale()
@@ -381,17 +384,17 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
 
     /**
      * Set the normal scale
-     * 
+     *
      * @param normalScale The normal scale
      */
     public void setNormalScale(float normalScale)
     {
         this.normalScale = normalScale;
     }
-    
+
     /**
      * Returns the occlusion texture
-     * 
+     *
      * @return The occlusion texture
      */
     public TextureModel getOcclusionTexture()
@@ -401,27 +404,27 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
 
     /**
      * Set the occlusion texture
-     * 
+     *
      * @param occlusionTexture The occlusion texture
      */
     public void setOcclusionTexture(TextureModel occlusionTexture)
     {
         this.occlusionTexture = occlusionTexture;
     }
-    
+
     /**
      * Returns the occlusion texture coordinate set
-     * 
+     *
      * @return The texture coordinate set
      */
     public Integer getOcclusionTexcoord()
     {
         return occlusionTexcoord;
     }
-    
+
     /**
      * Set the occlusion texture coordinate set
-     * 
+     *
      * @param occlusionTexcoord The texture coordinate set
      */
     public void setOcclusionTexcoord(Integer occlusionTexcoord)
@@ -431,7 +434,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
 
     /**
      * Returns the occlusion strength
-     * 
+     *
      * @return The occlusion strength
      */
     public float getOcclusionStrength()
@@ -441,7 +444,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
 
     /**
      * Set the occlusion strength
-     * 
+     *
      * @param occlusionStrength The occlusion strength
      */
     public void setOcclusionStrength(float occlusionStrength)
@@ -451,7 +454,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
 
     /**
      * Returns the emissive texture
-     * 
+     *
      * @return The emissive texture
      */
     public TextureModel getEmissiveTexture()
@@ -461,37 +464,37 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
 
     /**
      * Set the emissive texture
-     * 
+     *
      * @param emissiveTexture The emissive texture
      */
     public void setEmissiveTexture(TextureModel emissiveTexture)
     {
         this.emissiveTexture = emissiveTexture;
     }
-    
+
     /**
      * Set the emissive texture coordinate set
-     * 
+     *
      * @return The texture coordinate set
      */
     public Integer getEmissiveTexcoord()
     {
         return emissiveTexcoord;
     }
-    
+
     /**
      * Set the emissive texture coordinate set
-     * 
+     *
      * @param emissiveTexcoord The texture coordinate set
      */
     public void setEmissiveTexcoord(Integer emissiveTexcoord)
     {
         this.emissiveTexcoord = emissiveTexcoord;
     }
-    
+
     /**
      * Returns the emissive factor
-     * 
+     *
      * @return The emissive factor
      */
     public float[] getEmissiveFactor()
@@ -501,7 +504,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
 
     /**
      * Set the emissive factor
-     * 
+     *
      * @param emissiveFactor The emissive factor
      */
     public void setEmissiveFactor(float[] emissiveFactor)
@@ -511,7 +514,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
 
     /**
      * Returns the alpha mode
-     * 
+     *
      * @return The alpha mode
      */
     public AlphaMode getAlphaMode()
@@ -521,7 +524,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
 
     /**
      * Set the alpha mode
-     * 
+     *
      * @param alphaMode The alpha mode
      */
     public void setAlphaMode(AlphaMode alphaMode)
@@ -531,7 +534,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
 
     /**
      * Returns the alpha cutoff
-     * 
+     *
      * @return The alpha cutoff
      */
     public float getAlphaCutoff()
@@ -541,7 +544,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
 
     /**
      * Set the alpha cutoff
-     * 
+     *
      * @param alphaCutoff The alpha cutoff
      */
     public void setAlphaCutoff(float alphaCutoff)
@@ -551,7 +554,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
 
     /**
      * Returns whether the material is double sided
-     * 
+     *
      * @return Whether the material is double sided
      */
     public boolean isDoubleSided()
@@ -561,11 +564,44 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
 
     /**
      * Set whether the material is double sided
-     * 
+     *
      * @param doubleSided Whether the material is double sided
      */
     public void setDoubleSided(boolean doubleSided)
     {
         this.doubleSided = doubleSided;
     }
+
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        MaterialModelV2 other = (MaterialModelV2) obj;
+        return Float.compare(metallicFactor, other.metallicFactor) == 0 &&
+                Float.compare(roughnessFactor, other.roughnessFactor) == 0 &&
+                Float.compare(normalScale, other.normalScale) == 0 &&
+                Float.compare(occlusionStrength, other.occlusionStrength) == 0 &&
+                Float.compare(alphaCutoff, other.alphaCutoff) == 0 &&
+                doubleSided == other.doubleSided &&
+                alphaMode == other.alphaMode &&
+                Arrays.equals(baseColorFactor, other.baseColorFactor) &&
+                Arrays.equals(emissiveFactor, other.emissiveFactor) &&
+                Objects.equals(baseColorTexture, other.baseColorTexture) &&
+                Objects.equals(baseColorTexcoord, other.baseColorTexcoord) &&
+                Objects.equals(metallicRoughnessTexture, other.metallicRoughnessTexture) &&
+                Objects.equals(metallicRoughnessTexcoord, other.metallicRoughnessTexcoord) &&
+                Objects.equals(normalTexture, other.normalTexture) &&
+                Objects.equals(normalTexcoord, other.normalTexcoord) &&
+                Objects.equals(occlusionTexture, other.occlusionTexture) &&
+                Objects.equals(occlusionTexcoord, other.occlusionTexcoord) &&
+                Objects.equals(emissiveTexture, other.emissiveTexture) &&
+                Objects.equals(emissiveTexcoord, other.emissiveTexcoord);
+    }
+
 }
