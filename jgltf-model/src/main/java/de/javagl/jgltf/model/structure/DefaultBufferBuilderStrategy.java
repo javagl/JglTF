@@ -355,7 +355,10 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
                 processedAccessorModels.add(output);
             }
         }
-        if (!animationModel.getChannels().isEmpty())
+        // Only if any of the channels caused accessors to be added that
+        // was NOT already processed while handling other animations, then
+        // create a new buffer view for the newly added accessors
+        if (bufferStructureBuilder.getNumCurrentAccessorModels() > 0)
         {
             bufferStructureBuilder.createBufferViewModel("animation", null);
         }
