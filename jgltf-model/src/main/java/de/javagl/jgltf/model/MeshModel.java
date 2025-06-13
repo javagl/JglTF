@@ -48,6 +48,6 @@ public interface MeshModel extends NamedModelElement
      * 
      * @return The morph target weights
      */
-    float[] getWeights();
+    double[] getWeights();
 }
 

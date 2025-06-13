@@ -50,10 +50,10 @@ public class Suppliers
      * @param computer The computer function
      * @return The supplier
      */
-    public static <T> Supplier<float[]> createTransformSupplier(
-        T object, BiConsumer<T, float[]> computer)
+    public static <T> Supplier<double[]> createTransformSupplier(
+        T object, BiConsumer<T, double[]> computer)
     {
-        float transform[] = new float[16];
+        double transform[] = new double[16];
         if (object == null)
         {
             return () -> 

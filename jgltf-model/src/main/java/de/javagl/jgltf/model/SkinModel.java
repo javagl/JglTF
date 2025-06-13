@@ -44,7 +44,7 @@ public interface SkinModel extends NamedModelElement
      * @param result The result array
      * @return The result array
      */
-    float[] getBindShapeMatrix(float result[]);
+    double[] getBindShapeMatrix(double result[]);
     
     /**
      * Returns an unmodifiable list containing the joint nodes of the skeleton
@@ -82,5 +82,5 @@ public interface SkinModel extends NamedModelElement
      * @param result The result array
      * @return The result array
      */
-    float[] getInverseBindMatrix(int index, float result[]);
+    double[] getInverseBindMatrix(int index, double result[]);
 }

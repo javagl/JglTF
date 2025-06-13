@@ -47,26 +47,26 @@ final class ViewConfiguration
     /**
      * The supplier for the viewport, as an array [x, y, width, height]
      */
-    private final Supplier<float[]> viewportSupplier;
+    private final Supplier<double[]> viewportSupplier;
     
     /**
      * The supplier for the view matrix
      */
-    private final Supplier<float[]> viewMatrixSupplier;
+    private final Supplier<double[]> viewMatrixSupplier;
     
     /**
      * The supplier for the projection matrix
      */
-    private final Supplier<float[]> projectionMatrixSupplier;
+    private final Supplier<double[]> projectionMatrixSupplier;
     
     /**
      * Creates a new view configuration
      *  
      * @param viewportSupplier A supplier that supplies the viewport, 
-     * as 4 float elements, [x, y, width, height]
+     * as 4 double elements, [x, y, width, height]
      */
     ViewConfiguration(
-        Supplier<float[]> viewportSupplier)
+        Supplier<double[]> viewportSupplier)
     {
         this.viewportSupplier = Objects.requireNonNull(
             viewportSupplier, "The viewportSupplier may not be null");
@@ -97,7 +97,7 @@ final class ViewConfiguration
     }
     
     /**
-     * Create a supplier for the view matrix, as a float array with 16 
+     * Create a supplier for the view matrix, as a double array with 16 
      * elements, containing the view matrix in column-major order.<br>
      * <br>
      * The resulting supplier will supply a view matrix as follows:
@@ -116,9 +116,9 @@ final class ViewConfiguration
      * 
      * @return The view matrix supplier
      */
-    private Supplier<float[]> createViewMatrixSupplier()
+    private Supplier<double[]> createViewMatrixSupplier()
     {
-        float defaultViewMatrix[] = MathUtils.createIdentity4x4();
+        double defaultViewMatrix[] = MathUtils.createIdentity4x4();
         return () ->
         {
             if (renderedCamera == null)
@@ -131,7 +131,7 @@ final class ViewConfiguration
     }
     
     /**
-     * Create a supplier for the projection matrix, as a float array with 16 
+     * Create a supplier for the projection matrix, as a double array with 16 
      * elements, containing the projection matrix in column-major order.<br>
      * <br>
      * The resulting supplier will supply a projection matrix as follows:
@@ -150,9 +150,9 @@ final class ViewConfiguration
      *  
      * @return The projection matrix supplier
      */
-    private Supplier<float[]> createProjectionMatrixSupplier()
+    private Supplier<double[]> createProjectionMatrixSupplier()
     {
-        float defaultProjectionMatrix[] = MathUtils.createIdentity4x4();
+        double defaultProjectionMatrix[] = MathUtils.createIdentity4x4();
         return () ->
         {
             if (renderedCamera == null)
@@ -170,7 +170,7 @@ final class ViewConfiguration
      * 
      * @return The viewport
      */
-    public float[] getViewport()
+    public double[] getViewport()
     {
         return viewportSupplier.get();
     }
@@ -184,7 +184,7 @@ final class ViewConfiguration
      * 
      * @return The view matrix
      */
-    public float[] getViewMatrix()
+    public double[] getViewMatrix()
     {
         return viewMatrixSupplier.get();
     }
@@ -198,7 +198,7 @@ final class ViewConfiguration
      * 
      * @return The view matrix
      */
-    public float[] getProjectionMatrix()
+    public double[] getProjectionMatrix()
     {
         return projectionMatrixSupplier.get();
     }

@@ -36,27 +36,27 @@ public interface CameraOrthographicModel
      * 
      * @return The magnification
      */
-    Float getXmag();
+    Double getXmag();
 
     /**
      * Returns the vertical magnification
      * 
      * @return The magnification
      */
-    Float getYmag();
+    Double getYmag();
     
     /**
      * Returns the distance of the far clipping plane
      * 
      * @return The distance
      */
-    Float getZfar();
+    Double getZfar();
     
     /**
      * Returns the distance of the near clipping plane
      * 
      * @return The distance
      */
-    Float getZnear();
+    Double getZnear();
     
 }

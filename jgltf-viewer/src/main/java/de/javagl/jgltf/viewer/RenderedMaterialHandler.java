@@ -284,7 +284,7 @@ class RenderedMaterialHandler
         {
             values.put("hasBaseColorTexture", 0);
         }
-        float[] baseColorFactor = material.getBaseColorFactor();
+        double[] baseColorFactor = material.getBaseColorFactor();
         values.put("baseColorFactor", baseColorFactor);
         
         
@@ -301,10 +301,10 @@ class RenderedMaterialHandler
         {
             values.put("hasMetallicRoughnessTexture", 0);
         }
-        float metallicFactor = material.getMetallicFactor();
+        double metallicFactor = material.getMetallicFactor();
         values.put("metallicFactor", metallicFactor);
         
-        float roughnessFactor = material.getRoughnessFactor();
+        double roughnessFactor = material.getRoughnessFactor();
         values.put("roughnessFactor", roughnessFactor);
         
         
@@ -317,7 +317,7 @@ class RenderedMaterialHandler
                 materialStructure.getNormalTexCoordSemantic());
             values.put("normalTexture", normalTexture);
             
-            float normalScale = material.getNormalScale();
+            double normalScale = material.getNormalScale();
             values.put("normalScale", normalScale);
         }
         else
@@ -335,7 +335,7 @@ class RenderedMaterialHandler
                 materialStructure.getOcclusionTexCoordSemantic());
             values.put("occlusionTexture", occlusionTexture);
             
-            float occlusionStrength = material.getOcclusionStrength();
+            double occlusionStrength = material.getOcclusionStrength();
             values.put("occlusionStrength", occlusionStrength);
         }
         else
@@ -360,11 +360,11 @@ class RenderedMaterialHandler
             values.put("hasEmissiveTexture", 0);
         }
         
-        float[] emissiveFactor = material.getEmissiveFactor();
+        double[] emissiveFactor = material.getEmissiveFactor();
         values.put("emissiveFactor", emissiveFactor);
         
         
-        float lightPosition[] = { -800,500,500 };
+        double lightPosition[] = { -800,500,500 };
         values.put("lightPosition", lightPosition);
         
         DefaultRenderedMaterial renderedMaterial = 

@@ -81,7 +81,7 @@ public class GltfModelCreationMorphTargetsExample
         // Create a mesh with the mesh primitive, assigning
         // the morph target weights
         DefaultMeshModel meshModel = new DefaultMeshModel();
-        meshModel.setWeights(new float[] { 0.0f, 0.25f } );
+        meshModel.setWeights(new double[] { 0.0f, 0.25f } );
         meshModel.addMeshPrimitiveModel(meshPrimitiveModel);
         
         // Create a scene that only contains the given mesh

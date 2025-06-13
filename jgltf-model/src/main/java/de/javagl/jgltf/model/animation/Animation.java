@@ -42,13 +42,13 @@ public final class Animation
     /**
      * The key frame times, in seconds
      */
-    private final float timesS[];
+    private final double timesS[];
     
     /**
      * The values. Each element of this array corresponds to one key
      * frame time
      */
-    private final float values[][];
+    private final double values[][];
     
     /**
      * The interpolator for the values
@@ -60,7 +60,7 @@ public final class Animation
      * to the listeners. The listeners are not allowed to store or
      * modify this array.
      */
-    private final float outputValues[];
+    private final double outputValues[];
     
     /**
      * The {@link AnimationListener}s that are informed about the progress
@@ -86,8 +86,8 @@ public final class Animation
      * has a length that is different from the length of the times array. 
      */
     public Animation(
-        float timesS[],
-        float values[][], 
+        double timesS[],
+        double values[][], 
         InterpolatorType interpolatorType)
     {
         Objects.requireNonNull(timesS, "The times may not be null");
@@ -104,12 +104,12 @@ public final class Animation
                 "but have a length of "+values.length);
         }
         this.timesS = timesS.clone();
-        this.values = new float[values.length][];
+        this.values = new double[values.length][];
         for (int i=0; i<values.length; i++)
         {
             this.values[i] = values[i].clone();
         }
-        this.outputValues = new float[values[0].length];
+        this.outputValues = new double[values[0].length];
         this.interpolator = Interpolators.create(interpolatorType);
         this.listeners = new CopyOnWriteArrayList<AnimationListener>();
     }
@@ -120,7 +120,7 @@ public final class Animation
      * 
      * @return The start time
      */
-    float getStartTimeS()
+    double getStartTimeS()
     {
         return timesS[0];
     }
@@ -130,7 +130,7 @@ public final class Animation
      * 
      * @return The end time
      */
-    float getEndTimeS()
+    double getEndTimeS()
     {
         return timesS[timesS.length-1];
     }
@@ -140,7 +140,7 @@ public final class Animation
      * 
      * @return The duration
      */
-    float getDurationS()
+    double getDurationS()
     {
         return getEndTimeS() - getStartTimeS();
     }
@@ -172,19 +172,19 @@ public final class Animation
      * 
      * @param timeS The time, in seconds
      */
-    void update(float timeS)
+    void update(double timeS)
     {
         int index0 = InterpolatorKeys.computeIndex(timeS, timesS);
         int index1 = Math.min(timesS.length - 1, index0 + 1);
-        float alpha = InterpolatorKeys.computeAlpha(timeS, timesS, index0);
+        double alpha = InterpolatorKeys.computeAlpha(timeS, timesS, index0);
 
         //System.out.println("For "+timeS+" in "+Arrays.toString(timesS));
         //System.out.println("index0 "+index0);
         //System.out.println("index1 "+index1);
         //System.out.println("alpha  "+alpha);
         
-        float a[] = values[index0];
-        float b[] = values[index1];
+        double a[] = values[index0];
+        double b[] = values[index1];
         interpolator.interpolate(a, b, alpha, outputValues);
         for (AnimationListener listener : listeners)
         {

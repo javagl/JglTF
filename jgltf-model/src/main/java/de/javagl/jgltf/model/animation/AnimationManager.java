@@ -83,7 +83,7 @@ public final class AnimationManager
     /**
      * The maximum {@link Animation#getEndTimeS()} of all animations
      */
-    private float maxEndTimeS;
+    private double maxEndTimeS;
     
     /**
      * The list of {@link AnimationManagerListener}s that want to be 
@@ -102,7 +102,7 @@ public final class AnimationManager
         this.startNs = System.nanoTime();
         this.currentNs = startNs;
         this.animations = new CopyOnWriteArrayList<Animation>();
-        this.maxEndTimeS = 0.0f;
+        this.maxEndTimeS = 0.0;
         this.animationManagerListeners = 
             new CopyOnWriteArrayList<AnimationManagerListener>();
     }
@@ -197,7 +197,7 @@ public final class AnimationManager
      */
     private void updateMaxEndTime()
     {
-        maxEndTimeS = 0.0f;
+        maxEndTimeS = 0.0;
         for (Animation animation : animations)
         {
             maxEndTimeS = Math.max(maxEndTimeS, animation.getEndTimeS());
@@ -224,14 +224,14 @@ public final class AnimationManager
         {
             if (animationPolicy == AnimationPolicy.LOOP)
             {
-                float loopTimeS = currentTimeS % maxEndTimeS;
+                double loopTimeS = currentTimeS % maxEndTimeS;
                 animation.update(loopTimeS);
             }
             else if (animationPolicy == AnimationPolicy.PING_PONG)
             {
                 int interval = (int)(currentTimeS / maxEndTimeS);
-                float loopTimeS = currentTimeS % maxEndTimeS;
-                float pingPongTimeS = loopTimeS;
+                double loopTimeS = currentTimeS % maxEndTimeS;
+                double pingPongTimeS = loopTimeS;
                 if ((interval & 1) != 0)
                 {
                     pingPongTimeS = maxEndTimeS - loopTimeS; 

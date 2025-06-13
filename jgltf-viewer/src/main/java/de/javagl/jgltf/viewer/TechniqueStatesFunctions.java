@@ -42,8 +42,8 @@ class TechniqueStatesFunctions
     /**
      * The default BlendColor
      */
-    private static final float[] DEFAULT_BLENDCOLOR = 
-        new float[] { 0.0F, 0.0F, 0.0F, 0.0F };
+    private static final double[] DEFAULT_BLENDCOLOR = 
+        new double[] { 0.0F, 0.0F, 0.0F, 0.0F };
 
     /**
      * The default BlendEquationSeparate
@@ -84,8 +84,8 @@ class TechniqueStatesFunctions
     /**
      * The default DepthRange
      */
-    private static final float[] DEFAULT_DEPTH_RANGE = 
-        new float[] { 0.0F, 1.0F };
+    private static final double[] DEFAULT_DEPTH_RANGE = 
+        new double[] { 0.0F, 1.0F };
 
     /**
      * The default FrontFace
@@ -96,14 +96,14 @@ class TechniqueStatesFunctions
     /**
      * The default LineWidth
      */
-    private static final float[] DEFAULT_LINE_WIDTH = 
-        new float[] { 1.0F };
+    private static final double[] DEFAULT_LINE_WIDTH = 
+        new double[] { 1.0F };
 
     /**
      * The default PolygonOffset
      */
-    private static final float[] DEFAULT_POLYGON_OFFSET = 
-        new float[] { 0.0F, 0.0F };
+    private static final double[] DEFAULT_POLYGON_OFFSET = 
+        new double[] { 0.0F, 0.0F };
 
     /**
      * Create the functions that, when executed, call the functions
@@ -122,14 +122,14 @@ class TechniqueStatesFunctions
     {
         List<Runnable> commands = new ArrayList<Runnable>();
         
-        float[] blendColor = Optionals.of(
+        double[] blendColor = Optionals.of(
             techniqueStatesFunctionsModel.getBlendColor(),
             DEFAULT_BLENDCOLOR);
         commands.add(() ->
         {
             glContext.setBlendColor(
-                blendColor[0], blendColor[1], 
-                blendColor[2], blendColor[3]);
+                (float)blendColor[0], (float)blendColor[1], 
+                (float)blendColor[2], (float)blendColor[3]);
         });
         
         int[] blendEquationSeparate = Optionals.of( 
@@ -185,12 +185,13 @@ class TechniqueStatesFunctions
             glContext.setDepthMask(depthMask[0]);
         });
         
-        float[] depthRange = Optionals.of(
+        double[] depthRange = Optionals.of(
             techniqueStatesFunctionsModel.getDepthRange(),
             DEFAULT_DEPTH_RANGE);
         commands.add(() ->
         {
-            glContext.setDepthRange(depthRange[0], depthRange[1]);
+            glContext.setDepthRange(
+                (float)depthRange[0], (float)depthRange[1]);
         });
         
         int[] frontFace = Optionals.of(
@@ -201,21 +202,21 @@ class TechniqueStatesFunctions
             glContext.setFrontFace(frontFace[0]);
         });
         
-        float[] lineWidth = Optionals.of(
+        double[] lineWidth = Optionals.of(
             techniqueStatesFunctionsModel.getLineWidth(),
             DEFAULT_LINE_WIDTH);
         commands.add(() ->
         {
-            glContext.setLineWidth(lineWidth[0]);
+            glContext.setLineWidth((float)lineWidth[0]);
         });
         
-        float[] polygonOffset = Optionals.of(
+        double[] polygonOffset = Optionals.of(
             techniqueStatesFunctionsModel.getPolygonOffset(),
             DEFAULT_POLYGON_OFFSET);
         commands.add(() ->
         {
             glContext.setPolygonOffset(
-                polygonOffset[0], polygonOffset[1]);
+                (float)polygonOffset[0], (float)polygonOffset[1]);
         });
         
         return commands;

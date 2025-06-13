@@ -139,7 +139,7 @@ public class Optionals
      * @param array The array
      * @return The result
      */
-    public static float[] clone(float array[])
+    public static double[] clone(double array[])
     {
         if (array == null)
         {

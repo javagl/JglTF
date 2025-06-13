@@ -63,7 +63,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
     /**
      * The base color factor
      */
-    private float[] baseColorFactor;
+    private double[] baseColorFactor;
     
     /**
      * The base color texture
@@ -78,12 +78,12 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
     /**
      * The metallic factor
      */
-    private float metallicFactor;
+    private double metallicFactor;
     
     /**
      * The roughness factor
      */
-    private float roughnessFactor;
+    private double roughnessFactor;
     
     /**
      * The metallic-roughness texture
@@ -108,7 +108,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
     /**
      * The normal scale
      */
-    private float normalScale;
+    private double normalScale;
 
     /**
      * The occlusion texture
@@ -123,7 +123,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
     /**
      * The occlusion strength
      */
-    private float occlusionStrength;
+    private double occlusionStrength;
     
     /**
      * The emissive texture
@@ -138,7 +138,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
     /**
      * The emissive factor
      */
-    private float[] emissiveFactor;
+    private double[] emissiveFactor;
 
     /**
      * The alpha mode
@@ -148,7 +148,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
     /**
      * The alpha cutoff
      */
-    private float alphaCutoff;
+    private double alphaCutoff;
     
     /**
      * Whether the material is double sided
@@ -161,29 +161,29 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      */
     public MaterialModelV2()
     {
-        baseColorFactor = new float[]{ 1.0f, 1.0f, 1.0f, 1.0f };
+        baseColorFactor = new double[]{ 1.0, 1.0, 1.0, 1.0 };
         baseColorTexture = null;
         baseColorTexcoord = null;
         
-        metallicFactor = 1.0f;
-        roughnessFactor = 1.0f;
+        metallicFactor = 1.0;
+        roughnessFactor = 1.0;
         metallicRoughnessTexture = null;
         metallicRoughnessTexcoord = null;
         
-        normalScale = 1.0f;
+        normalScale = 1.0;
         normalTexture = null;
         normalTexcoord = null;
         
         occlusionTexture = null;
         occlusionTexcoord = null;
-        occlusionStrength = 1.0f;
+        occlusionStrength = 1.0;
         
         emissiveTexture = null;
         emissiveTexcoord = null;
-        emissiveFactor = new float[]{0.0f, 0.0f, 0.0f };
+        emissiveFactor = new double[]{0.0, 0.0, 0.0 };
 
         alphaMode = AlphaMode.OPAQUE;
-        alphaCutoff = 0.5f;
+        alphaCutoff = 0.5;
         
         doubleSided = false;
     }
@@ -193,7 +193,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @return The base color factor
      */
-    public float[] getBaseColorFactor()
+    public double[] getBaseColorFactor()
     {
         return baseColorFactor;
     }
@@ -203,7 +203,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @param baseColorFactor The base color factor
      */
-    public void setBaseColorFactor(float[] baseColorFactor)
+    public void setBaseColorFactor(double[] baseColorFactor)
     {
         this.baseColorFactor = baseColorFactor;
     }
@@ -253,7 +253,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @return The metallic factor
      */
-    public float getMetallicFactor()
+    public double getMetallicFactor()
     {
         return metallicFactor;
     }
@@ -263,7 +263,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @param metallicFactor The metallic factor
      */
-    public void setMetallicFactor(float metallicFactor)
+    public void setMetallicFactor(double metallicFactor)
     {
         this.metallicFactor = metallicFactor;
     }
@@ -273,7 +273,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @return The roughness factor
      */
-    public float getRoughnessFactor()
+    public double getRoughnessFactor()
     {
         return roughnessFactor;
     }
@@ -283,7 +283,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @param roughnessFactor The roughness factor
      */
-    public void setRoughnessFactor(float roughnessFactor)
+    public void setRoughnessFactor(double roughnessFactor)
     {
         this.roughnessFactor = roughnessFactor;
     }
@@ -374,7 +374,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @return The normal scale
      */
-    public float getNormalScale()
+    public double getNormalScale()
     {
         return normalScale;
     }
@@ -384,7 +384,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @param normalScale The normal scale
      */
-    public void setNormalScale(float normalScale)
+    public void setNormalScale(double normalScale)
     {
         this.normalScale = normalScale;
     }
@@ -434,7 +434,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @return The occlusion strength
      */
-    public float getOcclusionStrength()
+    public double getOcclusionStrength()
     {
         return occlusionStrength;
     }
@@ -444,7 +444,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @param occlusionStrength The occlusion strength
      */
-    public void setOcclusionStrength(float occlusionStrength)
+    public void setOcclusionStrength(double occlusionStrength)
     {
         this.occlusionStrength = occlusionStrength;
     }
@@ -494,7 +494,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @return The emissive factor
      */
-    public float[] getEmissiveFactor()
+    public double[] getEmissiveFactor()
     {
         return emissiveFactor;
     }
@@ -504,7 +504,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @param emissiveFactor The emissive factor
      */
-    public void setEmissiveFactor(float[] emissiveFactor)
+    public void setEmissiveFactor(double[] emissiveFactor)
     {
         this.emissiveFactor = emissiveFactor;
     }
@@ -534,7 +534,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @return The alpha cutoff
      */
-    public float getAlphaCutoff()
+    public double getAlphaCutoff()
     {
         return alphaCutoff;
     }
@@ -544,7 +544,7 @@ public final class MaterialModelV2 extends AbstractNamedModelElement
      * 
      * @param alphaCutoff The alpha cutoff
      */
-    public void setAlphaCutoff(float alphaCutoff)
+    public void setAlphaCutoff(double alphaCutoff)
     {
         this.alphaCutoff = alphaCutoff;
     }

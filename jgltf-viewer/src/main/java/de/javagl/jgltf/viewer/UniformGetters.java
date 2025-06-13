@@ -306,6 +306,18 @@ class UniformGetters
                 {
                     return (float[])object;
                 }
+                else if (object instanceof double[])
+                {
+                    double d[] = (double[]) object;
+                    if (value == null || value.length != d.length) 
+                    {
+                        value = new float[d.length];
+                    }
+                    for (int i=0; i<d.length; i++)
+                    {
+                        value[i] = (float) d[i];
+                    }
+                }
                 else
                 {
                     List<? extends Number> list = asNumberList(object);

@@ -3,7 +3,7 @@
  * 
  * Do not modify this class. It is automatically generated
  * with JsonModelGen (https://github.com/javagl/JsonModelGen)
- * Copyright (c) 2016 Marco Hutter - http://www.javagl.de
+ * Copyright (c) 2016-2021 Marco Hutter - http://www.javagl.de
  */
 
 package de.javagl.jgltf.impl.v1;
@@ -27,7 +27,7 @@ public class AnimationChannelTarget
     private String id;
     /**
      * The name of the node's TRS property to modify. (required)<br> 
-     * Valid values: ["translation", "rotation", "scale"] 
+     * Valid values: [translation, rotation, scale] 
      * 
      */
     private String path;
@@ -58,7 +58,7 @@ public class AnimationChannelTarget
 
     /**
      * The name of the node's TRS property to modify. (required)<br> 
-     * Valid values: ["translation", "rotation", "scale"] 
+     * Valid values: [translation, rotation, scale] 
      * 
      * @param path The path to set
      * @throws NullPointerException If the given value is <code>null</code>
@@ -71,14 +71,14 @@ public class AnimationChannelTarget
             throw new NullPointerException((("Invalid value for path: "+ path)+", may not be null"));
         }
         if (((!"translation".equals(path))&&(!"rotation".equals(path)))&&(!"scale".equals(path))) {
-            throw new IllegalArgumentException((("Invalid value for path: "+ path)+", valid: [\"translation\", \"rotation\", \"scale\"]"));
+            throw new IllegalArgumentException((("Invalid value for path: "+ path)+", valid: [translation, rotation, scale]"));
         }
         this.path = path;
     }
 
     /**
      * The name of the node's TRS property to modify. (required)<br> 
-     * Valid values: ["translation", "rotation", "scale"] 
+     * Valid values: [translation, rotation, scale] 
      * 
      * @return The path
      * 

@@ -3,7 +3,7 @@
  * 
  * Do not modify this class. It is automatically generated
  * with JsonModelGen (https://github.com/javagl/JsonModelGen)
- * Copyright (c) 2016 Marco Hutter - http://www.javagl.de
+ * Copyright (c) 2016-2021 Marco Hutter - http://www.javagl.de
  */
 
 package de.javagl.jgltf.impl.v1;
@@ -59,8 +59,7 @@ public class Accessor
     /**
      * Specifies if the attribute is a scalar, vector, or matrix. 
      * (required)<br> 
-     * Valid values: ["SCALAR", "VEC2", "VEC3", "VEC4", "MAT2", "MAT3", 
-     * "MAT4"] 
+     * Valid values: [SCALAR, VEC2, VEC3, VEC4, MAT2, MAT3, MAT4] 
      * 
      */
     private String type;
@@ -256,8 +255,7 @@ public class Accessor
     /**
      * Specifies if the attribute is a scalar, vector, or matrix. 
      * (required)<br> 
-     * Valid values: ["SCALAR", "VEC2", "VEC3", "VEC4", "MAT2", "MAT3", 
-     * "MAT4"] 
+     * Valid values: [SCALAR, VEC2, VEC3, VEC4, MAT2, MAT3, MAT4] 
      * 
      * @param type The type to set
      * @throws NullPointerException If the given value is <code>null</code>
@@ -270,7 +268,7 @@ public class Accessor
             throw new NullPointerException((("Invalid value for type: "+ type)+", may not be null"));
         }
         if (((((((!"SCALAR".equals(type))&&(!"VEC2".equals(type)))&&(!"VEC3".equals(type)))&&(!"VEC4".equals(type)))&&(!"MAT2".equals(type)))&&(!"MAT3".equals(type)))&&(!"MAT4".equals(type))) {
-            throw new IllegalArgumentException((("Invalid value for type: "+ type)+", valid: [\"SCALAR\", \"VEC2\", \"VEC3\", \"VEC4\", \"MAT2\", \"MAT3\", \"MAT4\"]"));
+            throw new IllegalArgumentException((("Invalid value for type: "+ type)+", valid: [SCALAR, VEC2, VEC3, VEC4, MAT2, MAT3, MAT4]"));
         }
         this.type = type;
     }
@@ -278,8 +276,7 @@ public class Accessor
     /**
      * Specifies if the attribute is a scalar, vector, or matrix. 
      * (required)<br> 
-     * Valid values: ["SCALAR", "VEC2", "VEC3", "VEC4", "MAT2", "MAT3", 
-     * "MAT4"] 
+     * Valid values: [SCALAR, VEC2, VEC3, VEC4, MAT2, MAT3, MAT4] 
      * 
      * @return The type
      * 

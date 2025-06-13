@@ -53,7 +53,7 @@ public class Material
      * &nbsp;&nbsp;Maximum: 1.0 (inclusive) 
      * 
      */
-    private float[] emissiveFactor;
+    private double[] emissiveFactor;
     /**
      * The alpha rendering mode of the material. (optional)<br> 
      * Default: "OPAQUE"<br> 
@@ -67,7 +67,7 @@ public class Material
      * Minimum: 0.0 (inclusive) 
      * 
      */
-    private Float alphaCutoff;
+    private Double alphaCutoff;
     /**
      * Specifies whether the material is double sided. (optional)<br> 
      * Default: false 
@@ -191,7 +191,7 @@ public class Material
      * the given constraints
      * 
      */
-    public void setEmissiveFactor(float[] emissiveFactor) {
+    public void setEmissiveFactor(double[] emissiveFactor) {
         if (emissiveFactor == null) {
             this.emissiveFactor = emissiveFactor;
             return ;
@@ -202,7 +202,7 @@ public class Material
         if (emissiveFactor.length > 3) {
             throw new IllegalArgumentException("Number of emissiveFactor elements is > 3");
         }
-        for (float emissiveFactorElement: emissiveFactor) {
+        for (double emissiveFactorElement: emissiveFactor) {
             if (emissiveFactorElement > 1.0D) {
                 throw new IllegalArgumentException("emissiveFactorElement > 1.0");
             }
@@ -225,7 +225,7 @@ public class Material
      * @return The emissiveFactor
      * 
      */
-    public float[] getEmissiveFactor() {
+    public double[] getEmissiveFactor() {
         return this.emissiveFactor;
     }
 
@@ -236,8 +236,8 @@ public class Material
      * @return The default emissiveFactor
      * 
      */
-    public float[] defaultEmissiveFactor() {
-        return new float[] { 0.0F, 0.0F, 0.0F };
+    public double[] defaultEmissiveFactor() {
+        return new double[] { 0.0D, 0.0D, 0.0D };
     }
 
     /**
@@ -294,7 +294,7 @@ public class Material
      * the given constraints
      * 
      */
-    public void setAlphaCutoff(Float alphaCutoff) {
+    public void setAlphaCutoff(Double alphaCutoff) {
         if (alphaCutoff == null) {
             this.alphaCutoff = alphaCutoff;
             return ;
@@ -313,7 +313,7 @@ public class Material
      * @return The alphaCutoff
      * 
      */
-    public Float getAlphaCutoff() {
+    public Double getAlphaCutoff() {
         return this.alphaCutoff;
     }
 
@@ -324,8 +324,8 @@ public class Material
      * @return The default alphaCutoff
      * 
      */
-    public Float defaultAlphaCutoff() {
-        return  0.5F;
+    public Double defaultAlphaCutoff() {
+        return  0.5D;
     }
 
     /**

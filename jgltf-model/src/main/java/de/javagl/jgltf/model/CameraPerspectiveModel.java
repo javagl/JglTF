@@ -36,27 +36,27 @@ public interface CameraPerspectiveModel
      *  
      * @return The aspect ratio
      */
-    Float getAspectRatio();
+    Double getAspectRatio();
     
     /**
      * Returns the FOV, in y-direction, in radians
      * 
      * @return The FOV
      */
-    Float getYfov();
+    Double getYfov();
     
     /**
      * Returns the distance of the far clipping plane
      * 
      * @return The distance
      */
-    Float getZfar();
+    Double getZfar();
     
     /**
      * Returns the distance of the near clipping plane
      * 
      * @return The distance
      */
-    Float getZnear();
+    Double getZnear();
     
 }
