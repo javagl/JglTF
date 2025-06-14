@@ -75,7 +75,7 @@ public class Node
      * &nbsp;&nbsp;The elements of this array (optional) 
      * 
      */
-    private float[] matrix;
+    private double[] matrix;
     /**
      * The IDs of the meshes in this node. (optional)<br> 
      * Array elements:<br> 
@@ -92,7 +92,7 @@ public class Node
      * &nbsp;&nbsp;The elements of this array (optional) 
      * 
      */
-    private float[] rotation;
+    private double[] rotation;
     /**
      * The node's non-uniform scale. (optional)<br> 
      * Default: [1.0,1.0,1.0]<br> 
@@ -101,7 +101,7 @@ public class Node
      * &nbsp;&nbsp;The elements of this array (optional) 
      * 
      */
-    private float[] scale;
+    private double[] scale;
     /**
      * The node's translation. (optional)<br> 
      * Default: [0.0,0.0,0.0]<br> 
@@ -110,7 +110,7 @@ public class Node
      * &nbsp;&nbsp;The elements of this array (optional) 
      * 
      */
-    private float[] translation;
+    private double[] translation;
 
     /**
      * The ID of the camera referenced by this node. (optional) 
@@ -367,7 +367,7 @@ public class Node
      * the given constraints
      * 
      */
-    public void setMatrix(float[] matrix) {
+    public void setMatrix(double[] matrix) {
         if (matrix == null) {
             this.matrix = matrix;
             return ;
@@ -393,7 +393,7 @@ public class Node
      * @return The matrix
      * 
      */
-    public float[] getMatrix() {
+    public double[] getMatrix() {
         return this.matrix;
     }
 
@@ -404,8 +404,8 @@ public class Node
      * @return The default matrix
      * 
      */
-    public float[] defaultMatrix() {
-        return new float[] { 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F };
+    public double[] defaultMatrix() {
+        return new double[] { 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 };
     }
 
     /**
@@ -499,7 +499,7 @@ public class Node
      * the given constraints
      * 
      */
-    public void setRotation(float[] rotation) {
+    public void setRotation(double[] rotation) {
         if (rotation == null) {
             this.rotation = rotation;
             return ;
@@ -524,7 +524,7 @@ public class Node
      * @return The rotation
      * 
      */
-    public float[] getRotation() {
+    public double[] getRotation() {
         return this.rotation;
     }
 
@@ -535,8 +535,8 @@ public class Node
      * @return The default rotation
      * 
      */
-    public float[] defaultRotation() {
-        return new float[] { 0.0F, 0.0F, 0.0F, 1.0F };
+    public double[] defaultRotation() {
+        return new double[] { 0.0, 0.0, 0.0, 1.0 };
     }
 
     /**
@@ -551,7 +551,7 @@ public class Node
      * the given constraints
      * 
      */
-    public void setScale(float[] scale) {
+    public void setScale(double[] scale) {
         if (scale == null) {
             this.scale = scale;
             return ;
@@ -575,7 +575,7 @@ public class Node
      * @return The scale
      * 
      */
-    public float[] getScale() {
+    public double[] getScale() {
         return this.scale;
     }
 
@@ -586,8 +586,8 @@ public class Node
      * @return The default scale
      * 
      */
-    public float[] defaultScale() {
-        return new float[] { 1.0F, 1.0F, 1.0F };
+    public double[] defaultScale() {
+        return new double[] { 1.0, 1.0, 1.0 };
     }
 
     /**
@@ -602,7 +602,7 @@ public class Node
      * the given constraints
      * 
      */
-    public void setTranslation(float[] translation) {
+    public void setTranslation(double[] translation) {
         if (translation == null) {
             this.translation = translation;
             return ;
@@ -626,7 +626,7 @@ public class Node
      * @return The translation
      * 
      */
-    public float[] getTranslation() {
+    public double[] getTranslation() {
         return this.translation;
     }
 
@@ -637,8 +637,8 @@ public class Node
      * @return The default translation
      * 
      */
-    public float[] defaultTranslation() {
-        return new float[] { 0.0F, 0.0F, 0.0F };
+    public double[] defaultTranslation() {
+        return new double[] { 0.0, 0.0, 0.0 };
     }
 
 }

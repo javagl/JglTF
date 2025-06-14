@@ -67,7 +67,7 @@ class BoundingBoxComputer
         List<SceneModel> sceneModels = gltfModel.getSceneModels();
         for (SceneModel sceneModel : sceneModels)
         {
-            float rootTransform[] = MathUtils.createIdentity4x4();
+            double rootTransform[] = MathUtils.createIdentity4x4();
             computeSceneBoundingBox(sceneModel, rootTransform, boundingBox);
         }
         return boundingBox;
@@ -86,7 +86,7 @@ class BoundingBoxComputer
      * @return The result
      */
     private BoundingBox computeSceneBoundingBox(
-        SceneModel sceneModel, float transform[], BoundingBox boundingBox)
+        SceneModel sceneModel, double transform[], BoundingBox boundingBox)
     {
         BoundingBox localResult = boundingBox;
         if (localResult == null)
@@ -115,7 +115,7 @@ class BoundingBoxComputer
      * @return The result
      */
     private BoundingBox computeNodeBoundingBox(
-        NodeModel nodeModel, float parentTransform[], BoundingBox boundingBox) 
+        NodeModel nodeModel, double parentTransform[], BoundingBox boundingBox)
     {
         BoundingBox result = boundingBox;
         if (result == null)
@@ -123,8 +123,8 @@ class BoundingBoxComputer
             result = new BoundingBox();
         }
 
-        float[] localTransform = nodeModel.computeLocalTransform(null);
-        float[] transform = new float[16];
+        double[] localTransform = nodeModel.computeLocalTransform(null);
+        double[] transform = new double[16];
         MathUtils.mul4x4(parentTransform, localTransform, transform);
         
         List<MeshModel> meshModels = nodeModel.getMeshModels();
@@ -157,7 +157,7 @@ class BoundingBoxComputer
      * @return The result
      */
     private BoundingBox computeMeshBoundingBox(
-        MeshModel meshModel, float transform[], BoundingBox boundingBox)
+        MeshModel meshModel, double transform[], BoundingBox boundingBox)
     {
         BoundingBox result = boundingBox;
         if (result == null)
@@ -194,7 +194,7 @@ class BoundingBoxComputer
      * returned. 
      */
     private BoundingBox computeBoundingBox(
-        MeshPrimitiveModel meshPrimitiveModel, float transform[])
+        MeshPrimitiveModel meshPrimitiveModel, double transform[])
     {
         Map<String, AccessorModel> attributes = 
             meshPrimitiveModel.getAttributes();

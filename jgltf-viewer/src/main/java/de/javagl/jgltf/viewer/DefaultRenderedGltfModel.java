@@ -147,7 +147,7 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
         Objects.requireNonNull(viewConfiguration,
             "The viewConfiguration may not be null");
 
-        float rtcCenter[] = CesiumRtcUtils.extractRtcCenterFromModel(gltfModel);
+        double rtcCenter[] = CesiumRtcUtils.extractRtcCenterFromModel(gltfModel);
         if (rtcCenter != null)
         {
             // NOTE: The RTC center is not really APPLIED here during 
