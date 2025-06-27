@@ -72,12 +72,12 @@ class ExternalCameraRendering implements RenderedCamera
     /**
      * The view matrix
      */
-    private final float viewMatrix[];
+    private final double viewMatrix[];
     
     /**
      * The projection matrix
      */
-    private final float projectionMatrix[];
+    private final double projectionMatrix[];
     
     /**
      * A listener for the {@link #component} that will update the aspect
@@ -100,8 +100,8 @@ class ExternalCameraRendering implements RenderedCamera
     ExternalCameraRendering()
     {
         this.view = Views.create();
-        this.viewMatrix = new float[16];
-        this.projectionMatrix = new float[16];
+        this.viewMatrix = new double[16];
+        this.projectionMatrix = new double[16];
         
         view.getCamera().addCameraListener(new CameraListener()
         {
@@ -118,7 +118,7 @@ class ExternalCameraRendering implements RenderedCamera
     }
 
     @Override
-    public float[] getViewMatrix()
+    public double[] getViewMatrix()
     {
         Matrix4f m = CameraUtils.computeViewMatrix(view.getCamera());
         writeMatrixToArrayColumnMajor4f(m, viewMatrix, 0);
@@ -126,7 +126,7 @@ class ExternalCameraRendering implements RenderedCamera
     }
     
     @Override
-    public float[] getProjectionMatrix()
+    public double[] getProjectionMatrix()
     {
         Matrix4f m = view.getProjectionMatrix();
         writeMatrixToArrayColumnMajor4f(m, projectionMatrix, 0);
@@ -143,7 +143,7 @@ class ExternalCameraRendering implements RenderedCamera
      * @param offset The offset where to start writing into the array
      */
     private static void writeMatrixToArrayColumnMajor4f(
-        Matrix4f m, float a[], int offset)
+        Matrix4f m, double a[], int offset)
     {
         int i = offset;
         a[i++] = m.m00;
@@ -264,18 +264,18 @@ class ExternalCameraRendering implements RenderedCamera
         // generously moves the camera so that for usual scenes 
         // everything is visible, regardless of the aspect ratio
         
-        float minMax[] = BoundingBoxes.computeBoundingBoxMinMax(gltfModel);
+        double minMax[] = BoundingBoxes.computeBoundingBoxMinMax(gltfModel);
         
         // Compute diagonal length and center of the bounding box
         Point3f min = new Point3f();
-        min.x = minMax[0];
-        min.y = minMax[1];
-        min.z = minMax[2];
+        min.x = (float)minMax[0];
+        min.y = (float)minMax[1];
+        min.z = (float)minMax[2];
         
         Point3f max = new Point3f();
-        max.x = minMax[3];
-        max.y = minMax[4];
-        max.z = minMax[5];
+        max.x = (float)minMax[3];
+        max.y = (float)minMax[4];
+        max.z = (float)minMax[5];
 
         float diagonalLength = max.distance(min);
 

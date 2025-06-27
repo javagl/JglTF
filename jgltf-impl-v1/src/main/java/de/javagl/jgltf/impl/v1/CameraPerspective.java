@@ -3,7 +3,7 @@
  * 
  * Do not modify this class. It is automatically generated
  * with JsonModelGen (https://github.com/javagl/JsonModelGen)
- * Copyright (c) 2016 Marco Hutter - http://www.javagl.de
+ * Copyright (c) 2016-2021 Marco Hutter - http://www.javagl.de
  */
 
 package de.javagl.jgltf.impl.v1;
@@ -26,25 +26,23 @@ public class CameraPerspective
      * Minimum: 0.0 (inclusive) 
      * 
      */
-    private Float aspectRatio;
+    private Double aspectRatio;
     /**
      * The floating-point vertical field of view in radians. (required)<br> 
      * Minimum: 0.0 (inclusive) 
      * 
      */
-    private Float yfov;
+    private Double yfov;
     /**
-     * The floating-point distance to the far clipping plane. (required)<br> 
-     * Minimum: 0.0 (exclusive) 
+     * The floating-point distance to the far clipping plane. (required) 
      * 
      */
-    private Float zfar;
+    private Double zfar;
     /**
-     * The floating-point distance to the near clipping plane. (required)<br> 
-     * Minimum: 0.0 (exclusive) 
+     * The floating-point distance to the near clipping plane. (required) 
      * 
      */
-    private Float znear;
+    private Double znear;
 
     /**
      * The floating-point aspect ratio of the field of view. (optional)<br> 
@@ -55,7 +53,7 @@ public class CameraPerspective
      * the given constraints
      * 
      */
-    public void setAspectRatio(Float aspectRatio) {
+    public void setAspectRatio(Double aspectRatio) {
         if (aspectRatio == null) {
             this.aspectRatio = aspectRatio;
             return ;
@@ -73,7 +71,7 @@ public class CameraPerspective
      * @return The aspectRatio
      * 
      */
-    public Float getAspectRatio() {
+    public Double getAspectRatio() {
         return this.aspectRatio;
     }
 
@@ -87,7 +85,7 @@ public class CameraPerspective
      * the given constraints
      * 
      */
-    public void setYfov(Float yfov) {
+    public void setYfov(Double yfov) {
         if (yfov == null) {
             throw new NullPointerException((("Invalid value for yfov: "+ yfov)+", may not be null"));
         }
@@ -104,69 +102,55 @@ public class CameraPerspective
      * @return The yfov
      * 
      */
-    public Float getYfov() {
+    public Double getYfov() {
         return this.yfov;
     }
 
     /**
-     * The floating-point distance to the far clipping plane. (required)<br> 
-     * Minimum: 0.0 (exclusive) 
+     * The floating-point distance to the far clipping plane. (required) 
      * 
      * @param zfar The zfar to set
      * @throws NullPointerException If the given value is <code>null</code>
-     * @throws IllegalArgumentException If the given value does not meet
-     * the given constraints
      * 
      */
-    public void setZfar(Float zfar) {
+    public void setZfar(Double zfar) {
         if (zfar == null) {
             throw new NullPointerException((("Invalid value for zfar: "+ zfar)+", may not be null"));
-        }
-        if (zfar<= 0.0D) {
-            throw new IllegalArgumentException("zfar <= 0.0");
         }
         this.zfar = zfar;
     }
 
     /**
-     * The floating-point distance to the far clipping plane. (required)<br> 
-     * Minimum: 0.0 (exclusive) 
+     * The floating-point distance to the far clipping plane. (required) 
      * 
      * @return The zfar
      * 
      */
-    public Float getZfar() {
+    public Double getZfar() {
         return this.zfar;
     }
 
     /**
-     * The floating-point distance to the near clipping plane. (required)<br> 
-     * Minimum: 0.0 (exclusive) 
+     * The floating-point distance to the near clipping plane. (required) 
      * 
      * @param znear The znear to set
      * @throws NullPointerException If the given value is <code>null</code>
-     * @throws IllegalArgumentException If the given value does not meet
-     * the given constraints
      * 
      */
-    public void setZnear(Float znear) {
+    public void setZnear(Double znear) {
         if (znear == null) {
             throw new NullPointerException((("Invalid value for znear: "+ znear)+", may not be null"));
-        }
-        if (znear<= 0.0D) {
-            throw new IllegalArgumentException("znear <= 0.0");
         }
         this.znear = znear;
     }
 
     /**
-     * The floating-point distance to the near clipping plane. (required)<br> 
-     * Minimum: 0.0 (exclusive) 
+     * The floating-point distance to the near clipping plane. (required) 
      * 
      * @return The znear
      * 
      */
-    public Float getZnear() {
+    public Double getZnear() {
         return this.znear;
     }
 

@@ -36,29 +36,29 @@ public class DefaultCameraOrthographicModel implements CameraOrthographicModel
     /**
      * The magnification in x-direction
      */
-    private Float xmag;
+    private Double xmag;
 
     /**
      * The magnification in y-direction
      */
-    private Float ymag;
+    private Double ymag;
 
     /**
      * The clipping plane distance
      */
-    private Float zfar;
+    private Double zfar;
 
     /**
      * The near clipping plane distance
      */
-    private Float znear;
+    private Double znear;
 
     /**
      * Set the magnification in x-direction
      * 
      * @param xmag The magnification
      */
-    public void setXmag(Float xmag)
+    public void setXmag(Double xmag)
     {
         this.xmag = xmag;
     }
@@ -68,7 +68,7 @@ public class DefaultCameraOrthographicModel implements CameraOrthographicModel
      * 
      * @param ymag The magnification
      */
-    public void setYmag(Float ymag)
+    public void setYmag(Double ymag)
     {
         this.ymag = ymag;
     }
@@ -78,7 +78,7 @@ public class DefaultCameraOrthographicModel implements CameraOrthographicModel
      * 
      * @param zfar The distance
      */
-    public void setZfar(Float zfar)
+    public void setZfar(Double zfar)
     {
         this.zfar = zfar;
     }
@@ -88,31 +88,31 @@ public class DefaultCameraOrthographicModel implements CameraOrthographicModel
      * 
      * @param znear The distance
      */
-    public void setZnear(Float znear)
+    public void setZnear(Double znear)
     {
         this.znear = znear;
     }
     
     @Override
-    public Float getXmag()
+    public Double getXmag()
     {
         return xmag;
     }
 
     @Override
-    public Float getYmag()
+    public Double getYmag()
     {
         return ymag;
     }
 
     @Override
-    public Float getZfar()
+    public Double getZfar()
     {
         return zfar;
     }
 
     @Override
-    public Float getZnear()
+    public Double getZnear()
     {
         return znear;
     }

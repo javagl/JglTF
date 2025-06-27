@@ -30,7 +30,7 @@ import java.util.Arrays;
 
 /**
  * Methods to compute {@link Interpolator} keys from a given value and a 
- * (sorted) float array
+ * (sorted) double array
  */
 class InterpolatorKeys
 {
@@ -44,7 +44,7 @@ class InterpolatorKeys
      * @param keys The sorted keys
      * @return The index for the key
      */
-    static int computeIndex(float key, float keys[])
+    static int computeIndex(double key, double keys[])
     {
         int index = Arrays.binarySearch(keys, key);
         if (index >= 0)
@@ -64,19 +64,19 @@ class InterpolatorKeys
      * @param index The index of the key
      * @return The alpha value
      */
-    static float computeAlpha(float key, float keys[], int index)
+    static double computeAlpha(double key, double keys[], int index)
     {
         if (key <= keys[0])
         {
-            return 0.0f;
+            return 0.0;
         }
         if (key >= keys[keys.length-1])
         {
-            return 1.0f;
+            return 1.0;
         }
-        float local = key - keys[index];
-        float delta = keys[index+1] - keys[index];
-        float alpha = local / delta;
+        double local = key - keys[index];
+        double delta = keys[index+1] - keys[index];
+        double alpha = local / delta;
         return alpha;
         
     }
@@ -87,11 +87,11 @@ class InterpolatorKeys
      */
     public static void main(String[] args)
     {
-        float keys[] = { 1, 8, 11 };
-        for (float d = -1; d <= 12; d+=0.1)
+        double keys[] = { 1, 8, 11 };
+        for (double d = -1; d <= 12; d+=0.1)
         {
             int index = computeIndex(d, keys);
-            float alpha = computeAlpha(d, keys, index);
+            double alpha = computeAlpha(d, keys, index);
             System.out.println("For "+d);
             System.out.println("    index "+index);
             System.out.println("    alpha "+alpha);

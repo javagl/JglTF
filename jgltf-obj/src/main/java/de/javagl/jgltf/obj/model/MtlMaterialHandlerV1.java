@@ -105,7 +105,7 @@ class MtlMaterialHandlerV1 implements MtlMaterialHandler
 
     @Override
     public MaterialModel createMaterialWithColor(boolean withNormals, 
-        float r, float g, float b)
+        double r, double g, double b)
     {
         MaterialModelV1 materialModelV1 = new MaterialModelV1();
         if (withNormals)

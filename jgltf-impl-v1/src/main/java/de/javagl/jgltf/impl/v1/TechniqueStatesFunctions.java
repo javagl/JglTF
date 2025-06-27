@@ -3,7 +3,7 @@
  * 
  * Do not modify this class. It is automatically generated
  * with JsonModelGen (https://github.com/javagl/JsonModelGen)
- * Copyright (c) 2016 Marco Hutter - http://www.javagl.de
+ * Copyright (c) 2016-2021 Marco Hutter - http://www.javagl.de
  */
 
 package de.javagl.jgltf.impl.v1;
@@ -30,7 +30,7 @@ public class TechniqueStatesFunctions
      * &nbsp;&nbsp;The elements of this array (optional) 
      * 
      */
-    private float[] blendColor;
+    private double[] blendColor;
     /**
      * Integer values passed to `blendEquationSeparate()`. (optional)<br> 
      * Default: [32774,32774]<br> 
@@ -100,7 +100,7 @@ public class TechniqueStatesFunctions
      * &nbsp;&nbsp;The elements of this array (optional) 
      * 
      */
-    private float[] depthRange;
+    private double[] depthRange;
     /**
      * Integer value passed to `frontFace()`. (optional)<br> 
      * Default: [2305]<br> 
@@ -116,11 +116,10 @@ public class TechniqueStatesFunctions
      * Default: [1.0]<br> 
      * Number of items: 1<br> 
      * Array elements:<br> 
-     * &nbsp;&nbsp;The elements of this array (optional)<br> 
-     * &nbsp;&nbsp;Minimum: 0.0 (exclusive) 
+     * &nbsp;&nbsp;The elements of this array (optional) 
      * 
      */
-    private float[] lineWidth;
+    private double[] lineWidth;
     /**
      * Floating-point value passed to `polygonOffset()`. [factor, units] 
      * (optional)<br> 
@@ -130,7 +129,7 @@ public class TechniqueStatesFunctions
      * &nbsp;&nbsp;The elements of this array (optional) 
      * 
      */
-    private float[] polygonOffset;
+    private double[] polygonOffset;
     /**
      * Floating-point value passed to `scissor()`. [x, y, width, height]. 
      * (optional)<br> 
@@ -140,7 +139,7 @@ public class TechniqueStatesFunctions
      * &nbsp;&nbsp;The elements of this array (optional) 
      * 
      */
-    private float[] scissor;
+    private double[] scissor;
 
     /**
      * Floating-point values passed to `blendColor()`. [red, green, blue, 
@@ -155,7 +154,7 @@ public class TechniqueStatesFunctions
      * the given constraints
      * 
      */
-    public void setBlendColor(float[] blendColor) {
+    public void setBlendColor(double[] blendColor) {
         if (blendColor == null) {
             this.blendColor = blendColor;
             return ;
@@ -180,7 +179,7 @@ public class TechniqueStatesFunctions
      * @return The blendColor
      * 
      */
-    public float[] getBlendColor() {
+    public double[] getBlendColor() {
         return this.blendColor;
     }
 
@@ -191,8 +190,8 @@ public class TechniqueStatesFunctions
      * @return The default blendColor
      * 
      */
-    public float[] defaultBlendColor() {
-        return new float[] { 0.0F, 0.0F, 0.0F, 0.0F };
+    public double[] defaultBlendColor() {
+        return new double[] { 0.0D, 0.0D, 0.0D, 0.0D };
     }
 
     /**
@@ -546,7 +545,7 @@ public class TechniqueStatesFunctions
      * the given constraints
      * 
      */
-    public void setDepthRange(float[] depthRange) {
+    public void setDepthRange(double[] depthRange) {
         if (depthRange == null) {
             this.depthRange = depthRange;
             return ;
@@ -571,7 +570,7 @@ public class TechniqueStatesFunctions
      * @return The depthRange
      * 
      */
-    public float[] getDepthRange() {
+    public double[] getDepthRange() {
         return this.depthRange;
     }
 
@@ -582,8 +581,8 @@ public class TechniqueStatesFunctions
      * @return The default depthRange
      * 
      */
-    public float[] defaultDepthRange() {
-        return new float[] { 0.0F, 1.0F };
+    public double[] defaultDepthRange() {
+        return new double[] { 0.0D, 1.0D };
     }
 
     /**
@@ -649,15 +648,14 @@ public class TechniqueStatesFunctions
      * Default: [1.0]<br> 
      * Number of items: 1<br> 
      * Array elements:<br> 
-     * &nbsp;&nbsp;The elements of this array (optional)<br> 
-     * &nbsp;&nbsp;Minimum: 0.0 (exclusive) 
+     * &nbsp;&nbsp;The elements of this array (optional) 
      * 
      * @param lineWidth The lineWidth to set
      * @throws IllegalArgumentException If the given value does not meet
      * the given constraints
      * 
      */
-    public void setLineWidth(float[] lineWidth) {
+    public void setLineWidth(double[] lineWidth) {
         if (lineWidth == null) {
             this.lineWidth = lineWidth;
             return ;
@@ -668,11 +666,6 @@ public class TechniqueStatesFunctions
         if (lineWidth.length > 1) {
             throw new IllegalArgumentException("Number of lineWidth elements is > 1");
         }
-        for (float lineWidthElement: lineWidth) {
-            if (lineWidthElement<= 0.0D) {
-                throw new IllegalArgumentException("lineWidthElement <= 0.0");
-            }
-        }
         this.lineWidth = lineWidth;
     }
 
@@ -681,13 +674,12 @@ public class TechniqueStatesFunctions
      * Default: [1.0]<br> 
      * Number of items: 1<br> 
      * Array elements:<br> 
-     * &nbsp;&nbsp;The elements of this array (optional)<br> 
-     * &nbsp;&nbsp;Minimum: 0.0 (exclusive) 
+     * &nbsp;&nbsp;The elements of this array (optional) 
      * 
      * @return The lineWidth
      * 
      */
-    public float[] getLineWidth() {
+    public double[] getLineWidth() {
         return this.lineWidth;
     }
 
@@ -698,8 +690,8 @@ public class TechniqueStatesFunctions
      * @return The default lineWidth
      * 
      */
-    public float[] defaultLineWidth() {
-        return new float[] { 1.0F };
+    public double[] defaultLineWidth() {
+        return new double[] { 1.0D };
     }
 
     /**
@@ -715,7 +707,7 @@ public class TechniqueStatesFunctions
      * the given constraints
      * 
      */
-    public void setPolygonOffset(float[] polygonOffset) {
+    public void setPolygonOffset(double[] polygonOffset) {
         if (polygonOffset == null) {
             this.polygonOffset = polygonOffset;
             return ;
@@ -740,7 +732,7 @@ public class TechniqueStatesFunctions
      * @return The polygonOffset
      * 
      */
-    public float[] getPolygonOffset() {
+    public double[] getPolygonOffset() {
         return this.polygonOffset;
     }
 
@@ -751,8 +743,8 @@ public class TechniqueStatesFunctions
      * @return The default polygonOffset
      * 
      */
-    public float[] defaultPolygonOffset() {
-        return new float[] { 0.0F, 0.0F };
+    public double[] defaultPolygonOffset() {
+        return new double[] { 0.0D, 0.0D };
     }
 
     /**
@@ -768,7 +760,7 @@ public class TechniqueStatesFunctions
      * the given constraints
      * 
      */
-    public void setScissor(float[] scissor) {
+    public void setScissor(double[] scissor) {
         if (scissor == null) {
             this.scissor = scissor;
             return ;
@@ -793,7 +785,7 @@ public class TechniqueStatesFunctions
      * @return The scissor
      * 
      */
-    public float[] getScissor() {
+    public double[] getScissor() {
         return this.scissor;
     }
 
@@ -804,8 +796,8 @@ public class TechniqueStatesFunctions
      * @return The default scissor
      * 
      */
-    public float[] defaultScissor() {
-        return new float[] { 0.0F, 0.0F, 0.0F, 0.0F };
+    public double[] defaultScissor() {
+        return new double[] { 0.0D, 0.0D, 0.0D, 0.0D };
     }
 
 }

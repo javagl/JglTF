@@ -77,11 +77,11 @@ class CesiumRtcUtils
      * @param rtcCenter The RTC center
      * @return The supplier
      */
-    static Supplier<float[]> createCesiumRtcModelViewMatrixSupplier(
-        NodeModel nodeModel, Supplier<float[]> viewMatrixSupplier, 
-        float rtcCenter[])
+    static Supplier<double[]> createCesiumRtcModelViewMatrixSupplier(
+        NodeModel nodeModel, Supplier<double[]> viewMatrixSupplier, 
+        double rtcCenter[])
     {
-        Supplier<float[]> modelMatrixSupplier = 
+        Supplier<double[]> modelMatrixSupplier = 
             nodeModel.createGlobalTransformSupplier();
         return MatrixOps
             .create4x4()
@@ -94,7 +94,7 @@ class CesiumRtcUtils
     }
     
     /**
-     * Extract the 3D float array from the given glTF model that is stored
+     * Extract the 3D double array from the given glTF model that is stored
      * as the <code>"center"</code> property in the <code>"CESIUM_RTC"</code>
      * extension. If no such property is found, then <code>null</code> is
      * returned.
@@ -102,7 +102,7 @@ class CesiumRtcUtils
      * @param gltfModel The {@link GltfModel}
      * @return The RTC center
      */
-    static float[] extractRtcCenterFromModel(GltfModel gltfModel)
+    static double[] extractRtcCenterFromModel(GltfModel gltfModel)
     {
         Map<String, Object> extensions = gltfModel.getExtensions();
         if (extensions == null) 
@@ -114,14 +114,14 @@ class CesiumRtcUtils
     }
 
     /**
-     * Extract the 3D float array from the given <code>"CESIUM_RTC"</code>
+     * Extract the 3D double array from the given <code>"CESIUM_RTC"</code>
      * extension object. This will be an array containing the numbers that
      * are stored in the list under the <code>"center"</code> property.
      * 
      * @param extensionObject The extension object
      * @return The RTC center
      */
-    private static float[] extractRtcCenterFromExtensionObbject(
+    private static double[] extractRtcCenterFromExtensionObbject(
         Object extensionObject)
     {
         // NOTE: This is very pragmatic and involves some manual fiddling.
@@ -156,7 +156,7 @@ class CesiumRtcUtils
                 + "have size 3, but has " + list.size());
             return null;
         }
-        float result[] = new float[3];
+        double result[] = new double[3];
         for (int i = 0; i < list.size(); i++)
         {
             Object value = list.get(i);
@@ -168,7 +168,7 @@ class CesiumRtcUtils
                 return null;
             }
             Number number = (Number) value;
-            result[i] = number.floatValue();
+            result[i] = number.doubleValue();
         }
         return result;
     }

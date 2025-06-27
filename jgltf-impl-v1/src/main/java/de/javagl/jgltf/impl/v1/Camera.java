@@ -3,7 +3,7 @@
  * 
  * Do not modify this class. It is automatically generated
  * with JsonModelGen (https://github.com/javagl/JsonModelGen)
- * Copyright (c) 2016 Marco Hutter - http://www.javagl.de
+ * Copyright (c) 2016-2021 Marco Hutter - http://www.javagl.de
  */
 
 package de.javagl.jgltf.impl.v1;
@@ -36,7 +36,7 @@ public class Camera
     /**
      * Specifies if the camera uses a perspective or orthographic projection. 
      * (required)<br> 
-     * Valid values: ["perspective", "orthographic"] 
+     * Valid values: [perspective, orthographic] 
      * 
      */
     private String type;
@@ -96,7 +96,7 @@ public class Camera
     /**
      * Specifies if the camera uses a perspective or orthographic projection. 
      * (required)<br> 
-     * Valid values: ["perspective", "orthographic"] 
+     * Valid values: [perspective, orthographic] 
      * 
      * @param type The type to set
      * @throws NullPointerException If the given value is <code>null</code>
@@ -109,7 +109,7 @@ public class Camera
             throw new NullPointerException((("Invalid value for type: "+ type)+", may not be null"));
         }
         if ((!"perspective".equals(type))&&(!"orthographic".equals(type))) {
-            throw new IllegalArgumentException((("Invalid value for type: "+ type)+", valid: [\"perspective\", \"orthographic\"]"));
+            throw new IllegalArgumentException((("Invalid value for type: "+ type)+", valid: [perspective, orthographic]"));
         }
         this.type = type;
     }
@@ -117,7 +117,7 @@ public class Camera
     /**
      * Specifies if the camera uses a perspective or orthographic projection. 
      * (required)<br> 
-     * Valid values: ["perspective", "orthographic"] 
+     * Valid values: [perspective, orthographic] 
      * 
      * @return The type
      * 

@@ -32,7 +32,7 @@ package de.javagl.jgltf.viewer;
 public interface RenderedCamera
 {
     /**
-     * The view matrix of this camera, as a float array with 16 elements, 
+     * The view matrix of this camera, as a double array with 16 elements, 
      * representing the 4x4 matrix in column-major order.<br>
      * <br>
      * The returned matrix will not be stored or modified. So the supplier
@@ -40,10 +40,10 @@ public interface RenderedCamera
      * 
      * @return The view matrix
      */
-    float[] getViewMatrix();
+    double[] getViewMatrix();
 
     /**
-     * The projection matrix of this camera, as a float array with 16 elements,
+     * The projection matrix of this camera, as a double array with 16 elements,
      * representing the 4x4 matrix in column-major order.<br>
      * <br>
      * The returned matrix will not be stored or modified. So the supplier
@@ -51,5 +51,5 @@ public interface RenderedCamera
      * 
      * @return The projection matrix
      */
-    float[] getProjectionMatrix();
+    double[] getProjectionMatrix();
 }

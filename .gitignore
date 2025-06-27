@@ -15,9 +15,23 @@
 /AccessorVis
 /JglTF
 /jgltf-jgltfifier
-/jgltf-impl-v2-khr-lights-punctual
-/jgltf-model-khr-lights-punctual
 /jgltf-asset-creator
+
+# Preliminary for extension experiments:
+# ---
+/jgltf-impl-v2-khr-lights-punctual
+/jgltf-impl-v2-khr-materials-variants
+/jgltf-impl-v2-khr-materials-clearcoat
+/jgltf-impl-v2-khr-texture-transform
+/jgltf-impl-v2-ext-draco-mesh-compression
+
+/jgltf-model-khr-lights-punctual
+/jgltf-model-khr-materials-variants
+/jgltf-model-khr-materials-clearcoat/
+/jgltf-model-khr-texture-transform
+
+/jgltf-draco-test
+# ---
 
 /jgltf-browser/.classpath
 /jgltf-browser/.settings

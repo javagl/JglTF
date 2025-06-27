@@ -74,7 +74,7 @@ class MtlMaterialHandlerV2 implements MtlMaterialHandler
 
         // If there is an MTL, try to translate some of the MTL
         // information into reasonable PBR information
-        float baseColorFactor[] = new float[] { 1.0f, 1.0f, 1.0f, 1.0f };
+        double baseColorFactor[] = new double[] { 1.0f, 1.0f, 1.0f, 1.0f };
         FloatTuple ambientColor = mtl.getKd();
         if (ambientColor != null)
         {
@@ -127,12 +127,12 @@ class MtlMaterialHandlerV2 implements MtlMaterialHandler
     
     @Override
     public MaterialModelV2 createMaterialWithColor(
-        boolean withNormals, float r, float g, float b)
+        boolean withNormals, double r, double g, double b)
     {
         MaterialModelV2 material = new MaterialModelV2();
         material.setRoughnessFactor(0.0f);
         material.setMetallicFactor(0.0f);
-        material.setBaseColorFactor(new float[] { r, g, b, 1.0f });
+        material.setBaseColorFactor(new double[] { r, g, b, 1.0f });
         material.setDoubleSided(true);
         return material;
     }
