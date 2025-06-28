@@ -44,7 +44,7 @@ public interface SkinModel extends NamedModelElement
      * @param result The result array
      * @return The result array
      */
-    float[] getBindShapeMatrix(float result[]);
+    double[] getBindShapeMatrix(double result[]);
     
     /**
      * Returns an unmodifiable list containing the joint nodes of the skeleton
@@ -73,14 +73,14 @@ public interface SkinModel extends NamedModelElement
      * Convenience function to obtain the inverse bind matrix for the joint
      * with the given index.<br>
      * <br>
-     * The result will be written to the given array, as a 4x4 matrix in 
+     * The result will be written to the given array, as a 4x4 matrix in
      * column major order. If the given array is <code>null</code> or does
-     * not have a length of 16, then a new array with length 16 will be 
-     * created and returned. 
-     *  
-     * @param index The index of the joint
+     * not have a length of 16, then a new array with length 16 will be
+     * created and returned.
+     *
+     * @param index  The index of the joint
      * @param result The result array
      * @return The result array
      */
-    float[] getInverseBindMatrix(int index, float result[]);
+    double[] getInverseBindMatrix(int index, double result[]);
 }

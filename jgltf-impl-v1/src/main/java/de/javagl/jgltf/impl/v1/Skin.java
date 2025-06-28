@@ -32,7 +32,7 @@ public class Skin
      * &nbsp;&nbsp;The elements of this array (optional) 
      * 
      */
-    private float[] bindShapeMatrix;
+    private double[] bindShapeMatrix;
     /**
      * The ID of the accessor containing the floating-point 4x4 inverse-bind 
      * matrices. (required) 
@@ -62,7 +62,7 @@ public class Skin
      * the given constraints
      * 
      */
-    public void setBindShapeMatrix(float[] bindShapeMatrix) {
+    public void setBindShapeMatrix(double[] bindShapeMatrix) {
         if (bindShapeMatrix == null) {
             this.bindShapeMatrix = bindShapeMatrix;
             return ;
@@ -88,7 +88,7 @@ public class Skin
      * @return The bindShapeMatrix
      * 
      */
-    public float[] getBindShapeMatrix() {
+    public double[] getBindShapeMatrix() {
         return this.bindShapeMatrix;
     }
 

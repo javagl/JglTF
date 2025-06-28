@@ -1083,12 +1083,12 @@ public class GltfCreatorV2
         }
         return indices;
     }
-    
-    
+
+
     /**
      * Returns a new list containing the elements of the given array,
      * or <code>null</code> if the given array is <code>null</code>
-     * 
+     *
      * @param array The array
      * @return The list
      */

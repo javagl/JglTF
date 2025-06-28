@@ -93,16 +93,16 @@ public final class DefaultCameraModel extends AbstractNamedModelElement
     }
 
     @Override
-    public float[] computeProjectionMatrix(float result[], Float aspectRatio)
+    public double[] computeProjectionMatrix(double result[], Float aspectRatio)
     {
         return Cameras.computeProjectionMatrix(this, aspectRatio, result);
     }
     
     @Override
-    public Supplier<float[]> createProjectionMatrixSupplier(
+    public Supplier<double[]> createProjectionMatrixSupplier(
         DoubleSupplier aspectRatioSupplier)
     {
-        return Suppliers.createTransformSupplier(this, (c, t) -> 
+        return Suppliers.createTransformSupplier(this, (c, t) ->
         {
             Float aspectRatio = null;
             if (aspectRatioSupplier != null)

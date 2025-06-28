@@ -58,16 +58,16 @@ public class MathUtils
     /**
      * Epsilon for floating point computations
      */
-    private static final float FLOAT_EPSILON = 1e-8f;
+    private static final double FLOAT_EPSILON = 1e-8f;
     
     /**
      * Creates a 4x4 identity matrix
      * 
      * @return The matrix
      */
-    public static float[] createIdentity4x4()
+    public static double[] createIdentity4x4()
     {
-        float m[] = new float[16];
+        double m[] = new double[16];
         setIdentity4x4(m);
         return m;
     }
@@ -77,7 +77,7 @@ public class MathUtils
      * 
      * @param m The matrix
      */
-    public static void setIdentity4x4(float m[])
+    public static void setIdentity4x4(double m[])
     {
         Arrays.fill(m, 0.0f);
         m[0] = 1.0f;
@@ -91,7 +91,7 @@ public class MathUtils
      * 
      * @param m The matrix
      */
-    static void setIdentity3x3(float m[])
+    static void setIdentity3x3(double m[])
     {
         Arrays.fill(m, 0.0f);
         m[0] = 1.0f;
@@ -107,7 +107,7 @@ public class MathUtils
      * @param source The source array
      * @param target The target array
      */
-    static void set(float source[], float target[])
+    static void set(double source[], double target[])
     {
         System.arraycopy(source, 0, target, 0, 
             Math.min(source.length, target.length));
@@ -122,7 +122,7 @@ public class MathUtils
      * @param targetMatrix3x3 The target matrix
      */
     public static void getRotationScale(
-        float sourceMatrix4x4[], float targetMatrix3x3[])
+        double sourceMatrix4x4[], double targetMatrix3x3[])
     {
         targetMatrix3x3[0] = sourceMatrix4x4[ 0];
         targetMatrix3x3[1] = sourceMatrix4x4[ 1];
@@ -143,17 +143,17 @@ public class MathUtils
      * @param m The input matrix
      * @param t The target matrix
      */
-    static void transpose3x3(float m[], float t[])
+    static void transpose3x3(double m[], double t[])
     {
-        float m0 = m[0];
-        float m1 = m[1];
-        float m2 = m[2];
-        float m3 = m[3];
-        float m4 = m[4];
-        float m5 = m[5];
-        float m6 = m[6];
-        float m7 = m[7];
-        float m8 = m[8];
+        double m0 = m[0];
+        double m1 = m[1];
+        double m2 = m[2];
+        double m3 = m[3];
+        double m4 = m[4];
+        double m5 = m[5];
+        double m6 = m[6];
+        double m7 = m[7];
+        double m8 = m[8];
         t[0] = m0;
         t[1] = m3;
         t[2] = m6;
@@ -172,24 +172,24 @@ public class MathUtils
      * @param m The input matrix
      * @param t The target matrix
      */
-    public static void transpose4x4(float m[], float t[])
+    public static void transpose4x4(double m[], double t[])
     {
-        float m0 = m[ 0];
-        float m1 = m[ 1];
-        float m2 = m[ 2];
-        float m3 = m[ 3];
-        float m4 = m[ 4];
-        float m5 = m[ 5];
-        float m6 = m[ 6];
-        float m7 = m[ 7];
-        float m8 = m[ 8];
-        float m9 = m[ 9];
-        float mA = m[10];
-        float mB = m[11];
-        float mC = m[12];
-        float mD = m[13];
-        float mE = m[14];
-        float mF = m[15];
+        double m0 = m[ 0];
+        double m1 = m[ 1];
+        double m2 = m[ 2];
+        double m3 = m[ 3];
+        double m4 = m[ 4];
+        double m5 = m[ 5];
+        double m6 = m[ 6];
+        double m7 = m[ 7];
+        double m8 = m[ 8];
+        double m9 = m[ 9];
+        double mA = m[10];
+        double mB = m[11];
+        double mC = m[12];
+        double mD = m[13];
+        double mE = m[14];
+        double mF = m[15];
         t[ 0] = m0;
         t[ 1] = m4;
         t[ 2] = m8;
@@ -215,61 +215,61 @@ public class MathUtils
      * @param b The second matrix
      * @param m The result matrix
      */
-    public static void mul4x4(float a[], float b[], float m[])
+    public static void mul4x4(double a[], double b[], double m[])
     {
-        float a00 = a[ 0];
-        float a10 = a[ 1];
-        float a20 = a[ 2];
-        float a30 = a[ 3];
-        float a01 = a[ 4];
-        float a11 = a[ 5];
-        float a21 = a[ 6];
-        float a31 = a[ 7];
-        float a02 = a[ 8];
-        float a12 = a[ 9];
-        float a22 = a[10];
-        float a32 = a[11];
-        float a03 = a[12];
-        float a13 = a[13];
-        float a23 = a[14];
-        float a33 = a[15];
+        double a00 = a[ 0];
+        double a10 = a[ 1];
+        double a20 = a[ 2];
+        double a30 = a[ 3];
+        double a01 = a[ 4];
+        double a11 = a[ 5];
+        double a21 = a[ 6];
+        double a31 = a[ 7];
+        double a02 = a[ 8];
+        double a12 = a[ 9];
+        double a22 = a[10];
+        double a32 = a[11];
+        double a03 = a[12];
+        double a13 = a[13];
+        double a23 = a[14];
+        double a33 = a[15];
 
-        float b00 = b[ 0];
-        float b10 = b[ 1];
-        float b20 = b[ 2];
-        float b30 = b[ 3];
-        float b01 = b[ 4];
-        float b11 = b[ 5];
-        float b21 = b[ 6];
-        float b31 = b[ 7];
-        float b02 = b[ 8];
-        float b12 = b[ 9];
-        float b22 = b[10];
-        float b32 = b[11];
-        float b03 = b[12];
-        float b13 = b[13];
-        float b23 = b[14];
-        float b33 = b[15];
+        double b00 = b[ 0];
+        double b10 = b[ 1];
+        double b20 = b[ 2];
+        double b30 = b[ 3];
+        double b01 = b[ 4];
+        double b11 = b[ 5];
+        double b21 = b[ 6];
+        double b31 = b[ 7];
+        double b02 = b[ 8];
+        double b12 = b[ 9];
+        double b22 = b[10];
+        double b32 = b[11];
+        double b03 = b[12];
+        double b13 = b[13];
+        double b23 = b[14];
+        double b33 = b[15];
 
-        float m00 = a00 * b00 + a01 * b10 + a02 * b20 + a03 * b30;
-        float m01 = a00 * b01 + a01 * b11 + a02 * b21 + a03 * b31;
-        float m02 = a00 * b02 + a01 * b12 + a02 * b22 + a03 * b32;
-        float m03 = a00 * b03 + a01 * b13 + a02 * b23 + a03 * b33;
+        double m00 = a00 * b00 + a01 * b10 + a02 * b20 + a03 * b30;
+        double m01 = a00 * b01 + a01 * b11 + a02 * b21 + a03 * b31;
+        double m02 = a00 * b02 + a01 * b12 + a02 * b22 + a03 * b32;
+        double m03 = a00 * b03 + a01 * b13 + a02 * b23 + a03 * b33;
 
-        float m10 = a10 * b00 + a11 * b10 + a12 * b20 + a13 * b30;
-        float m11 = a10 * b01 + a11 * b11 + a12 * b21 + a13 * b31;
-        float m12 = a10 * b02 + a11 * b12 + a12 * b22 + a13 * b32;
-        float m13 = a10 * b03 + a11 * b13 + a12 * b23 + a13 * b33;
+        double m10 = a10 * b00 + a11 * b10 + a12 * b20 + a13 * b30;
+        double m11 = a10 * b01 + a11 * b11 + a12 * b21 + a13 * b31;
+        double m12 = a10 * b02 + a11 * b12 + a12 * b22 + a13 * b32;
+        double m13 = a10 * b03 + a11 * b13 + a12 * b23 + a13 * b33;
 
-        float m20 = a20 * b00 + a21 * b10 + a22 * b20 + a23 * b30;
-        float m21 = a20 * b01 + a21 * b11 + a22 * b21 + a23 * b31;
-        float m22 = a20 * b02 + a21 * b12 + a22 * b22 + a23 * b32;
-        float m23 = a20 * b03 + a21 * b13 + a22 * b23 + a23 * b33;
+        double m20 = a20 * b00 + a21 * b10 + a22 * b20 + a23 * b30;
+        double m21 = a20 * b01 + a21 * b11 + a22 * b21 + a23 * b31;
+        double m22 = a20 * b02 + a21 * b12 + a22 * b22 + a23 * b32;
+        double m23 = a20 * b03 + a21 * b13 + a22 * b23 + a23 * b33;
 
-        float m30 = a30 * b00 + a31 * b10 + a32 * b20 + a33 * b30;
-        float m31 = a30 * b01 + a31 * b11 + a32 * b21 + a33 * b31;
-        float m32 = a30 * b02 + a31 * b12 + a32 * b22 + a33 * b32;
-        float m33 = a30 * b03 + a31 * b13 + a32 * b23 + a33 * b33;
+        double m30 = a30 * b00 + a31 * b10 + a32 * b20 + a33 * b30;
+        double m31 = a30 * b01 + a31 * b11 + a32 * b21 + a33 * b31;
+        double m32 = a30 * b02 + a31 * b12 + a32 * b22 + a33 * b32;
+        double m33 = a30 * b03 + a31 * b13 + a32 * b23 + a33 * b33;
 
         m[ 0] = m00;
         m[ 1] = m10;
@@ -298,15 +298,15 @@ public class MathUtils
      * @param q The quaternion
      * @param m The matrix
      */
-    public static void quaternionToMatrix4x4(float q[], float m[])
+    public static void quaternionToMatrix4x4(double q[], double m[])
     {
-        float invLength = 1.0f / (float)Math.sqrt(dot(q, q));
+        double invLength = 1.0f / Math.sqrt(dot(q, q));
 
         // Adapted from javax.vecmath.Matrix4f
-        float qx = q[0] * invLength;
-        float qy = q[1] * invLength;
-        float qz = q[2] * invLength;
-        float qw = q[3] * invLength;
+        double qx = q[0] * invLength;
+        double qy = q[1] * invLength;
+        double qz = q[2] * invLength;
+        double qw = q[3] * invLength;
         m[ 0] = 1.0f - 2.0f * qy * qy - 2.0f * qz * qz;
         m[ 1] = 2.0f * (qx * qy + qw * qz);
         m[ 2] = 2.0f * (qx * qz - qw * qy);
@@ -333,27 +333,27 @@ public class MathUtils
      * @param m The input matrix
      * @param inv The inverse matrix
      */
-    public static void invert4x4(float m[], float inv[])
+    public static void invert4x4(double m[], double inv[])
     {
         // Adapted from The Mesa 3-D graphics library. 
         // Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
         // Published under the MIT license (see the header of this file)
-        float m0 = m[ 0];
-        float m1 = m[ 1];
-        float m2 = m[ 2];
-        float m3 = m[ 3];
-        float m4 = m[ 4];
-        float m5 = m[ 5];
-        float m6 = m[ 6];
-        float m7 = m[ 7];
-        float m8 = m[ 8];
-        float m9 = m[ 9];
-        float mA = m[10];
-        float mB = m[11];
-        float mC = m[12];
-        float mD = m[13];
-        float mE = m[14];
-        float mF = m[15];
+        double m0 = m[ 0];
+        double m1 = m[ 1];
+        double m2 = m[ 2];
+        double m3 = m[ 3];
+        double m4 = m[ 4];
+        double m5 = m[ 5];
+        double m6 = m[ 6];
+        double m7 = m[ 7];
+        double m8 = m[ 8];
+        double m9 = m[ 9];
+        double mA = m[10];
+        double mB = m[11];
+        double mC = m[12];
+        double mD = m[13];
+        double mE = m[14];
+        double mF = m[15];
 
         inv[ 0] =  m5 * mA * mF - m5 * mB * mE - m9 * m6 * mF + 
                    m9 * m7 * mE + mD * m6 * mB - mD * m7 * mA;
@@ -389,7 +389,7 @@ public class MathUtils
                    m4 * m2 * m9 + m8 * m1 * m6 - m8 * m2 * m5;
         // (Ain't that pretty?)
         
-        float det = m0 * inv[0] + m1 * inv[4] + m2 * inv[8] + m3 * inv[12];
+        double det = m0 * inv[0] + m1 * inv[4] + m2 * inv[8] + m3 * inv[12];
         if (Math.abs(det) <= FLOAT_EPSILON)
         {
             if (logger.isLoggable(Level.FINE)) 
@@ -400,7 +400,7 @@ public class MathUtils
             setIdentity4x4(inv);
             return;
         }
-        float invDet = 1.0f / det;
+        double invDet = 1.0f / det;
         for (int i = 0; i < 16; i++)
         {
             inv[i] *= invDet;
@@ -415,19 +415,19 @@ public class MathUtils
      * @param m The input matrix
      * @param inv The inverse matrix
      */
-    public static void invert3x3(float m[], float inv[])
+    public static void invert3x3(double m[], double inv[])
     {
         // Adapted from http://stackoverflow.com/a/18504573
-        float m0 = m[0];
-        float m1 = m[1];
-        float m2 = m[2];
-        float m3 = m[3];
-        float m4 = m[4];
-        float m5 = m[5];
-        float m6 = m[6];
-        float m7 = m[7];
-        float m8 = m[8];
-        float det = m0 * (m4 * m8 - m5 * m7) -
+        double m0 = m[0];
+        double m1 = m[1];
+        double m2 = m[2];
+        double m3 = m[3];
+        double m4 = m[4];
+        double m5 = m[5];
+        double m6 = m[6];
+        double m7 = m[7];
+        double m8 = m[8];
+        double det = m0 * (m4 * m8 - m5 * m7) -
                     m3 * (m1 * m8 - m7 * m2) +
                     m6 * (m1 * m5 - m4 * m2);
         if (Math.abs(det) <= FLOAT_EPSILON)
@@ -440,7 +440,7 @@ public class MathUtils
             setIdentity3x3(inv);
             return;
         }
-        float invDet = 1.0f / det;
+        double invDet = 1.0f / det;
         inv[0] = (m4 * m8 - m5 * m7) * invDet;
         inv[3] = (m6 * m5 - m3 * m8) * invDet;
         inv[6] = (m3 * m7 - m6 * m4) * invDet;
@@ -463,7 +463,7 @@ public class MathUtils
      * @param result The result matrix
      */
     public static void translate(
-        float m[], float x, float y, float z, float result[])
+        double m[], double x, double y, double z, double result[])
     {
         set(m,  result);
         result[12] += x;
@@ -481,11 +481,11 @@ public class MathUtils
      * @param m The matrix to fill
      */
     public static void infinitePerspective4x4(
-        float fovyDeg, float aspect, float zNear, float m[])
+        double fovyDeg, double aspect, double zNear, double m[])
     {
         setIdentity4x4(m);
-        float fovyRad = (float)Math.toRadians(fovyDeg);
-        float t = (float)Math.tan(0.5 * fovyRad);
+        double fovyRad = Math.toRadians(fovyDeg);
+        double t = Math.tan(0.5 * fovyRad);
         m[0] = 1.0f / (aspect * t);
         m[5] = 1.0f / t;
         m[10] = -1.0f;
@@ -505,11 +505,11 @@ public class MathUtils
      * @param m The matrix to fill
      */
     public static void perspective4x4(
-        float fovyDeg, float aspect, float zNear, float zFar, float m[])
+        double fovyDeg, double aspect, double zNear, double zFar, double m[])
     {
         setIdentity4x4(m);
-        float fovyRad = (float)Math.toRadians(fovyDeg);
-        float t = (float)Math.tan(0.5 * fovyRad);
+        double fovyRad = Math.toRadians(fovyDeg);
+        double t = Math.tan(0.5 * fovyRad);
         m[0] = 1.0f / (aspect * t);
         m[5] = 1.0f / t;
         m[10] = (zFar + zNear) / (zNear - zFar);
@@ -527,9 +527,9 @@ public class MathUtils
      * @param b The second array
      * @return The dot product
      */
-    private static float dot(float a[], float b[])
+    private static double dot(double a[], double b[])
     {
-        float sum = 0;
+        double sum = 0;
         for (int i=0; i<a.length; i++)
         {
             sum += a[i] * b[i];
@@ -548,7 +548,7 @@ public class MathUtils
      * @param result3D The result point
      */
     public static void transformPoint3D(
-        float matrix4x4[], float point3D[], float result3D[])
+        double matrix4x4[], float point3D[], float result3D[])
     {
         Arrays.fill(result3D, 0.0f);
         for (int r=0; r<3; r++)
@@ -556,12 +556,12 @@ public class MathUtils
             for (int c=0; c<3; c++)
             {
                 int index = c * 4 + r;
-                float m = matrix4x4[index];
-                result3D[r] += m * point3D[c];
+                double m = matrix4x4[index];
+                result3D[r] += (float) (m * point3D[c]);
             }
             int index = 3 * 4 + r;
-            float m = matrix4x4[index];
-            result3D[r] += m;
+            double m = matrix4x4[index];
+            result3D[r] += (float) m;
         }
     }
     
@@ -574,7 +574,7 @@ public class MathUtils
      * @param array The array
      * @return The string representation
      */
-    public static String createMatrixString(float array[])
+    public static String createMatrixString(double array[])
     {
         if (array == null)
         {
@@ -600,7 +600,7 @@ public class MathUtils
      * @param cols The number of columns
      * @return The string representation
      */
-    private static String createMatrixString(float array[], int rows, int cols)
+    private static String createMatrixString(double array[], int rows, int cols)
     {
         StringBuilder sb = new StringBuilder();
         for (int r=0; r<rows; r++)
@@ -627,7 +627,7 @@ public class MathUtils
      * @param array The array
      * @return The string representation
      */
-    public static String createFormattedMatrixString(float array[])
+    public static String createFormattedMatrixString(double array[])
     {
         if (array == null)
         {
@@ -657,7 +657,7 @@ public class MathUtils
      * @return The string representation
      */
     private static String createFormattedMatrixString(
-        float array[], int rows, int cols, String format)
+        double array[], int rows, int cols, String format)
     {
         StringBuilder sb = new StringBuilder();
         for (int r = 0; r < rows; r++)

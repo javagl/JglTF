@@ -308,15 +308,22 @@ public class GltfAnimations
     {
         return (animation, timeS, values) ->
         {
-            float translation[] = nodeModel.getTranslation();
+            double translation[] = nodeModel.getTranslation();
             if (translation == null)
             {
-                translation = values.clone();
+                translation = new double[values.length];
+                for (int i = 0; i < values.length; i++)
+                {
+                    translation[i] = values[i];
+                }
                 nodeModel.setTranslation(translation);
             }
             else
             {
-                System.arraycopy(values, 0, translation, 0, values.length);
+                for (int i = 0; i < values.length; i++)
+                {
+                    translation[i] = values[i];
+                }
             }
         };
     }
@@ -334,15 +341,22 @@ public class GltfAnimations
     {
         return (animation, timeS, values) ->
         {
-            float rotation[] = nodeModel.getRotation();
+            double rotation[] = nodeModel.getRotation();
             if (rotation == null)
             {
-                rotation = values.clone();
+                rotation = new double[values.length];
+                for (int i = 0; i < values.length; i++)
+                {
+                    rotation[i] = values[i];
+                }
                 nodeModel.setRotation(rotation);
             }
             else
             {
-                System.arraycopy(values, 0, rotation, 0, values.length);
+                for (int i = 0; i < values.length; i++)
+                {
+                    rotation[i] = values[i];
+                }
             }
         };
     }
@@ -360,15 +374,22 @@ public class GltfAnimations
     {
         return (animation, timeS, values) ->
         {
-            float scale[] = nodeModel.getScale();
+            double scale[] = nodeModel.getScale();
             if (scale == null)
             {
-                scale = values.clone();
+                scale = new double[values.length];
+                for (int i = 0; i < values.length; i++)
+                {
+                    scale[i] = values[i];
+                }
                 nodeModel.setScale(scale);
             }
             else
             {
-                System.arraycopy(values, 0, scale, 0, values.length);
+                for (int i = 0; i < values.length; i++)
+                {
+                    scale[i] = values[i];
+                }
             }
         };
     }
