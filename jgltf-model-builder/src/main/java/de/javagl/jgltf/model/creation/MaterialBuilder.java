@@ -69,9 +69,9 @@ public class MaterialBuilder
      * @return This builder
      */
     public MaterialBuilder setBaseColorFactor(
-        float r, float g, float b, float a)
+        double r, double g, double b, double a)
     {
-        materialModel.setBaseColorFactor(new float[] { r, g, b, a });
+        materialModel.setBaseColorFactor(new double[] { r, g, b, a });
         return this;
     }
     
@@ -115,7 +115,7 @@ public class MaterialBuilder
      * @return This builder
      */
     public MaterialBuilder setMetallicRoughnessFactors(
-        float metallicFactor, float roughnessFactor)
+        double metallicFactor, double roughnessFactor)
     {
         materialModel.setMetallicFactor(metallicFactor);
         materialModel.setRoughnessFactor(roughnessFactor);
@@ -166,7 +166,7 @@ public class MaterialBuilder
      */
     public MaterialBuilder setNormalTexture(
         String fileName, String uri, 
-        float scale, Integer texCoord)
+        double scale, Integer texCoord)
     {
         TextureModel textureModel = 
             TextureModels.createFromImageFile(fileName, uri);
@@ -182,7 +182,7 @@ public class MaterialBuilder
      * @return This builder
      */
     public MaterialBuilder setNormalTexture(
-        TextureModel normalTexture, float scale, Integer texCoord)
+        TextureModel normalTexture, double scale, Integer texCoord)
     {
         materialModel.setNormalTexture(normalTexture);
         materialModel.setNormalScale(scale);
@@ -202,7 +202,7 @@ public class MaterialBuilder
      */
     public MaterialBuilder setOcclusionTexture(
         String fileName, String uri, 
-        float strength, Integer texCoord)
+        double strength, Integer texCoord)
     {
         TextureModel textureModel = 
             TextureModels.createFromImageFile(fileName, uri);
@@ -218,7 +218,7 @@ public class MaterialBuilder
      * @return This builder
      */
     public MaterialBuilder setOcclusionTexture(
-        TextureModel occlusionTexture, float strength, Integer texCoord)
+        TextureModel occlusionTexture, double strength, Integer texCoord)
     {
         materialModel.setOcclusionTexture(occlusionTexture);
         materialModel.setOcclusionStrength(strength);
@@ -240,7 +240,7 @@ public class MaterialBuilder
      */
     public MaterialBuilder setEmissiveTexture(
         String fileName, String uri, 
-        float r, float g, float b, Integer texCoord)
+        double r, double g, double b, Integer texCoord)
     {
         TextureModel textureModel = 
             TextureModels.createFromImageFile(fileName, uri);
@@ -258,10 +258,10 @@ public class MaterialBuilder
      * @return This builder
      */
     public MaterialBuilder setEmissiveTexture(TextureModel emissiveTexture, 
-        float r, float g, float b, Integer texCoord)
+        double r, double g, double b, Integer texCoord)
     {
         materialModel.setEmissiveTexture(emissiveTexture);
-        materialModel.setEmissiveFactor(new float[] { r, g, b });
+        materialModel.setEmissiveFactor(new double[] { r, g, b });
         materialModel.setEmissiveTexcoord(texCoord);
         return this;
     }
@@ -284,7 +284,7 @@ public class MaterialBuilder
      * @param alphaCutoff The alpha cutoff
      * @return This builder
      */
-    public MaterialBuilder setAlphaCutoff(float alphaCutoff)
+    public MaterialBuilder setAlphaCutoff(double alphaCutoff)
     {
         materialModel.setAlphaCutoff(alphaCutoff);
         return this;

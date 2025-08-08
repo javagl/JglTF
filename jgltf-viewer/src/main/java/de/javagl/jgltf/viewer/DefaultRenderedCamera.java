@@ -52,12 +52,12 @@ public class DefaultRenderedCamera implements RenderedCamera
     /**
      * The view matrix
      */
-    private final float viewMatrix[];
+    private final double viewMatrix[];
     
     /**
      * The projection matrix
      */
-    private final float projectionMatrix[];
+    private final double projectionMatrix[];
     
     /**
      * An optional supplier for the aspect ratio. If this is <code>null</code>, 
@@ -89,12 +89,12 @@ public class DefaultRenderedCamera implements RenderedCamera
             cameraModel, "The cameraModel may not be null");
         this.aspectRatioSupplier = aspectRatioSupplier;
         
-        this.viewMatrix = new float[16];
-        this.projectionMatrix = new float[16];
+        this.viewMatrix = new double[16];
+        this.projectionMatrix = new double[16];
     }
 
     @Override
-    public float[] getViewMatrix()
+    public double[] getViewMatrix()
     {
         nodeModel.computeGlobalTransform(viewMatrix);
         MathUtils.invert4x4(viewMatrix, viewMatrix);
@@ -102,12 +102,12 @@ public class DefaultRenderedCamera implements RenderedCamera
     }
 
     @Override
-    public float[] getProjectionMatrix()
+    public double[] getProjectionMatrix()
     {
-        Float aspectRatio = null;
+        Double aspectRatio = null;
         if (aspectRatioSupplier != null)
         {
-            aspectRatio = (float)aspectRatioSupplier.getAsDouble();
+            aspectRatio = aspectRatioSupplier.getAsDouble();
         }
         cameraModel.computeProjectionMatrix(projectionMatrix, aspectRatio);
         return projectionMatrix;

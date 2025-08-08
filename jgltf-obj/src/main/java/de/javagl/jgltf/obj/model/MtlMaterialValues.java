@@ -149,7 +149,7 @@ class MtlMaterialValues
      * @return The values
      */
     static Map<String, Object> createDefaultMaterialValues(
-        float r, float g, float b)
+        double r, double g, double b)
     {
         Map<String, Object> materialValues = 
             new LinkedHashMap<String, Object>();

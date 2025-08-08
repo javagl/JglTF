@@ -1092,16 +1092,16 @@ public class GltfCreatorV2
      * @param array The array
      * @return The list
      */
-    private static List<Float> toList(float array[])
+    private static List<Double> toList(double array[])
     {
         if (array == null)
         {
             return null;
         }
-        List<Float> list = new ArrayList<Float>();
-        for (float f : array)
+        List<Double> list = new ArrayList<Double>();
+        for (double d : array)
         {
-            list.add(f);
+            list.add(d);
         }
         return list;
     }

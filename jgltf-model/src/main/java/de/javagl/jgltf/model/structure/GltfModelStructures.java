@@ -607,7 +607,7 @@ public class GltfModelStructures
                         (DefaultMeshPrimitiveModel) sourceMeshPrimitiveModel);
                 targetMeshModel.addMeshPrimitiveModel(targetMeshPrimitiveModel);
             }
-            float[] weights = sourceMeshModel.getWeights();
+            double[] weights = sourceMeshModel.getWeights();
             targetMeshModel.setWeights(Optionals.clone(weights));
         }
     }
@@ -709,11 +709,11 @@ public class GltfModelStructures
             DefaultCameraModel targetCamera = cameraModelsMap.get(sourceCamera);
             targetNodeModel.setCameraModel(targetCamera);
 
-            float matrix[] = sourceNodeModel.getMatrix();
-            float translation[] = sourceNodeModel.getTranslation();
-            float rotation[] = sourceNodeModel.getRotation();
-            float scale[] = sourceNodeModel.getScale();
-            float weights[] = sourceNodeModel.getWeights();
+            double matrix[] = sourceNodeModel.getMatrix();
+            double translation[] = sourceNodeModel.getTranslation();
+            double rotation[] = sourceNodeModel.getRotation();
+            double scale[] = sourceNodeModel.getScale();
+            double weights[] = sourceNodeModel.getWeights();
             
             targetNodeModel.setMatrix(Optionals.clone(matrix));
             targetNodeModel.setTranslation(Optionals.clone(translation));
@@ -1070,7 +1070,7 @@ public class GltfModelStructures
         targetMaterialModel.setBaseColorTexcoord(
             sourceMaterialModel.getBaseColorTexcoord());
         
-        float[] baseColorFactor = sourceMaterialModel.getBaseColorFactor();
+        double[] baseColorFactor = sourceMaterialModel.getBaseColorFactor();
         targetMaterialModel.setBaseColorFactor(
             Optionals.clone(baseColorFactor));
 
@@ -1122,7 +1122,7 @@ public class GltfModelStructures
         targetMaterialModel.setEmissiveTexcoord(
             sourceMaterialModel.getEmissiveTexcoord());
         
-        float emissiveFactor[] = sourceMaterialModel.getEmissiveFactor();
+        double emissiveFactor[] = sourceMaterialModel.getEmissiveFactor();
         targetMaterialModel.setEmissiveFactor(
             Optionals.clone(emissiveFactor));
     }

@@ -3,7 +3,7 @@
  * 
  * Do not modify this class. It is automatically generated
  * with JsonModelGen (https://github.com/javagl/JsonModelGen)
- * Copyright (c) 2016 Marco Hutter - http://www.javagl.de
+ * Copyright (c) 2016-2021 Marco Hutter - http://www.javagl.de
  */
 
 package de.javagl.jgltf.impl.v1;

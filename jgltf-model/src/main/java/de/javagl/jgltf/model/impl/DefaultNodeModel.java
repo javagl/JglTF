@@ -49,14 +49,14 @@ public class DefaultNodeModel extends AbstractNamedModelElement
     /**
      * A thread-local, temporary 16-element matrix
      */
-    private static final ThreadLocal<float[]> TEMP_MATRIX_4x4_IN_LOCAL =
-        ThreadLocal.withInitial(() -> new float[16]);
+    private static final ThreadLocal<double[]> TEMP_MATRIX_4x4_IN_LOCAL =
+        ThreadLocal.withInitial(() -> new double[16]);
     
     /**
      * A thread-local, temporary 16-element matrix
      */
-    private static final ThreadLocal<float[]> TEMP_MATRIX_4x4_IN_GLOBAL =
-        ThreadLocal.withInitial(() -> new float[16]);
+    private static final ThreadLocal<double[]> TEMP_MATRIX_4x4_IN_GLOBAL =
+        ThreadLocal.withInitial(() -> new double[16]);
     
     /**
      * The parent of this node. This is <code>null</code> for the root node.
@@ -86,27 +86,27 @@ public class DefaultNodeModel extends AbstractNamedModelElement
     /**
      * The local transform matrix
      */
-    private float matrix[];
+    private double matrix[];
     
     /**
      * The translation
      */
-    private float translation[];
+    private double translation[];
     
     /**
      * The rotation
      */
-    private float rotation[];
+    private double rotation[];
     
     /**
      * The scale
      */
-    private float scale[];
+    private double scale[];
 
     /**
      * The weights
      */
-    private float weights[];
+    private double weights[];
     
     /**
      * Creates a new instance 
@@ -222,87 +222,87 @@ public class DefaultNodeModel extends AbstractNamedModelElement
     }
     
     @Override
-    public void setMatrix(float[] matrix)
+    public void setMatrix(double[] matrix)
     {
         this.matrix = check(matrix, 16);
     }
     
     @Override
-    public float[] getMatrix()
+    public double[] getMatrix()
     {
         return matrix;
     }
 
     @Override
-    public void setTranslation(float[] translation)
+    public void setTranslation(double[] translation)
     {
         this.translation = check(translation, 3);
     }
 
     @Override
-    public float[] getTranslation()
+    public double[] getTranslation()
     {
         return translation;
     }
 
     @Override
-    public void setRotation(float[] rotation)
+    public void setRotation(double[] rotation)
     {
         this.rotation = check(rotation, 4);
     }
 
     @Override
-    public float[] getRotation()
+    public double[] getRotation()
     {
         return rotation;
     }
 
     @Override
-    public void setScale(float[] scale)
+    public void setScale(double[] scale)
     {
         this.scale = check(scale, 3);
     }
 
     @Override
-    public float[] getScale()
+    public double[] getScale()
     {
         return scale;
     }
 
     @Override
-    public void setWeights(float[] weights)
+    public void setWeights(double[] weights)
     {
         this.weights = weights;
     }
 
     @Override
-    public float[] getWeights()
+    public double[] getWeights()
     {
         return weights;
     }
     
     
     @Override
-    public float[] computeLocalTransform(float result[])
+    public double[] computeLocalTransform(double result[])
     {
         return computeLocalTransform(this, result);
     }
 
     @Override
-    public float[] computeGlobalTransform(float result[])
+    public double[] computeGlobalTransform(double result[])
     {
         return computeGlobalTransform(this, result);
     }
     
     @Override
-    public Supplier<float[]> createGlobalTransformSupplier()
+    public Supplier<double[]> createGlobalTransformSupplier()
     {
         return Suppliers.createTransformSupplier(this, 
             NodeModel::computeGlobalTransform);
     }
     
     @Override
-    public Supplier<float[]> createLocalTransformSupplier()
+    public Supplier<double[]> createLocalTransformSupplier()
     {
         return Suppliers.createTransformSupplier(this, 
             NodeModel::computeLocalTransform);
@@ -324,13 +324,13 @@ public class DefaultNodeModel extends AbstractNamedModelElement
      * @param result The result array
      * @return The result array
      */
-    public static float[] computeLocalTransform(
-        NodeModel nodeModel, float result[])
+    public static double[] computeLocalTransform(
+        NodeModel nodeModel, double result[])
     {
-        float localResult[] = Utils.validate(result, 16);
+        double localResult[] = Utils.validate(result, 16);
         if (nodeModel.getMatrix() != null)
         {
-            float m[] = nodeModel.getMatrix();
+            double m[] = nodeModel.getMatrix();
             System.arraycopy(m, 0, localResult, 0, m.length);
             return localResult;
         }
@@ -338,22 +338,22 @@ public class DefaultNodeModel extends AbstractNamedModelElement
         MathUtils.setIdentity4x4(localResult);
         if (nodeModel.getTranslation() != null)
         {
-            float t[] = nodeModel.getTranslation();
+            double t[] = nodeModel.getTranslation();
             localResult[12] = t[0]; 
             localResult[13] = t[1]; 
             localResult[14] = t[2]; 
         }
         if (nodeModel.getRotation() != null)
         {
-            float q[] = nodeModel.getRotation();
-            float m[] = TEMP_MATRIX_4x4_IN_LOCAL.get();
+            double q[] = nodeModel.getRotation();
+            double m[] = TEMP_MATRIX_4x4_IN_LOCAL.get();
             MathUtils.quaternionToMatrix4x4(q, m);
             MathUtils.mul4x4(localResult, m, localResult);
         }
         if (nodeModel.getScale() != null)
         {
-            float s[] = nodeModel.getScale();
-            float m[] = TEMP_MATRIX_4x4_IN_LOCAL.get();
+            double s[] = nodeModel.getScale();
+            double m[] = TEMP_MATRIX_4x4_IN_LOCAL.get();
             MathUtils.setIdentity4x4(m);
             m[ 0] = s[0];
             m[ 5] = s[1];
@@ -374,11 +374,11 @@ public class DefaultNodeModel extends AbstractNamedModelElement
      * @param result The result
      * @return The result
      */
-    private static float[] computeGlobalTransform(
-        NodeModel nodeModel, float result[])
+    private static double[] computeGlobalTransform(
+        NodeModel nodeModel, double result[])
     {
-        float localResult[] = Utils.validate(result, 16);
-        float tempLocalTransform[] = TEMP_MATRIX_4x4_IN_GLOBAL.get();
+        double localResult[] = Utils.validate(result, 16);
+        double tempLocalTransform[] = TEMP_MATRIX_4x4_IN_GLOBAL.get();
         NodeModel currentNode = nodeModel;
         MathUtils.setIdentity4x4(localResult);
         while (currentNode != null)
@@ -404,7 +404,7 @@ public class DefaultNodeModel extends AbstractNamedModelElement
      * @throws IllegalArgumentException If the given array does not have
      * the expected length
      */
-    private static float[] check(float array[], int expectedLength)
+    private static double[] check(double array[], int expectedLength)
     {
         if (array == null)
         {

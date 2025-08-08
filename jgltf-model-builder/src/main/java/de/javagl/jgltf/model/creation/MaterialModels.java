@@ -49,12 +49,12 @@ public class MaterialModels
      * @return The material model
      */
     public static MaterialModelV2 createFromBaseColor(
-        float r, float g, float b, float a)
+        double r, double g, double b, double a)
     {
         MaterialBuilder builder = MaterialBuilder.create();
         builder.setBaseColorFactor(r, g, b, a);
         builder.setDoubleSided(true);
-        builder.setMetallicRoughnessFactors(0.0f, 1.0f);
+        builder.setMetallicRoughnessFactors(0.0, 1.0);
         MaterialModelV2 result = builder.build();
         return result;
     }
@@ -73,7 +73,7 @@ public class MaterialModels
         MaterialBuilder builder = MaterialBuilder.create();
         builder.setBaseColorTexture(baseColorTexture, texCoord);
         builder.setDoubleSided(true);
-        builder.setMetallicRoughnessFactors(0.0f, 1.0f);
+        builder.setMetallicRoughnessFactors(0.0, 1.0);
         MaterialModelV2 result = builder.build();
         return result;
     }
@@ -93,7 +93,7 @@ public class MaterialModels
         MaterialBuilder builder = MaterialBuilder.create();
         builder.setBaseColorTexture(imageFileName, uri, null);
         builder.setDoubleSided(true);
-        builder.setMetallicRoughnessFactors(0.0f, 1.0f);
+        builder.setMetallicRoughnessFactors(0.0, 1.0);
         MaterialModelV2 result = builder.build();
         return result;
     }
@@ -116,7 +116,7 @@ public class MaterialModels
         MaterialBuilder builder = MaterialBuilder.create();
         builder.setBaseColorTexture(baseColorTexture, null);
         builder.setDoubleSided(true);
-        builder.setMetallicRoughnessFactors(0.0f, 1.0f);
+        builder.setMetallicRoughnessFactors(0.0, 1.0);
         MaterialModelV2 result = builder.build();
         return result;
     }

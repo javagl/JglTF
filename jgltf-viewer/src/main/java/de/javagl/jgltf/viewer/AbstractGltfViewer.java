@@ -64,12 +64,12 @@ public abstract class AbstractGltfViewer<C> implements GltfViewer<C>
      * {@link RenderedGltfModel} constructor, and eventually provide the data 
      * for the uniforms that have the <code>VIEWPORT</code> semantic.
      */
-    private final Supplier<float[]> viewportSupplier = new Supplier<float[]>()
+    private final Supplier<double[]> viewportSupplier = new Supplier<double[]>()
     {
-        private final float viewport[] = new float[4];
+        private final double viewport[] = new double[4];
 
         @Override
-        public float[] get()
+        public double[] get()
         {
             viewport[0] = 0;
             viewport[1] = 0;

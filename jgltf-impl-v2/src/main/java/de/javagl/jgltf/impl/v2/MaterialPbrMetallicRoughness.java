@@ -32,7 +32,7 @@ public class MaterialPbrMetallicRoughness
      * &nbsp;&nbsp;Maximum: 1.0 (inclusive) 
      * 
      */
-    private float[] baseColorFactor;
+    private double[] baseColorFactor;
     /**
      * The base color texture. (optional) 
      * 
@@ -45,7 +45,7 @@ public class MaterialPbrMetallicRoughness
      * Maximum: 1.0 (inclusive) 
      * 
      */
-    private Float metallicFactor;
+    private Double metallicFactor;
     /**
      * The factor for the roughness of the material. (optional)<br> 
      * Default: 1.0<br> 
@@ -53,7 +53,7 @@ public class MaterialPbrMetallicRoughness
      * Maximum: 1.0 (inclusive) 
      * 
      */
-    private Float roughnessFactor;
+    private Double roughnessFactor;
     /**
      * The metallic-roughness texture. (optional) 
      * 
@@ -74,7 +74,7 @@ public class MaterialPbrMetallicRoughness
      * the given constraints
      * 
      */
-    public void setBaseColorFactor(float[] baseColorFactor) {
+    public void setBaseColorFactor(double[] baseColorFactor) {
         if (baseColorFactor == null) {
             this.baseColorFactor = baseColorFactor;
             return ;
@@ -85,7 +85,7 @@ public class MaterialPbrMetallicRoughness
         if (baseColorFactor.length > 4) {
             throw new IllegalArgumentException("Number of baseColorFactor elements is > 4");
         }
-        for (float baseColorFactorElement: baseColorFactor) {
+        for (double baseColorFactorElement: baseColorFactor) {
             if (baseColorFactorElement > 1.0D) {
                 throw new IllegalArgumentException("baseColorFactorElement > 1.0");
             }
@@ -108,7 +108,7 @@ public class MaterialPbrMetallicRoughness
      * @return The baseColorFactor
      * 
      */
-    public float[] getBaseColorFactor() {
+    public double[] getBaseColorFactor() {
         return this.baseColorFactor;
     }
 
@@ -119,8 +119,8 @@ public class MaterialPbrMetallicRoughness
      * @return The default baseColorFactor
      * 
      */
-    public float[] defaultBaseColorFactor() {
-        return new float[] { 1.0F, 1.0F, 1.0F, 1.0F };
+    public double[] defaultBaseColorFactor() {
+        return new double[] { 1.0D, 1.0D, 1.0D, 1.0D };
     }
 
     /**
@@ -158,7 +158,7 @@ public class MaterialPbrMetallicRoughness
      * the given constraints
      * 
      */
-    public void setMetallicFactor(Float metallicFactor) {
+    public void setMetallicFactor(Double metallicFactor) {
         if (metallicFactor == null) {
             this.metallicFactor = metallicFactor;
             return ;
@@ -181,7 +181,7 @@ public class MaterialPbrMetallicRoughness
      * @return The metallicFactor
      * 
      */
-    public Float getMetallicFactor() {
+    public Double getMetallicFactor() {
         return this.metallicFactor;
     }
 
@@ -192,8 +192,8 @@ public class MaterialPbrMetallicRoughness
      * @return The default metallicFactor
      * 
      */
-    public Float defaultMetallicFactor() {
-        return  1.0F;
+    public Double defaultMetallicFactor() {
+        return  1.0D;
     }
 
     /**
@@ -207,7 +207,7 @@ public class MaterialPbrMetallicRoughness
      * the given constraints
      * 
      */
-    public void setRoughnessFactor(Float roughnessFactor) {
+    public void setRoughnessFactor(Double roughnessFactor) {
         if (roughnessFactor == null) {
             this.roughnessFactor = roughnessFactor;
             return ;
@@ -230,7 +230,7 @@ public class MaterialPbrMetallicRoughness
      * @return The roughnessFactor
      * 
      */
-    public Float getRoughnessFactor() {
+    public Double getRoughnessFactor() {
         return this.roughnessFactor;
     }
 
@@ -241,8 +241,8 @@ public class MaterialPbrMetallicRoughness
      * @return The default roughnessFactor
      * 
      */
-    public Float defaultRoughnessFactor() {
-        return  1.0F;
+    public Double defaultRoughnessFactor() {
+        return  1.0D;
     }
 
     /**
