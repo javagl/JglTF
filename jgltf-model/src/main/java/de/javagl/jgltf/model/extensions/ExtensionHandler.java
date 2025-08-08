@@ -30,8 +30,7 @@ import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.ModelElement;
 
 /**
- * Interface for classes that convert between implementation- and 
- * model classes.
+ * Interface for classes that convert between implementation- and model classes.
  */
 public interface ExtensionHandler
 {
@@ -41,10 +40,10 @@ public interface ExtensionHandler
      * @return The extension name
      */
     String getExtensionName();
-    
+
     /**
-     * Returns the model class that contains this extension object.
-     * This will usually be a class that is a {@link ModelElement}.
+     * Returns the model class that contains this extension object. This will
+     * usually be a class that is a {@link ModelElement}.
      * 
      * @return The model class
      */
@@ -56,25 +55,25 @@ public interface ExtensionHandler
      * @return The implementation class.
      */
     Class<?> getImplClass();
-    
+
     /**
      * Returns the class that represents the model.
-     *  
+     * 
      * @return The model class
      */
     Class<?> getModelClass();
-    
+
     /**
-     * Convert the given implementation object into the model representation
-     * of the extension.
+     * Convert the given implementation object into the model representation of
+     * the extension.
      * 
      * 
      * @param gltfModel The {@link GltfModel} in which the extension was found
      * @param owningModelObject The model object (usually an instance of
-     * {@link ModelElement}) that contained the extension
+     *        {@link ModelElement}) that contained the extension
      * @param impl The implementation object
      * @return The model object
      */
-    Object convertToModel(
-        GltfModel gltfModel, Object owningModelObject, Object impl);
+    Object convertToModel(GltfModel gltfModel, Object owningModelObject,
+        Object impl);
 }

@@ -35,8 +35,7 @@ import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.impl.AbstractModelElement;
 
 /**
- * Methods related to handling extension implementation- and model
- * objects.
+ * Methods related to handling extension implementation- and model objects.
  * 
  * This class is not part of the public API.
  *
@@ -46,10 +45,31 @@ public class ExtensionModels
     /**
      * The logger used in this class
      */
-    private static final Logger logger = 
+    private static final Logger logger =
         Logger.getLogger(ExtensionModels.class.getName());
-    
-    
+
+    /**
+     * Process the extensions of the given model element with the given class 
+     * that is contained in the given glTF model.
+     * 
+     * Note: An implementation detail is that this assumes that the given model 
+     * element extends the {@link AbstractModelElement} class.
+     * 
+     * This will examine all extension objects that are stored in the given 
+     * {@link ModelElement}. For each extension object, it will look up
+     * an {@link ExtensionHandler} in the {@link ExtensionHandlerRegistry}.
+     * When an extension handler is found, then it will be used for 
+     * converting the extension object into its "model" representation,
+     * and add it to the {@link ModelElement#getExtensionModels()} of the
+     * model element.
+     * 
+     * Clients can then obtain the extension model object from the model
+     * element, with {@link ModelElement#getExtensionModel(String, Class)}.
+     * 
+     * @param gltfModel The {@link GltfModel}
+     * @param modelElement The {@link ModelElement}
+     * @param modelClass The class of the {@link ModelElement}
+     */
     public static void process(
         GltfModel gltfModel, ModelElement modelElement, Class<?> modelClass)
     {
@@ -59,49 +79,47 @@ public class ExtensionModels
                 + ": The object is not an AbstractModelElement");
             return;
         }
-        AbstractModelElement abstractModelElement = 
+        AbstractModelElement abstractModelElement =
             (AbstractModelElement) modelElement;
-        
+
         Map<String, Object> extensions = modelElement.getExtensions();
         if (extensions == null || extensions.isEmpty())
         {
             return;
         }
-        ExtensionHandlerRegistry extensionHandlerRegistry = 
+        ExtensionHandlerRegistry extensionHandlerRegistry =
             ExtensionHandlerRegistries.get();
         for (Entry<String, Object> entry : extensions.entrySet())
         {
             String extensionName = entry.getKey();
-            
+
             Object jsonObject = entry.getValue();
-            ExtensionHandler extensionHandler = 
-                extensionHandlerRegistry.get(
-                    modelClass, extensionName);
-            
+            ExtensionHandler extensionHandler =
+                extensionHandlerRegistry.get(modelClass, extensionName);
+
             logger.info("Found extension " + extensionName
-                + " with extension handler " + extensionHandler);            
-            
+                + " with extension handler " + extensionHandler);
+
             if (extensionHandler == null)
             {
                 continue;
             }
             Class<?> implClass = extensionHandler.getImplClass();
-            
+
             // Try to convert the object, printing a warning when
             // the conversion fails
-            Object impl = GltfExtensions.convertValueOptional(
-                jsonObject, implClass);
+            Object impl =
+                GltfExtensions.convertValueOptional(jsonObject, implClass);
             if (impl != null)
             {
-                Object extensionModel = extensionHandler.convertToModel(
-                    gltfModel, modelElement, impl);
-                abstractModelElement.addExtensionModel(
-                    extensionName, extensionModel);
+                Object extensionModel = extensionHandler
+                    .convertToModel(gltfModel, modelElement, impl);
+                abstractModelElement.addExtensionModel(extensionName,
+                    extensionModel);
             }
         }
     }
 
-    
     /**
      * Private constructor to prevent instantiation
      */

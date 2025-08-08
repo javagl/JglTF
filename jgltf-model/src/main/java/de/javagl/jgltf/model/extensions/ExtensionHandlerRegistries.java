@@ -39,9 +39,9 @@ public class ExtensionHandlerRegistries
     /**
      * The logger used in this class
      */
-    private static final Logger logger = 
+    private static final Logger logger =
         Logger.getLogger(ExtensionHandlerRegistries.class.getName());
-    
+
     /**
      * Holder class for the instance
      */
@@ -59,39 +59,42 @@ public class ExtensionHandlerRegistries
      * 
      * @return The {@link ExtensionHandlerRegistry}
      */
-     public static ExtensionHandlerRegistry get() 
-     {
-         return Holder.INSTANCE;
-     }    
-    
+    public static ExtensionHandlerRegistry get()
+    {
+        return Holder.INSTANCE;
+    }
+
     /**
-     * Create a new {@link ExtensionHandlerRegistry} that is filled with
-     * all extension handlers for which an implementation can be found
-     * on the class path, using a service loader.
+     * Create a new {@link ExtensionHandlerRegistry} that is filled with all
+     * extension handlers for which an implementation can be found on the class
+     * path, using a service loader.
      * 
      * @return The {@link ExtensionHandlerRegistry}
      */
     private static ExtensionHandlerRegistry createDefault()
     {
-        ServiceLoader<ExtensionHandler> extensionHandlers = 
+        ServiceLoader<ExtensionHandler> extensionHandlers =
             ServiceLoader.load(ExtensionHandler.class);
-        List<ExtensionHandler> result = 
-            new ArrayList<ExtensionHandler>();
-        for (ExtensionHandler extensionHandler : extensionHandlers) 
+        List<ExtensionHandler> result = new ArrayList<ExtensionHandler>();
+        for (ExtensionHandler extensionHandler : extensionHandlers)
         {
             logger.info("Found ExtensionHandler: "
-                + extensionHandler.getExtensionName());
+                + extensionHandler.getExtensionName() + " for "
+                + extensionHandler.getImplClass().getSimpleName() + " as " 
+                + extensionHandler.getModelClass().getSimpleName() + " on "
+                + extensionHandler.getOwningModelClass().getSimpleName());
             result.add(extensionHandler);
         }
         return new DefaultExtensionHandlerRegistry(result);
-        
+
     }
+
     /**
      * Private constructor to prevent instantiation
      */
     private ExtensionHandlerRegistries()
     {
-         // Private constructor to prevent instantiation
+        // Private constructor to prevent instantiation
     }
-    
+
 }

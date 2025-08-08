@@ -215,8 +215,17 @@ public class GltfModelCreatorV2
         logger.warning(
             "Experimental extension processing in GltfModelCreatorV2");
         processModel();
+        // animation
+        // buffer
+        // bufferView
+        // camera
+        // image
         processMaterialModels();
         processMeshModels();
+        // node
+        // scene
+        // skin
+        processTextureModels();
     }
     
     /**
@@ -1193,8 +1202,9 @@ public class GltfModelCreatorV2
         {
             materialModel.setAlphaMode(AlphaMode.valueOf(alphaModeString));
         }
-        materialModel.setAlphaCutoff(
-            Optionals.of(material.getAlphaCutoff(), 0.5));
+        materialModel.setAlphaCutoff(Optionals.of(
+            material.getAlphaCutoff(),
+            material.defaultAlphaCutoff()));
         
         materialModel.setDoubleSided(
             Boolean.TRUE.equals(material.isDoubleSided()));
@@ -1352,6 +1362,19 @@ public class GltfModelCreatorV2
                 ExtensionModels.process(
                     gltfModel, meshPrimitiveModel, MeshPrimitiveModel.class);
             }
+        }
+    }
+
+    /**
+     * Process the {@link TextureModel} instances
+     */
+    private void processTextureModels()
+    {
+        List<TextureModel> textureModels = gltfModel.getTextureModels();
+        for (TextureModel textureModel : textureModels)
+        {
+            ExtensionModels.process(
+                gltfModel, textureModel, TextureModel.class);
         }
     }
     

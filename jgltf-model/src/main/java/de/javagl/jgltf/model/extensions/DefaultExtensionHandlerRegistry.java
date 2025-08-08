@@ -39,17 +39,17 @@ class DefaultExtensionHandlerRegistry implements ExtensionHandlerRegistry
     /**
      * The logger used in this class
      */
-    private static final Logger logger = 
+    private static final Logger logger =
         Logger.getLogger(DefaultExtensionHandlerRegistry.class.getName());
-    
+
     /**
      * The list of extension handlers
      */
     private List<ExtensionHandler> extensionHandlers;
-    
+
     /**
-     * Package-private default constructor. This will store a reference
-     * to the given list.
+     * Package-private default constructor. This will store a reference to the
+     * given list.
      * 
      * @param extensionHandlers The extension handlers
      */
@@ -58,19 +58,19 @@ class DefaultExtensionHandlerRegistry implements ExtensionHandlerRegistry
         this.extensionHandlers = Objects.requireNonNull(extensionHandlers,
             "The extensionsHandlers may not be null");
     }
-    
+
     /**
-     * Return an unmodifiable list containing all 
-     * {@link ExtensionHandler} instances
+     * Return an unmodifiable list containing all {@link ExtensionHandler}
+     * instances
      * 
      * @return The list of {@link ExtensionHandler} instances
      */
     @Override
-    public List<ExtensionHandler> getAll() 
+    public List<ExtensionHandler> getAll()
     {
         return Collections.unmodifiableList(extensionHandlers);
     }
-    
+
     @Override
     public ExtensionHandler get(Class<?> owningModelClass, String extensionName)
     {
@@ -90,5 +90,5 @@ class DefaultExtensionHandlerRegistry implements ExtensionHandlerRegistry
             + " owned by class " + owningModelClass);
         return null;
     }
-    
+
 }

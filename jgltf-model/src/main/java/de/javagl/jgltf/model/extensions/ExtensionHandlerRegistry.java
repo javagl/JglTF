@@ -40,7 +40,7 @@ import de.javagl.jgltf.model.TextureModel;
 public interface ExtensionHandlerRegistry
 {
     /**
-     * Return an unmodifiable list containing all {@link ExtensionHandler} 
+     * Return an unmodifiable list containing all {@link ExtensionHandler}
      * instances
      * 
      * @return The list of {@link ExtensionHandler} instances
@@ -48,17 +48,17 @@ public interface ExtensionHandlerRegistry
     List<ExtensionHandler> getAll();
 
     /**
-     * Returns an {@link ExtensionHandler} for the specified extension when
-     * it is attached to an object with the specified model class.
+     * Returns an {@link ExtensionHandler} for the specified extension when it
+     * is attached to an object with the specified model class.
      * 
-     * The model class with usually be a class implementing the 
-     * {@link ModelElement} interface - for example, {@link TextureModel}
-     * or {@link AccessorModel}.
+     * The model class with usually be a class implementing the
+     * {@link ModelElement} interface - for example, {@link TextureModel} or
+     * {@link AccessorModel}.
      * 
      * @param owningModelClass The owning model class
      * @param extensionName The extension name
      * @return The extension handler, or <code>null</code> if no extension
-     * handler was registered for the specified extension
+     *         handler was registered for the specified extension
      */
     ExtensionHandler get(Class<?> owningModelClass, String extensionName);
 
