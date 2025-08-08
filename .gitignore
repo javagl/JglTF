@@ -7,6 +7,8 @@
 .idea
 *.iml
 
+# Internal experiments
+# ---
 /jgltf-converter
 /jgltf-viewer-demo
 /jgltf-viewer-lwjgl3
@@ -15,8 +17,14 @@
 /JglTF
 /jgltf-jgltfifier
 /jgltf-asset-creator
+# ---
+
+# Extension experiments:
+# ---
+/jgltf-experiments-extensions
 /jgltf-impl-v2-ext-draco-mesh-compression
 /jgltf-draco-test
+# ---
 
 # Preliminary for extension experiments:
 # ---
@@ -70,22 +78,6 @@
 /jgltf-model-khr-texture-transform/.settings
 /jgltf-model-khr-texture-transform/.project
 /jgltf-model-khr-texture-transform/target
-
-# Preliminary for extension experiments:
-# ---
-/jgltf-impl-v2-khr-lights-punctual
-/jgltf-impl-v2-khr-materials-variants
-/jgltf-impl-v2-khr-materials-clearcoat
-/jgltf-impl-v2-khr-texture-transform
-/jgltf-impl-v2-ext-draco-mesh-compression
-
-/jgltf-model-khr-lights-punctual
-/jgltf-model-khr-materials-variants
-/jgltf-model-khr-materials-clearcoat/
-/jgltf-model-khr-texture-transform
-
-/jgltf-draco-test
-# ---
 
 /jgltf-browser/.classpath
 /jgltf-browser/.settings
