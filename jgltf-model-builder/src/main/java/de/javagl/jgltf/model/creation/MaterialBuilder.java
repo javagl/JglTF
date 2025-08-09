@@ -338,6 +338,7 @@ public class MaterialBuilder
     {
         DefaultPbrMaterialModel result = materialModel;
         materialModel = new DefaultPbrMaterialModel();
+        metallicRoughnessModel = new DefaultPbrMetallicRoughnessModel();
         return result;
     }
 }
