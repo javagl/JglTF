@@ -16,10 +16,10 @@ import de.javagl.jgltf.model.creation.MaterialModels;
 import de.javagl.jgltf.model.creation.MeshPrimitiveModels;
 import de.javagl.jgltf.model.creation.SceneModels;
 import de.javagl.jgltf.model.impl.DefaultMeshPrimitiveModel;
+import de.javagl.jgltf.model.impl.DefaultPbrMaterialModel;
 import de.javagl.jgltf.model.io.GltfWriter;
 import de.javagl.jgltf.model.io.v2.GltfAssetV2;
 import de.javagl.jgltf.model.io.v2.GltfAssetsV2;
-import de.javagl.jgltf.model.v2.MaterialModelV2;
 
 /**
  * A basic example for the glTF model creation.
@@ -67,7 +67,7 @@ public class GltfModelCreationTextureExample
         
         // Create a material from a buffered image
         BufferedImage bufferedImage = createTextureImage();
-        MaterialModelV2 materialModel = MaterialModels.createFromBufferedImage(
+        DefaultPbrMaterialModel materialModel = MaterialModels.createFromBufferedImage(
             bufferedImage, "texture.jpg", "image/jpeg");
 
         // Assign the material to the mesh primitive

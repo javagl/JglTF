@@ -28,7 +28,11 @@ package de.javagl.jgltf.viewer;
 
 import java.util.Objects;
 
-import de.javagl.jgltf.model.v2.MaterialModelV2;
+import de.javagl.jgltf.model.Optionals;
+import de.javagl.jgltf.model.PbrMaterialModel;
+import de.javagl.jgltf.model.PbrMetallicRoughnessModel;
+import de.javagl.jgltf.model.TextureInfoModel;
+import de.javagl.jgltf.model.impl.DefaultPbrMaterialModel;
 
 /**
  * A simple (package-private!) class describing the structure of a material.
@@ -71,10 +75,10 @@ class MaterialStructure
     /**
      * Default constructor 
      * 
-     * @param material The {@link MaterialModelV2}
+     * @param material The {@link DefaultPbrMaterialModel}
      * @param numJoints The number of joints
      */
-    MaterialStructure(MaterialModelV2 material, int numJoints)
+    MaterialStructure(PbrMaterialModel material, int numJoints)
     {
         this.baseColorTexCoordSemantic = 
             getTexCoordSemantic(material.getBaseColorTexcoord());
