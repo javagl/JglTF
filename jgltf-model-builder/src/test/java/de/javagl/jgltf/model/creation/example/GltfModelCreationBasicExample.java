@@ -11,10 +11,10 @@ import de.javagl.jgltf.model.creation.MeshPrimitiveModels;
 import de.javagl.jgltf.model.creation.SceneModels;
 import de.javagl.jgltf.model.impl.DefaultGltfModel;
 import de.javagl.jgltf.model.impl.DefaultMeshPrimitiveModel;
+import de.javagl.jgltf.model.impl.DefaultPbrMaterialModel;
 import de.javagl.jgltf.model.io.GltfWriter;
 import de.javagl.jgltf.model.io.v2.GltfAssetV2;
 import de.javagl.jgltf.model.io.v2.GltfAssetsV2;
-import de.javagl.jgltf.model.v2.MaterialModelV2;
 
 /**
  * A basic example for the glTF model creation.<br>
@@ -46,7 +46,7 @@ public class GltfModelCreationBasicExample
             MeshPrimitiveModels.create(indices, positions, null, null);
         
         // Create a material, and assign it to the mesh primitive
-        MaterialModelV2 materialModel = 
+        DefaultPbrMaterialModel materialModel = 
             MaterialModels.createFromBaseColor(1.0f, 0.0f, 0.0f, 1.0f);
         meshPrimitiveModel.setMaterialModel(materialModel);
         

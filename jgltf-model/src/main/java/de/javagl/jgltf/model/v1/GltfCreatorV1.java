@@ -99,6 +99,7 @@ import de.javagl.jgltf.model.gl.TechniqueModel;
 import de.javagl.jgltf.model.gl.TechniqueParametersModel;
 import de.javagl.jgltf.model.gl.TechniqueStatesFunctionsModel;
 import de.javagl.jgltf.model.gl.TechniqueStatesModel;
+import de.javagl.jgltf.model.impl.DefaultTechniqueMaterialModel;
 
 /**
  * A class for creating the {@link GlTF version 1.0 glTF} from a 
@@ -635,9 +636,9 @@ public class GltfCreatorV1
      */
     private Material createMaterial(MaterialModel materialModel)
     {
-        if (materialModel instanceof MaterialModelV1)
+        if (materialModel instanceof DefaultTechniqueMaterialModel)
         {
-            MaterialModelV1 materialModelV1 = (MaterialModelV1)materialModel;
+            DefaultTechniqueMaterialModel materialModelV1 = (DefaultTechniqueMaterialModel)materialModel;
             return createMaterialV1(materialModelV1);
         }
         // TODO It should be possible to use a glTF 2.0 material model here
@@ -646,12 +647,12 @@ public class GltfCreatorV1
     }
     
     /**
-     * Create the {@link Material} for the given {@link MaterialModelV1}
+     * Create the {@link Material} for the given {@link DefaultTechniqueMaterialModel}
      * 
-     * @param materialModel The {@link MaterialModelV1}
+     * @param materialModel The {@link DefaultTechniqueMaterialModel}
      * @return The {@link Material}
      */
-    private Material createMaterialV1(MaterialModelV1 materialModel)
+    private Material createMaterialV1(DefaultTechniqueMaterialModel materialModel)
     {
         Material material = new Material();
         transferGltfChildOfRootPropertyElements(materialModel, material);

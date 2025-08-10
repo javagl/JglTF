@@ -85,10 +85,12 @@ import de.javagl.jgltf.model.MeshModel;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
 import de.javagl.jgltf.model.NodeModel;
 import de.javagl.jgltf.model.Optionals;
+import de.javagl.jgltf.model.PbrMaterialModel.AlphaMode;
+import de.javagl.jgltf.model.PbrMetallicRoughnessModel;
 import de.javagl.jgltf.model.SceneModel;
 import de.javagl.jgltf.model.SkinModel;
+import de.javagl.jgltf.model.TextureInfoModel;
 import de.javagl.jgltf.model.TextureModel;
-import de.javagl.jgltf.model.extensions.ExtensionModels;
 import de.javagl.jgltf.model.impl.AbstractModelElement;
 import de.javagl.jgltf.model.impl.AbstractNamedModelElement;
 import de.javagl.jgltf.model.impl.DefaultAccessorModel;
@@ -107,16 +109,19 @@ import de.javagl.jgltf.model.impl.DefaultImageModel;
 import de.javagl.jgltf.model.impl.DefaultMeshModel;
 import de.javagl.jgltf.model.impl.DefaultMeshPrimitiveModel;
 import de.javagl.jgltf.model.impl.DefaultNodeModel;
+import de.javagl.jgltf.model.impl.DefaultNormalTextureInfoModel;
+import de.javagl.jgltf.model.impl.DefaultOcclusionTextureInfoModel;
+import de.javagl.jgltf.model.impl.DefaultPbrMaterialModel;
+import de.javagl.jgltf.model.impl.DefaultPbrMetallicRoughnessModel;
 import de.javagl.jgltf.model.impl.DefaultSceneModel;
 import de.javagl.jgltf.model.impl.DefaultSkinModel;
+import de.javagl.jgltf.model.impl.DefaultTextureInfoModel;
 import de.javagl.jgltf.model.impl.DefaultTextureModel;
 import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.model.io.GltfAsset;
 import de.javagl.jgltf.model.io.IO;
 import de.javagl.jgltf.model.io.MimeTypes;
 import de.javagl.jgltf.model.io.v2.GltfAssetV2;
-import de.javagl.jgltf.model.v2.MaterialModelV2.AlphaMode;
-import de.javagl.jgltf.model.v2.gl.Materials;
 
 /**
  * A class that is responsible for filling a {@link DefaultGltfModel} with
@@ -210,22 +215,6 @@ public class GltfModelCreatorV2
         
         initExtensionsModel();
         initAssetModel();
-        
-        // TODO TODO_EXTENSIONS Experiments for extension handling
-        logger.warning(
-            "Experimental extension processing in GltfModelCreatorV2");
-        processModel();
-        // animation
-        // buffer
-        // bufferView
-        // camera
-        // image
-        processMaterialModels();
-        processMeshModels();
-        // node
-        // scene
-        // skin
-        processTextureModels();
     }
     
     /**
@@ -390,7 +379,7 @@ public class GltfModelCreatorV2
         List<Material> materials = Optionals.of(gltf.getMaterials());
         for (int i = 0; i < materials.size(); i++)
         {
-            MaterialModelV2 materialModel = new MaterialModelV2();
+            DefaultPbrMaterialModel materialModel = new DefaultPbrMaterialModel();
             gltfModel.addMaterialModel(materialModel);
         }
     }
@@ -980,8 +969,8 @@ public class GltfModelCreatorV2
         Integer materialIndex = meshPrimitive.getMaterial();
         if (materialIndex != null)
         {
-            MaterialModelV2 materialModel = 
-                (MaterialModelV2) gltfModel.getMaterialModel(materialIndex);
+            DefaultPbrMaterialModel materialModel = 
+                (DefaultPbrMaterialModel) gltfModel.getMaterialModel(materialIndex);
             meshPrimitiveModel.setMaterialModel(materialModel);
         }
         
@@ -1171,8 +1160,8 @@ public class GltfModelCreatorV2
         for (int i = 0; i < materials.size(); i++)
         {
             Material material = materials.get(i);
-            MaterialModelV2 materialModel = 
-                (MaterialModelV2) gltfModel.getMaterialModel(i);
+            DefaultPbrMaterialModel materialModel = 
+                (DefaultPbrMaterialModel) gltfModel.getMaterialModel(i);
             
             transferGltfChildOfRootPropertyElements(material, materialModel);            
             initMaterialModel(materialModel, material);
@@ -1180,27 +1169,23 @@ public class GltfModelCreatorV2
     }
     
     /**
-     * Initialize the given {@link MaterialModelV2} based on the given
+     * Initialize the given {@link DefaultPbrMaterialModel} based on the given
      * {@link Material}
      * 
-     * @param materialModel The {@link MaterialModelV2}
+     * @param materialModel The {@link DefaultPbrMaterialModel}
      * @param material The {@link Material}
      */
     private void initMaterialModel(
-        MaterialModelV2 materialModel, Material material)
+        DefaultPbrMaterialModel materialModel, Material material)
     {
-        MaterialPbrMetallicRoughness pbrMetallicRoughness = 
-            material.getPbrMetallicRoughness();
-        if (pbrMetallicRoughness == null)
-        {
-            pbrMetallicRoughness = 
-                Materials.createDefaultMaterialPbrMetallicRoughness();
-        }
-        
         String alphaModeString = material.getAlphaMode();
         if (alphaModeString != null)
         {
             materialModel.setAlphaMode(AlphaMode.valueOf(alphaModeString));
+        }
+        else
+        {
+            materialModel.setAlphaMode(AlphaMode.OPAQUE);
         }
         materialModel.setAlphaCutoff(Optionals.of(
             material.getAlphaCutoff(),
@@ -1209,82 +1194,82 @@ public class GltfModelCreatorV2
         materialModel.setDoubleSided(
             Boolean.TRUE.equals(material.isDoubleSided()));
         
-        TextureInfo baseColorTextureInfo = 
-            pbrMetallicRoughness.getBaseColorTexture();
-        if (baseColorTextureInfo != null)
+        MaterialPbrMetallicRoughness pbrMetallicRoughness = 
+            material.getPbrMetallicRoughness();
+        if (pbrMetallicRoughness != null)
         {
-            int index = baseColorTextureInfo.getIndex();
-            TextureModel textureModel = gltfModel.getTextureModel(index);
-            materialModel.setBaseColorTexture(textureModel);
-            materialModel.setBaseColorTexcoord(
-                baseColorTextureInfo.getTexCoord());
+            // Create the PbrMetallicRoughnessModel and assign it to the 
+            // material model
+            DefaultPbrMetallicRoughnessModel pbrMetallicRoughnessModel = 
+                new DefaultPbrMetallicRoughnessModel();
+            materialModel.setPbrMetallicRoughnessModel(
+                pbrMetallicRoughnessModel);
+            
+            // Initialize the PbrMetallicRoughnessModel
+            transferGltfPropertyElements(
+                pbrMetallicRoughness, pbrMetallicRoughnessModel);
+            initPbrMetallicRoughness(
+                pbrMetallicRoughnessModel, pbrMetallicRoughness);
         }
-        double[] baseColorFactor = Optionals.of(
-            pbrMetallicRoughness.getBaseColorFactor(),
-            pbrMetallicRoughness.defaultBaseColorFactor());
-        materialModel.setBaseColorFactor(baseColorFactor);
-        
-        TextureInfo metallicRoughnessTextureInfo = 
-            pbrMetallicRoughness.getMetallicRoughnessTexture();
-        if (metallicRoughnessTextureInfo != null)
-        {
-            int index = metallicRoughnessTextureInfo.getIndex();
-            TextureModel textureModel = gltfModel.getTextureModel(index);
-            materialModel.setMetallicRoughnessTexture(textureModel);
-            materialModel.setMetallicRoughnessTexcoord(
-                metallicRoughnessTextureInfo.getTexCoord());
-        }
-        double metallicFactor = Optionals.of(
-            pbrMetallicRoughness.getMetallicFactor(),
-            pbrMetallicRoughness.defaultMetallicFactor());
-        materialModel.setMetallicFactor(metallicFactor);
-        
-        double roughnessFactor = Optionals.of(
-            pbrMetallicRoughness.getRoughnessFactor(),
-            pbrMetallicRoughness.defaultRoughnessFactor());
-        materialModel.setRoughnessFactor(roughnessFactor);
         
         MaterialNormalTextureInfo normalTextureInfo = 
             material.getNormalTexture();
         if (normalTextureInfo != null)
         {
-            int index = normalTextureInfo.getIndex();
-            TextureModel textureModel = gltfModel.getTextureModel(index);
-            materialModel.setNormalTexture(textureModel);
-            materialModel.setNormalTexcoord(
-                normalTextureInfo.getTexCoord());
+            // Create the TextureInfoModel and assign it to the material model
+            DefaultNormalTextureInfoModel normalTextureInfoModel = 
+                new DefaultNormalTextureInfoModel();
+            materialModel.setNormalTextureInfoModel(normalTextureInfoModel);
+
+            // Initialize the TextureInfoModel
+            transferGltfPropertyElements(
+                normalTextureInfo, normalTextureInfoModel);
+            initTextureInfo(normalTextureInfoModel, normalTextureInfo);
             
+            // The additional 'scale' property for normals
             double normalScale = Optionals.of(
                 normalTextureInfo.getScale(),
                 normalTextureInfo.defaultScale());
-            materialModel.setNormalScale(normalScale);
+            normalTextureInfoModel.setScale(normalScale);
+            
         }
 
         MaterialOcclusionTextureInfo occlusionTextureInfo = 
             material.getOcclusionTexture();
         if (occlusionTextureInfo != null)
         {
-            int index = occlusionTextureInfo.getIndex();
-            TextureModel textureModel = gltfModel.getTextureModel(index);
-            materialModel.setOcclusionTexture(textureModel);
-            materialModel.setOcclusionTexcoord(
-                occlusionTextureInfo.getTexCoord());
+            // Create the TextureInfoModel and assign it to the material model
+            DefaultOcclusionTextureInfoModel occlusionTextureInfoModel =
+                new DefaultOcclusionTextureInfoModel();
+            materialModel.setOcclusionTextureInfoModel(
+                occlusionTextureInfoModel);
             
+            // Initialize the TextureInfoModel
+            transferGltfPropertyElements(
+                occlusionTextureInfo, occlusionTextureInfoModel);
+            initTextureInfo(occlusionTextureInfoModel, occlusionTextureInfo);
+            
+            // The additional 'strength' property for occlusion
             double occlusionStrength = Optionals.of(
                 occlusionTextureInfo.getStrength(),
                 occlusionTextureInfo.defaultStrength());
-            materialModel.setOcclusionStrength(occlusionStrength);
+            occlusionTextureInfoModel.setStrength(occlusionStrength);
+            
         }
 
         TextureInfo emissiveTextureInfo = 
             material.getEmissiveTexture();
         if (emissiveTextureInfo != null)
         {
-            int index = emissiveTextureInfo.getIndex();
-            TextureModel textureModel = gltfModel.getTextureModel(index);
-            materialModel.setEmissiveTexture(textureModel);
-            materialModel.setEmissiveTexcoord(
-                emissiveTextureInfo.getTexCoord());
+            // Create the TextureInfoModel and assign it to the material model
+            DefaultTextureInfoModel emissiveTextureInfoModel = 
+                new DefaultTextureInfoModel();
+            materialModel.setEmissiveTextureInfoModel(emissiveTextureInfoModel);
+
+            // Initialize the TextureInfoModel
+            transferGltfPropertyElements(
+                emissiveTextureInfo, emissiveTextureInfoModel);
+            initTextureInfo(emissiveTextureInfoModel, emissiveTextureInfo);
         }
         
         double[] emissiveFactor = Optionals.of(
@@ -1292,6 +1277,83 @@ public class GltfModelCreatorV2
             material.defaultEmissiveFactor());
         materialModel.setEmissiveFactor(emissiveFactor);
     }
+
+    /**
+     * Initialize the given {@link PbrMetallicRoughnessModel} based on the
+     * given {@link MaterialPbrMetallicRoughness}.
+     * 
+     * @param pbrMetallicRoughnessModel The {@link PbrMetallicRoughnessModel}
+     * @param pbrMetallicRoughness The {@link MaterialPbrMetallicRoughness}
+     */
+    private void initPbrMetallicRoughness(
+        DefaultPbrMetallicRoughnessModel pbrMetallicRoughnessModel,
+        MaterialPbrMetallicRoughness pbrMetallicRoughness)
+    {
+        TextureInfo baseColorTextureInfo = 
+            pbrMetallicRoughness.getBaseColorTexture();
+        if (baseColorTextureInfo != null)
+        {
+            // Create the TextureInfoModel and assign it to the material model
+            DefaultTextureInfoModel baseColorTextureInfoModel = 
+                new DefaultTextureInfoModel();
+            pbrMetallicRoughnessModel.setBaseColorTexture(
+                baseColorTextureInfoModel);
+
+            // Initialize the TextureInfoModel
+            transferGltfPropertyElements(
+                baseColorTextureInfo, baseColorTextureInfoModel);
+            initTextureInfo(baseColorTextureInfoModel, baseColorTextureInfo);
+        }
+        double[] baseColorFactor = Optionals.of(
+            pbrMetallicRoughness.getBaseColorFactor(),
+            pbrMetallicRoughness.defaultBaseColorFactor());
+        pbrMetallicRoughnessModel.setBaseColorFactor(baseColorFactor);
+    
+        TextureInfo metallicRoughnessTextureInfo = 
+            pbrMetallicRoughness.getMetallicRoughnessTexture();
+        if (metallicRoughnessTextureInfo != null)
+        {
+            // Create the TextureInfoModel and assign it to the material model
+            DefaultTextureInfoModel metallicRoughnessTextureInfoModel = 
+                new DefaultTextureInfoModel();
+            pbrMetallicRoughnessModel.setMetallicRoughnessTextureInfo(
+                metallicRoughnessTextureInfoModel);
+
+            // Initialize the TextureInfoModel
+            transferGltfPropertyElements(
+                metallicRoughnessTextureInfo, 
+                metallicRoughnessTextureInfoModel);
+            initTextureInfo(metallicRoughnessTextureInfoModel, 
+                metallicRoughnessTextureInfo);
+        }
+        
+        double metallicFactor = Optionals.of(
+            pbrMetallicRoughness.getMetallicFactor(),
+            pbrMetallicRoughness.defaultMetallicFactor());
+        pbrMetallicRoughnessModel.setMetallicFactor(metallicFactor);
+        
+        double roughnessFactor = Optionals.of(
+            pbrMetallicRoughness.getRoughnessFactor(),
+            pbrMetallicRoughness.defaultRoughnessFactor());
+        pbrMetallicRoughnessModel.setRoughnessFactor(roughnessFactor);
+    }
+
+    /**
+     * Initialize the given {@link TextureInfoModel} based on the given
+     * {@link TextureInfo}.
+     * 
+     * @param textureInfoModel The {@link TextureInfoModel}
+     * @param textureInfo The {@link TextureInfo}
+     */
+    private void initTextureInfo(DefaultTextureInfoModel textureInfoModel,
+        TextureInfo textureInfo)
+    {
+        int index = textureInfo.getIndex();
+        TextureModel textureModel = gltfModel.getTextureModel(index);
+        textureInfoModel.setTextureModel(textureModel);
+        textureInfoModel.setTexCoord(textureInfo.getTexCoord());
+    }
+    
     
     /**
      * Initialize the {@link ExtensionsModel} with the extensions that
@@ -1319,62 +1381,6 @@ public class GltfModelCreatorV2
             transferGltfPropertyElements(asset, assetModel);
             assetModel.setCopyright(asset.getCopyright());
             assetModel.setGenerator(asset.getGenerator());
-        }
-    }
-    
-    /**
-     * Process the {@link GltfModel} object
-     */
-    private void processModel()
-    {
-        ExtensionModels.process(
-            gltfModel, gltfModel, GltfModel.class);
-    }
-
-    /**
-     * Process the {@link MaterialModel} instances
-     */
-    private void processMaterialModels()
-    {
-        List<MaterialModel> materialModels = gltfModel.getMaterialModels();
-        for (MaterialModel materialModel : materialModels)
-        {
-            ExtensionModels.process(
-                gltfModel, materialModel, MaterialModel.class);
-        }
-    }
-    
-    /**
-     * Process the {@link MeshModel} instances
-     */
-    private void processMeshModels()
-    {
-        List<MeshModel> meshModels = gltfModel.getMeshModels();
-        for (MeshModel meshModel : meshModels)
-        {
-            ExtensionModels.process(
-                gltfModel, meshModel, MeshModel.class);
-            
-            List<MeshPrimitiveModel> meshPrimitiveModels = 
-                meshModel.getMeshPrimitiveModels();
-            for (MeshPrimitiveModel meshPrimitiveModel : meshPrimitiveModels)
-            {
-                ExtensionModels.process(
-                    gltfModel, meshPrimitiveModel, MeshPrimitiveModel.class);
-            }
-        }
-    }
-
-    /**
-     * Process the {@link TextureModel} instances
-     */
-    private void processTextureModels()
-    {
-        List<TextureModel> textureModels = gltfModel.getTextureModels();
-        for (TextureModel textureModel : textureModels)
-        {
-            ExtensionModels.process(
-                gltfModel, textureModel, TextureModel.class);
         }
     }
     

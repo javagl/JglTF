@@ -17,11 +17,11 @@ import de.javagl.jgltf.model.creation.TextureModels;
 import de.javagl.jgltf.model.impl.DefaultMeshModel;
 import de.javagl.jgltf.model.impl.DefaultMeshPrimitiveModel;
 import de.javagl.jgltf.model.impl.DefaultNodeModel;
+import de.javagl.jgltf.model.impl.DefaultPbrMaterialModel;
 import de.javagl.jgltf.model.impl.DefaultSceneModel;
 import de.javagl.jgltf.model.io.GltfWriter;
 import de.javagl.jgltf.model.io.v2.GltfAssetV2;
 import de.javagl.jgltf.model.io.v2.GltfAssetsV2;
-import de.javagl.jgltf.model.v2.MaterialModelV2;
 
 /**
  * A basic example for the glTF model creation.<br>
@@ -42,7 +42,7 @@ public class GltfModelCreationExample
     private static GltfModel createGltfModel()
     {
         // Create a material
-        MaterialModelV2 materialModel = createMaterial();
+        DefaultPbrMaterialModel materialModel = createMaterial();
 
         // Create a mesh primitive
         DefaultMeshPrimitiveModel meshPrimitiveModel = createMeshPrimitive();
@@ -117,7 +117,7 @@ public class GltfModelCreationExample
         return meshPrimitiveModel;
     }
     
-    private static MaterialModelV2 createMaterial()
+    private static DefaultPbrMaterialModel createMaterial()
     {
         // Create a material using the MaterialBuilder class.
         // This allows configuring all elements of the resulting
@@ -138,7 +138,7 @@ public class GltfModelCreationExample
         materialBuilder.setEmissiveTexture(
             emissiveTexture, 1.0f, 1.0f, 1.0f, 1);
         
-        MaterialModelV2 materialModel = materialBuilder.build();
+        DefaultPbrMaterialModel materialModel = materialBuilder.build();
         return materialModel;
     }
     
