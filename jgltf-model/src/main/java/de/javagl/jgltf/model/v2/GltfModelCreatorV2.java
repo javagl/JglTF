@@ -1183,6 +1183,10 @@ public class GltfModelCreatorV2
         {
             materialModel.setAlphaMode(AlphaMode.valueOf(alphaModeString));
         }
+        else
+        {
+            materialModel.setAlphaMode(AlphaMode.OPAQUE);
+        }
         materialModel.setAlphaCutoff(Optionals.of(
             material.getAlphaCutoff(),
             material.defaultAlphaCutoff()));
