@@ -120,7 +120,7 @@ public class DefaultPbrMetallicRoughnessModel extends AbstractModelElement
      *
      * @param baseColorTextureInfoModel The base color texture info model
      */
-    public void setBaseColorTexture(TextureInfoModel baseColorTextureInfoModel)
+    public void setBaseColorTextureInfoModel(TextureInfoModel baseColorTextureInfoModel)
     {
         this.baseColorTextureInfoModel = baseColorTextureInfoModel;
     }
@@ -169,7 +169,7 @@ public class DefaultPbrMetallicRoughnessModel extends AbstractModelElement
      * @param metallicRoughnessTextureInfoModel The metallic-roughness-texture
      *        info model
      */
-    public void setMetallicRoughnessTextureInfo(
+    public void setMetallicRoughnessTextureInfoModel(
         TextureInfoModel metallicRoughnessTextureInfoModel)
     {
         this.metallicRoughnessTextureInfoModel =

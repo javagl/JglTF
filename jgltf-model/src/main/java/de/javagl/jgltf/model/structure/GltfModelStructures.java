@@ -62,6 +62,7 @@ import de.javagl.jgltf.model.NodeModel;
 import de.javagl.jgltf.model.NormalTextureInfoModel;
 import de.javagl.jgltf.model.OcclusionTextureInfoModel;
 import de.javagl.jgltf.model.Optionals;
+import de.javagl.jgltf.model.PbrMaterialModel;
 import de.javagl.jgltf.model.PbrMetallicRoughnessModel;
 import de.javagl.jgltf.model.SceneModel;
 import de.javagl.jgltf.model.SkinModel;
@@ -1058,7 +1059,7 @@ public class GltfModelStructures
      * @param targetMaterial The target {@link DefaultPbrMaterialModel}
      */
     private void initMaterialModel(
-        DefaultPbrMaterialModel sourceMaterial, 
+        PbrMaterialModel sourceMaterial, 
         DefaultPbrMaterialModel targetMaterial)
     {
         targetMaterial.setAlphaMode(sourceMaterial.getAlphaMode());
@@ -1090,7 +1091,7 @@ public class GltfModelStructures
                 targetBaseColorTextureInfo.setTexCoord(
                     sourceBaseColorTextureInfo.getTexCoord());
 
-                targetPbrMetallicRoughness.setBaseColorTexture(
+                targetPbrMetallicRoughness.setBaseColorTextureInfoModel(
                     targetBaseColorTextureInfo);
 
                 targetPbrMetallicRoughness.setMetallicFactor(

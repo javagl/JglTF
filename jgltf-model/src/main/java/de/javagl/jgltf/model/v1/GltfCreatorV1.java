@@ -91,6 +91,7 @@ import de.javagl.jgltf.model.NodeModel;
 import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.SceneModel;
 import de.javagl.jgltf.model.SkinModel;
+import de.javagl.jgltf.model.TechniqueMaterialModel;
 import de.javagl.jgltf.model.TextureModel;
 import de.javagl.jgltf.model.gl.ProgramModel;
 import de.javagl.jgltf.model.gl.ShaderModel;
@@ -99,7 +100,6 @@ import de.javagl.jgltf.model.gl.TechniqueModel;
 import de.javagl.jgltf.model.gl.TechniqueParametersModel;
 import de.javagl.jgltf.model.gl.TechniqueStatesFunctionsModel;
 import de.javagl.jgltf.model.gl.TechniqueStatesModel;
-import de.javagl.jgltf.model.impl.DefaultTechniqueMaterialModel;
 
 /**
  * A class for creating the {@link GlTF version 1.0 glTF} from a 
@@ -628,7 +628,7 @@ public class GltfCreatorV1
     
     /**
      * Create the {@link Material} for the given {@link MaterialModel}.
-     * If the given {@link MaterialModel} is not a {@link MaterialModelV1},
+     * If the given {@link MaterialModel} is not a {@link TechniqueMaterialModel},
      * then a warning is printed and <code>null</code> is returned.
      * 
      * @param materialModel The {@link MaterialModel}
@@ -636,9 +636,9 @@ public class GltfCreatorV1
      */
     private Material createMaterial(MaterialModel materialModel)
     {
-        if (materialModel instanceof DefaultTechniqueMaterialModel)
+        if (materialModel instanceof TechniqueMaterialModel)
         {
-            DefaultTechniqueMaterialModel materialModelV1 = (DefaultTechniqueMaterialModel)materialModel;
+            TechniqueMaterialModel materialModelV1 = (TechniqueMaterialModel)materialModel;
             return createMaterialV1(materialModelV1);
         }
         // TODO It should be possible to use a glTF 2.0 material model here
@@ -647,12 +647,12 @@ public class GltfCreatorV1
     }
     
     /**
-     * Create the {@link Material} for the given {@link DefaultTechniqueMaterialModel}
+     * Create the {@link Material} for the given {@link TechniqueMaterialModel}
      * 
-     * @param materialModel The {@link DefaultTechniqueMaterialModel}
+     * @param materialModel The {@link TechniqueMaterialModel}
      * @return The {@link Material}
      */
-    private Material createMaterialV1(DefaultTechniqueMaterialModel materialModel)
+    private Material createMaterialV1(TechniqueMaterialModel materialModel)
     {
         Material material = new Material();
         transferGltfChildOfRootPropertyElements(materialModel, material);

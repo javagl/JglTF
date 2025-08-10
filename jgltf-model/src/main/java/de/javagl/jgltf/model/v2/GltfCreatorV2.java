@@ -610,10 +610,10 @@ public class GltfCreatorV2
      */
     private Material createMaterial(MaterialModel materialModel)
     {
-        if (materialModel instanceof DefaultPbrMaterialModel)
+        if (materialModel instanceof PbrMaterialModel)
         {
-            DefaultPbrMaterialModel DefaultPbrMaterialModel = (DefaultPbrMaterialModel)materialModel;
-            return createMaterialV2(DefaultPbrMaterialModel);
+            PbrMaterialModel pbrMaterialModel = (PbrMaterialModel)materialModel;
+            return createMaterialV2(pbrMaterialModel);
         }
         // TODO It should be possible to use a glTF 1.0 material model here
         logger.severe("Cannot store glTF 1.0 material in glTF 2.0");

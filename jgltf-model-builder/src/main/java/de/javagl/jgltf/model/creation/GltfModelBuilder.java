@@ -48,6 +48,7 @@ import de.javagl.jgltf.model.NodeModel;
 import de.javagl.jgltf.model.PbrMaterialModel;
 import de.javagl.jgltf.model.SceneModel;
 import de.javagl.jgltf.model.SkinModel;
+import de.javagl.jgltf.model.TechniqueMaterialModel;
 import de.javagl.jgltf.model.TextureModel;
 import de.javagl.jgltf.model.gl.ProgramModel;
 import de.javagl.jgltf.model.gl.ShaderModel;
@@ -66,7 +67,6 @@ import de.javagl.jgltf.model.impl.DefaultMeshModel;
 import de.javagl.jgltf.model.impl.DefaultNodeModel;
 import de.javagl.jgltf.model.impl.DefaultSceneModel;
 import de.javagl.jgltf.model.impl.DefaultSkinModel;
-import de.javagl.jgltf.model.impl.DefaultTechniqueMaterialModel;
 import de.javagl.jgltf.model.impl.DefaultTextureModel;
 import de.javagl.jgltf.model.structure.BufferBuilderStrategies;
 import de.javagl.jgltf.model.structure.BufferBuilderStrategy;
@@ -387,10 +387,10 @@ public class GltfModelBuilder
         boolean added = materialModelsSet.add(materialModel);
         if (added)
         {
-            if (materialModel instanceof DefaultTechniqueMaterialModel)
+            if (materialModel instanceof TechniqueMaterialModel)
             {
-                DefaultTechniqueMaterialModel materialModelV1 = 
-                    (DefaultTechniqueMaterialModel)materialModel;
+                TechniqueMaterialModel materialModelV1 = 
+                    (TechniqueMaterialModel)materialModel;
                 
                 addTechniqueModel(materialModelV1.getTechniqueModel());
                 

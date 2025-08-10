@@ -116,7 +116,7 @@ public class MaterialBuilder
         DefaultTextureInfoModel textureInfo = new DefaultTextureInfoModel();
         textureInfo.setTextureModel(baseColorTexture);
         textureInfo.setTexCoord(texCoord);
-        metallicRoughnessModel.setBaseColorTexture(textureInfo);
+        metallicRoughnessModel.setBaseColorTextureInfoModel(textureInfo);
         materialModel.setPbrMetallicRoughnessModel(metallicRoughnessModel);
         return this;
     }
@@ -167,7 +167,7 @@ public class MaterialBuilder
         DefaultTextureInfoModel textureInfo = new DefaultTextureInfoModel();
         textureInfo.setTextureModel(metallicRoughnessTexture);
         textureInfo.setTexCoord(texCoord);
-        metallicRoughnessModel.setMetallicRoughnessTextureInfo(textureInfo);
+        metallicRoughnessModel.setMetallicRoughnessTextureInfoModel(textureInfo);
         materialModel.setPbrMetallicRoughnessModel(metallicRoughnessModel);
         return this;
     }
