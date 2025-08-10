@@ -29,7 +29,11 @@ package de.javagl.jgltf.model.impl;
 import de.javagl.jgltf.model.NamedModelElement;
 
 /**
- * Abstract base implementation of the {@link NamedModelElement} interface.
+ * Abstract base implementation of the {@link NamedModelElement} interface.<br>
+ * <br>
+ * Clients should usually not use this class. It is mainly intended for
+ * convenience of implementing model elements as part of the core 
+ * implementation or extensions.
  */
 public class AbstractNamedModelElement extends AbstractModelElement 
     implements NamedModelElement

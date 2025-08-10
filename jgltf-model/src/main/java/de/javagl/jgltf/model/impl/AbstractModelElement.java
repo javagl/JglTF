@@ -35,7 +35,11 @@ import java.util.logging.Logger;
 import de.javagl.jgltf.model.ModelElement;
 
 /**
- * Abstract base implementation of the {@link ModelElement} interface.
+ * Abstract base implementation of the {@link ModelElement} interface.<br>
+ * <br>
+ * Clients should usually not use this class. It is mainly intended for
+ * convenience of implementing model elements as part of the core 
+ * implementation or extensions.
  */
 public class AbstractModelElement implements ModelElement
 {
