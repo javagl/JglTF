@@ -1211,7 +1211,11 @@ public class GltfModelCreatorV2
         {
             materialModel.setAlphaMode(AlphaMode.valueOf(alphaModeString));
         }
-        materialModel.setAlphaCutoff(material.getAlphaCutoff());
+        Double alphaCutoff = material.getAlphaCutoff();
+        if (alphaCutoff != null)
+        {
+            materialModel.setAlphaCutoff(alphaCutoff);
+        }
         
         materialModel.setDoubleSided(
             Boolean.TRUE.equals(material.isDoubleSided()));
