@@ -497,7 +497,8 @@ public class GltfModelCreatorV2
             Accessor accessor = accessors.get(i);
             DefaultAccessorModel accessorModel = 
                 gltfModel.getAccessorModel(i);
-            ModelElementsV2.transferGltfChildOfRootPropertyElementsToModel(accessor, accessorModel);
+            ModelElementsV2.transferGltfChildOfRootPropertyElementsToModel(
+                accessor, accessorModel);
             
             int byteOffset = Optionals.of(accessor.getByteOffset(), 0);
             accessorModel.setByteOffset(byteOffset);
@@ -759,7 +760,8 @@ public class GltfModelCreatorV2
             Animation animation = animations.get(i);
             DefaultAnimationModel animationModel = 
                 gltfModel.getAnimationModel(i);
-            ModelElementsV2.transferGltfChildOfRootPropertyElementsToModel(animation, animationModel);
+            ModelElementsV2.transferGltfChildOfRootPropertyElementsToModel(
+                animation, animationModel);
             
             List<AnimationChannel> channels = 
                 Optionals.of(animation.getChannels());
@@ -850,7 +852,8 @@ public class GltfModelCreatorV2
         {
             Buffer buffer = buffers.get(i);
             DefaultBufferModel bufferModel = gltfModel.getBufferModel(i);
-            ModelElementsV2.transferGltfChildOfRootPropertyElementsToModel(buffer, bufferModel);
+            ModelElementsV2.transferGltfChildOfRootPropertyElementsToModel(
+                buffer, bufferModel);
             if (i == 0 && binaryData != null)
             {
                 bufferModel.setBufferData(binaryData);
@@ -918,7 +921,8 @@ public class GltfModelCreatorV2
         {
             Mesh mesh = meshes.get(i);
             DefaultMeshModel meshModel = gltfModel.getMeshModel(i);
-            ModelElementsV2.transferGltfChildOfRootPropertyElementsToModel(mesh, meshModel);
+            ModelElementsV2.transferGltfChildOfRootPropertyElementsToModel(
+                mesh, meshModel);
             
             List<MeshPrimitive> primitives = 
                 Optionals.of(mesh.getPrimitives());
@@ -947,7 +951,8 @@ public class GltfModelCreatorV2
             meshPrimitive.defaultMode());
         DefaultMeshPrimitiveModel meshPrimitiveModel = 
             new DefaultMeshPrimitiveModel(mode);
-        ModelElementsV2.transferGltfPropertyElementsToModel(meshPrimitive, meshPrimitiveModel);
+        ModelElementsV2.transferGltfPropertyElementsToModel(
+            meshPrimitive, meshPrimitiveModel);
         
         Integer indicesIndex = meshPrimitive.getIndices();
         if (indicesIndex != null)
@@ -1005,7 +1010,8 @@ public class GltfModelCreatorV2
             Node node = nodes.get(i);
             
             DefaultNodeModel nodeModel = gltfModel.getNodeModel(i);
-            ModelElementsV2.transferGltfChildOfRootPropertyElementsToModel(node, nodeModel);            
+            ModelElementsV2.transferGltfChildOfRootPropertyElementsToModel(
+                node, nodeModel);            
             
             List<Integer> childIndices = Optionals.of(node.getChildren());
             for (Integer childIndex : childIndices)
@@ -1060,7 +1066,8 @@ public class GltfModelCreatorV2
             Scene scene = scenes.get(i);
 
             DefaultSceneModel sceneModel = gltfModel.getSceneModel(i);
-            ModelElementsV2.transferGltfChildOfRootPropertyElementsToModel(scene, sceneModel);            
+            ModelElementsV2.transferGltfChildOfRootPropertyElementsToModel(
+                scene, sceneModel);            
             
             List<Integer> nodeIndices = Optionals.of(scene.getNodes());
             for (Integer nodeIndex : nodeIndices)
@@ -1081,7 +1088,8 @@ public class GltfModelCreatorV2
         {
             Skin skin = skins.get(i);
             DefaultSkinModel skinModel = gltfModel.getSkinModel(i);
-            ModelElementsV2.transferGltfChildOfRootPropertyElementsToModel(skin, skinModel);
+            ModelElementsV2.transferGltfChildOfRootPropertyElementsToModel(
+                skin, skinModel);
             
             List<Integer> jointIndices = skin.getJoints();
             for (Integer jointIndex : jointIndices)
@@ -1107,7 +1115,8 @@ public class GltfModelCreatorV2
         {
             Texture texture = textures.get(i);
             DefaultTextureModel textureModel = gltfModel.getTextureModel(i);
-            ModelElementsV2.transferGltfChildOfRootPropertyElementsToModel(texture, textureModel);
+            ModelElementsV2.transferGltfChildOfRootPropertyElementsToModel(
+                texture, textureModel);
             
             // The source may be null when the image data is provided
             // by an extension.
@@ -1131,7 +1140,8 @@ public class GltfModelCreatorV2
         {
             Image image = images.get(i);
             DefaultImageModel imageModel = gltfModel.getImageModel(i);
-            ModelElementsV2.transferGltfChildOfRootPropertyElementsToModel(image, imageModel);
+            ModelElementsV2.transferGltfChildOfRootPropertyElementsToModel(
+                image, imageModel);
             
             Integer bufferViewIndex = image.getBufferView();
             if (bufferViewIndex != null)
@@ -1180,7 +1190,8 @@ public class GltfModelCreatorV2
             DefaultPbrMaterialModel materialModel = 
                 (DefaultPbrMaterialModel) gltfModel.getMaterialModel(i);
             
-            ModelElementsV2.transferGltfChildOfRootPropertyElementsToModel(material, materialModel);            
+            ModelElementsV2.transferGltfChildOfRootPropertyElementsToModel(
+                material, materialModel);            
             initMaterialModel(materialModel, material);
         }
     }
@@ -1366,7 +1377,8 @@ public class GltfModelCreatorV2
         if (asset != null)
         {
             DefaultAssetModel assetModel = gltfModel.getAssetModel();
-            ModelElementsV2.transferGltfPropertyElementsToModel(asset, assetModel);
+            ModelElementsV2.transferGltfPropertyElementsToModel(
+                asset, assetModel);
             assetModel.setCopyright(asset.getCopyright());
             assetModel.setGenerator(asset.getGenerator());
         }
