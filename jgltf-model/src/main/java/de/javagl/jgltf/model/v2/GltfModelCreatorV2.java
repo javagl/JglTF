@@ -1211,13 +1211,7 @@ public class GltfModelCreatorV2
         {
             materialModel.setAlphaMode(AlphaMode.valueOf(alphaModeString));
         }
-        else
-        {
-            materialModel.setAlphaMode(AlphaMode.OPAQUE);
-        }
-        materialModel.setAlphaCutoff(Optionals.of(
-            material.getAlphaCutoff(),
-            material.defaultAlphaCutoff()));
+        materialModel.setAlphaCutoff(material.getAlphaCutoff());
         
         materialModel.setDoubleSided(
             Boolean.TRUE.equals(material.isDoubleSided()));
@@ -1303,9 +1297,7 @@ public class GltfModelCreatorV2
                 baseColorTextureInfo, baseColorTextureInfoModel);
             initTextureInfo(baseColorTextureInfoModel, baseColorTextureInfo);
         }
-        double[] baseColorFactor = Optionals.of(
-            pbrMetallicRoughness.getBaseColorFactor(),
-            pbrMetallicRoughness.defaultBaseColorFactor());
+        double[] baseColorFactor = pbrMetallicRoughness.getBaseColorFactor();
         pbrMetallicRoughnessModel.setBaseColorFactor(baseColorFactor);
     
         TextureInfo metallicRoughnessTextureInfo = 

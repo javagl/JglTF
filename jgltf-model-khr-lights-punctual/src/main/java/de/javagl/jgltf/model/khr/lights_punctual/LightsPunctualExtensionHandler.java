@@ -75,19 +75,15 @@ public class LightsPunctualExtensionHandler implements ExtensionHandler
         for (Light light : lights)
         {
             LightModel lightModel = new DefaultLightModel();
-            lightModel.setColor(Optionals.clone(
-                Optionals.of(light.getColor(), light.defaultColor())));
-            lightModel.setIntensity(
-                Optionals.of(light.getIntensity(), light.defaultIntensity()));
+            lightModel.setColor(Optionals.clone(light.getColor()));
+            lightModel.setIntensity(light.getIntensity());
             
             LightSpot spot = light.getSpot();
             if (spot != null)
             {
                 DefaultLightSpotModel spotModel = new DefaultLightSpotModel();
-                spotModel.setInnerConeAngle(Optionals.of(
-                    spot.getInnerConeAngle(), spot.defaultInnerConeAngle()));
-                spotModel.setOuterConeAngle(Optionals.of(
-                    spot.getOuterConeAngle(), spot.defaultOuterConeAngle()));
+                spotModel.setInnerConeAngle(spot.getInnerConeAngle());
+                spotModel.setOuterConeAngle(spot.getOuterConeAngle());
                 lightModel.setSpot(spotModel);
             }
             lightModel.setRange(light.getRange());

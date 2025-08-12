@@ -33,7 +33,6 @@ import de.javagl.jgltf.impl.v2.TextureInfo;
 import de.javagl.jgltf.impl.v2.khr.materials_clearcoat.MaterialMaterialsClearcoat;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.MaterialModel;
-import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.TextureInfoModel;
 import de.javagl.jgltf.model.TextureModel;
 import de.javagl.jgltf.model.extensions.ExtensionHandler;
@@ -82,8 +81,7 @@ public class MaterialsClearcoatExtensionHandler implements ExtensionHandler
 
         List<TextureModel> textureModels = gltfModel.getTextureModels();
 
-        model.setClearcoatFactor(Optionals.of(impl.getClearcoatFactor(),
-            impl.defaultClearcoatFactor()));
+        model.setClearcoatFactor(impl.getClearcoatFactor());
         TextureInfo clearcoatTextureInfo = impl.getClearcoatTexture();
         if (clearcoatTextureInfo != null)
         {
@@ -95,8 +93,7 @@ public class MaterialsClearcoatExtensionHandler implements ExtensionHandler
         }
 
         model.setClearcoatRoughnessFactor(
-            Optionals.of(impl.getClearcoatRoughnessFactor(),
-                impl.defaultClearcoatRoughnessFactor()));
+            impl.getClearcoatRoughnessFactor());
         TextureInfo clearcoatRoughnessTextureInfo =
             impl.getClearcoatRoughnessTexture();
         if (clearcoatRoughnessTextureInfo != null)
