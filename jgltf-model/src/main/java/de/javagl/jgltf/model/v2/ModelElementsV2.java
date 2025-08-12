@@ -45,12 +45,12 @@ class ModelElementsV2
      * @param modelElement The model element
      * @param property The property
      */
-    static void transferGltfChildOfRootPropertyElements(
+    static void transferGltfChildOfRootPropertyElementsFromModel(
         NamedModelElement modelElement,
         GlTFChildOfRootProperty property)
     {
         property.setName(modelElement.getName());
-        transferGltfPropertyElements(modelElement, property);
+        transferGltfPropertyElementsFromModel(modelElement, property);
     }
 
     /**
@@ -60,7 +60,7 @@ class ModelElementsV2
      * @param modelElement The model element
      * @param property The property
      */
-    static void transferGltfPropertyElements(
+    static void transferGltfPropertyElementsFromModel(
         ModelElement modelElement, GlTFProperty property)
     {
         property.setExtensions(modelElement.getExtensions());
@@ -74,12 +74,12 @@ class ModelElementsV2
      * @param property The property
      * @param modelElement The target
      */
-    static void transferGltfChildOfRootPropertyElements(
+    static void transferGltfChildOfRootPropertyElementsToModel(
         GlTFChildOfRootProperty property, 
         AbstractNamedModelElement modelElement)
     {
         modelElement.setName(property.getName());
-        transferGltfPropertyElements(property, modelElement);
+        transferGltfPropertyElementsToModel(property, modelElement);
     }
 
     /**
@@ -89,7 +89,7 @@ class ModelElementsV2
      * @param property The property
      * @param modelElement The target
      */
-    static void transferGltfPropertyElements(
+    static void transferGltfPropertyElementsToModel(
         GlTFProperty property, AbstractModelElement modelElement)
     {
         modelElement.setExtensions(property.getExtensions());

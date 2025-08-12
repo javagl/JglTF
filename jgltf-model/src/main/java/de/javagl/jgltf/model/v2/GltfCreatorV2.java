@@ -280,7 +280,7 @@ public class GltfCreatorV2
     public GlTF create()
     {
         GlTF gltf = new GlTF();
-        ModelElementsV2.transferGltfPropertyElements(gltfModel, gltf);
+        ModelElementsV2.transferGltfPropertyElementsFromModel(gltfModel, gltf);
         
         gltf.setAccessors(map(
             gltfModel.getAccessorModels(), this::createAccessor));
@@ -398,7 +398,7 @@ public class GltfCreatorV2
         AccessorModel accessorModel, Integer bufferViewIndex)
     {
         Accessor accessor = new Accessor();
-        ModelElementsV2.transferGltfChildOfRootPropertyElements(accessorModel, accessor);
+        ModelElementsV2.transferGltfChildOfRootPropertyElementsFromModel(accessorModel, accessor);
         
         accessor.setBufferView(bufferViewIndex);
         
@@ -425,7 +425,7 @@ public class GltfCreatorV2
     private Animation createAnimation(AnimationModel animationModel)
     {
         Animation animation = new Animation();
-        ModelElementsV2.transferGltfChildOfRootPropertyElements(animationModel, animation);
+        ModelElementsV2.transferGltfChildOfRootPropertyElementsFromModel(animationModel, animation);
         
         List<Sampler> samplers = new ArrayList<Sampler>();
         List<Channel> channels = animationModel.getChannels();
@@ -481,7 +481,7 @@ public class GltfCreatorV2
     public static Buffer createBuffer(BufferModel bufferModel)
     {
         Buffer buffer = new Buffer();
-        ModelElementsV2.transferGltfChildOfRootPropertyElements(bufferModel, buffer);
+        ModelElementsV2.transferGltfChildOfRootPropertyElementsFromModel(bufferModel, buffer);
 
         buffer.setUri(bufferModel.getUri());
         buffer.setByteLength(bufferModel.getByteLength());
@@ -513,7 +513,7 @@ public class GltfCreatorV2
         BufferViewModel bufferViewModel, Integer bufferIndex)
     {
         BufferView bufferView = new BufferView();
-        ModelElementsV2.transferGltfChildOfRootPropertyElements(bufferViewModel, bufferView);
+        ModelElementsV2.transferGltfChildOfRootPropertyElementsFromModel(bufferViewModel, bufferView);
 
         bufferView.setBuffer(bufferIndex);
         bufferView.setByteOffset(bufferViewModel.getByteOffset());
@@ -534,7 +534,7 @@ public class GltfCreatorV2
     private Camera createCamera(CameraModel cameraModel)
     {
         Camera camera = new Camera();
-        ModelElementsV2.transferGltfChildOfRootPropertyElements(cameraModel, camera);
+        ModelElementsV2.transferGltfChildOfRootPropertyElementsFromModel(cameraModel, camera);
         
         CameraPerspectiveModel cameraPerspectiveModel = 
             cameraModel.getCameraPerspectiveModel();
@@ -584,7 +584,7 @@ public class GltfCreatorV2
     private Image createImage(ImageModel imageModel)
     {
         Image image = new Image();
-        ModelElementsV2.transferGltfChildOfRootPropertyElements(imageModel, image);
+        ModelElementsV2.transferGltfChildOfRootPropertyElementsFromModel(imageModel, image);
         
         Integer bufferView = 
             bufferViewIndices.get(imageModel.getBufferViewModel());
@@ -625,7 +625,7 @@ public class GltfCreatorV2
     private Material createMaterialV2(PbrMaterialModel materialModel)
     {
         Material material = new Material();
-        ModelElementsV2.transferGltfChildOfRootPropertyElements(materialModel, material);
+        ModelElementsV2.transferGltfChildOfRootPropertyElementsFromModel(materialModel, material);
         
         AlphaMode alphaMode = materialModel.getAlphaMode();
         if (alphaMode == null)
@@ -751,7 +751,7 @@ public class GltfCreatorV2
     private Mesh createMesh(MeshModel meshModel)
     {
         Mesh mesh = new Mesh();
-        ModelElementsV2.transferGltfChildOfRootPropertyElements(meshModel, mesh);
+        ModelElementsV2.transferGltfChildOfRootPropertyElementsFromModel(meshModel, mesh);
         
         List<MeshPrimitive> meshPrimitives = new ArrayList<MeshPrimitive>();
         List<MeshPrimitiveModel> meshPrimitiveModels = 
@@ -777,7 +777,7 @@ public class GltfCreatorV2
         MeshPrimitiveModel meshPrimitiveModel)
     {
         MeshPrimitive meshPrimitive = new MeshPrimitive();
-        ModelElementsV2.transferGltfPropertyElements(meshPrimitiveModel, meshPrimitive);
+        ModelElementsV2.transferGltfPropertyElementsFromModel(meshPrimitiveModel, meshPrimitive);
 
         meshPrimitive.setMode(meshPrimitiveModel.getMode());
         
@@ -820,7 +820,7 @@ public class GltfCreatorV2
     private Node createNode(NodeModel nodeModel)
     {
         Node node = new Node();
-        ModelElementsV2.transferGltfChildOfRootPropertyElements(nodeModel, node);
+        ModelElementsV2.transferGltfChildOfRootPropertyElementsFromModel(nodeModel, node);
         
         if (!nodeModel.getChildren().isEmpty())
         {
@@ -867,7 +867,7 @@ public class GltfCreatorV2
     private Scene createScene(SceneModel sceneModel)
     {
         Scene scene = new Scene();
-        ModelElementsV2.transferGltfChildOfRootPropertyElements(sceneModel, scene);
+        ModelElementsV2.transferGltfChildOfRootPropertyElementsFromModel(sceneModel, scene);
         
         scene.setNodes(map(
             sceneModel.getNodeModels(), nodeIndices::get));
@@ -883,7 +883,7 @@ public class GltfCreatorV2
     private Skin createSkin(SkinModel skinModel)
     {
         Skin skin = new Skin();
-        ModelElementsV2.transferGltfChildOfRootPropertyElements(skinModel, skin);
+        ModelElementsV2.transferGltfChildOfRootPropertyElementsFromModel(skinModel, skin);
         
         Integer inverseBindMatrices = 
             accessorIndices.get(skinModel.getInverseBindMatrices());
@@ -975,7 +975,7 @@ public class GltfCreatorV2
     private Texture createTexture(TextureModel textureModel)
     {
         Texture texture = new Texture();
-        ModelElementsV2.transferGltfChildOfRootPropertyElements(textureModel, texture);
+        ModelElementsV2.transferGltfChildOfRootPropertyElementsFromModel(textureModel, texture);
         
         SamplerInfo samplerInfo = new SamplerInfo(textureModel);
         Integer index = samplerIndices.get(samplerInfo);
@@ -998,7 +998,7 @@ public class GltfCreatorV2
         asset.setVersion("2.0");
         asset.setGenerator("JglTF from https://github.com/javagl/JglTF");
         
-        ModelElementsV2.transferGltfPropertyElements(assetModel, asset);
+        ModelElementsV2.transferGltfPropertyElementsFromModel(assetModel, asset);
         
         if (assetModel.getCopyright() != null)
         {
