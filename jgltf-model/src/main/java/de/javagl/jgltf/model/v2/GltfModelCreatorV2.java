@@ -50,8 +50,6 @@ import de.javagl.jgltf.impl.v2.Camera;
 import de.javagl.jgltf.impl.v2.CameraOrthographic;
 import de.javagl.jgltf.impl.v2.CameraPerspective;
 import de.javagl.jgltf.impl.v2.GlTF;
-import de.javagl.jgltf.impl.v2.GlTFChildOfRootProperty;
-import de.javagl.jgltf.impl.v2.GlTFProperty;
 import de.javagl.jgltf.impl.v2.Image;
 import de.javagl.jgltf.impl.v2.Material;
 import de.javagl.jgltf.impl.v2.MaterialNormalTextureInfo;
@@ -95,8 +93,6 @@ import de.javagl.jgltf.model.SkinModel;
 import de.javagl.jgltf.model.TextureInfoModel;
 import de.javagl.jgltf.model.TextureModel;
 import de.javagl.jgltf.model.extensions.ExtensionModels;
-import de.javagl.jgltf.model.impl.AbstractModelElement;
-import de.javagl.jgltf.model.impl.AbstractNamedModelElement;
 import de.javagl.jgltf.model.impl.DefaultAccessorModel;
 import de.javagl.jgltf.model.impl.DefaultAnimationModel;
 import de.javagl.jgltf.model.impl.DefaultAnimationModel.DefaultChannel;
@@ -189,7 +185,7 @@ public class GltfModelCreatorV2
      */
     void create()
     {
-        transferGltfPropertyElements(gltf, gltfModel);
+        ModelElementsV2.transferGltfPropertyElements(gltf, gltfModel);
         
         createAccessorModels();
         createAnimationModels();
@@ -500,7 +496,7 @@ public class GltfModelCreatorV2
             Accessor accessor = accessors.get(i);
             DefaultAccessorModel accessorModel = 
                 gltfModel.getAccessorModel(i);
-            transferGltfChildOfRootPropertyElements(accessor, accessorModel);
+            ModelElementsV2.transferGltfChildOfRootPropertyElements(accessor, accessorModel);
             
             int byteOffset = Optionals.of(accessor.getByteOffset(), 0);
             accessorModel.setByteOffset(byteOffset);
@@ -762,7 +758,7 @@ public class GltfModelCreatorV2
             Animation animation = animations.get(i);
             DefaultAnimationModel animationModel = 
                 gltfModel.getAnimationModel(i);
-            transferGltfChildOfRootPropertyElements(animation, animationModel);
+            ModelElementsV2.transferGltfChildOfRootPropertyElements(animation, animationModel);
             
             List<AnimationChannel> channels = 
                 Optionals.of(animation.getChannels());
@@ -853,7 +849,7 @@ public class GltfModelCreatorV2
         {
             Buffer buffer = buffers.get(i);
             DefaultBufferModel bufferModel = gltfModel.getBufferModel(i);
-            transferGltfChildOfRootPropertyElements(buffer, bufferModel);
+            ModelElementsV2.transferGltfChildOfRootPropertyElements(buffer, bufferModel);
             if (i == 0 && binaryData != null)
             {
                 bufferModel.setBufferData(binaryData);
@@ -901,7 +897,7 @@ public class GltfModelCreatorV2
             
             DefaultBufferViewModel bufferViewModel = 
                 gltfModel.getBufferViewModel(i);
-            transferGltfChildOfRootPropertyElements(
+            ModelElementsV2.transferGltfChildOfRootPropertyElements(
                 bufferView, bufferViewModel);
             
             int bufferIndex = bufferView.getBuffer();
@@ -921,7 +917,7 @@ public class GltfModelCreatorV2
         {
             Mesh mesh = meshes.get(i);
             DefaultMeshModel meshModel = gltfModel.getMeshModel(i);
-            transferGltfChildOfRootPropertyElements(mesh, meshModel);
+            ModelElementsV2.transferGltfChildOfRootPropertyElements(mesh, meshModel);
             
             List<MeshPrimitive> primitives = 
                 Optionals.of(mesh.getPrimitives());
@@ -950,7 +946,7 @@ public class GltfModelCreatorV2
             meshPrimitive.defaultMode());
         DefaultMeshPrimitiveModel meshPrimitiveModel = 
             new DefaultMeshPrimitiveModel(mode);
-        transferGltfPropertyElements(meshPrimitive, meshPrimitiveModel);
+        ModelElementsV2.transferGltfPropertyElements(meshPrimitive, meshPrimitiveModel);
         
         Integer indicesIndex = meshPrimitive.getIndices();
         if (indicesIndex != null)
@@ -1008,7 +1004,7 @@ public class GltfModelCreatorV2
             Node node = nodes.get(i);
             
             DefaultNodeModel nodeModel = gltfModel.getNodeModel(i);
-            transferGltfChildOfRootPropertyElements(node, nodeModel);            
+            ModelElementsV2.transferGltfChildOfRootPropertyElements(node, nodeModel);            
             
             List<Integer> childIndices = Optionals.of(node.getChildren());
             for (Integer childIndex : childIndices)
@@ -1063,7 +1059,7 @@ public class GltfModelCreatorV2
             Scene scene = scenes.get(i);
 
             DefaultSceneModel sceneModel = gltfModel.getSceneModel(i);
-            transferGltfChildOfRootPropertyElements(scene, sceneModel);            
+            ModelElementsV2.transferGltfChildOfRootPropertyElements(scene, sceneModel);            
             
             List<Integer> nodeIndices = Optionals.of(scene.getNodes());
             for (Integer nodeIndex : nodeIndices)
@@ -1084,7 +1080,7 @@ public class GltfModelCreatorV2
         {
             Skin skin = skins.get(i);
             DefaultSkinModel skinModel = gltfModel.getSkinModel(i);
-            transferGltfChildOfRootPropertyElements(skin, skinModel);
+            ModelElementsV2.transferGltfChildOfRootPropertyElements(skin, skinModel);
             
             List<Integer> jointIndices = skin.getJoints();
             for (Integer jointIndex : jointIndices)
@@ -1110,7 +1106,7 @@ public class GltfModelCreatorV2
         {
             Texture texture = textures.get(i);
             DefaultTextureModel textureModel = gltfModel.getTextureModel(i);
-            transferGltfChildOfRootPropertyElements(texture, textureModel);
+            ModelElementsV2.transferGltfChildOfRootPropertyElements(texture, textureModel);
             
             // The source may be null when the image data is provided
             // by an extension.
@@ -1134,7 +1130,7 @@ public class GltfModelCreatorV2
         {
             Image image = images.get(i);
             DefaultImageModel imageModel = gltfModel.getImageModel(i);
-            transferGltfChildOfRootPropertyElements(image, imageModel);
+            ModelElementsV2.transferGltfChildOfRootPropertyElements(image, imageModel);
             
             Integer bufferViewIndex = image.getBufferView();
             if (bufferViewIndex != null)
@@ -1183,7 +1179,7 @@ public class GltfModelCreatorV2
             DefaultPbrMaterialModel materialModel = 
                 (DefaultPbrMaterialModel) gltfModel.getMaterialModel(i);
             
-            transferGltfChildOfRootPropertyElements(material, materialModel);            
+            ModelElementsV2.transferGltfChildOfRootPropertyElements(material, materialModel);            
             initMaterialModel(materialModel, material);
         }
     }
@@ -1226,7 +1222,7 @@ public class GltfModelCreatorV2
                 pbrMetallicRoughnessModel);
             
             // Initialize the PbrMetallicRoughnessModel
-            transferGltfPropertyElements(
+            ModelElementsV2.transferGltfPropertyElements(
                 pbrMetallicRoughness, pbrMetallicRoughnessModel);
             initPbrMetallicRoughness(
                 pbrMetallicRoughnessModel, pbrMetallicRoughness);
@@ -1242,7 +1238,7 @@ public class GltfModelCreatorV2
             materialModel.setNormalTextureInfoModel(normalTextureInfoModel);
 
             // Initialize the TextureInfoModel
-            transferGltfPropertyElements(
+            ModelElementsV2.transferGltfPropertyElements(
                 normalTextureInfo, normalTextureInfoModel);
             initTextureInfo(normalTextureInfoModel, normalTextureInfo);
             
@@ -1265,7 +1261,7 @@ public class GltfModelCreatorV2
                 occlusionTextureInfoModel);
             
             // Initialize the TextureInfoModel
-            transferGltfPropertyElements(
+            ModelElementsV2.transferGltfPropertyElements(
                 occlusionTextureInfo, occlusionTextureInfoModel);
             initTextureInfo(occlusionTextureInfoModel, occlusionTextureInfo);
             
@@ -1287,7 +1283,7 @@ public class GltfModelCreatorV2
             materialModel.setEmissiveTextureInfoModel(emissiveTextureInfoModel);
 
             // Initialize the TextureInfoModel
-            transferGltfPropertyElements(
+            ModelElementsV2.transferGltfPropertyElements(
                 emissiveTextureInfo, emissiveTextureInfoModel);
             initTextureInfo(emissiveTextureInfoModel, emissiveTextureInfo);
         }
@@ -1320,7 +1316,7 @@ public class GltfModelCreatorV2
                 baseColorTextureInfoModel);
 
             // Initialize the TextureInfoModel
-            transferGltfPropertyElements(
+            ModelElementsV2.transferGltfPropertyElements(
                 baseColorTextureInfo, baseColorTextureInfoModel);
             initTextureInfo(baseColorTextureInfoModel, baseColorTextureInfo);
         }
@@ -1340,7 +1336,7 @@ public class GltfModelCreatorV2
                 metallicRoughnessTextureInfoModel);
 
             // Initialize the TextureInfoModel
-            transferGltfPropertyElements(
+            ModelElementsV2.transferGltfPropertyElements(
                 metallicRoughnessTextureInfo, 
                 metallicRoughnessTextureInfoModel);
             initTextureInfo(metallicRoughnessTextureInfoModel, 
@@ -1398,7 +1394,7 @@ public class GltfModelCreatorV2
         if (asset != null)
         {
             DefaultAssetModel assetModel = gltfModel.getAssetModel();
-            transferGltfPropertyElements(asset, assetModel);
+            ModelElementsV2.transferGltfPropertyElements(asset, assetModel);
             assetModel.setCopyright(asset.getCopyright());
             assetModel.setGenerator(asset.getGenerator());
         }
@@ -1515,35 +1511,6 @@ public class GltfModelCreatorV2
             ExtensionModels.process(
                 gltfModel, textureModel, TextureModel.class);
         }
-    }
-    
-    /**
-     * Transfer the extensions and extras from the given property to
-     * the given target
-     * 
-     * @param property The property
-     * @param modelElement The target
-     */
-    private static void transferGltfPropertyElements(
-        GlTFProperty property, AbstractModelElement modelElement)
-    {
-        modelElement.setExtensions(property.getExtensions());
-        modelElement.setExtras(property.getExtras());
-    }
-    
-    /**
-     * Transfer the name and extensions and extras from the given property to
-     * the given target
-     * 
-     * @param property The property
-     * @param modelElement The target
-     */
-    private static void transferGltfChildOfRootPropertyElements(
-        GlTFChildOfRootProperty property, 
-        AbstractNamedModelElement modelElement)
-    {
-        modelElement.setName(property.getName());
-        transferGltfPropertyElements(property, modelElement);
     }
     
     /**
