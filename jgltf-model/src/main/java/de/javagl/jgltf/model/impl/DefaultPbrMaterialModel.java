@@ -90,7 +90,7 @@ public final class DefaultPbrMaterialModel extends AbstractNamedModelElement
         
         emissiveFactor = new double[]{0.0, 0.0, 0.0 };
 
-        alphaMode = AlphaMode.OPAQUE;
+        alphaMode = null;
         alphaCutoff = 0.5;
 
         doubleSided = false;
