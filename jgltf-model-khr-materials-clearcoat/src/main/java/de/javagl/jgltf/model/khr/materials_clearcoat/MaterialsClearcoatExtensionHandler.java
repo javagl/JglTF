@@ -28,7 +28,6 @@ package de.javagl.jgltf.model.khr.materials_clearcoat;
 
 import java.util.List;
 
-import de.javagl.jgltf.impl.v2.GlTFProperty;
 import de.javagl.jgltf.impl.v2.MaterialNormalTextureInfo;
 import de.javagl.jgltf.impl.v2.TextureInfo;
 import de.javagl.jgltf.impl.v2.khr.materials_clearcoat.MaterialMaterialsClearcoat;
@@ -39,9 +38,9 @@ import de.javagl.jgltf.model.TextureInfoModel;
 import de.javagl.jgltf.model.TextureModel;
 import de.javagl.jgltf.model.extensions.ExtensionHandler;
 import de.javagl.jgltf.model.extensions.ExtensionModels;
-import de.javagl.jgltf.model.impl.AbstractModelElement;
 import de.javagl.jgltf.model.impl.DefaultNormalTextureInfoModel;
 import de.javagl.jgltf.model.impl.DefaultTextureInfoModel;
+import de.javagl.jgltf.model.impl.TextureInfoModels;
 
 /**
  * Implementation of an {@link ExtensionHandler} for the
@@ -88,8 +87,8 @@ public class MaterialsClearcoatExtensionHandler implements ExtensionHandler
         TextureInfo clearcoatTextureInfo = impl.getClearcoatTexture();
         if (clearcoatTextureInfo != null)
         {
-            DefaultTextureInfoModel clearcoatTextureInfoModel =
-                createTextureInfoModel(textureModels, clearcoatTextureInfo);
+            DefaultTextureInfoModel clearcoatTextureInfoModel = 
+                TextureInfoModels.from(textureModels, clearcoatTextureInfo);
             model.setClearcoatTextureInfoModel(clearcoatTextureInfoModel);
             ExtensionModels.process(gltfModel, clearcoatTextureInfoModel,
                 TextureInfoModel.class);
@@ -103,8 +102,7 @@ public class MaterialsClearcoatExtensionHandler implements ExtensionHandler
         if (clearcoatRoughnessTextureInfo != null)
         {
             DefaultTextureInfoModel clearcoatRoughnessTextureInfoModel =
-                createTextureInfoModel(textureModels,
-                    clearcoatRoughnessTextureInfo);
+                TextureInfoModels.from(textureModels, clearcoatRoughnessTextureInfo);
             model.setClearcoatRoughnessTextureInfoModel(
                 clearcoatRoughnessTextureInfoModel);
             ExtensionModels.process(gltfModel,
@@ -116,8 +114,7 @@ public class MaterialsClearcoatExtensionHandler implements ExtensionHandler
         if (clearcoatNormalTextureInfo != null)
         {
             DefaultNormalTextureInfoModel clearcoatNormalTextureInfoModel =
-                createNormalTextureInfoModel(textureModels,
-                    clearcoatNormalTextureInfo);
+                TextureInfoModels.from(textureModels, clearcoatNormalTextureInfo);
             model.setClearcoatNormalTextureInfoModel(
                 clearcoatNormalTextureInfoModel);
             ExtensionModels.process(gltfModel, clearcoatNormalTextureInfoModel,
@@ -126,66 +123,5 @@ public class MaterialsClearcoatExtensionHandler implements ExtensionHandler
         return model;
     }
 
-    /**
-     * Create a {@link DefaultTextureInfoModel} from the given 
-     * {@link TextureInfo}
-     * 
-     * @param textureModels The {@link TextureModel} list
-     * @param textureInfo The {@link TextureInfo}
-     * @return The {@link DefaultTextureInfoModel}
-     */
-    private static DefaultTextureInfoModel createTextureInfoModel(
-        List<TextureModel> textureModels, TextureInfo textureInfo)
-    {
-        DefaultTextureInfoModel textureInfoModel =
-            new DefaultTextureInfoModel();
-        transferGltfPropertyElements(textureInfo, textureInfoModel);
-
-        int index = textureInfo.getIndex();
-        TextureModel textureModel = textureModels.get(index);
-        textureInfoModel.setTextureModel(textureModel);
-        textureInfoModel.setTexCoord(textureInfo.getTexCoord());
-        return textureInfoModel;
-    }
-
-    /**
-     * Create a {@link DefaultNormalTextureInfoModel} from the given 
-     * {@link MaterialNormalTextureInfo}
-     * 
-     * @param textureModels The {@link TextureModel} list
-     * @param textureInfo The {@link MaterialNormalTextureInfo}
-     * @return The {@link DefaultNormalTextureInfoModel}
-     */
-    private static DefaultNormalTextureInfoModel createNormalTextureInfoModel(
-        List<TextureModel> textureModels, MaterialNormalTextureInfo textureInfo)
-    {
-        DefaultNormalTextureInfoModel textureInfoModel =
-            new DefaultNormalTextureInfoModel();
-        transferGltfPropertyElements(textureInfo, textureInfoModel);
-
-        int index = textureInfo.getIndex();
-        TextureModel textureModel = textureModels.get(index);
-        textureInfoModel.setTextureModel(textureModel);
-        textureInfoModel.setTexCoord(textureInfo.getTexCoord());
-
-        textureInfoModel.setScale(
-            Optionals.of(textureInfo.getScale(), textureInfo.defaultScale()));
-
-        return textureInfoModel;
-    }
-
-    /**
-     * Transfer the extensions and extras from the given property to the given
-     * target
-     * 
-     * @param property The property
-     * @param modelElement The target
-     */
-    private static void transferGltfPropertyElements(
-        GlTFProperty property, AbstractModelElement modelElement)
-    {
-        modelElement.setExtensions(property.getExtensions());
-        modelElement.setExtras(property.getExtras());
-    }
 
 }

@@ -34,9 +34,11 @@ import de.javagl.jgltf.model.impl.AbstractModelElement;
 import de.javagl.jgltf.model.impl.AbstractNamedModelElement;
 
 /**
- * Internal utility methods related to model elements
+ * Internal utility methods related to model elements.
+ * 
+ * These methods are not part of the public API.
  */
-class ModelElementsV2
+public class ModelElementsV2
 {
     /**
      * Transfer the name and extensions and extras from the given model
@@ -89,7 +91,7 @@ class ModelElementsV2
      * @param property The property
      * @param modelElement The target
      */
-    static void transferGltfPropertyElementsToModel(
+    public static void transferGltfPropertyElementsToModel(
         GlTFProperty property, AbstractModelElement modelElement)
     {
         modelElement.setExtensions(property.getExtensions());

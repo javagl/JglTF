@@ -117,6 +117,7 @@ import de.javagl.jgltf.model.impl.DefaultSceneModel;
 import de.javagl.jgltf.model.impl.DefaultSkinModel;
 import de.javagl.jgltf.model.impl.DefaultTextureInfoModel;
 import de.javagl.jgltf.model.impl.DefaultTextureModel;
+import de.javagl.jgltf.model.impl.TextureInfoModels;
 import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.model.io.GltfAsset;
 import de.javagl.jgltf.model.io.IO;
@@ -1228,49 +1229,25 @@ public class GltfModelCreatorV2
                 pbrMetallicRoughnessModel, pbrMetallicRoughness);
         }
         
+        List<TextureModel> textureModels = gltfModel.getTextureModels();
+        
         MaterialNormalTextureInfo normalTextureInfo = 
             material.getNormalTexture();
         if (normalTextureInfo != null)
         {
-            // Create the TextureInfoModel and assign it to the material model
             DefaultNormalTextureInfoModel normalTextureInfoModel = 
-                new DefaultNormalTextureInfoModel();
+                TextureInfoModels.from(textureModels, normalTextureInfo);
             materialModel.setNormalTextureInfoModel(normalTextureInfoModel);
-
-            // Initialize the TextureInfoModel
-            ModelElementsV2.transferGltfPropertyElementsToModel(
-                normalTextureInfo, normalTextureInfoModel);
-            initTextureInfo(normalTextureInfoModel, normalTextureInfo);
-            
-            // The additional 'scale' property for normals
-            double normalScale = Optionals.of(
-                normalTextureInfo.getScale(),
-                normalTextureInfo.defaultScale());
-            normalTextureInfoModel.setScale(normalScale);
-            
         }
 
         MaterialOcclusionTextureInfo occlusionTextureInfo = 
             material.getOcclusionTexture();
         if (occlusionTextureInfo != null)
         {
-            // Create the TextureInfoModel and assign it to the material model
             DefaultOcclusionTextureInfoModel occlusionTextureInfoModel =
-                new DefaultOcclusionTextureInfoModel();
+                TextureInfoModels.from(textureModels, occlusionTextureInfo);
             materialModel.setOcclusionTextureInfoModel(
                 occlusionTextureInfoModel);
-            
-            // Initialize the TextureInfoModel
-            ModelElementsV2.transferGltfPropertyElementsToModel(
-                occlusionTextureInfo, occlusionTextureInfoModel);
-            initTextureInfo(occlusionTextureInfoModel, occlusionTextureInfo);
-            
-            // The additional 'strength' property for occlusion
-            double occlusionStrength = Optionals.of(
-                occlusionTextureInfo.getStrength(),
-                occlusionTextureInfo.defaultStrength());
-            occlusionTextureInfoModel.setStrength(occlusionStrength);
-            
         }
 
         TextureInfo emissiveTextureInfo = 
@@ -1279,13 +1256,8 @@ public class GltfModelCreatorV2
         {
             // Create the TextureInfoModel and assign it to the material model
             DefaultTextureInfoModel emissiveTextureInfoModel = 
-                new DefaultTextureInfoModel();
+                TextureInfoModels.from(textureModels, emissiveTextureInfo);
             materialModel.setEmissiveTextureInfoModel(emissiveTextureInfoModel);
-
-            // Initialize the TextureInfoModel
-            ModelElementsV2.transferGltfPropertyElementsToModel(
-                emissiveTextureInfo, emissiveTextureInfoModel);
-            initTextureInfo(emissiveTextureInfoModel, emissiveTextureInfo);
         }
         
         double[] emissiveFactor = Optionals.of(
