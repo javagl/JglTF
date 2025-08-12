@@ -39,6 +39,11 @@
 #/jgltf-model-khr-texture-transform
 # ---
 
+/jgltf-impl-v2-ext-mesh-gpu-instancing/.classpath
+/jgltf-impl-v2-ext-mesh-gpu-instancing/.settings
+/jgltf-impl-v2-ext-mesh-gpu-instancing/.project
+/jgltf-impl-v2-ext-mesh-gpu-instancing/target
+
 /jgltf-impl-v2-khr-lights-punctual/.classpath
 /jgltf-impl-v2-khr-lights-punctual/.settings
 /jgltf-impl-v2-khr-lights-punctual/.project
@@ -58,6 +63,11 @@
 /jgltf-impl-v2-khr-texture-transform/.settings
 /jgltf-impl-v2-khr-texture-transform/.project
 /jgltf-impl-v2-khr-texture-transform/target
+
+/jgltf-model-ext-mesh-gpu-instancing/.classpath
+/jgltf-model-ext-mesh-gpu-instancing/.settings
+/jgltf-model-ext-mesh-gpu-instancing/.project
+/jgltf-model-ext-mesh-gpu-instancing/target
 
 /jgltf-model-khr-lights-punctual/.classpath
 /jgltf-model-khr-lights-punctual/.settings
@@ -150,11 +160,6 @@
 /jgltf-impl-v2-ext-structural-metadata/.settings
 /jgltf-impl-v2-ext-structural-metadata/.project
 /jgltf-impl-v2-ext-structural-metadata/target
-
-/jgltf-impl-v2-ext-mesh-gpu-instancing/.classpath
-/jgltf-impl-v2-ext-mesh-gpu-instancing/.settings
-/jgltf-impl-v2-ext-mesh-gpu-instancing/.project
-/jgltf-impl-v2-ext-mesh-gpu-instancing/target
 
 /jgltf-impl-v2-ext-instance-features/.classpath
 /jgltf-impl-v2-ext-instance-features/.settings

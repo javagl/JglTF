@@ -228,7 +228,7 @@ public class GltfModelCreatorV2
         // image
         processMaterialModels();
         processMeshModels();
-        // node
+        processNodeModels();
         // scene
         // skin
         processTextureModels();
@@ -1473,6 +1473,19 @@ public class GltfModelCreatorV2
                 ExtensionModels.process(
                     gltfModel, meshPrimitiveModel, MeshPrimitiveModel.class);
             }
+        }
+    }
+
+    /**
+     * Process the {@link NodeModel} instances
+     */
+    private void processNodeModels()
+    {
+        List<NodeModel> nodeModels = gltfModel.getNodeModels();
+        for (NodeModel nodeModel : nodeModels)
+        {
+            ExtensionModels.process(
+                gltfModel, nodeModel, NodeModel.class);
         }
     }
 
