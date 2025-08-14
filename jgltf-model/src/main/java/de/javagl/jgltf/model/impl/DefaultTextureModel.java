@@ -26,7 +26,10 @@
  */
 package de.javagl.jgltf.model.impl;
 
+import java.util.Set;
+
 import de.javagl.jgltf.model.ImageModel;
+import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.TextureModel;
 
 /**
@@ -146,5 +149,17 @@ public class DefaultTextureModel extends AbstractNamedModelElement
     public ImageModel getImageModel()
     {
         return imageModel;
+    }
+    
+    @Override
+    public Set<ModelElement> getReferencedModelElements()
+    {
+        Set<ModelElement> modelElements = 
+            getReferencedExtensionModelElements();
+        if (imageModel != null)
+        {
+            modelElements.add(imageModel);
+        }
+        return modelElements;
     }
 }

@@ -26,6 +26,9 @@
  */
 package de.javagl.jgltf.model.impl;
 
+import java.util.Set;
+
+import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.NormalTextureInfoModel;
 import de.javagl.jgltf.model.OcclusionTextureInfoModel;
 import de.javagl.jgltf.model.PbrMaterialModel;
@@ -226,4 +229,29 @@ public final class DefaultPbrMaterialModel extends AbstractNamedModelElement
     {
         this.doubleSided = doubleSided;
     }
+    
+    @Override
+    public Set<ModelElement> getReferencedModelElements()
+    {
+        Set<ModelElement> modelElements = 
+            getReferencedExtensionModelElements();
+        if (pbrMetallicRoughnessModel != null)
+        {
+            modelElements.add(pbrMetallicRoughnessModel);
+        }
+        if (normalTextureInfoModel != null)
+        {
+            modelElements.add(normalTextureInfoModel);
+        }
+        if (occlusionTextureInfoModel != null)
+        {
+            modelElements.add(occlusionTextureInfoModel);
+        }
+        if (emissiveTextureInfoModel != null)
+        {
+            modelElements.add(emissiveTextureInfoModel);
+        }
+        return modelElements;
+    }
+    
 }

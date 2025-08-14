@@ -30,9 +30,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.AnimationModel;
+import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.NodeModel;
 
 /**
@@ -192,6 +194,34 @@ public class DefaultAnimationModel extends AbstractNamedModelElement
     public List<Channel> getChannels()
     {
         return Collections.unmodifiableList(channels);
+    }
+    
+    
+    @Override
+    public Set<ModelElement> getReferencedModelElements()
+    {
+        Set<ModelElement> modelElements = 
+            getReferencedExtensionModelElements();
+        for (Channel channel : channels)
+        {
+            NodeModel nodeModel = channel.getNodeModel();
+            if (nodeModel != null)
+            {
+                modelElements.add(nodeModel);
+            }
+            Sampler sampler = channel.getSampler();
+            AccessorModel input = sampler.getInput();
+            if (input != null)
+            {
+                modelElements.add(input);
+            }
+            AccessorModel output = sampler.getOutput();
+            if (output != null)
+            {
+                modelElements.add(output);
+            }
+        }
+        return modelElements;
     }
     
 }

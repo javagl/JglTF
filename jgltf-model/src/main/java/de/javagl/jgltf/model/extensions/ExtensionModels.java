@@ -30,9 +30,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
+import de.javagl.jgltf.impl.v2.GlTFProperty;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.impl.AbstractModelElement;
+import de.javagl.jgltf.model.io.JacksonUtils;
 
 /**
  * Methods related to handling extension implementation- and model objects.
@@ -120,6 +122,41 @@ public class ExtensionModels
         }
     }
 
+    
+    // TODO TODO_EXTENSIONS comment
+    public static void processForImpl(
+        GltfModel gltfModel, ModelElement modelElement, 
+        Class<?> modelClass, GlTFProperty glTFProperty)
+    {
+        Map<String, Object> extensionModels = modelElement.getExtensionModels();
+        if (extensionModels == null || extensionModels.isEmpty())
+        {
+            return;
+        }
+        ExtensionHandlerRegistry extensionHandlerRegistry =
+            ExtensionHandlerRegistries.get();
+        for (Entry<String, Object> entry : extensionModels.entrySet())
+        {
+            String extensionName = entry.getKey();
+            Object modelObject = entry.getValue();
+            ExtensionHandler extensionHandler =
+                extensionHandlerRegistry.get(modelClass, extensionName);
+
+            logger.info("Found extension " + extensionName
+                + " with extension handler " + extensionHandler);
+
+            if (extensionHandler == null)
+            {
+                continue;
+            }
+            
+            Object impl = extensionHandler.convertToImpl(gltfModel, modelObject);
+            System.out.println("Created impl "+impl);
+            glTFProperty.addExtensions(extensionName, impl);
+        }
+    }
+    
+    
     /**
      * Private constructor to prevent instantiation
      */

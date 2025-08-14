@@ -26,6 +26,9 @@
  */
 package de.javagl.jgltf.model.khr.lights_punctual;
 
+import java.util.Set;
+
+import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.impl.AbstractNamedModelElement;
 
 /**
@@ -103,4 +106,12 @@ public class DefaultLightModel
         return this.range;
     }
 
+    @Override
+    public Set<ModelElement> getReferencedModelElements()
+    {
+        Set<ModelElement> modelElements = 
+            getReferencedExtensionModelElements();
+        return modelElements;
+    }
+    
 }

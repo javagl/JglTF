@@ -30,7 +30,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
+import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.gl.ProgramModel;
 import de.javagl.jgltf.model.gl.ShaderModel;
 import de.javagl.jgltf.model.impl.AbstractNamedModelElement;
@@ -113,5 +115,22 @@ public class DefaultProgramModel extends AbstractNamedModelElement
     {
         return Collections.unmodifiableList(attributes);
     }
+    
+    @Override
+    public Set<ModelElement> getReferencedModelElements()
+    {
+        Set<ModelElement> modelElements = 
+            getReferencedExtensionModelElements();
+        if (vertexShaderModel != null)
+        {
+            modelElements.add(vertexShaderModel);
+        }
+        if (fragmentShaderModel != null)
+        {
+            modelElements.add(fragmentShaderModel);
+        }
+        return modelElements;
+    }
+    
 }
 

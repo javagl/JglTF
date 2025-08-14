@@ -27,6 +27,7 @@
 package de.javagl.jgltf.model;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Interface for all classes of the model package. This is corresponds to
@@ -85,4 +86,12 @@ public interface ModelElement
      */
     <T> T getExtensionModel(String extensionName, Class<? extends T> type);
     
+    /**
+     * Returns a possibly unmodifiable and possibly empty set of all 
+     * {@link ModelElement} objects that are directly referred to
+     * by this {@link ModelElement}.
+     * 
+     * @return The list
+     */
+    Set<ModelElement> getReferencedModelElements();
 }

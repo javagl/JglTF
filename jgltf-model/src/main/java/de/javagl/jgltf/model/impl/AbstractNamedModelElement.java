@@ -35,7 +35,7 @@ import de.javagl.jgltf.model.NamedModelElement;
  * convenience of implementing model elements as part of the core 
  * implementation or extensions.
  */
-public class AbstractNamedModelElement extends AbstractModelElement 
+public abstract class AbstractNamedModelElement extends AbstractModelElement 
     implements NamedModelElement
 {
     /**

@@ -26,12 +26,14 @@
  */
 package de.javagl.jgltf.model.impl;
 
+import java.util.Set;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import de.javagl.jgltf.model.CameraModel;
 import de.javagl.jgltf.model.CameraOrthographicModel;
 import de.javagl.jgltf.model.CameraPerspectiveModel;
+import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.Suppliers;
 
 /**
@@ -107,11 +109,18 @@ public final class DefaultCameraModel extends AbstractNamedModelElement
             Double aspectRatio = null;
             if (aspectRatioSupplier != null)
             {
-                aspectRatio = (double)aspectRatioSupplier.getAsDouble();
+                aspectRatio = aspectRatioSupplier.getAsDouble();
             }
             computeProjectionMatrix(t, aspectRatio);
         });
     }
     
+    @Override
+    public Set<ModelElement> getReferencedModelElements()
+    {
+        Set<ModelElement> modelElements = 
+            getReferencedExtensionModelElements();
+        return modelElements;
+    }
     
 }

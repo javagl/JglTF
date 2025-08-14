@@ -76,4 +76,7 @@ public interface ExtensionHandler
      */
     Object convertToModel(GltfModel gltfModel, Object owningModelObject,
         Object impl);
+
+    // TODO TODO_EXTENSIONS comment
+    Object convertToImpl(GltfModel gltfModel, Object modelObject);
 }

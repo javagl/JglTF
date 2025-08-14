@@ -28,8 +28,10 @@ package de.javagl.jgltf.model.impl;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import de.javagl.jgltf.model.ModelElement;
@@ -41,7 +43,7 @@ import de.javagl.jgltf.model.ModelElement;
  * convenience of implementing model elements as part of the core 
  * implementation or extensions.
  */
-public class AbstractModelElement implements ModelElement
+public abstract class AbstractModelElement implements ModelElement
 {
     /**
      * The logger used in this class
@@ -211,5 +213,39 @@ public class AbstractModelElement implements ModelElement
             + " does not have type " + type);
         return null;
     }
+    
+//    @Override
+//    public List<? extends ModelElement> getReferencedModelElements()
+//    {
+//        return getReferencedExtensionModelElements();
+//    }
+    
+    /**
+     * Returns a set containing all {@link ModelElement} objects that are
+     * found as values in the {@link #getExtensionModels()} map.
+     * 
+     * This serves as the basis for {@link #getReferencedModelElements()}
+     * implementations.
+     * 
+     * @return The set
+     */
+    protected final Set<ModelElement> getReferencedExtensionModelElements()
+    {
+        Set<ModelElement> modelElements = new LinkedHashSet<ModelElement>();
+        Map<String, Object> extensionModels = getExtensionModels();
+        if (extensionModels != null)
+        {
+            for (Object object : extensionModels.values()) 
+            {
+                if (object instanceof ModelElement) 
+                {
+                    ModelElement modelElement = (ModelElement) object;
+                    modelElements.add(modelElement);
+                }
+            }
+        }
+        return modelElements;
+    }
+    
 
 }

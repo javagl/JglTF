@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.AnimationModel;
@@ -42,6 +43,7 @@ import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.MaterialModel;
 import de.javagl.jgltf.model.MeshModel;
+import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.NodeModel;
 import de.javagl.jgltf.model.SceneModel;
 import de.javagl.jgltf.model.SkinModel;
@@ -862,4 +864,27 @@ public class DefaultGltfModel extends AbstractModelElement implements GltfModel
     {
         return assetModel;
     }
+    
+    
+    @Override
+    public Set<ModelElement> getReferencedModelElements()
+    {
+        Set<ModelElement> modelElements = 
+            getReferencedExtensionModelElements();
+        modelElements.addAll(accessorModels);
+        modelElements.addAll(animationModels);
+        modelElements.addAll(bufferModels);
+        modelElements.addAll(bufferViewModels);
+        modelElements.addAll(cameraModels);
+        modelElements.addAll(imageModels);
+        modelElements.addAll(materialModels);
+        modelElements.addAll(meshModels);
+        modelElements.addAll(nodeModels);
+        modelElements.addAll(sceneModels);
+        modelElements.addAll(skinModels);
+        modelElements.addAll(textureModels);
+        modelElements.add(assetModel);
+        return modelElements;
+    }
+    
 }

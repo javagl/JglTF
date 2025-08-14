@@ -26,6 +26,9 @@
  */
 package de.javagl.jgltf.model.khr.materials_clearcoat;
 
+import java.util.Set;
+
+import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.NormalTextureInfoModel;
 import de.javagl.jgltf.model.TextureInfoModel;
 import de.javagl.jgltf.model.impl.AbstractModelElement;
@@ -125,4 +128,25 @@ public class DefaultMaterialsClearcoatModel
     {
         return this.clearcoatNormalTextureInfoModel;
     }
+    
+    @Override
+    public Set<ModelElement> getReferencedModelElements()
+    {
+        Set<ModelElement> modelElements = 
+            getReferencedExtensionModelElements();
+        if (clearcoatTextureInfoModel != null)
+        {
+            modelElements.add(clearcoatTextureInfoModel);
+        }
+        if (clearcoatRoughnessTextureInfoModel != null)
+        {
+            modelElements.add(clearcoatRoughnessTextureInfoModel);
+        }
+        if (clearcoatNormalTextureInfoModel != null)
+        {
+            modelElements.add(clearcoatNormalTextureInfoModel);
+        }
+        return modelElements;
+    }
+    
 }

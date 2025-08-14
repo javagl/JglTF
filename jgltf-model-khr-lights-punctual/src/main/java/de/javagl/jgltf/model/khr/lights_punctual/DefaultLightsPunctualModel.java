@@ -29,11 +29,16 @@ package de.javagl.jgltf.model.khr.lights_punctual;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+
+import de.javagl.jgltf.model.ModelElement;
+import de.javagl.jgltf.model.impl.AbstractModelElement;
 
 /**
  * Default implementation of a {@link LightsPunctualModel}
  */
-public class DefaultLightsPunctualModel implements LightsPunctualModel
+public class DefaultLightsPunctualModel extends AbstractModelElement 
+    implements LightsPunctualModel
 {
     /**
      * The {@link LightModel} instances
@@ -74,4 +79,13 @@ public class DefaultLightsPunctualModel implements LightsPunctualModel
         this.lightModels.remove(lightModel);
     }
 
+    @Override
+    public Set<ModelElement> getReferencedModelElements()
+    {
+        Set<ModelElement> modelElements = 
+            getReferencedExtensionModelElements();
+        modelElements.addAll(lightModels);
+        return modelElements;
+    }
+    
 }

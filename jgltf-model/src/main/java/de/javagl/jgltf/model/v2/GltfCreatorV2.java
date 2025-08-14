@@ -88,6 +88,7 @@ import de.javagl.jgltf.model.SceneModel;
 import de.javagl.jgltf.model.SkinModel;
 import de.javagl.jgltf.model.TextureInfoModel;
 import de.javagl.jgltf.model.TextureModel;
+import de.javagl.jgltf.model.extensions.ExtensionModels;
 import de.javagl.jgltf.model.impl.DefaultNodeModel;
 import de.javagl.jgltf.model.impl.DefaultPbrMaterialModel;
 
@@ -855,6 +856,12 @@ public class GltfCreatorV2
             Integer mesh = meshIndices.get(nodeMeshModel);
             node.setMesh(mesh);
         }
+        
+        int XXX; // TODO_EXTENSIONS
+        System.err.println("XXX Experimental processing of NodeModel in "+this);
+        ExtensionModels.processForImpl(
+            gltfModel, nodeModel, NodeModel.class, node);
+        
         return node;
     }
     

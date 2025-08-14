@@ -91,5 +91,13 @@ public class LightsPunctualExtensionHandler implements ExtensionHandler
         }
         return model;
     }
+    
+    @Override
+    public Object convertToImpl(GltfModel gltfModel, Object modelObject)
+    {
+        int XXX; // TODO_EXTENSIONS
+        // TODO Auto-generated method stub
+        return null;
+    }
 
 }

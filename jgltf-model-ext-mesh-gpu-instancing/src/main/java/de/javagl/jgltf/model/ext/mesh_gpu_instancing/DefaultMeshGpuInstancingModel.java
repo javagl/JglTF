@@ -30,8 +30,10 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import de.javagl.jgltf.model.AccessorModel;
+import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.impl.AbstractModelElement;
 
 /**
@@ -80,4 +82,14 @@ public class DefaultMeshGpuInstancingModel extends AbstractModelElement
     {
         return Collections.unmodifiableMap(attributes);
     }
+    
+    @Override
+    public Set<ModelElement> getReferencedModelElements()
+    {
+        Set<ModelElement> modelElements = 
+            getReferencedExtensionModelElements();
+        modelElements.addAll(attributes.values());
+        return modelElements;
+    }
+    
 }

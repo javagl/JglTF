@@ -29,7 +29,9 @@ package de.javagl.jgltf.model.impl;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
+import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.TechniqueMaterialModel;
 import de.javagl.jgltf.model.gl.TechniqueModel;
 
@@ -97,6 +99,18 @@ public final class DefaultTechniqueMaterialModel extends AbstractNamedModelEleme
     public Map<String, Object> getValues()
     {
         return values;
+    }
+    
+    @Override
+    public Set<ModelElement> getReferencedModelElements()
+    {
+        Set<ModelElement> modelElements = 
+            getReferencedExtensionModelElements();
+        if (techniqueModel != null)
+        {
+            modelElements.add(techniqueModel);
+        }
+        return modelElements;
     }
     
 }

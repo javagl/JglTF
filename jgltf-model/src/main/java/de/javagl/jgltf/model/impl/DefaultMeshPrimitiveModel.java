@@ -32,10 +32,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.MaterialModel;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
+import de.javagl.jgltf.model.ModelElement;
 
 /**
  * Implementation of a {@link MeshPrimitiveModel}
@@ -176,5 +178,31 @@ public final class DefaultMeshPrimitiveModel extends AbstractModelElement
         return Collections.unmodifiableList(targets);
     }
 
+    @Override
+    public Set<ModelElement> getReferencedModelElements()
+    {
+        Set<ModelElement> modelElements = 
+            getReferencedExtensionModelElements();
+        if (indices != null)
+        {
+            modelElements.add(indices);
+        }
+        for (AccessorModel accessorModel : attributes.values())
+        {
+            modelElements.add(accessorModel);
+        }
+        for (Map<String, AccessorModel> target : targets)
+        {
+            for (AccessorModel accessorModel : target.values())
+            {
+                modelElements.add(accessorModel);
+            }
+        }
+        if (materialModel != null)
+        {
+            modelElements.add(materialModel);
+        }
+        return modelElements;
+    }
 
 }

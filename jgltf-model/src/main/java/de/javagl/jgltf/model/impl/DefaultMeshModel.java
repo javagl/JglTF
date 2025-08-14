@@ -29,9 +29,11 @@ package de.javagl.jgltf.model.impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import de.javagl.jgltf.model.MeshModel;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
+import de.javagl.jgltf.model.ModelElement;
 
 /**
  * Implementation of a {@link MeshModel}
@@ -100,4 +102,16 @@ public class DefaultMeshModel extends AbstractNamedModelElement
         return weights;
     }
 
+    @Override
+    public Set<ModelElement> getReferencedModelElements()
+    {
+        Set<ModelElement> modelElements = 
+            getReferencedExtensionModelElements();
+        for (MeshPrimitiveModel meshPrimitiveModel : meshPrimitiveModels)
+        {
+            modelElements.add(meshPrimitiveModel);
+        }
+        return modelElements;
+    }
+    
 }

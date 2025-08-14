@@ -27,9 +27,11 @@
 package de.javagl.jgltf.model.impl;
 
 import java.nio.ByteBuffer;
+import java.util.Set;
 
 import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.ImageModel;
+import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.io.Buffers;
 
 /**
@@ -134,5 +136,16 @@ public class DefaultImageModel extends AbstractNamedModelElement
         return Buffers.createSlice(imageData);
     }
 
+    @Override
+    public Set<ModelElement> getReferencedModelElements()
+    {
+        Set<ModelElement> modelElements = 
+            getReferencedExtensionModelElements();
+        if (bufferViewModel != null)
+        {
+            modelElements.add(bufferViewModel);
+        }
+        return modelElements;
+    }
     
 }

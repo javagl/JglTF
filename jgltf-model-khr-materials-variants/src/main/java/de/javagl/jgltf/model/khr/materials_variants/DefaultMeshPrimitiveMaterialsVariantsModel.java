@@ -28,8 +28,10 @@ package de.javagl.jgltf.model.khr.materials_variants;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import de.javagl.jgltf.model.MaterialModel;
+import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.impl.AbstractModelElement;
 
 /**
@@ -97,6 +99,15 @@ public class DefaultMeshPrimitiveMaterialsVariantsModel
             this.materials.put(variantName, materialModel);
             this.names.put(variantName, mappingName);
         }
+    }
+    
+    @Override
+    public Set<ModelElement> getReferencedModelElements()
+    {
+        Set<ModelElement> modelElements = 
+            getReferencedExtensionModelElements();
+        modelElements.addAll(materials.values());
+        return modelElements;
     }
     
 }

@@ -27,6 +27,7 @@
 package de.javagl.jgltf.model.structure;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -43,6 +44,8 @@ import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.MeshModel;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
+import de.javagl.jgltf.model.ModelElement;
+import de.javagl.jgltf.model.ModelElements;
 import de.javagl.jgltf.model.SkinModel;
 import de.javagl.jgltf.model.impl.DefaultAccessorModel;
 import de.javagl.jgltf.model.impl.DefaultBufferModel;
@@ -186,6 +189,15 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
         processAnimationModels(gltfModel.getAnimationModels());
         processSkinModels(gltfModel.getSkinModels());
         processImageModels(gltfModel.getImageModels());
+        
+        int XXX; // TODO_EXTENSIONS
+        System.err.println("XXX Experimental handling of extension accessor models in "+this);
+        Set<AccessorModel> extensionAccessorModels = ModelElements
+            .collectReferencedModelElements(gltfModel, AccessorModel.class);
+        extensionAccessorModels.removeAll(processedAccessorModels);
+        extensionAccessorModels.removeAll(gltfModel.getAccessorModels());
+        processAccessorModels(extensionAccessorModels);
+        
         processAccessorModels(gltfModel.getAccessorModels());
         commitBuffer();
         bufferStructure = bufferStructureBuilder.build();

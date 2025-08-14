@@ -30,11 +30,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import de.javagl.jgltf.model.CameraModel;
 import de.javagl.jgltf.model.MathUtils;
 import de.javagl.jgltf.model.MeshModel;
+import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.NodeModel;
 import de.javagl.jgltf.model.SkinModel;
 import de.javagl.jgltf.model.Suppliers;
@@ -281,6 +283,25 @@ public class DefaultNodeModel extends AbstractNamedModelElement
         return weights;
     }
     
+    @Override
+    public Set<ModelElement> getReferencedModelElements()
+    {
+        Set<ModelElement> modelElements = 
+            getReferencedExtensionModelElements();
+        if (meshModels != null)
+        {
+            modelElements.addAll(meshModels);
+        }
+        if (cameraModel != null)
+        {
+            modelElements.add(cameraModel);
+        }
+        if (skinModel != null)
+        {
+            modelElements.add(skinModel);
+        }
+        return modelElements;
+    }
     
     @Override
     public double[] computeLocalTransform(double result[])
