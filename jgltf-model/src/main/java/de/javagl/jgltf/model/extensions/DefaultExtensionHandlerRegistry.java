@@ -74,6 +74,9 @@ class DefaultExtensionHandlerRegistry implements ExtensionHandlerRegistry
     @Override
     public ExtensionHandler get(Class<?> owningModelClass, String extensionName)
     {
+        // TODO When there are many extension handlers and this is called
+        // frequently, it might be better to store them in a Map that
+        // maps Entry<String, Class> objects to the instances.
         for (ExtensionHandler extensionHandler : extensionHandlers)
         {
             if (Objects.equals(extensionName,

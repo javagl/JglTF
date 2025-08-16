@@ -304,10 +304,14 @@ public class GltfModelBuilder
         if (added) 
         {
             addReferencedModelElements(animationModel);
+            
             for (Channel channel : animationModel.getChannels())
             {
                 addNodeModel(channel.getNodeModel());
             }
+            
+            // Note: The channel sampler input and output accessor models
+            // are handled with the buffer structure builder
         }
     }
     
