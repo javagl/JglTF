@@ -88,7 +88,7 @@ public class MaterialsClearcoatExtensionHandler implements ExtensionHandler
             DefaultTextureInfoModel clearcoatTextureInfoModel = 
                 TextureInfoModels.from(textureModels, clearcoatTextureInfo);
             model.setClearcoatTextureInfoModel(clearcoatTextureInfoModel);
-            ExtensionModels.process(gltfModel, clearcoatTextureInfoModel,
+            ExtensionModels.createExtensionModels(gltfModel, clearcoatTextureInfoModel,
                 TextureInfoModel.class);
         }
 
@@ -102,7 +102,7 @@ public class MaterialsClearcoatExtensionHandler implements ExtensionHandler
                 TextureInfoModels.from(textureModels, clearcoatRoughnessTextureInfo);
             model.setClearcoatRoughnessTextureInfoModel(
                 clearcoatRoughnessTextureInfoModel);
-            ExtensionModels.process(gltfModel,
+            ExtensionModels.createExtensionModels(gltfModel,
                 clearcoatRoughnessTextureInfoModel, TextureInfoModel.class);
         }
 
@@ -114,7 +114,7 @@ public class MaterialsClearcoatExtensionHandler implements ExtensionHandler
                 TextureInfoModels.from(textureModels, clearcoatNormalTextureInfo);
             model.setClearcoatNormalTextureInfoModel(
                 clearcoatNormalTextureInfoModel);
-            ExtensionModels.process(gltfModel, clearcoatNormalTextureInfoModel,
+            ExtensionModels.createExtensionModels(gltfModel, clearcoatNormalTextureInfoModel,
                 TextureInfoModel.class);
         }
         return model;

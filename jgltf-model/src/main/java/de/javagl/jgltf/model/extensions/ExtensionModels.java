@@ -34,7 +34,6 @@ import de.javagl.jgltf.impl.v2.GlTFProperty;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.impl.AbstractModelElement;
-import de.javagl.jgltf.model.io.JacksonUtils;
 
 /**
  * Methods related to handling extension implementation- and model objects.
@@ -52,19 +51,19 @@ public class ExtensionModels
 
     /**
      * Process the extensions of the given model element with the given class 
-     * that is contained in the given glTF model.
-     * 
+     * that is contained in the given glTF model.<br>
+     * <br>
      * Note: An implementation detail is that this assumes that the given model 
-     * element extends the {@link AbstractModelElement} class.
-     * 
+     * element extends the {@link AbstractModelElement} class.<br>
+     * <br>
      * This will examine all extension objects that are stored in the given 
      * {@link ModelElement}. For each extension object, it will look up
      * an {@link ExtensionHandler} in the {@link ExtensionHandlerRegistry}.
      * When an extension handler is found, then it will be used for 
      * converting the extension object into its "model" representation,
      * and add it to the {@link ModelElement#getExtensionModels()} of the
-     * model element.
-     * 
+     * model element.<br>
+     * <br>
      * Clients can then obtain the extension model object from the model
      * element, with {@link ModelElement#getExtensionModel(String, Class)}.
      * 
@@ -72,7 +71,7 @@ public class ExtensionModels
      * @param modelElement The {@link ModelElement}
      * @param modelClass The class of the {@link ModelElement}
      */
-    public static void process(
+    public static void createExtensionModels(
         GltfModel gltfModel, ModelElement modelElement, Class<?> modelClass)
     {
         if (!(modelElement instanceof AbstractModelElement))
@@ -124,7 +123,7 @@ public class ExtensionModels
 
     
     // TODO TODO_EXTENSIONS comment
-    public static void processForImpl(
+    public static void createExtensionImpls(
         GltfModel gltfModel, ModelElement modelElement, 
         Class<?> modelClass, GlTFProperty glTFProperty)
     {

@@ -1385,7 +1385,7 @@ public class GltfModelCreatorV2
      */
     private void processModel()
     {
-        ExtensionModels.process(
+        ExtensionModels.createExtensionModels(
             gltfModel, gltfModel, GltfModel.class);
     }
 
@@ -1397,7 +1397,7 @@ public class GltfModelCreatorV2
         List<MaterialModel> materialModels = gltfModel.getMaterialModels();
         for (MaterialModel materialModel : materialModels)
         {
-            ExtensionModels.process(
+            ExtensionModels.createExtensionModels(
                 gltfModel, materialModel, MaterialModel.class);
             
             if (materialModel instanceof PbrMaterialModel) 
@@ -1408,7 +1408,7 @@ public class GltfModelCreatorV2
                     pbrMaterialModel.getPbrMetallicRoughnessModel();
                 if (pbrMetallicRoughnessModel != null)
                 {
-                    ExtensionModels.process(gltfModel, 
+                    ExtensionModels.createExtensionModels(gltfModel, 
                         pbrMetallicRoughnessModel, 
                         PbrMetallicRoughnessModel.class);
                     
@@ -1416,7 +1416,7 @@ public class GltfModelCreatorV2
                         pbrMetallicRoughnessModel.getBaseColorTextureInfoModel();
                     if (baseColorTextureInfoModel != null)
                     {
-                        ExtensionModels.process(gltfModel, 
+                        ExtensionModels.createExtensionModels(gltfModel, 
                             baseColorTextureInfoModel, 
                             TextureInfoModel.class);
                     }
@@ -1425,7 +1425,7 @@ public class GltfModelCreatorV2
                         pbrMetallicRoughnessModel.getMetallicRoughnessTextureInfoModel();
                     if (metallicRoughnessTextureInfoModel != null)
                     {
-                        ExtensionModels.process(gltfModel, 
+                        ExtensionModels.createExtensionModels(gltfModel, 
                             metallicRoughnessTextureInfoModel, 
                             TextureInfoModel.class);
                     }
@@ -1435,7 +1435,7 @@ public class GltfModelCreatorV2
                     pbrMaterialModel.getNormalTextureInfoModel();
                 if (normalTextureInfoModel != null)
                 {
-                    ExtensionModels.process(gltfModel, 
+                    ExtensionModels.createExtensionModels(gltfModel, 
                         normalTextureInfoModel, 
                         TextureInfoModel.class);
                 }
@@ -1443,7 +1443,7 @@ public class GltfModelCreatorV2
                     pbrMaterialModel.getOcclusionTextureInfoModel();
                 if (occlusionTextureInfoModel != null)
                 {
-                    ExtensionModels.process(gltfModel, 
+                    ExtensionModels.createExtensionModels(gltfModel, 
                         occlusionTextureInfoModel, 
                         TextureInfoModel.class);
                 }
@@ -1451,7 +1451,7 @@ public class GltfModelCreatorV2
                     pbrMaterialModel.getEmissiveTextureInfoModel();
                 if (emissiveTextureInfoModel != null)
                 {
-                    ExtensionModels.process(gltfModel, 
+                    ExtensionModels.createExtensionModels(gltfModel, 
                         emissiveTextureInfoModel, 
                         TextureInfoModel.class);
                 }
@@ -1467,14 +1467,14 @@ public class GltfModelCreatorV2
         List<MeshModel> meshModels = gltfModel.getMeshModels();
         for (MeshModel meshModel : meshModels)
         {
-            ExtensionModels.process(
+            ExtensionModels.createExtensionModels(
                 gltfModel, meshModel, MeshModel.class);
 
             List<MeshPrimitiveModel> meshPrimitiveModels =
                 meshModel.getMeshPrimitiveModels();
             for (MeshPrimitiveModel meshPrimitiveModel : meshPrimitiveModels)
             {
-                ExtensionModels.process(
+                ExtensionModels.createExtensionModels(
                     gltfModel, meshPrimitiveModel, MeshPrimitiveModel.class);
             }
         }
@@ -1488,7 +1488,7 @@ public class GltfModelCreatorV2
         List<NodeModel> nodeModels = gltfModel.getNodeModels();
         for (NodeModel nodeModel : nodeModels)
         {
-            ExtensionModels.process(
+            ExtensionModels.createExtensionModels(
                 gltfModel, nodeModel, NodeModel.class);
         }
     }
@@ -1501,7 +1501,7 @@ public class GltfModelCreatorV2
         List<TextureModel> textureModels = gltfModel.getTextureModels();
         for (TextureModel textureModel : textureModels)
         {
-            ExtensionModels.process(
+            ExtensionModels.createExtensionModels(
                 gltfModel, textureModel, TextureModel.class);
         }
     }

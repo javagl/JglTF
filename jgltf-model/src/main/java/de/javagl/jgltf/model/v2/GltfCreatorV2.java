@@ -859,7 +859,7 @@ public class GltfCreatorV2
         
         int XXX; // TODO_EXTENSIONS
         System.err.println("XXX Experimental processing of NodeModel in "+this);
-        ExtensionModels.processForImpl(
+        ExtensionModels.createExtensionImpls(
             gltfModel, nodeModel, NodeModel.class, node);
         
         return node;
