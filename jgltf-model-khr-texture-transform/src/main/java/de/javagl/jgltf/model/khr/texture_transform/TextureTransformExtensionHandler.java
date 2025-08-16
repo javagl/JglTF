@@ -28,6 +28,7 @@ package de.javagl.jgltf.model.khr.texture_transform;
 
 import de.javagl.jgltf.impl.v2.khr.texture_transform.TextureInfoTextureTransform;
 import de.javagl.jgltf.model.GltfModel;
+import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.TextureInfoModel;
 import de.javagl.jgltf.model.extensions.ExtensionHandler;
 
@@ -69,9 +70,9 @@ public class TextureTransformExtensionHandler implements ExtensionHandler
             new DefaultTextureTransformModel();
         TextureInfoTextureTransform impl = 
             (TextureInfoTextureTransform) object;
-        model.setOffset(impl.getOffset());
+        model.setOffset(Optionals.clone(impl.getOffset()));
         model.setRotation(impl.getRotation());
-        model.setScale(impl.getScale());
+        model.setScale(Optionals.clone(impl.getScale()));
         model.setTexCoord(impl.getTexCoord());
         return model;
     }
@@ -79,8 +80,14 @@ public class TextureTransformExtensionHandler implements ExtensionHandler
     @Override
     public Object convertToImpl(GltfModel gltfModel, Object modelObject)
     {
-        int XXX; // TODO_EXTENSIONS
-        // TODO Auto-generated method stub
-        return null;
+        DefaultTextureTransformModel model = 
+            (DefaultTextureTransformModel)modelObject;
+        TextureInfoTextureTransform impl = 
+            new TextureInfoTextureTransform();
+        impl.setOffset(Optionals.clone(model.getOffset()));
+        impl.setRotation(model.getRotation());
+        impl.setScale(Optionals.clone(model.getScale()));
+        impl.setTexCoord(model.getTexCoord());
+        return impl;
     }
 }

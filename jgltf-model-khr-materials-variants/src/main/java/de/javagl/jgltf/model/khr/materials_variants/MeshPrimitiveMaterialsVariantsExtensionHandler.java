@@ -26,8 +26,11 @@
  */
 package de.javagl.jgltf.model.khr.materials_variants;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import de.javagl.jgltf.impl.v2.khr.materials_variants.MeshPrimitiveMaterialsVariants;
 import de.javagl.jgltf.impl.v2.khr.materials_variants.MeshPrimitiveMaterialsVariantsPropertiesMappingsItems;
@@ -109,9 +112,59 @@ public class MeshPrimitiveMaterialsVariantsExtensionHandler
     @Override
     public Object convertToImpl(GltfModel gltfModel, Object modelObject)
     {
-        int XXX; // TODO_EXTENSIONS
-        // TODO Auto-generated method stub
-        return null;
+        DefaultMeshPrimitiveMaterialsVariantsModel model =
+            (DefaultMeshPrimitiveMaterialsVariantsModel)modelObject;
+        MeshPrimitiveMaterialsVariants impl =
+            new MeshPrimitiveMaterialsVariants();
+        
+        Map<String, Object> extensionModels = gltfModel.getExtensionModels();
+        MaterialsVariantsModel materialVariantsModel =
+            (MaterialsVariantsModel) extensionModels
+                .get("KHR_materials_variants");
+        List<String> variantNames = materialVariantsModel.getNames();
+        
+        List<MaterialModel> materialModels = gltfModel.getMaterialModels();        
+        Map<MaterialModel, List<Integer>> variantIndicesPerMaterial = 
+            new LinkedHashMap<MaterialModel, List<Integer>>();
+        Map<MaterialModel, String> namesPerMaterial =  
+            new LinkedHashMap<MaterialModel, String>();
+        
+        for (int variantIndex = 0; 
+            variantIndex < variantNames.size(); variantIndex++)
+        {
+            String variantName = variantNames.get(variantIndex);
+            MaterialModel materialModel = model.getMaterialModel(variantName);
+
+            List<Integer> variantIndices = 
+                variantIndicesPerMaterial.get(materialModel);
+            if (variantIndices == null)
+            {
+                variantIndices = new ArrayList<Integer>();
+                variantIndicesPerMaterial.put(materialModel, variantIndices);
+            }
+            String name = model.getName(variantName);
+            namesPerMaterial.put(materialModel, name);
+            variantIndices.add(variantIndex);
+        }
+
+        for (Entry<MaterialModel, List<Integer>> entry : 
+            variantIndicesPerMaterial.entrySet())
+        {
+            MeshPrimitiveMaterialsVariantsPropertiesMappingsItems element = 
+                new MeshPrimitiveMaterialsVariantsPropertiesMappingsItems();
+            
+            MaterialModel materialModel = entry.getKey();
+            String name = namesPerMaterial.get(materialModel);
+            
+            int materialIndex = materialModels.indexOf(materialModel);
+            List<Integer> variantIndices = entry.getValue();
+            
+            element.setName(name);
+            element.setMaterial(materialIndex);
+            element.setVariants(variantIndices);
+            impl.addMappings(element);
+        }
+        return impl;
     }
     
 }

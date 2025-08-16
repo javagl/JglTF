@@ -1211,14 +1211,8 @@ public class GltfModelCreatorV2
         {
             materialModel.setAlphaMode(AlphaMode.valueOf(alphaModeString));
         }
-        Double alphaCutoff = material.getAlphaCutoff();
-        if (alphaCutoff != null)
-        {
-            materialModel.setAlphaCutoff(alphaCutoff);
-        }
-        
-        materialModel.setDoubleSided(
-            Boolean.TRUE.equals(material.isDoubleSided()));
+        materialModel.setAlphaCutoff(material.getAlphaCutoff());
+        materialModel.setDoubleSided(material.isDoubleSided());
         
         MaterialPbrMetallicRoughness pbrMetallicRoughness = 
             material.getPbrMetallicRoughness();
@@ -1242,37 +1236,25 @@ public class GltfModelCreatorV2
         
         MaterialNormalTextureInfo normalTextureInfo = 
             material.getNormalTexture();
-        if (normalTextureInfo != null)
-        {
-            DefaultNormalTextureInfoModel normalTextureInfoModel = 
-                TextureInfoModels.from(textureModels, normalTextureInfo);
-            materialModel.setNormalTextureInfoModel(normalTextureInfoModel);
-        }
+        DefaultNormalTextureInfoModel normalTextureInfoModel = 
+            TextureInfoModels.from(textureModels, normalTextureInfo);
+        materialModel.setNormalTextureInfoModel(normalTextureInfoModel);
 
         MaterialOcclusionTextureInfo occlusionTextureInfo = 
             material.getOcclusionTexture();
-        if (occlusionTextureInfo != null)
-        {
-            DefaultOcclusionTextureInfoModel occlusionTextureInfoModel =
-                TextureInfoModels.from(textureModels, occlusionTextureInfo);
-            materialModel.setOcclusionTextureInfoModel(
-                occlusionTextureInfoModel);
-        }
+        DefaultOcclusionTextureInfoModel occlusionTextureInfoModel =
+            TextureInfoModels.from(textureModels, occlusionTextureInfo);
+        materialModel.setOcclusionTextureInfoModel(
+            occlusionTextureInfoModel);
 
         TextureInfo emissiveTextureInfo = 
             material.getEmissiveTexture();
-        if (emissiveTextureInfo != null)
-        {
-            // Create the TextureInfoModel and assign it to the material model
-            DefaultTextureInfoModel emissiveTextureInfoModel = 
-                TextureInfoModels.from(textureModels, emissiveTextureInfo);
-            materialModel.setEmissiveTextureInfoModel(emissiveTextureInfoModel);
-        }
+        DefaultTextureInfoModel emissiveTextureInfoModel = 
+            TextureInfoModels.from(textureModels, emissiveTextureInfo);
+        materialModel.setEmissiveTextureInfoModel(emissiveTextureInfoModel);
         
-        double[] emissiveFactor = Optionals.of(
-            material.getEmissiveFactor(),
-            material.defaultEmissiveFactor());
-        materialModel.setEmissiveFactor(emissiveFactor);
+        materialModel.setEmissiveFactor(
+            Optionals.clone(material.getEmissiveFactor()));
     }
 
     /**
@@ -1286,6 +1268,9 @@ public class GltfModelCreatorV2
         DefaultPbrMetallicRoughnessModel pbrMetallicRoughnessModel,
         MaterialPbrMetallicRoughness pbrMetallicRoughness)
     {
+        double[] baseColorFactor = pbrMetallicRoughness.getBaseColorFactor();
+        pbrMetallicRoughnessModel.setBaseColorFactor(baseColorFactor);
+        
         TextureInfo baseColorTextureInfo = 
             pbrMetallicRoughness.getBaseColorTexture();
         if (baseColorTextureInfo != null)
@@ -1301,8 +1286,6 @@ public class GltfModelCreatorV2
                 baseColorTextureInfo, baseColorTextureInfoModel);
             initTextureInfo(baseColorTextureInfoModel, baseColorTextureInfo);
         }
-        double[] baseColorFactor = pbrMetallicRoughness.getBaseColorFactor();
-        pbrMetallicRoughnessModel.setBaseColorFactor(baseColorFactor);
     
         TextureInfo metallicRoughnessTextureInfo = 
             pbrMetallicRoughness.getMetallicRoughnessTexture();
@@ -1322,15 +1305,10 @@ public class GltfModelCreatorV2
                 metallicRoughnessTextureInfo);
         }
         
-        double metallicFactor = Optionals.of(
-            pbrMetallicRoughness.getMetallicFactor(),
-            pbrMetallicRoughness.defaultMetallicFactor());
-        pbrMetallicRoughnessModel.setMetallicFactor(metallicFactor);
-        
-        double roughnessFactor = Optionals.of(
-            pbrMetallicRoughness.getRoughnessFactor(),
-            pbrMetallicRoughness.defaultRoughnessFactor());
-        pbrMetallicRoughnessModel.setRoughnessFactor(roughnessFactor);
+        pbrMetallicRoughnessModel.setMetallicFactor(
+            pbrMetallicRoughness.getMetallicFactor());
+        pbrMetallicRoughnessModel.setRoughnessFactor(
+            pbrMetallicRoughness.getRoughnessFactor());
     }
 
     /**

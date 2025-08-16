@@ -147,7 +147,7 @@ public class GltfExtensions
 
     /**
      * Convert the given object to the given target type, returning
-     * <code>null</code> if the conversion failed.
+     * <code>null</code> and printing a warning if the conversion failed.
      * 
      * This method is not part of the public API.
      * 

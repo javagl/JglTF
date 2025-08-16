@@ -34,6 +34,7 @@ import de.javagl.jgltf.impl.v2.khr.lights_punctual.LightSpot;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.extensions.ExtensionHandler;
+import de.javagl.jgltf.model.extensions.ExtensionModels;
 
 /**
  * Implementation of an {@link ExtensionHandler} for 
@@ -87,6 +88,10 @@ public class LightsPunctualExtensionHandler implements ExtensionHandler
                 lightModel.setSpot(spotModel);
             }
             lightModel.setRange(light.getRange());
+            
+            ExtensionModels.createExtensionModels(gltfModel, 
+                lightModel, LightModel.class);
+            
             model.addLightModel(lightModel);
         }
         return model;
@@ -95,9 +100,29 @@ public class LightsPunctualExtensionHandler implements ExtensionHandler
     @Override
     public Object convertToImpl(GltfModel gltfModel, Object modelObject)
     {
-        int XXX; // TODO_EXTENSIONS
-        // TODO Auto-generated method stub
-        return null;
+        DefaultLightsPunctualModel model = 
+            (DefaultLightsPunctualModel) modelObject;
+        
+        GlTFLightsPunctual impl = new GlTFLightsPunctual();
+        List<LightModel> lightModels = model.getLightModels();
+        for (LightModel lightModel : lightModels)
+        {
+            Light light = new Light();
+            light.setColor(Optionals.clone(lightModel.getColor()));
+            light.setIntensity(lightModel.getIntensity());
+            light.setRange(lightModel.getRange());
+            
+            LightSpotModel lightSpotModel = lightModel.getSpot();
+            if (lightSpotModel != null)
+            {
+                LightSpot lightSpot = new LightSpot();
+                lightSpot.setInnerConeAngle(lightSpotModel.getInnerConeAngle());
+                lightSpot.setOuterConeAngle(lightSpotModel.getOuterConeAngle());
+                light.setSpot(lightSpot);
+            }
+            impl.addLights(light);
+        }
+        return impl;
     }
 
 }

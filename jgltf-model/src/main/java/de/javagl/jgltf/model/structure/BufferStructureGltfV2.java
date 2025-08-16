@@ -68,7 +68,7 @@ public class BufferStructureGltfV2
                 accessorModel.getBufferViewModel();
             int bufferViewIndex =
                 bufferStructure.getBufferViewIndex(bufferViewModel);
-            accessors.add(GltfCreatorV2.createAccessor(
+            accessors.add(GltfCreatorV2.createAccessorImpl(
                 accessorModel, bufferViewIndex));
         }
         return accessors;
@@ -91,7 +91,7 @@ public class BufferStructureGltfV2
         {
             BufferModel bufferModel = bufferViewModel.getBufferModel();
             int bufferIndex = bufferStructure.getBufferIndex(bufferModel);
-            bufferViews.add(GltfCreatorV2.createBufferView(
+            bufferViews.add(GltfCreatorV2.createBufferViewImpl(
                 bufferViewModel, bufferIndex));
         }
         return bufferViews;
@@ -111,7 +111,7 @@ public class BufferStructureGltfV2
         List<Buffer> buffers = new ArrayList<Buffer>();
         for (BufferModel bufferModel : bufferModels) 
         {
-            buffers.add(GltfCreatorV2.createBuffer(bufferModel));
+            buffers.add(GltfCreatorV2.createBufferImpl(bufferModel));
         }
         return buffers;
     }

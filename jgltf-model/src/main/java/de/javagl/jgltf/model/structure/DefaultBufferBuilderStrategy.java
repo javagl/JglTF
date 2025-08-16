@@ -188,15 +188,15 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
         processSkinModels(gltfModel.getSkinModels());
         processImageModels(gltfModel.getImageModels());
         
-        int XXX; // TODO_EXTENSIONS
-        System.err.println("XXX Experimental handling of extension accessor models in "+this);
         Set<AccessorModel> extensionAccessorModels = ModelElements
             .collectReferencedModelElements(gltfModel, AccessorModel.class);
         extensionAccessorModels.removeAll(processedAccessorModels);
-        extensionAccessorModels.removeAll(gltfModel.getAccessorModels());
+        extensionAccessorModels.removeAll(
+            new LinkedHashSet<AccessorModel>(gltfModel.getAccessorModels()));
         processAccessorModels(extensionAccessorModels);
         
         processAccessorModels(gltfModel.getAccessorModels());
+        
         commitBuffer();
         bufferStructure = bufferStructureBuilder.build();
     }

@@ -77,6 +77,15 @@ public interface ExtensionHandler
     Object convertToModel(GltfModel gltfModel, Object owningModelObject,
         Object impl);
 
-    // TODO TODO_EXTENSIONS comment
+    /**
+     * Convert the given model representation of the extension into the
+     * low-level implementation object (i.e. serialized JSON).
+     * 
+     * @param gltfModel The {@link GltfModel} in which the extension was found
+     * @param modelObject The model object (usually an instance of
+     *        {@link ModelElement}) that is the model representation of the
+     *        extension.
+     * @return The implementation object
+     */
     Object convertToImpl(GltfModel gltfModel, Object modelObject);
 }

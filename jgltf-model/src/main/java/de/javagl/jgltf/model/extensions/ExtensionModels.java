@@ -50,7 +50,7 @@ public class ExtensionModels
         Logger.getLogger(ExtensionModels.class.getName());
 
     /**
-     * Process the extensions of the given model element with the given class 
+     * Process the extensions of the given model element (with the given class) 
      * that is contained in the given glTF model.<br>
      * <br>
      * Note: An implementation detail is that this assumes that the given model 
@@ -61,6 +61,7 @@ public class ExtensionModels
      * an {@link ExtensionHandler} in the {@link ExtensionHandlerRegistry}.
      * When an extension handler is found, then it will be used for 
      * converting the extension object into its "model" representation,
+     * using {@link ExtensionHandler#convertToModel(GltfModel, Object, Object)},
      * and add it to the {@link ModelElement#getExtensionModels()} of the
      * model element.<br>
      * <br>
@@ -122,7 +123,28 @@ public class ExtensionModels
     }
 
     
-    // TODO TODO_EXTENSIONS comment
+    /**
+     * Create the implementation-level representation of the given model
+     * element, to be stored in the {@link GlTFProperty#getExtensions()}
+     * of the given glTF property.<br>
+     * <br>
+     * This will examine all extension model objects that are stored in the 
+     * {@link ModelElement#getExtensionModels()} of the given 
+     * {@link ModelElement}. For each extension model object, it will look up
+     * an {@link ExtensionHandler} in the {@link ExtensionHandlerRegistry}.
+     * When an extension handler is found, then it will be used for 
+     * converting the extension model object into its "impl" representation,
+     * using {@link ExtensionHandler#convertToImpl(GltfModel, Object)},
+     * and add it to the {@link GlTFProperty#getExtensions()} of the
+     * given {@link GlTFProperty}.<br>
+     * <br>
+     * 
+     * @param gltfModel The {@link GltfModel}
+     * @param modelElement The {@link ModelElement}
+     * @param modelClass The class of the {@link ModelElement}
+     * @param glTFProperty The {@link GlTFProperty} that will store the 
+     * implementation-level representation of the extension.
+     */
     public static void createExtensionImpls(
         GltfModel gltfModel, ModelElement modelElement, 
         Class<?> modelClass, GlTFProperty glTFProperty)
@@ -149,8 +171,12 @@ public class ExtensionModels
                 continue;
             }
             
-            Object impl = extensionHandler.convertToImpl(gltfModel, modelObject);
-            System.out.println("Created impl "+impl);
+            Object impl = extensionHandler.convertToImpl(
+                gltfModel, modelObject);
+
+            logger.info("Extension " + extensionName
+                + " was converted to " + impl);
+            
             glTFProperty.addExtensions(extensionName, impl);
         }
     }

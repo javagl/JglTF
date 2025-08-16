@@ -83,9 +83,18 @@ public class MaterialsVariantsExtensionHandler implements ExtensionHandler
     @Override
     public Object convertToImpl(GltfModel gltfModel, Object modelObject)
     {
-        int XXX; // TODO_EXTENSIONS
-        // TODO Auto-generated method stub
-        return null;
+        DefaultMaterialsVariantsModel model = 
+            (DefaultMaterialsVariantsModel) modelObject;
+        GlTFMaterialsVariants impl = new GlTFMaterialsVariants();
+        List<String> names = model.getNames();
+        for (String name : names)
+        {
+            GlTFMaterialsVariantsPropertiesVariantsItems element = 
+                new GlTFMaterialsVariantsPropertiesVariantsItems();
+            element.setName(name);
+            impl.addVariants(element);
+        }
+        return impl;
     }
     
 }

@@ -62,7 +62,7 @@ public class ModelElementsV2
      * @param modelElement The model element
      * @param property The property
      */
-    static void transferGltfPropertyElementsFromModel(
+    public static void transferGltfPropertyElementsFromModel(
         ModelElement modelElement, GlTFProperty property)
     {
         property.setExtensions(modelElement.getExtensions());

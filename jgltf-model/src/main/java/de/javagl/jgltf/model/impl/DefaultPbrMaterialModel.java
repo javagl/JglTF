@@ -74,7 +74,7 @@ public final class DefaultPbrMaterialModel extends AbstractNamedModelElement
     /**
      * The alpha cutoff
      */
-    private double alphaCutoff;
+    private Double alphaCutoff;
 
     /**
      * Whether the material is double sided
@@ -90,12 +90,9 @@ public final class DefaultPbrMaterialModel extends AbstractNamedModelElement
         normalTextureInfoModel = null;
         occlusionTextureInfoModel = null;
         emissiveTextureInfoModel = null;
-        
-        emissiveFactor = new double[]{0.0, 0.0, 0.0 };
-
+        emissiveFactor = null;
         alphaMode = null;
-        alphaCutoff = 0.5;
-
+        alphaCutoff = null;
         doubleSided = false;
     }
 
@@ -199,7 +196,7 @@ public final class DefaultPbrMaterialModel extends AbstractNamedModelElement
     }
 
     @Override
-    public double getAlphaCutoff()
+    public Double getAlphaCutoff()
     {
         return alphaCutoff;
     }
@@ -209,13 +206,13 @@ public final class DefaultPbrMaterialModel extends AbstractNamedModelElement
      *
      * @param alphaCutoff The alpha cutoff
      */
-    public void setAlphaCutoff(double alphaCutoff)
+    public void setAlphaCutoff(Double alphaCutoff)
     {
         this.alphaCutoff = alphaCutoff;
     }
 
     @Override
-    public boolean isDoubleSided()
+    public Boolean isDoubleSided()
     {
         return doubleSided;
     }
@@ -225,7 +222,7 @@ public final class DefaultPbrMaterialModel extends AbstractNamedModelElement
      *
      * @param doubleSided Whether the material is double sided
      */
-    public void setDoubleSided(boolean doubleSided)
+    public void setDoubleSided(Boolean doubleSided)
     {
         this.doubleSided = doubleSided;
     }

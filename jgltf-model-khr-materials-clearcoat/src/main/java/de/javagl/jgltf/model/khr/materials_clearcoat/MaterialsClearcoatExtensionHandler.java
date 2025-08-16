@@ -33,6 +33,7 @@ import de.javagl.jgltf.impl.v2.TextureInfo;
 import de.javagl.jgltf.impl.v2.khr.materials_clearcoat.MaterialMaterialsClearcoat;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.MaterialModel;
+import de.javagl.jgltf.model.NormalTextureInfoModel;
 import de.javagl.jgltf.model.TextureInfoModel;
 import de.javagl.jgltf.model.TextureModel;
 import de.javagl.jgltf.model.extensions.ExtensionHandler;
@@ -40,6 +41,7 @@ import de.javagl.jgltf.model.extensions.ExtensionModels;
 import de.javagl.jgltf.model.impl.DefaultNormalTextureInfoModel;
 import de.javagl.jgltf.model.impl.DefaultTextureInfoModel;
 import de.javagl.jgltf.model.impl.TextureInfoModels;
+import de.javagl.jgltf.model.impl.TextureInfos;
 
 /**
  * Implementation of an {@link ExtensionHandler} for the
@@ -88,8 +90,8 @@ public class MaterialsClearcoatExtensionHandler implements ExtensionHandler
             DefaultTextureInfoModel clearcoatTextureInfoModel = 
                 TextureInfoModels.from(textureModels, clearcoatTextureInfo);
             model.setClearcoatTextureInfoModel(clearcoatTextureInfoModel);
-            ExtensionModels.createExtensionModels(gltfModel, clearcoatTextureInfoModel,
-                TextureInfoModel.class);
+            ExtensionModels.createExtensionModels(gltfModel, 
+                clearcoatTextureInfoModel, TextureInfoModel.class);
         }
 
         model.setClearcoatRoughnessFactor(
@@ -99,7 +101,8 @@ public class MaterialsClearcoatExtensionHandler implements ExtensionHandler
         if (clearcoatRoughnessTextureInfo != null)
         {
             DefaultTextureInfoModel clearcoatRoughnessTextureInfoModel =
-                TextureInfoModels.from(textureModels, clearcoatRoughnessTextureInfo);
+                TextureInfoModels.from(
+                    textureModels, clearcoatRoughnessTextureInfo);
             model.setClearcoatRoughnessTextureInfoModel(
                 clearcoatRoughnessTextureInfoModel);
             ExtensionModels.createExtensionModels(gltfModel,
@@ -111,11 +114,12 @@ public class MaterialsClearcoatExtensionHandler implements ExtensionHandler
         if (clearcoatNormalTextureInfo != null)
         {
             DefaultNormalTextureInfoModel clearcoatNormalTextureInfoModel =
-                TextureInfoModels.from(textureModels, clearcoatNormalTextureInfo);
+                TextureInfoModels.from(
+                    textureModels, clearcoatNormalTextureInfo);
             model.setClearcoatNormalTextureInfoModel(
                 clearcoatNormalTextureInfoModel);
-            ExtensionModels.createExtensionModels(gltfModel, clearcoatNormalTextureInfoModel,
-                TextureInfoModel.class);
+            ExtensionModels.createExtensionModels(gltfModel, 
+                clearcoatNormalTextureInfoModel, TextureInfoModel.class);
         }
         return model;
     }
@@ -123,9 +127,34 @@ public class MaterialsClearcoatExtensionHandler implements ExtensionHandler
     @Override
     public Object convertToImpl(GltfModel gltfModel, Object modelObject)
     {
-        int XXX; // TODO_EXTENSIONS
-        // TODO Auto-generated method stub
-        return null;
+        DefaultMaterialsClearcoatModel model =
+            (DefaultMaterialsClearcoatModel)modelObject;
+        MaterialMaterialsClearcoat impl = new MaterialMaterialsClearcoat();
+
+        List<TextureModel> textureModels = gltfModel.getTextureModels();
+
+        impl.setClearcoatFactor(model.getClearcoatFactor());
+        TextureInfoModel clearcoatTextureInfoModel = 
+            model.getClearcoatTextureInfoModel();
+        TextureInfo clearcoatTextureInfo = 
+            TextureInfos.from(textureModels, clearcoatTextureInfoModel);
+        impl.setClearcoatTexture(clearcoatTextureInfo);
+
+        model.setClearcoatRoughnessFactor(
+            impl.getClearcoatRoughnessFactor());
+        TextureInfoModel clearcoatRoughnessTextureInfoModel =
+            model.getClearcoatRoughnessTextureInfoModel();
+        TextureInfo clearcoatRoughnessTextureInfo = TextureInfos.from(
+            textureModels, clearcoatRoughnessTextureInfoModel);
+        impl.setClearcoatTexture(clearcoatRoughnessTextureInfo);
+        
+        NormalTextureInfoModel clearcoatNormalTextureInfoModel =
+            model.getClearcoatNormalTextureInfoModel();
+        MaterialNormalTextureInfo clearcoatNormalTextureInfo = 
+            TextureInfos.from(textureModels, clearcoatNormalTextureInfoModel);
+        impl.setClearcoatNormalTexture(clearcoatNormalTextureInfo);
+        
+        return impl;
     }
 
 }
