@@ -28,13 +28,11 @@ package de.javagl.jgltf.model.creation;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.AnimationModel;
-import de.javagl.jgltf.model.AnimationModel.Channel;
 import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.CameraModel;
@@ -46,13 +44,9 @@ import de.javagl.jgltf.model.MeshModel;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
 import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.NodeModel;
-import de.javagl.jgltf.model.NormalTextureInfoModel;
-import de.javagl.jgltf.model.OcclusionTextureInfoModel;
-import de.javagl.jgltf.model.PbrMaterialModel;
 import de.javagl.jgltf.model.PbrMetallicRoughnessModel;
 import de.javagl.jgltf.model.SceneModel;
 import de.javagl.jgltf.model.SkinModel;
-import de.javagl.jgltf.model.TechniqueMaterialModel;
 import de.javagl.jgltf.model.TextureInfoModel;
 import de.javagl.jgltf.model.TextureModel;
 import de.javagl.jgltf.model.gl.ProgramModel;
@@ -304,14 +298,6 @@ public class GltfModelBuilder
         if (added) 
         {
             addReferencedModelElements(animationModel);
-            
-            for (Channel channel : animationModel.getChannels())
-            {
-                addNodeModel(channel.getNodeModel());
-            }
-            
-            // Note: The channel sampler input and output accessor models
-            // are handled with the buffer structure builder
         }
     }
     
@@ -412,52 +398,6 @@ public class GltfModelBuilder
         if (added)
         {
             addReferencedModelElements(materialModel);
-            
-            if (materialModel instanceof TechniqueMaterialModel)
-            {
-                TechniqueMaterialModel materialModelV1 = 
-                    (TechniqueMaterialModel)materialModel;
-                
-                addTechniqueModel(materialModelV1.getTechniqueModel());
-                
-                Map<String, Object> values = materialModelV1.getValues();
-                for (Object value : values.values())
-                {
-                    if (value instanceof TextureModel)
-                    {
-                        TextureModel textureModel = (TextureModel)value;
-                        addTextureModel(textureModel);
-                    }
-                }
-            }
-            if (materialModel instanceof PbrMaterialModel)
-            {
-                PbrMaterialModel pbrMaterialModel =
-                    (PbrMaterialModel)materialModel;
-                
-                PbrMetallicRoughnessModel pbrMetallicRoughnessModel = 
-                    pbrMaterialModel.getPbrMetallicRoughnessModel();
-                addPbrMetallicRoughnessModelInternal(pbrMetallicRoughnessModel);
-                
-                NormalTextureInfoModel normalTextureInfoModel = 
-                    pbrMaterialModel.getNormalTextureInfoModel();
-                addTextureInfoModelInternal(normalTextureInfoModel);
-
-                OcclusionTextureInfoModel occlusionTextureInfoModel = 
-                    pbrMaterialModel.getOcclusionTextureInfoModel();
-                addTextureInfoModelInternal(occlusionTextureInfoModel);
-                
-                TextureInfoModel emissiveTextureInfoModel = 
-                    pbrMaterialModel.getEmissiveTextureInfoModel();
-                addTextureInfoModelInternal(emissiveTextureInfoModel);
-
-                // TODO Not necessary
-                addTextureModel(pbrMaterialModel.getBaseColorTexture());
-                addTextureModel(pbrMaterialModel.getOcclusionTexture());
-                addTextureModel(pbrMaterialModel.getMetallicRoughnessTexture());
-                addTextureModel(pbrMaterialModel.getEmissiveTexture());
-                addTextureModel(pbrMaterialModel.getNormalTexture());
-            }
         }
     }
 
@@ -491,14 +431,6 @@ public class GltfModelBuilder
             return;
         }
         addReferencedModelElements(pbrMetallicRoughnessModel);
-        
-        TextureInfoModel baseColorTextureInfoModel = 
-            pbrMetallicRoughnessModel.getBaseColorTextureInfoModel();
-        addTextureInfoModelInternal(baseColorTextureInfoModel);
-        
-        TextureInfoModel metallicRoughnessTextureInfoModel = 
-            pbrMetallicRoughnessModel.getMetallicRoughnessTextureInfoModel();
-        addTextureInfoModelInternal(metallicRoughnessTextureInfoModel);
     }
 
     
@@ -518,7 +450,6 @@ public class GltfModelBuilder
             return;
         }
         addReferencedModelElements(textureInfoModel);
-        addTextureModel(textureInfoModel.getTextureModel());
     }
 
     
@@ -538,9 +469,6 @@ public class GltfModelBuilder
         if (added) 
         {
             addReferencedModelElements(meshModel);
-            
-            addMeshPrimitiveModelsInternal(
-                meshModel.getMeshPrimitiveModels());
         }
     }
 
@@ -574,27 +502,8 @@ public class GltfModelBuilder
             return;
         }
         addReferencedModelElements(meshPrimitiveModel);
-        addMaterialModel(meshPrimitiveModel.getMaterialModel());
     }
 
-    /**
-     * Add the given {@link MeshPrimitiveModel} instances.
-     * 
-     * This is only used internally, because the given objects are not
-     * top-level glTF objects.
-     * 
-     * @param meshPrimitiveModels The instances to add
-     */
-    private void addMeshPrimitiveModelsInternal(
-        Collection<? extends MeshPrimitiveModel> meshPrimitiveModels)
-    {
-        for (MeshPrimitiveModel meshPrimitiveModel : meshPrimitiveModels)
-        {
-            addMeshPrimitiveModelInternal(meshPrimitiveModel);
-        }
-    }
-
-    
     /**
      * Add the given {@link NodeModel}
      * 
@@ -611,11 +520,6 @@ public class GltfModelBuilder
         if (added) 
         {
             addReferencedModelElements(nodeModel);
-            
-            addCameraModel(nodeModel.getCameraModel());
-            addMeshModels(nodeModel.getMeshModels());
-            addNodeModels(nodeModel.getChildren());
-            addSkinModel(nodeModel.getSkinModel());
         }
     }
 
@@ -649,8 +553,6 @@ public class GltfModelBuilder
         if (added) 
         {
             addReferencedModelElements(sceneModel);
-            
-            addNodeModels(sceneModel.getNodeModels());
         }
     }
 
@@ -684,9 +586,6 @@ public class GltfModelBuilder
         if (added) 
         {
             addReferencedModelElements(skinModel);
-            
-            addNodeModels(skinModel.getJoints());
-            addNodeModel(skinModel.getSkeleton());
         }
     }
 
@@ -721,8 +620,6 @@ public class GltfModelBuilder
         if (added) 
         {
             addReferencedModelElements(textureModel);
-            
-            addImageModel(textureModel.getImageModel());
         }
     }
 
@@ -758,8 +655,6 @@ public class GltfModelBuilder
         if (added) 
         {
             addReferencedModelElements(techniqueModel);
-            
-            addProgramModel(techniqueModel.getProgramModel());
         }
     }
     
@@ -795,9 +690,6 @@ public class GltfModelBuilder
         if (added) 
         {
             addReferencedModelElements(programModel);
-            
-            addShaderModel(programModel.getVertexShaderModel());
-            addShaderModel(programModel.getFragmentShaderModel());
         }
     }
 
@@ -831,8 +723,6 @@ public class GltfModelBuilder
         boolean added = shaderModelsSet.add(defaultShaderModel);
         if (added)
         {
-            addReferencedModelElements(shaderModel);
-            
             addReferencedModelElements(shaderModel);
         }
     }
@@ -1016,11 +906,6 @@ public class GltfModelBuilder
      */
     private void addModelElement(ModelElement modelElement)
     {
-        int XXX; // TODO_EXTENSIONS
-        // TODO The current process of manual handling
-        // of referenced model elements could/should be replaced by
-        // this
-        
         if (modelElement instanceof AnimationModel)
         {
             AnimationModel element = (AnimationModel)modelElement;
