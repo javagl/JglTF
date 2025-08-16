@@ -27,7 +27,6 @@
 package de.javagl.jgltf.model.structure;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -44,7 +43,6 @@ import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.MeshModel;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
-import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.ModelElements;
 import de.javagl.jgltf.model.SkinModel;
 import de.javagl.jgltf.model.impl.DefaultAccessorModel;

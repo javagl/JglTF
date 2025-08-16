@@ -288,10 +288,8 @@ public class DefaultNodeModel extends AbstractNamedModelElement
     {
         Set<ModelElement> modelElements = 
             getReferencedExtensionModelElements();
-        if (meshModels != null)
-        {
-            modelElements.addAll(meshModels);
-        }
+        modelElements.addAll(children);
+        modelElements.addAll(meshModels);
         if (cameraModel != null)
         {
             modelElements.add(cameraModel);

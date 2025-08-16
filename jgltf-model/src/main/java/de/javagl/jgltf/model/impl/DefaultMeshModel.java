@@ -107,10 +107,7 @@ public class DefaultMeshModel extends AbstractNamedModelElement
     {
         Set<ModelElement> modelElements = 
             getReferencedExtensionModelElements();
-        for (MeshPrimitiveModel meshPrimitiveModel : meshPrimitiveModels)
-        {
-            modelElements.add(meshPrimitiveModel);
-        }
+        modelElements.addAll(meshPrimitiveModels);
         return modelElements;
     }
     
