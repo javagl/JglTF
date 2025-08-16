@@ -18,12 +18,11 @@ import de.javagl.jgltf.model.io.v2.GltfAssetV2;
 import de.javagl.jgltf.model.io.v2.GltfAssetsV2;
 
 /**
- * A test to make sure that creating a model that contains the same accessors
- * multiple times (via one mesh primitive that appears multiple times) can
- * be constructed without errors 
+ * A test to make sure that creating a model that contains the same mesh
+ * multiple times can be constructed without errors 
  */
 @SuppressWarnings("javadoc")
-public class DuplicateAccessorsTest
+public class GltfModelBuilderDuplicateMeshesTest
 {
     public static void main(String[] args) throws Exception
     {
@@ -31,8 +30,9 @@ public class DuplicateAccessorsTest
         printEmbedded(gltfModel);
     }
     
+
     @Test
-    public void testDuplicateAccessors()
+    public void testDuplicateMeshes()
     {
         GltfModel gltfModel = createGltfModel();
         int expectedNumAccessors = 2;
@@ -53,20 +53,21 @@ public class DuplicateAccessorsTest
         DefaultMeshPrimitiveModel meshPrimitiveModel =
             MeshPrimitiveModels.create(indices, positions, null, null);
         
+        // Create a single mesh with the mesh primitive
+        DefaultMeshModel meshModel = new DefaultMeshModel();
+        meshModel.addMeshPrimitiveModel(meshPrimitiveModel);
+        
         DefaultSceneModel sceneModel = new DefaultSceneModel();
         
-        // Use the same mesh primitive model (with the same accessors)
-        // in two different meshes, and add them to the scene
-        DefaultMeshModel meshModel0 = new DefaultMeshModel();
-        meshModel0.addMeshPrimitiveModel(meshPrimitiveModel);
+        // Add the same mesh to the scene twice
         DefaultNodeModel nodeModel0 = new DefaultNodeModel();
-        nodeModel0.addMeshModel(meshModel0);
+        nodeModel0.setTranslation(new double[] { -1.0f, 0, 0 });
+        nodeModel0.addMeshModel(meshModel);
         sceneModel.addNode(nodeModel0);
 
-        DefaultMeshModel meshModel1 = new DefaultMeshModel();
-        meshModel1.addMeshPrimitiveModel(meshPrimitiveModel);
         DefaultNodeModel nodeModel1 = new DefaultNodeModel();
-        nodeModel1.addMeshModel(meshModel1);
+        nodeModel1.setTranslation(new double[] { 1.0f, 0, 0 });
+        nodeModel1.addMeshModel(meshModel);
         sceneModel.addNode(nodeModel1);
         
         // Pass the scene to the model builder. It will take care
