@@ -51,14 +51,14 @@ public interface PbrMetallicRoughnessModel extends ModelElement
      *
      * @return The metallic factor
      */
-    double getMetallicFactor();
+    Double getMetallicFactor();
     
     /**
      * Returns the roughness factor
      *
      * @return The roughness factor
      */
-    double getRoughnessFactor();
+    Double getRoughnessFactor();
 
     /**
      * Returns the metallic-roughness-texture info

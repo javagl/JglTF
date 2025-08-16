@@ -709,18 +709,11 @@ public class GltfCreatorV2
             materialModel, material);
         
         AlphaMode alphaMode = materialModel.getAlphaMode();
-        if (alphaMode == null)
-        {
-            material.setAlphaMode(AlphaMode.OPAQUE.name());
-        }
-        else
+        if (alphaMode != null)
         {
             material.setAlphaMode(alphaMode.name());
         }
-        if (AlphaMode.MASK.equals(alphaMode))
-        {
-            material.setAlphaCutoff(materialModel.getAlphaCutoff());
-        }
+        material.setAlphaCutoff(materialModel.getAlphaCutoff());
         material.setDoubleSided(materialModel.isDoubleSided());
         
         PbrMetallicRoughnessModel pbrMetallicRoughnessModel =

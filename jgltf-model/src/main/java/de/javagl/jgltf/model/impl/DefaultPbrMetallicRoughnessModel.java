@@ -51,12 +51,12 @@ public class DefaultPbrMetallicRoughnessModel extends AbstractModelElement
     /**
      * The metallic factor
      */
-    private double metallicFactor;
+    private Double metallicFactor;
 
     /**
      * The roughness factor
      */
-    private double roughnessFactor;
+    private Double roughnessFactor;
 
     /**
      * The metallic-roughness texture info
@@ -70,8 +70,8 @@ public class DefaultPbrMetallicRoughnessModel extends AbstractModelElement
     {
         baseColorFactor = null;
         baseColorTextureInfoModel = null;
-        metallicFactor = 1.0;
-        roughnessFactor = 1.0;
+        metallicFactor = null;
+        roughnessFactor = null;
         metallicRoughnessTextureInfoModel = null;
     }
 
@@ -108,7 +108,7 @@ public class DefaultPbrMetallicRoughnessModel extends AbstractModelElement
     }
 
     @Override
-    public double getMetallicFactor()
+    public Double getMetallicFactor()
     {
         return metallicFactor;
     }
@@ -118,13 +118,13 @@ public class DefaultPbrMetallicRoughnessModel extends AbstractModelElement
      *
      * @param metallicFactor The metallic factor
      */
-    public void setMetallicFactor(double metallicFactor)
+    public void setMetallicFactor(Double metallicFactor)
     {
         this.metallicFactor = metallicFactor;
     }
 
     @Override
-    public double getRoughnessFactor()
+    public Double getRoughnessFactor()
     {
         return roughnessFactor;
     }
@@ -134,7 +134,7 @@ public class DefaultPbrMetallicRoughnessModel extends AbstractModelElement
      *
      * @param roughnessFactor The roughness factor
      */
-    public void setRoughnessFactor(double roughnessFactor)
+    public void setRoughnessFactor(Double roughnessFactor)
     {
         this.roughnessFactor = roughnessFactor;
     }

@@ -79,7 +79,7 @@ public final class DefaultPbrMaterialModel extends AbstractNamedModelElement
     /**
      * Whether the material is double sided
      */
-    private boolean doubleSided;
+    private Boolean doubleSided;
 
     /**
      * Creates a new instance with default values
@@ -93,7 +93,7 @@ public final class DefaultPbrMaterialModel extends AbstractNamedModelElement
         emissiveFactor = null;
         alphaMode = null;
         alphaCutoff = null;
-        doubleSided = false;
+        doubleSided = null;
     }
 
     @Override
