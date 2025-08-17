@@ -41,13 +41,10 @@ import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.MaterialModel;
 import de.javagl.jgltf.model.MeshModel;
-import de.javagl.jgltf.model.MeshPrimitiveModel;
 import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.NodeModel;
-import de.javagl.jgltf.model.PbrMetallicRoughnessModel;
 import de.javagl.jgltf.model.SceneModel;
 import de.javagl.jgltf.model.SkinModel;
-import de.javagl.jgltf.model.TextureInfoModel;
 import de.javagl.jgltf.model.TextureModel;
 import de.javagl.jgltf.model.gl.ProgramModel;
 import de.javagl.jgltf.model.gl.ShaderModel;
@@ -416,44 +413,6 @@ public class GltfModelBuilder
     }
 
     /**
-     * Add the given {@link PbrMetallicRoughnessModel}.
-     * 
-     * This is only used internally, because the given object is not
-     * a top-level glTF object.
-     * 
-     * @param pbrMetallicRoughnessModel The instance to add
-     */
-    private void addPbrMetallicRoughnessModelInternal(
-        PbrMetallicRoughnessModel pbrMetallicRoughnessModel)
-    {
-        if (pbrMetallicRoughnessModel == null)
-        {
-            return;
-        }
-        addReferencedModelElements(pbrMetallicRoughnessModel);
-    }
-
-    
-    /**
-     * Add the given {@link TextureInfoModel}.
-     * 
-     * This is only used internally, because the given object is not
-     * a top-level glTF object.
-     * 
-     * @param textureInfoModel The instance to add
-     */
-    private void addTextureInfoModelInternal(
-        TextureInfoModel textureInfoModel)
-    {
-        if (textureInfoModel == null)
-        {
-            return;
-        }
-        addReferencedModelElements(textureInfoModel);
-    }
-
-    
-    /**
      * Add the given {@link MeshModel}
      * 
      * @param meshModel The instance to add
@@ -484,24 +443,6 @@ public class GltfModelBuilder
         {
             addMeshModel(meshModel);
         }
-    }
-
-    /**
-     * Add the given {@link MeshPrimitiveModel}.
-     * 
-     * This is only used internally, because the given object is not
-     * a top-level glTF object.
-     * 
-     * @param meshPrimitiveModel The instance to add
-     */
-    private void addMeshPrimitiveModelInternal(
-        MeshPrimitiveModel meshPrimitiveModel)
-    {
-        if (meshPrimitiveModel == null)
-        {
-            return;
-        }
-        addReferencedModelElements(meshPrimitiveModel);
     }
 
     /**
@@ -981,26 +922,14 @@ public class GltfModelBuilder
             // Buffer models are created by the buffer structure 
             // builder when calling 'fill'
         }
-        else if (modelElement instanceof MeshPrimitiveModel)
-        {
-            MeshPrimitiveModel element = (MeshPrimitiveModel)modelElement;
-            addMeshPrimitiveModelInternal(element);
-        }
-        else if (modelElement instanceof PbrMetallicRoughnessModel)
-        {
-            PbrMetallicRoughnessModel element = 
-                (PbrMetallicRoughnessModel)modelElement;
-            addPbrMetallicRoughnessModelInternal(element);
-        }
-        else if (modelElement instanceof TextureInfoModel)
-        {
-            TextureInfoModel element = (TextureInfoModel)modelElement;
-            addTextureInfoModelInternal(element);
-        }
         else
         {
-            logger.warning("Unknown model element type: "+modelElement);
-            //addReferencedModelElements(modelElement);
+            int XXX; // TODO TODO_EXTENSIONS Is it necessary to
+            // track model elements to avoid infinite recursion
+            // for the case that the given one is a new top-level
+            // element?
+            logger.warning("Generic model element type: "+modelElement);
+            addReferencedModelElements(modelElement);
         }
     }
     
