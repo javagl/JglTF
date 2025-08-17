@@ -82,8 +82,6 @@ import de.javagl.jgltf.model.MaterialModel;
 import de.javagl.jgltf.model.MeshModel;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
 import de.javagl.jgltf.model.NodeModel;
-import de.javagl.jgltf.model.NormalTextureInfoModel;
-import de.javagl.jgltf.model.OcclusionTextureInfoModel;
 import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.PbrMaterialModel;
 import de.javagl.jgltf.model.PbrMaterialModel.AlphaMode;
@@ -92,7 +90,6 @@ import de.javagl.jgltf.model.SceneModel;
 import de.javagl.jgltf.model.SkinModel;
 import de.javagl.jgltf.model.TextureInfoModel;
 import de.javagl.jgltf.model.TextureModel;
-import de.javagl.jgltf.model.extensions.ExtensionModels;
 import de.javagl.jgltf.model.impl.DefaultAccessorModel;
 import de.javagl.jgltf.model.impl.DefaultAnimationModel;
 import de.javagl.jgltf.model.impl.DefaultAnimationModel.DefaultChannel;
@@ -217,21 +214,9 @@ public class GltfModelCreatorV2
         initExtensionsModel();
         initAssetModel();
         
-        // TODO TODO_EXTENSIONS Experiments for extension handling
-        logger.warning(
-            "Experimental extension processing in GltfModelCreatorV2");
-        processModel();
-        // animation
-        // buffer
-        // bufferView
-        // camera
-        // image
-        processMaterialModels();
-        processMeshModels();
-        processNodeModels();
-        // scene
-        // skin
-        processTextureModels();
+        GltfModelExtensionProcessorV2 extensionProcessor = 
+            new GltfModelExtensionProcessorV2(gltfModel);
+        extensionProcessor.process();
     }
     
     /**
@@ -1355,132 +1340,6 @@ public class GltfModelCreatorV2
                 asset, assetModel);
             assetModel.setCopyright(asset.getCopyright());
             assetModel.setGenerator(asset.getGenerator());
-        }
-    }
-    
-    /**
-     * Process the {@link GltfModel} object
-     */
-    private void processModel()
-    {
-        ExtensionModels.createExtensionModels(
-            gltfModel, gltfModel, GltfModel.class);
-    }
-
-    /**
-     * Process the {@link MaterialModel} instances
-     */
-    private void processMaterialModels()
-    {
-        List<MaterialModel> materialModels = gltfModel.getMaterialModels();
-        for (MaterialModel materialModel : materialModels)
-        {
-            ExtensionModels.createExtensionModels(
-                gltfModel, materialModel, MaterialModel.class);
-            
-            if (materialModel instanceof PbrMaterialModel) 
-            {
-                PbrMaterialModel pbrMaterialModel = 
-                    (PbrMaterialModel) materialModel;
-                PbrMetallicRoughnessModel pbrMetallicRoughnessModel = 
-                    pbrMaterialModel.getPbrMetallicRoughnessModel();
-                if (pbrMetallicRoughnessModel != null)
-                {
-                    ExtensionModels.createExtensionModels(gltfModel, 
-                        pbrMetallicRoughnessModel, 
-                        PbrMetallicRoughnessModel.class);
-                    
-                    TextureInfoModel baseColorTextureInfoModel = 
-                        pbrMetallicRoughnessModel.getBaseColorTextureInfoModel();
-                    if (baseColorTextureInfoModel != null)
-                    {
-                        ExtensionModels.createExtensionModels(gltfModel, 
-                            baseColorTextureInfoModel, 
-                            TextureInfoModel.class);
-                    }
-                    
-                    TextureInfoModel metallicRoughnessTextureInfoModel =
-                        pbrMetallicRoughnessModel.getMetallicRoughnessTextureInfoModel();
-                    if (metallicRoughnessTextureInfoModel != null)
-                    {
-                        ExtensionModels.createExtensionModels(gltfModel, 
-                            metallicRoughnessTextureInfoModel, 
-                            TextureInfoModel.class);
-                    }
-                }
-                
-                NormalTextureInfoModel normalTextureInfoModel = 
-                    pbrMaterialModel.getNormalTextureInfoModel();
-                if (normalTextureInfoModel != null)
-                {
-                    ExtensionModels.createExtensionModels(gltfModel, 
-                        normalTextureInfoModel, 
-                        TextureInfoModel.class);
-                }
-                OcclusionTextureInfoModel occlusionTextureInfoModel = 
-                    pbrMaterialModel.getOcclusionTextureInfoModel();
-                if (occlusionTextureInfoModel != null)
-                {
-                    ExtensionModels.createExtensionModels(gltfModel, 
-                        occlusionTextureInfoModel, 
-                        TextureInfoModel.class);
-                }
-                TextureInfoModel emissiveTextureInfoModel = 
-                    pbrMaterialModel.getEmissiveTextureInfoModel();
-                if (emissiveTextureInfoModel != null)
-                {
-                    ExtensionModels.createExtensionModels(gltfModel, 
-                        emissiveTextureInfoModel, 
-                        TextureInfoModel.class);
-                }
-            }
-        }
-    }
-
-    /**
-     * Process the {@link MeshModel} instances
-     */
-    private void processMeshModels()
-    {
-        List<MeshModel> meshModels = gltfModel.getMeshModels();
-        for (MeshModel meshModel : meshModels)
-        {
-            ExtensionModels.createExtensionModels(
-                gltfModel, meshModel, MeshModel.class);
-
-            List<MeshPrimitiveModel> meshPrimitiveModels =
-                meshModel.getMeshPrimitiveModels();
-            for (MeshPrimitiveModel meshPrimitiveModel : meshPrimitiveModels)
-            {
-                ExtensionModels.createExtensionModels(
-                    gltfModel, meshPrimitiveModel, MeshPrimitiveModel.class);
-            }
-        }
-    }
-
-    /**
-     * Process the {@link NodeModel} instances
-     */
-    private void processNodeModels()
-    {
-        List<NodeModel> nodeModels = gltfModel.getNodeModels();
-        for (NodeModel nodeModel : nodeModels)
-        {
-            ExtensionModels.createExtensionModels(
-                gltfModel, nodeModel, NodeModel.class);
-        }
-    }
-
-    /**
-     * Process the {@link TextureModel} instances
-     */
-    private void processTextureModels()
-    {
-        List<TextureModel> textureModels = gltfModel.getTextureModels();
-        for (TextureModel textureModel : textureModels)
-        {
-            ExtensionModels.createExtensionModels(
-                gltfModel, textureModel, TextureModel.class);
         }
     }
     
