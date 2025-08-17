@@ -100,7 +100,7 @@ class MtlMaterialHandlerV2 implements MtlMaterialHandler
         Float shininess = mtl.getNs();
         if (shininess != null)
         {
-            metallicRoughness.setMetallicFactor(shininess / 128f);
+            metallicRoughness.setMetallicFactor(shininess / 128.0);
         }
         material.setPbrMetallicRoughnessModel(metallicRoughness);
 
@@ -132,8 +132,8 @@ class MtlMaterialHandlerV2 implements MtlMaterialHandler
         textureInfo.setTextureModel(textureModel);
         metallicRoughness.setBaseColorTextureInfoModel(textureInfo);
 
-        metallicRoughness.setMetallicFactor(0.0f);
-        metallicRoughness.setRoughnessFactor(1.0f);
+        metallicRoughness.setMetallicFactor(0.0);
+        metallicRoughness.setRoughnessFactor(1.0);
         
         material.setDoubleSided(true);
         return material;
@@ -149,8 +149,8 @@ class MtlMaterialHandlerV2 implements MtlMaterialHandler
             new DefaultPbrMetallicRoughnessModel();
         material.setPbrMetallicRoughnessModel(metallicRoughness);
 
-        metallicRoughness.setMetallicFactor(0.0f);
-        metallicRoughness.setRoughnessFactor(1.0f);
+        metallicRoughness.setMetallicFactor(0.0);
+        metallicRoughness.setRoughnessFactor(1.0);
         metallicRoughness.setBaseColorFactor(new double[] { r, g, b, 1.0f });
         material.setDoubleSided(true);
         return material;
