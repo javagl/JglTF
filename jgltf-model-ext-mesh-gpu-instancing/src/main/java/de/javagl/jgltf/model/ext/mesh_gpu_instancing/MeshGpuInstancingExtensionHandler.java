@@ -71,7 +71,8 @@ public class MeshGpuInstancingExtensionHandler implements ExtensionHandler
         GltfModel gltfModel, Object owningModelObject, Object object)
     {
         GlTFMeshGpuInstancing impl = (GlTFMeshGpuInstancing) object;
-        DefaultMeshGpuInstancingModel model = new DefaultMeshGpuInstancingModel();
+        DefaultMeshGpuInstancingModel model = 
+            new DefaultMeshGpuInstancingModel();
         
         Map<String, Integer> attributes = impl.getAttributes();
         if (attributes != null)
@@ -85,6 +86,7 @@ public class MeshGpuInstancingExtensionHandler implements ExtensionHandler
                 model.setAttribute(key, accessorModel);
             }
         }
+        
         return model;
     }
 
@@ -104,6 +106,7 @@ public class MeshGpuInstancingExtensionHandler implements ExtensionHandler
             int index = accessorModels.indexOf(value);
             impl.addAttributes(key, index);
         }
+        
         return impl;
     }
 

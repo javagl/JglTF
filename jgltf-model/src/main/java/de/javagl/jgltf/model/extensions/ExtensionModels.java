@@ -114,8 +114,8 @@ public class ExtensionModels
                 GltfExtensions.convertValueOptional(jsonObject, implClass);
             if (impl != null)
             {
-                Object extensionModel = extensionHandler
-                    .convertToModel(gltfModel, modelElement, impl);
+                Object extensionModel = extensionHandler.convertToModel(
+                    gltfModel, modelElement, impl);
                 abstractModelElement.addExtensionModel(extensionName,
                     extensionModel);
             }

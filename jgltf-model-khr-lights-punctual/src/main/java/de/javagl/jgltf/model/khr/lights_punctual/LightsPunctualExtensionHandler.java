@@ -35,6 +35,7 @@ import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.extensions.ExtensionHandler;
 import de.javagl.jgltf.model.extensions.ExtensionModels;
+import de.javagl.jgltf.model.v2.ModelElementsV2;
 
 /**
  * Implementation of an {@link ExtensionHandler} for 
@@ -72,10 +73,14 @@ public class LightsPunctualExtensionHandler implements ExtensionHandler
     {
         DefaultLightsPunctualModel model = new DefaultLightsPunctualModel();
         GlTFLightsPunctual impl = (GlTFLightsPunctual) object;
+        
         List<Light> lights = impl.getLights();
         for (Light light : lights)
         {
-            LightModel lightModel = new DefaultLightModel();
+            DefaultLightModel lightModel = new DefaultLightModel();
+            ModelElementsV2.transferGltfPropertyElementsToModel(
+                light, lightModel);
+            
             lightModel.setColor(Optionals.clone(light.getColor()));
             lightModel.setIntensity(light.getIntensity());
             
@@ -94,6 +99,7 @@ public class LightsPunctualExtensionHandler implements ExtensionHandler
             
             model.addLightModel(lightModel);
         }
+        
         return model;
     }
     
@@ -108,6 +114,9 @@ public class LightsPunctualExtensionHandler implements ExtensionHandler
         for (LightModel lightModel : lightModels)
         {
             Light light = new Light();
+            ModelElementsV2.transferGltfPropertyElementsFromModel(
+                lightModel, light);
+            
             light.setColor(Optionals.clone(lightModel.getColor()));
             light.setIntensity(lightModel.getIntensity());
             light.setRange(lightModel.getRange());
@@ -120,6 +129,11 @@ public class LightsPunctualExtensionHandler implements ExtensionHandler
                 lightSpot.setOuterConeAngle(lightSpotModel.getOuterConeAngle());
                 light.setSpot(lightSpot);
             }
+            
+            ExtensionModels.createExtensionImpls(
+                gltfModel, lightModel, 
+                LightModel.class, light);
+
             impl.addLights(light);
         }
         return impl;

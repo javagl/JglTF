@@ -31,10 +31,12 @@ import java.util.List;
 import de.javagl.jgltf.impl.v2.MaterialNormalTextureInfo;
 import de.javagl.jgltf.impl.v2.MaterialOcclusionTextureInfo;
 import de.javagl.jgltf.impl.v2.TextureInfo;
+import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.NormalTextureInfoModel;
 import de.javagl.jgltf.model.OcclusionTextureInfoModel;
 import de.javagl.jgltf.model.TextureInfoModel;
 import de.javagl.jgltf.model.TextureModel;
+import de.javagl.jgltf.model.extensions.ExtensionModels;
 import de.javagl.jgltf.model.v2.ModelElementsV2;
 
 /**
@@ -52,12 +54,12 @@ public class TextureInfos
      * {@link TextureInfoModel}, or <code>null</code> if the given
      * texture info is <code>null</code>.
      * 
-     * @param textureModels The {@link TextureModel} list
+     * @param gltfModel The {@link GltfModel}
      * @param textureInfoModel The {@link TextureInfoModel}
      * @return The {@link TextureInfo}
      */
     public static TextureInfo from(
-        List<? extends TextureModel> textureModels, 
+        GltfModel gltfModel,
         TextureInfoModel textureInfoModel)
     {
         if (textureInfoModel == null)
@@ -70,9 +72,15 @@ public class TextureInfos
             textureInfo);
 
         TextureModel textureModel = textureInfoModel.getTextureModel();
+        List<TextureModel> textureModels = gltfModel.getTextureModels(); 
         int index = textureModels.indexOf(textureModel);
         textureInfo.setIndex(index);
         textureInfo.setTexCoord(textureInfoModel.getTexCoord());
+        
+        ExtensionModels.createExtensionImpls(
+            gltfModel, textureInfoModel, 
+            TextureInfoModel.class, textureInfo);
+        
         return textureInfo;
     }
 
@@ -81,12 +89,12 @@ public class TextureInfos
      * {@link NormalTextureInfoModel}, or <code>null</code> if the given
      * texture info is <code>null</code>.
      * 
-     * @param textureModels The {@link TextureModel} list
+     * @param gltfModel The {@link GltfModel}
      * @param textureInfoModel The {@link NormalTextureInfoModel}
      * @return The {@link MaterialNormalTextureInfo}
      */
     public static MaterialNormalTextureInfo from(
-        List<? extends TextureModel> textureModels, 
+        GltfModel gltfModel,
         NormalTextureInfoModel textureInfoModel)
     {
         if (textureInfoModel == null)
@@ -99,10 +107,16 @@ public class TextureInfos
             textureInfo);
 
         TextureModel textureModel = textureInfoModel.getTextureModel();
+        List<TextureModel> textureModels = gltfModel.getTextureModels(); 
         int index = textureModels.indexOf(textureModel);
         textureInfo.setIndex(index);
         textureInfo.setTexCoord(textureInfoModel.getTexCoord());
         textureInfo.setScale(textureInfoModel.getScale());
+        
+        ExtensionModels.createExtensionImpls(
+            gltfModel, textureInfoModel, 
+            NormalTextureInfoModel.class, textureInfo);
+        
         return textureInfo;
     }
     
@@ -111,12 +125,12 @@ public class TextureInfos
      * {@link OcclusionTextureInfoModel}, or <code>null</code> if the given
      * texture info is <code>null</code>.
      * 
-     * @param textureModels The {@link TextureModel} list
+     * @param gltfModel The {@link GltfModel}
      * @param textureInfoModel The {@link OcclusionTextureInfoModel}
      * @return The {@link MaterialOcclusionTextureInfo}
      */
     public static MaterialOcclusionTextureInfo from(
-        List<? extends TextureModel> textureModels, 
+        GltfModel gltfModel,
         OcclusionTextureInfoModel textureInfoModel)
     {
         if (textureInfoModel == null)
@@ -129,10 +143,16 @@ public class TextureInfos
             textureInfo);
 
         TextureModel textureModel = textureInfoModel.getTextureModel();
+        List<TextureModel> textureModels = gltfModel.getTextureModels(); 
         int index = textureModels.indexOf(textureModel);
         textureInfo.setIndex(index);
         textureInfo.setTexCoord(textureInfoModel.getTexCoord());
         textureInfo.setStrength(textureInfoModel.getStrength());
+        
+        ExtensionModels.createExtensionImpls(
+            gltfModel, textureInfoModel, 
+            OcclusionTextureInfoModel.class, textureInfo);
+        
         return textureInfo;
     }
     
