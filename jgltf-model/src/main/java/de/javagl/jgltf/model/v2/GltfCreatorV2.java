@@ -129,6 +129,14 @@ public class GltfCreatorV2
         final Integer wrapS;
         final Integer wrapT;
         
+        SamplerInfo()
+        {
+            this.magFilter = null;
+            this.minFilter = null;
+            this.wrapS = null;
+            this.wrapT = null;
+        }
+
         SamplerInfo(TextureModel textureModel)
         {
             this.magFilter = textureModel.getMagFilter();
@@ -178,6 +186,11 @@ public class GltfCreatorV2
             return true;
         }
     }
+    
+    /**
+     * The default sampler info, with all values being <code>null</code>.
+     */
+    private static final SamplerInfo DEFAULT_SAMPLER_INFO = new SamplerInfo(); 
     
     /**
      * The {@link GltfModel} that this instance operates on
@@ -1080,9 +1093,12 @@ public class GltfCreatorV2
         for (TextureModel textureModel : textureModels)
         {
             SamplerInfo samplerInfo = new SamplerInfo(textureModel);
-            if (!samplerIndices.containsKey(samplerInfo))
+            if (!samplerInfo.equals(DEFAULT_SAMPLER_INFO))
             {
-                samplerIndices.put(samplerInfo, samplerIndices.size());
+                if (!samplerIndices.containsKey(samplerInfo))
+                {
+                    samplerIndices.put(samplerInfo, samplerIndices.size());
+                }
             }
         }
         return samplerIndices;
@@ -1145,8 +1161,11 @@ public class GltfCreatorV2
             textureModel, texture);
         
         SamplerInfo samplerInfo = new SamplerInfo(textureModel);
-        Integer index = samplerIndices.get(samplerInfo);
-        texture.setSampler(index);
+        if (!samplerInfo.equals(DEFAULT_SAMPLER_INFO))
+        {
+            Integer index = samplerIndices.get(samplerInfo);
+            texture.setSampler(index);
+        }
         
         texture.setSource(imageIndices.get(textureModel.getImageModel()));
         
