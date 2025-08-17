@@ -75,7 +75,6 @@ import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.CameraModel;
 import de.javagl.jgltf.model.ElementType;
 import de.javagl.jgltf.model.ExtensionsModel;
-import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.MaterialModel;
@@ -446,20 +445,18 @@ public class GltfModelCreatorV2
             Texture texture = textures.get(i);
             Integer samplerIndex = texture.getSampler();
             
-            Integer magFilter = GltfConstants.GL_LINEAR;
-            Integer minFilter = GltfConstants.GL_LINEAR;
-            Integer wrapS = GltfConstants.GL_REPEAT;
-            Integer wrapT = GltfConstants.GL_REPEAT;
+            Integer magFilter = null;
+            Integer minFilter = null;
+            Integer wrapS = null;
+            Integer wrapT = null;
             
             if (samplerIndex != null)
             {
                 Sampler sampler = samplers.get(samplerIndex);
                 magFilter = sampler.getMagFilter();
                 minFilter = sampler.getMinFilter();
-                wrapS = Optionals.of(
-                    sampler.getWrapS(), sampler.defaultWrapS());
-                wrapT = Optionals.of(
-                    sampler.getWrapT(), sampler.defaultWrapT());
+                wrapS = sampler.getWrapS();
+                wrapT = sampler.getWrapT();
             }
             
             DefaultTextureModel textureModel = new DefaultTextureModel();
