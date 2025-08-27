@@ -29,14 +29,17 @@ package de.javagl.jgltf.model.structure;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import de.javagl.jgltf.impl.v2.GlTFProperty;
 import de.javagl.jgltf.model.AccessorData;
 import de.javagl.jgltf.model.AccessorDatas;
 import de.javagl.jgltf.model.AccessorModel;
@@ -58,12 +61,14 @@ import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.MaterialModel;
 import de.javagl.jgltf.model.MeshModel;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
+import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.NodeModel;
 import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.PbrMaterialModel;
 import de.javagl.jgltf.model.SceneModel;
 import de.javagl.jgltf.model.SkinModel;
 import de.javagl.jgltf.model.TextureModel;
+import de.javagl.jgltf.model.extensions.ExtensionModels;
 import de.javagl.jgltf.model.gl.ProgramModel;
 import de.javagl.jgltf.model.gl.ShaderModel;
 import de.javagl.jgltf.model.gl.TechniqueModel;
@@ -220,7 +225,6 @@ public class GltfModelStructures
         {
             this.target = new DefaultGltfModel();
         }
-        copyGltfPropertyElements(source, target);
 
         accessorModelsMap = 
             new LinkedHashMap<AccessorModel, DefaultAccessorModel>();
@@ -296,6 +300,8 @@ public class GltfModelStructures
                 DefaultTechniqueModel::new, 
                 targetV1::addTechniqueModel);
         }
+        
+        copyGltfPropertyElements(source, target);
         
         initAnimationModels();
         initImageModels();
@@ -445,7 +451,6 @@ public class GltfModelStructures
         
     }
     
-    
     /**
      * Copy the extensions and extras from the given source to
      * the given target
@@ -453,16 +458,14 @@ public class GltfModelStructures
      * @param source The source
      * @param target The target
      */
-    private static void copyGltfPropertyElements(
+    private void copyGltfPropertyElements(
         AbstractModelElement source, AbstractModelElement target)
     {
-        int XXX; // TODO TODO_EXTENSIONS
-        logger.warning("Have to copy extension models in GltfModelStructures");
-
         target.setExtensions(source.getExtensions());
         target.setExtras(source.getExtras());
+        copyExtensionModels(source, target);
     }
-    
+
     /**
      * Copy the name and extensions and extras from the given source to
      * the given target
@@ -470,14 +473,13 @@ public class GltfModelStructures
      * @param source The source
      * @param target The target
      */
-    private static void copyGltfChildOfRootPropertyElements(
+    private void copyGltfChildOfRootPropertyElements(
         AbstractNamedModelElement source, 
         AbstractNamedModelElement target)
     {
         target.setName(source.getName());
         copyGltfPropertyElements(source, target);
     }
-
     
     
     /**
@@ -509,7 +511,7 @@ public class GltfModelStructures
      * @param input The input model
      * @return The copy
      */
-    private static DefaultAccessorModel copy(DefaultAccessorModel input)
+    private DefaultAccessorModel copy(DefaultAccessorModel input)
     {
         AccessorData inputAccessorData = input.getAccessorData();
         ByteBuffer byteBuffer = inputAccessorData.createByteBuffer();
@@ -521,6 +523,7 @@ public class GltfModelStructures
             componentType, count, elementType);
         output.setNormalized(normalized);
         output.setAccessorData(AccessorDatas.create(output, byteBuffer));
+        
         copyGltfChildOfRootPropertyElements(input, output);
         return output;
     }
@@ -539,8 +542,6 @@ public class GltfModelStructures
                 (DefaultAnimationModel)sourceAnimationModels.get(i);
             DefaultAnimationModel targetAnimationModel = 
                 animationModelsMap.get(sourceAnimationModel); 
-            copyGltfChildOfRootPropertyElements(
-                sourceAnimationModel, targetAnimationModel);
             
             List<Channel> sourceChannels = 
                 sourceAnimationModel.getChannels();
@@ -549,6 +550,9 @@ public class GltfModelStructures
                 Channel targetChannel = copyChannel(sourceChannel);
                 targetAnimationModel.addChannel(targetChannel);
             }
+
+            copyGltfChildOfRootPropertyElements(
+                sourceAnimationModel, targetAnimationModel);
         }
     }
     
@@ -599,8 +603,6 @@ public class GltfModelStructures
                 (DefaultMeshModel)sourceMeshModels.get(i);
             DefaultMeshModel targetMeshModel = 
                 meshModelsMap.get(sourceMeshModel);
-            copyGltfChildOfRootPropertyElements(
-                sourceMeshModel, targetMeshModel);
             
             List<MeshPrimitiveModel> sourceMeshPrimitiveModels =
                 sourceMeshModel.getMeshPrimitiveModels();
@@ -614,6 +616,9 @@ public class GltfModelStructures
             }
             double[] weights = sourceMeshModel.getWeights();
             targetMeshModel.setWeights(Optionals.clone(weights));
+            
+            copyGltfChildOfRootPropertyElements(
+                sourceMeshModel, targetMeshModel);
         }
     }
     
@@ -629,8 +634,6 @@ public class GltfModelStructures
         int mode = sourceMeshPrimitiveModel.getMode();
         DefaultMeshPrimitiveModel targetMeshPrimitiveModel =
             new DefaultMeshPrimitiveModel(mode);
-        copyGltfPropertyElements(
-            sourceMeshPrimitiveModel, targetMeshPrimitiveModel);
         
         AccessorModel sourceIndices =
             sourceMeshPrimitiveModel.getIndices();
@@ -673,6 +676,9 @@ public class GltfModelStructures
             sourceMeshPrimitiveModel.getMaterialModel();
         MaterialModel targetMaterial = materialModelsMap.get(sourceMaterial);
         targetMeshPrimitiveModel.setMaterialModel(targetMaterial);
+        
+        copyGltfPropertyElements(
+            sourceMeshPrimitiveModel, targetMeshPrimitiveModel);
         return targetMeshPrimitiveModel;
     }
 
@@ -688,9 +694,6 @@ public class GltfModelStructures
                 (DefaultNodeModel) sourceNodeModels.get(i);
             DefaultNodeModel targetNodeModel = 
                 nodeModelsMap.get(sourceNodeModel);
-            
-            copyGltfChildOfRootPropertyElements(
-                sourceNodeModel, targetNodeModel);            
             
             List<NodeModel> sourceChildren = sourceNodeModel.getChildren();
             for (NodeModel sourceChild : sourceChildren)
@@ -725,6 +728,9 @@ public class GltfModelStructures
             targetNodeModel.setRotation(Optionals.clone(rotation));
             targetNodeModel.setScale(Optionals.clone(scale));
             targetNodeModel.setWeights(Optionals.clone(weights));
+
+            copyGltfChildOfRootPropertyElements(
+                sourceNodeModel, targetNodeModel);            
         }
     }
     
@@ -742,9 +748,6 @@ public class GltfModelStructures
             DefaultSceneModel targetSceneModel = 
                 sceneModelsMap.get(sourceSceneModel);
             
-            copyGltfChildOfRootPropertyElements(
-                sourceSceneModel, targetSceneModel);            
-            
             List<NodeModel> sourceNodeModels = sourceSceneModel.getNodeModels();
             for (NodeModel sourceNodeModel : sourceNodeModels)
             {
@@ -752,6 +755,9 @@ public class GltfModelStructures
                     nodeModelsMap.get(sourceNodeModel);
                 targetSceneModel.addNode(targetNodeModel);
             }
+            
+            copyGltfChildOfRootPropertyElements(
+                sourceSceneModel, targetSceneModel);            
         }
     }
     
@@ -767,8 +773,6 @@ public class GltfModelStructures
                 (DefaultSkinModel) sourceSkinModels.get(i);
             DefaultSkinModel targetSkinModel = 
                 skinModelsMap.get(sourceSkinModel);
-            copyGltfChildOfRootPropertyElements(
-                sourceSkinModel, targetSkinModel);
             
             List<NodeModel> sourceJoints = sourceSkinModel.getJoints();
             for (NodeModel sourceJoint : sourceJoints)
@@ -786,6 +790,9 @@ public class GltfModelStructures
             NodeModel sourceSkeleton = sourceSkinModel.getSkeleton();
             DefaultNodeModel targetSkeleton = nodeModelsMap.get(sourceSkeleton);
             targetSkinModel.setSkeleton(targetSkeleton);
+            
+            copyGltfChildOfRootPropertyElements(
+                sourceSkinModel, targetSkinModel);
         }
     }
     
@@ -801,8 +808,6 @@ public class GltfModelStructures
                 (DefaultTextureModel) sourceTextureModels.get(i);
             DefaultTextureModel targetTextureModel = 
                 textureModelsMap.get(sourceTextureModel);
-            copyGltfChildOfRootPropertyElements(
-                sourceTextureModel, targetTextureModel);
             
             targetTextureModel.setMagFilter(
                 sourceTextureModel.getMagFilter());
@@ -817,6 +822,9 @@ public class GltfModelStructures
             DefaultImageModel targetImageModel = 
                 imageModelsMap.get(sourceImageModel);
             targetTextureModel.setImageModel(targetImageModel);
+            
+            copyGltfChildOfRootPropertyElements(
+                sourceTextureModel, targetTextureModel);
         }
     }
     
@@ -832,12 +840,13 @@ public class GltfModelStructures
                 (DefaultImageModel) sourceImageModels.get(i);
             DefaultImageModel targetImageModel = 
                 imageModelsMap.get(sourceImageModel);
-            copyGltfChildOfRootPropertyElements(
-                sourceImageModel, targetImageModel);
             
             targetImageModel.setUri(sourceImageModel.getUri());
             targetImageModel.setMimeType(sourceImageModel.getMimeType());
             targetImageModel.setImageData(sourceImageModel.getImageData());
+            
+            copyGltfChildOfRootPropertyElements(
+                sourceImageModel, targetImageModel);
         }
     }
     
@@ -860,10 +869,11 @@ public class GltfModelStructures
                 (DefaultTechniqueModel) sourceTechniqueModels.get(i);
             DefaultTechniqueModel targetTechniqueModel = 
                 techniqueModelsMap.get(sourceTechniqueModel);
-            copyGltfChildOfRootPropertyElements(
-                sourceTechniqueModel, targetTechniqueModel);
             
             initTechniqueModel(sourceTechniqueModel, targetTechniqueModel);
+            
+            copyGltfChildOfRootPropertyElements(
+                sourceTechniqueModel, targetTechniqueModel);
         }
     }
 
@@ -975,9 +985,10 @@ public class GltfModelStructures
                 (DefaultTechniqueMaterialModel) materialModelsMap.get(
                     sourceMaterialModel);
             
+            initMaterialModel(sourceMaterialModel, targetMaterialModel);
+            
             copyGltfChildOfRootPropertyElements(
                 sourceMaterialModel, targetMaterialModel);            
-            initMaterialModel(sourceMaterialModel, targetMaterialModel);
         }
     }
     
@@ -1045,9 +1056,10 @@ public class GltfModelStructures
                 (DefaultPbrMaterialModel) materialModelsMap.get(
                     sourceMaterialModel);
             
+            initMaterialModel(sourceMaterialModel, targetMaterialModel);
+            
             copyGltfChildOfRootPropertyElements(
                 sourceMaterialModel, targetMaterialModel);            
-            initMaterialModel(sourceMaterialModel, targetMaterialModel);
         }
     }
     
@@ -1120,8 +1132,6 @@ public class GltfModelStructures
         }
         DefaultPbrMetallicRoughnessModel targetPbrMetallicRoughness =
             new DefaultPbrMetallicRoughnessModel();
-        copyGltfPropertyElements(
-            sourcePbrMetallicRoughness, targetPbrMetallicRoughness);            
 
         double[] sourceBaseColorFactor = 
             sourcePbrMetallicRoughness.getBaseColorFactor();
@@ -1149,6 +1159,8 @@ public class GltfModelStructures
         targetPbrMetallicRoughness.setMetallicRoughnessTextureInfoModel(
             targetMetallicRoughnessTextureInfo);
         
+        copyGltfPropertyElements(
+            sourcePbrMetallicRoughness, targetPbrMetallicRoughness);            
         return targetPbrMetallicRoughness;
     }
     
@@ -1168,8 +1180,6 @@ public class GltfModelStructures
         }
         DefaultTextureInfoModel targetTextureInfo =
             new DefaultTextureInfoModel();
-        copyGltfPropertyElements(
-            sourceTextureInfo, targetTextureInfo);            
 
         TextureModel sourceTextureModel =
             sourceTextureInfo.getTextureModel();
@@ -1179,6 +1189,8 @@ public class GltfModelStructures
         targetTextureInfo.setTexCoord(
             sourceTextureInfo.getTexCoord());
         
+        copyGltfPropertyElements(
+            sourceTextureInfo, targetTextureInfo);            
         return targetTextureInfo;
     }
 
@@ -1199,8 +1211,6 @@ public class GltfModelStructures
         }
         DefaultNormalTextureInfoModel targetTextureInfo =
             new DefaultNormalTextureInfoModel();
-        copyGltfPropertyElements(
-            sourceTextureInfo, targetTextureInfo);            
         
         TextureModel sourceTextureModel =
             sourceTextureInfo.getTextureModel();
@@ -1211,6 +1221,8 @@ public class GltfModelStructures
             sourceTextureInfo.getTexCoord());
         targetTextureInfo.setScale(sourceTextureInfo.getScale());
         
+        copyGltfPropertyElements(
+            sourceTextureInfo, targetTextureInfo);            
         return targetTextureInfo;
     }
 
@@ -1231,8 +1243,6 @@ public class GltfModelStructures
         }
         DefaultOcclusionTextureInfoModel targetTextureInfo =
             new DefaultOcclusionTextureInfoModel();
-        copyGltfPropertyElements(
-            sourceTextureInfo, targetTextureInfo);            
         
         TextureModel sourceTextureModel =
             sourceTextureInfo.getTextureModel();
@@ -1243,13 +1253,15 @@ public class GltfModelStructures
             sourceTextureInfo.getTexCoord());
         targetTextureInfo.setStrength(sourceTextureInfo.getStrength());
         
+        copyGltfPropertyElements(
+            sourceTextureInfo, targetTextureInfo);            
         return targetTextureInfo;
     }
 
     
     
     /**
-     * Initialize the {@link ShaderModel} instances
+     * Initialize the {@link CameraModel} instances
      */
     private void initCameraModels()
     {
@@ -1260,8 +1272,6 @@ public class GltfModelStructures
                 (DefaultCameraModel) sourceCameraModels.get(i);
             DefaultCameraModel targetCameraModel = 
                 cameraModelsMap.get(sourceCameraModel);
-            copyGltfChildOfRootPropertyElements(
-                sourceCameraModel, targetCameraModel);
             
             CameraPerspectiveModel sourceCameraPerspectiveModel = 
                 sourceCameraModel.getCameraPerspectiveModel();
@@ -1301,6 +1311,9 @@ public class GltfModelStructures
                 targetCameraModel.setCameraOrthographicModel(
                     targetCameraOrthographicModel);
             }
+            
+            copyGltfChildOfRootPropertyElements(
+                sourceCameraModel, targetCameraModel);
         }
     }
     
@@ -1323,12 +1336,13 @@ public class GltfModelStructures
                 (DefaultShaderModel) sourceShaderModels.get(i);
             DefaultShaderModel targetShaderModel = 
                 shaderModelsMap.get(sourceShaderModel);
-            copyGltfChildOfRootPropertyElements(
-                sourceShaderModel, targetShaderModel);
             
             targetShaderModel.setUri(sourceShaderModel.getUri());
             targetShaderModel.setShaderType(sourceShaderModel.getShaderType());
             targetShaderModel.setShaderData(sourceShaderModel.getShaderData());
+            
+            copyGltfChildOfRootPropertyElements(
+                sourceShaderModel, targetShaderModel);
         }
     }
 
@@ -1350,8 +1364,6 @@ public class GltfModelStructures
                 (DefaultProgramModel) sourceProgramModels.get(i);
             DefaultProgramModel targetProgramModel = 
                 programModelsMap.get(sourceProgramModel);
-            copyGltfChildOfRootPropertyElements(
-                sourceProgramModel, targetProgramModel);
 
             ShaderModel sourceVertexShaderModel = 
                 sourceProgramModel.getVertexShaderModel();
@@ -1373,6 +1385,9 @@ public class GltfModelStructures
             {
                 targetProgramModel.addAttribute(attribute);
             }
+            
+            copyGltfChildOfRootPropertyElements(
+                sourceProgramModel, targetProgramModel);
         }
     }
     
@@ -1404,13 +1419,106 @@ public class GltfModelStructures
     {
         DefaultAssetModel sourceAssetModel = source.getAssetModel();
         DefaultAssetModel targetAssetModel = target.getAssetModel();
-        copyGltfChildOfRootPropertyElements(
-            sourceAssetModel, targetAssetModel);
-        
         targetAssetModel.setCopyright(sourceAssetModel.getCopyright());
         targetAssetModel.setGenerator(sourceAssetModel.getGenerator());
+        copyGltfChildOfRootPropertyElements(
+            sourceAssetModel, targetAssetModel);
     }
 
+    /**
+     * Compute the set of all class objects that represent interfaces that
+     * are implemented by the given class or any of its superclasses, and
+     * that are assignable to {@link ModelElement}
+     * 
+     * @param c The class
+     * @return The resulting types
+     */
+    private static Set<Class<?>> computeModelElementInterfaceTypes(Class<?> c)
+    {
+        Set<Class<?>> types = new LinkedHashSet<Class<?>>();
+        computeModelElementInterfaceTypes(c, types);
+        return types;
+    }
+    
+    /**
+     * Implementation for {@link #computeModelElementInterfaceTypes(Class)}
+     * 
+     * @param c The class
+     * @param types The resulting types
+     */
+    private static void computeModelElementInterfaceTypes(
+        Class<?> c, Set<Class<?>> types)
+    {
+        if (c.isInterface() && ModelElement.class.isAssignableFrom(c))
+        {
+            types.add(c);
+        }
+        Class<?> superclass = c.getSuperclass();
+        if (superclass != null)
+        {
+            computeModelElementInterfaceTypes(superclass, types);
+        }
+        Class<?>[] interfaces = c.getInterfaces();
+        for (Class<?> i : interfaces)
+        {
+            computeModelElementInterfaceTypes(i, types);
+        }
+    }
+    
+    /**
+     * Copy all extension model objects that are stored in the given source
+     * model element into the target model element.
+     * 
+     * @param sourceElement The source {@link ModelElement}
+     * @param targetElement The target {@link ModelElement}
+     */
+    private void copyExtensionModels(
+        ModelElement sourceElement, ModelElement targetElement)
+    {
+        Class<? extends ModelElement> sourceType = sourceElement.getClass();
+        Set<Class<?>> types = computeModelElementInterfaceTypes(sourceType);
+        for (Class<?> type : types)
+        {
+            logger.fine("Copying extension models based on type " + type);
+            copyExtensionModels(sourceElement, targetElement, type);
+        }
+    }
+    
+    /**
+     * Copy all extension model objects that are stored in the given source
+     * model element into the target model element, based on the given
+     * model class
+     * 
+     * @param sourceElement The source {@link ModelElement}
+     * @param targetElement The target {@link ModelElement}
+     * @param modelClass The model class
+     */
+    private void copyExtensionModels(ModelElement sourceElement,
+        ModelElement targetElement, Class<?> modelClass)
+    {
+        if (!(targetElement instanceof AbstractModelElement))
+        {
+            logger.warning("The target element is not an AbstractModelElement");
+            return;
+        }
+        AbstractModelElement targetModelElement = 
+            (AbstractModelElement) targetElement;
+        GlTFProperty gltfProperty = new GlTFProperty();
+        ExtensionModels.createExtensionImpls(
+            this.source, sourceElement, modelClass, gltfProperty);
+        Map<String, Object> extensions = gltfProperty.getExtensions();
+        if (extensions != null)
+        {
+            for (Entry<String, Object> entry : extensions.entrySet())
+            {
+                String key = entry.getKey();
+                Object value = entry.getValue();
+                targetModelElement.addExtension(key, value);            
+            }
+        }
+        ExtensionModels.createExtensionModels(
+            this.target, targetElement, modelClass);
+    }
     
     /**
      * Create a mapping from each source element to a newly created target
