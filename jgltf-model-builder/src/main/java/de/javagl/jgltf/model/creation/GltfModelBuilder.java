@@ -190,6 +190,12 @@ public class GltfModelBuilder
      * model manually.
      */
     private final Set<DefaultBufferModel> bufferModelsSet;
+
+    /**
+     * A set of {@link ModelElement} objects that have been found in 
+     * extensions and are not part of the top-level elements.
+     */
+    private final Set<ModelElement> genericModelElements;
     
     /**
      * Private constructor
@@ -212,6 +218,8 @@ public class GltfModelBuilder
         this.accessorModelsSet = new LinkedHashSet<DefaultAccessorModel>();
         this.bufferViewModelsSet = new LinkedHashSet<DefaultBufferViewModel>();
         this.bufferModelsSet = new LinkedHashSet<DefaultBufferModel>();
+        
+        this.genericModelElements = new LinkedHashSet<ModelElement>();
         
     }
     
@@ -924,12 +932,12 @@ public class GltfModelBuilder
         }
         else
         {
-            int XXX; // TODO TODO_EXTENSIONS Is it necessary to
-            // track model elements to avoid infinite recursion
-            // for the case that the given one is a new top-level
-            // element?
-            logger.warning("Generic model element type: "+modelElement);
-            addReferencedModelElements(modelElement);
+            logger.fine("Generic model element: " + modelElement);
+            boolean added = genericModelElements.add(modelElement);
+            if (added)
+            {
+                addReferencedModelElements(modelElement);
+            }
         }
     }
     
