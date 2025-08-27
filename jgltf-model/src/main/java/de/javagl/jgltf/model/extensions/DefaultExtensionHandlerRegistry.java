@@ -89,7 +89,7 @@ class DefaultExtensionHandlerRegistry implements ExtensionHandlerRegistry
                 }
             }
         }
-        logger.info("No extension handler found for " + extensionName
+        logger.fine("No extension handler found for " + extensionName
             + " owned by class " + owningModelClass);
         return null;
     }

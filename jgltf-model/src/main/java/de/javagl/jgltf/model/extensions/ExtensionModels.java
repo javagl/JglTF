@@ -99,7 +99,7 @@ public class ExtensionModels
             ExtensionHandler extensionHandler =
                 extensionHandlerRegistry.get(modelClass, extensionName);
 
-            logger.info("Found extension " + extensionName
+            logger.fine("Found extension " + extensionName
                 + " with extension handler " + extensionHandler);
 
             if (extensionHandler == null)
@@ -116,6 +116,13 @@ public class ExtensionModels
             {
                 Object extensionModel = extensionHandler.convertToModel(
                     gltfModel, modelElement, impl);
+                
+                logger.info("Found extension implementation for " + extensionName);
+                logger.info("  with model class         " + modelClass);
+                logger.info("  extension handler        " + extensionHandler);
+                logger.info("  converted implementation " + impl);
+                logger.info("  to model                 " + extensionModel);
+                
                 abstractModelElement.addExtensionModel(extensionName,
                     extensionModel);
             }
@@ -163,7 +170,7 @@ public class ExtensionModels
             ExtensionHandler extensionHandler =
                 extensionHandlerRegistry.get(modelClass, extensionName);
 
-            logger.info("Found extension " + extensionName
+            logger.fine("Found extension " + extensionName
                 + " with extension handler " + extensionHandler);
 
             if (extensionHandler == null)
@@ -174,8 +181,11 @@ public class ExtensionModels
             Object impl = extensionHandler.convertToImpl(
                 gltfModel, modelObject);
 
-            logger.info("Extension " + extensionName
-                + " was converted to " + impl);
+            logger.info("Found extension model for " + extensionName);
+            logger.info("  with model class  " + modelClass);
+            logger.info("  extension handler " + extensionHandler);
+            logger.info("  converted model   " + modelElement);
+            logger.info("  to implementation " + impl);
             
             glTFProperty.addExtensions(extensionName, impl);
         }
