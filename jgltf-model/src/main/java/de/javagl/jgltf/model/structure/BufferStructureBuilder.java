@@ -569,7 +569,10 @@ public final class BufferStructureBuilder
             bufferStructure.addPaddingByteIndices(
                 bufferModel, accumulatedBufferBytes, paddingBytesForBuffer);
             accumulatedBufferBytes += paddingBytesForBuffer;
-            bufferElements.add(ByteBuffer.allocate(paddingBytesForBuffer));
+            if (paddingBytesForBuffer > 0)
+            {
+                bufferElements.add(ByteBuffer.allocate(paddingBytesForBuffer));
+            }
             
             bufferViewModel.setByteOffset(accumulatedBufferBytes);
 
@@ -669,8 +672,11 @@ public final class BufferStructureBuilder
                     accumulatedBufferViewBytes += accessorByteBuffer.capacity();
     
                     accumulatedBufferBytes += paddingBytesForBufferView;
-                    bufferElements.add(
-                        ByteBuffer.allocate(paddingBytesForBufferView));
+                    if (paddingBytesForBufferView > 0)
+                    {
+                        bufferElements.add(
+                            ByteBuffer.allocate(paddingBytesForBufferView));
+                    }
                     accumulatedBufferBytes += accessorByteBuffer.capacity();
                     bufferElements.add(accessorByteBuffer);
     
