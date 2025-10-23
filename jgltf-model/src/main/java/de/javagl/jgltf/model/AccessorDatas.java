@@ -172,6 +172,11 @@ public class AccessorDatas
      * Returns whether the given constant is <code>GL_SHORT</code> or
      * <code>GL_UNSIGNED_SHORT</code>. 
      * 
+     * Given that there is no actual native representation of 
+     * "half-precision (16 bit)" floating point values in Java,
+     * this also returns <code>true</code> when the given 
+     * constant is <code>GL_HALF</code>.
+     * 
      * @param type The type constant
      * @return Whether the type is a <code>short</code> type
      */
@@ -179,7 +184,8 @@ public class AccessorDatas
     {
         return 
             type == GltfConstants.GL_SHORT ||
-            type == GltfConstants.GL_UNSIGNED_SHORT;
+            type == GltfConstants.GL_UNSIGNED_SHORT ||
+            type == GltfConstants.GL_HALF;
     }
 
     /**

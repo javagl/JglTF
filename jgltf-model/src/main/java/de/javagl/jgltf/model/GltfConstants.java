@@ -93,6 +93,11 @@ public class GltfConstants
      * The GL_DOUBLE constant (5130)
      */
     public static final int GL_DOUBLE = 5130;
+
+    /**
+     * The GL_HALF constant (5131)
+     */
+    public static final int GL_HALF = 5131;
     
     /**
      * The GL_FLOAT_VEC2 constant (35664)
