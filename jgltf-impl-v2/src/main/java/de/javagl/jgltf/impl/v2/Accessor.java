@@ -168,7 +168,7 @@ public class Accessor
         if (componentType == null) {
             throw new NullPointerException((("Invalid value for componentType: "+ componentType)+", may not be null"));
         }
-        if ((((((componentType!= 5120)&&(componentType!= 5121))&&(componentType!= 5122))&&(componentType!= 5123))&&(componentType!= 5125))&&(componentType!= 5126)) {
+        if ((((((componentType!= 5120)&&(componentType!= 5121))&&(componentType!= 5122))&&(componentType!= 5123))&&(componentType!= 5125))&&(componentType!= 5126)&&(componentType!= 5130)) {
             throw new IllegalArgumentException((("Invalid value for componentType: "+ componentType)+", valid: [5120, 5121, 5122, 5123, 5125, 5126]"));
         }
         this.componentType = componentType;
