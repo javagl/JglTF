@@ -696,6 +696,15 @@ public class AccessorDatas
                     Locale.ENGLISH, "%10.5f", elementsPerRow);
             return accessorDataString;
         }
+        if (accessorData instanceof AccessorDoubleData) 
+        {
+            AccessorDoubleData accessorDoubleData = 
+                (AccessorDoubleData) accessorData;
+            String accessorDataString = 
+                accessorDoubleData.createString(
+                    Locale.ENGLISH, "%10.5f", elementsPerRow);
+            return accessorDataString;
+        }
         return "Unknown accessor data type: " + accessorData;
     }
     
