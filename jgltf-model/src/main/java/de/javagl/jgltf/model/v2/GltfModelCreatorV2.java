@@ -842,34 +842,91 @@ public class GltfModelCreatorV2
             }
             else
             {
-                String uri = buffer.getUri();
-                if (IO.isDataUriString(uri))
-                {
-                    byte data[] = IO.readDataUri(uri);
-                    ByteBuffer bufferData = Buffers.create(data);
-                    bufferModel.setBufferData(bufferData);
-                }
-                else
-                {
-                    if (uri == null)
-                    {
-                        logger.warning("Buffer " + i + " does not have "
-                            + "a uri. Binary chunks that are not the main GLB "
-                            + "buffer are not supported.");
-                        ByteBuffer fallbackBuffer =
-                            Buffers.create(buffer.getByteLength());
-                        bufferModel.setBufferData(fallbackBuffer);
-                    }
-                    else
-                    {
-                        ByteBuffer bufferData = gltfAsset.getReferenceData(uri);
-                        bufferModel.setBufferData(bufferData);
-                    }
-                }
+                initBufferData(i, buffer, bufferModel);
             }
         }
     }
+
+    /**
+     * Initialize the buffer data of the given buffer model, based on the
+     * information from the given buffer.
+     * 
+     * @param index The index of the buffer
+     * @param buffer The buffer
+     * @param bufferModel The buffer model
+     */
+    private void initBufferData(int index, Buffer buffer,
+        DefaultBufferModel bufferModel)
+    {
+        String uri = buffer.getUri();
+        
+        // When the URI is a data URI, decode it directly and assign
+        // the result as the buffer data
+        if (IO.isDataUriString(uri))
+        {
+            byte data[] = IO.readDataUri(uri);
+            ByteBuffer bufferData = Buffers.create(data);
+            bufferModel.setBufferData(bufferData);
+            return;
+        }
+        
+        // For any other URI, the data is resolved as a reference data
+        // from the glTF asset
+        if (uri != null)
+        {
+            ByteBuffer bufferData = gltfAsset.getReferenceData(uri);
+            bufferModel.setBufferData(bufferData);
+            return;
+        }
+
+        // Found a buffer without a URI. 
+        // Special handling for the meshopt fallback buffer
+        if (isMeshoptFallbackBuffer(buffer))
+        {
+            ByteBuffer fallbackBuffer = Buffers.create(buffer.getByteLength());
+            bufferModel.setBufferData(fallbackBuffer);
+            return;
+        }
+        
+        logger.warning("Buffer " + index + " does not have "
+            + "a uri. Binary chunks that are not the main "
+            + "GLB buffer are not supported.");
+    }
     
+    /**
+     * Returns whether the given buffer is a meshopt fallback buffer.
+     * 
+     * This means that it has a <code>EXT_meshopt_compression</code>
+     * extension object that defines <code>fallback: true</code>.
+     *  
+     * @param buffer The buffer
+     * @return Whether the buffer is a fallback buffer.
+     */
+    private static boolean isMeshoptFallbackBuffer(Buffer buffer)
+    {
+        Map<String, Object> extensions = buffer.getExtensions();
+        if (extensions == null)
+        {
+            return false;
+        }
+        Object extensionObject = extensions.get("EXT_meshopt_compression");
+        if (extensionObject == null)
+        {
+            return false;
+        }
+        if (!(extensionObject instanceof Map<?, ?>))
+        {
+            return false;
+        }
+        Map<?, ?> extensionObjectMap = (Map<?, ?>) extensionObject;
+        Object fallbackObject = extensionObjectMap.get("fallback");
+        if (fallbackObject == null)
+        {
+            return false;
+        }
+        boolean isFallback = Boolean.TRUE.equals(fallbackObject);
+        return isFallback;
+    }    
     
     /**
      * Initialize the {@link BufferViewModel} instances
