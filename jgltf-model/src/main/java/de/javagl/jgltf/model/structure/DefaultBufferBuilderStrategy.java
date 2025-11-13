@@ -102,6 +102,11 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
     static class Config
     {
         /**
+         * Whether to create one buffer view for each attribute accessor
+         */
+        boolean bufferViewPerAttributeAccessor = false;
+        
+        /**
          * Whether to create one buffer per mesh primitive
          */
         boolean bufferPerMeshPrimitive = false;
@@ -280,6 +285,14 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
                 bufferStructureBuilder.addAccessorModel("attribute", 
                     (DefaultAccessorModel)attribute);
                 processedAccessorModels.add(attribute);
+            }
+            if (config.bufferViewPerAttributeAccessor)
+            {
+                if (bufferStructureBuilder.getNumCurrentAccessorModels() > 0)
+                {
+                    bufferStructureBuilder.createArrayBufferViewModel(
+                        "attributes");
+                }
             }
         }
         if (bufferStructureBuilder.getNumCurrentAccessorModels() > 0)

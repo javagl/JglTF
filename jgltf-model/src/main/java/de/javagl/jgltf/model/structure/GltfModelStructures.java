@@ -362,6 +362,7 @@ public class GltfModelStructures
         DefaultBufferBuilderStrategy.Config config = 
             new DefaultBufferBuilderStrategy.Config();
         config.imagesInBufferViews = true;
+        config.bufferViewPerAttributeAccessor = true;
         return create(config);
     }
 
