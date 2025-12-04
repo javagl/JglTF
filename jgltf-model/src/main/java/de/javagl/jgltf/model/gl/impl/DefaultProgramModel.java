@@ -27,6 +27,7 @@
 package de.javagl.jgltf.model.gl.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -131,6 +132,26 @@ public class DefaultProgramModel extends AbstractNamedModelElement
         }
         return modelElements;
     }
+    
+    @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove) 
+    {
+        removeExtensionModelElements(modelElementsToRemove);
+        boolean removeThis = false;
+        if (modelElementsToRemove.contains(vertexShaderModel))
+        {
+            setVertexShaderModel(null);
+            removeThis = true;
+        }
+        if (modelElementsToRemove.contains(fragmentShaderModel))
+        {
+            setVertexShaderModel(null);
+            removeThis = true;
+        }
+        return removeThis;
+    }
+    
     
 }
 

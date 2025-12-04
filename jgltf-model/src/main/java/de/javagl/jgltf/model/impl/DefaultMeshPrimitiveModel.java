@@ -27,10 +27,13 @@
 package de.javagl.jgltf.model.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 
@@ -204,5 +207,61 @@ public final class DefaultMeshPrimitiveModel extends AbstractModelElement
         }
         return modelElements;
     }
+    
+    @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove)
+    {
+        removeExtensionModelElements(modelElementsToRemove);
+        boolean removeThis = true;
+        if (modelElementsToRemove.contains(indices)) 
+        {
+            setIndices(null);
+            removeThis = true;
+        }
+        
+        Set<String> attributeKeysToRemove = new LinkedHashSet<String>();
+        for (Entry<String, AccessorModel> entry : attributes.entrySet())
+        {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            if (modelElementsToRemove.contains(value))
+            {
+                attributeKeysToRemove.add(key);
+            }
+        }
+        for (String attributeKeyToRemove : attributeKeysToRemove)
+        {
+            attributes.remove(attributeKeyToRemove);
+        }
+        if (attributes.isEmpty())
+        {
+            removeThis = true;
+        }
+        
+        Set<Map<String, AccessorModel>> targetsToRemove = 
+            new LinkedHashSet<Map<String, AccessorModel>>();
+        for (Map<String, AccessorModel> target : targets)
+        {
+            for (String attributeKeyToRemove : attributeKeysToRemove)
+            {
+                if (target.containsKey(attributeKeyToRemove))
+                {
+                    targetsToRemove.add(target);
+                }
+            }
+            for (Entry<String, AccessorModel> entry : target.entrySet())
+            {
+                Object value = entry.getValue();
+                if (modelElementsToRemove.contains(value))
+                {
+                    targetsToRemove.add(target);
+                }
+            }
+        }
+        targets.removeAll(targetsToRemove);        
+        return removeThis;
+    }
+    
 
 }

@@ -26,9 +26,12 @@
  */
 package de.javagl.jgltf.model.ext.mesh_gpu_instancing;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 
@@ -91,5 +94,28 @@ public class DefaultMeshGpuInstancingModel extends AbstractModelElement
         modelElements.addAll(attributes.values());
         return modelElements;
     }
+    
+    @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove) 
+    {
+        removeExtensionModelElements(modelElementsToRemove);
+        Set<String> keysToRemove = new LinkedHashSet<String>();
+        for (Entry<String, AccessorModel> entry : attributes.entrySet())
+        {
+            String key = entry.getKey();
+            AccessorModel value = entry.getValue();
+            if (modelElementsToRemove.contains(value))
+            {
+                keysToRemove.add(key);
+            }
+        }
+        for (String keyToRemove : keysToRemove)
+        {
+            attributes.remove(keyToRemove);
+        }
+        return attributes.isEmpty();
+    }
+    
     
 }

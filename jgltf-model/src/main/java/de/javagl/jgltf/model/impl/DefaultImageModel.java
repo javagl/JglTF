@@ -27,6 +27,7 @@
 package de.javagl.jgltf.model.impl;
 
 import java.nio.ByteBuffer;
+import java.util.Collection;
 import java.util.Set;
 
 import de.javagl.jgltf.model.BufferViewModel;
@@ -146,6 +147,18 @@ public class DefaultImageModel extends AbstractNamedModelElement
             modelElements.add(bufferViewModel);
         }
         return modelElements;
+    }
+    
+    @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove)
+    {
+        removeExtensionModelElements(modelElementsToRemove);
+        if (modelElementsToRemove.contains(bufferViewModel)) 
+        {
+            setBufferViewModel(null);
+        }
+        return false;
     }
     
 }

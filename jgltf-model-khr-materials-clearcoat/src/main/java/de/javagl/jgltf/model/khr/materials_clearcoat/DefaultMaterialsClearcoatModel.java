@@ -26,6 +26,7 @@
  */
 package de.javagl.jgltf.model.khr.materials_clearcoat;
 
+import java.util.Collection;
 import java.util.Set;
 
 import de.javagl.jgltf.model.ModelElement;
@@ -148,5 +149,26 @@ public class DefaultMaterialsClearcoatModel
         }
         return modelElements;
     }
+    
+    @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove) 
+    {
+        removeExtensionModelElements(modelElementsToRemove);
+        if (modelElementsToRemove.contains(clearcoatTextureInfoModel)) 
+        {
+            setClearcoatTextureInfoModel(null);
+        }
+        if (modelElementsToRemove.contains(clearcoatRoughnessTextureInfoModel)) 
+        {
+            setClearcoatRoughnessTextureInfoModel(null);
+        }
+        if (modelElementsToRemove.contains(clearcoatNormalTextureInfoModel)) 
+        {
+            setClearcoatNormalTextureInfoModel(null);
+        }
+        return false;
+    }
+    
     
 }

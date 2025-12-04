@@ -26,10 +26,12 @@
  */
 package de.javagl.jgltf.model.impl;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -225,7 +227,10 @@ public abstract class AbstractModelElement implements ModelElement
      * found as values in the {@link #getExtensionModels()} map.
      * 
      * This serves as the basis for {@link #getReferencedModelElements()}
-     * implementations.
+     * implementations. Classes implementing the {@link ModelElement} 
+     * interface will implement {@link #getReferencedModelElements()} 
+     * by calling this function, and then adding their referenced
+     * model elements to the returned set.
      * 
      * @return The set
      */
@@ -247,5 +252,43 @@ public abstract class AbstractModelElement implements ModelElement
         return modelElements;
     }
     
+    
+//    @Override
+//    public boolean removeModelElements(
+//        Collection<? extends ModelElement> modelElementsToRemove)
+//    {
+//        System.out.println("XXX DEFAULT IMPLEMENTATION OF removeModelElements FOR "+this);
+//        return false;
+//    }
+    // TODO to be called at the start of removeModelElements
+    protected final void removeExtensionModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove)
+    {
+        if (extensionModels == null)
+        {
+            return;
+        }
+        Set<String> keysToRemove = new LinkedHashSet<String>();
+        for (Entry<String, Object> entry : extensionModels.entrySet())
+        {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            if (value instanceof ModelElement)
+            {
+                ModelElement modelElement = (ModelElement) value;
+                boolean removeExtensionObject =
+                    modelElement.removeModelElements(modelElementsToRemove);
+                if (removeExtensionObject
+                    || modelElementsToRemove.contains(modelElement))
+                {
+                    keysToRemove.add(key);
+                }
+            }
+        }
+        for (String keyToRemove : keysToRemove)
+        {
+            extensionModels.remove(keyToRemove);
+        }
+    }
 
 }

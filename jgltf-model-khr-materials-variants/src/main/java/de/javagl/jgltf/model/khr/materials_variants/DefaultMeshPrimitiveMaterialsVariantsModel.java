@@ -26,8 +26,11 @@
  */
 package de.javagl.jgltf.model.khr.materials_variants;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import de.javagl.jgltf.model.MaterialModel;
@@ -109,5 +112,28 @@ public class DefaultMeshPrimitiveMaterialsVariantsModel
         modelElements.addAll(materials.values());
         return modelElements;
     }
+    
+    @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove) 
+    {
+        removeExtensionModelElements(modelElementsToRemove);
+        Set<String> keysToRemove = new LinkedHashSet<String>();
+        for (Entry<String, MaterialModel> entry : materials.entrySet())
+        {
+            String key = entry.getKey();
+            MaterialModel value = entry.getValue();
+            if (modelElementsToRemove.contains(value))
+            {
+                keysToRemove.add(key);
+            }
+        }
+        for (String keyToRemove : keysToRemove)
+        {
+            materials.remove(keyToRemove);
+        }
+        return materials.isEmpty();
+    }
+    
     
 }

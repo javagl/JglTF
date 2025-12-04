@@ -26,6 +26,7 @@
  */
 package de.javagl.jgltf.model.impl;
 
+import java.util.Collection;
 import java.util.Set;
 
 import de.javagl.jgltf.model.AccessorData;
@@ -265,6 +266,20 @@ public final class DefaultAccessorModel extends AbstractNamedModelElement
             modelElements.add(bufferViewModel);
         }
         return modelElements;
+    }
+    
+    @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove)
+    {
+        removeExtensionModelElements(modelElementsToRemove);
+        boolean removeThis = false;
+        if (modelElementsToRemove.contains(bufferViewModel)) 
+        {
+            setBufferViewModel(null);
+            removeThis = true;
+        }
+        return removeThis;
     }
     
 }

@@ -27,7 +27,9 @@
 package de.javagl.jgltf.model.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -223,5 +225,35 @@ public class DefaultAnimationModel extends AbstractNamedModelElement
         }
         return modelElements;
     }
+    
+    @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove)
+    {
+        removeExtensionModelElements(modelElementsToRemove);
+        Set<Channel> channelsToRemove = new LinkedHashSet<Channel>();
+        for (Channel channel : channels)
+        {
+            NodeModel nodeModel = channel.getNodeModel();
+            if (modelElementsToRemove.contains(nodeModel))
+            {
+                channelsToRemove.add(channel);
+            }
+            Sampler sampler = channel.getSampler();
+            AccessorModel input = sampler.getInput();
+            if (modelElementsToRemove.contains(input))
+            {
+                channelsToRemove.add(channel);
+            }
+            AccessorModel output = sampler.getOutput();
+            if (modelElementsToRemove.contains(output))
+            {
+                channelsToRemove.add(channel);
+            }
+        }
+        channels.removeAll(channelsToRemove);
+        return !channelsToRemove.isEmpty();
+    }
+    
     
 }

@@ -26,6 +26,7 @@
  */
 package de.javagl.jgltf.model.impl;
 
+import java.util.Collection;
 import java.util.Set;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -121,6 +122,14 @@ public final class DefaultCameraModel extends AbstractNamedModelElement
         Set<ModelElement> modelElements = 
             getReferencedExtensionModelElements();
         return modelElements;
+    }
+    
+    @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove) 
+    {
+        removeExtensionModelElements(modelElementsToRemove);
+        return false;
     }
     
 }

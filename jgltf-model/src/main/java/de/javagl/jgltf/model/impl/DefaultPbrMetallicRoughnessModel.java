@@ -26,6 +26,7 @@
  */
 package de.javagl.jgltf.model.impl;
 
+import java.util.Collection;
 import java.util.Set;
 
 import de.javagl.jgltf.model.ModelElement;
@@ -102,7 +103,8 @@ public class DefaultPbrMetallicRoughnessModel extends AbstractModelElement
      *
      * @param baseColorTextureInfoModel The base color texture info model
      */
-    public void setBaseColorTextureInfoModel(TextureInfoModel baseColorTextureInfoModel)
+    public void setBaseColorTextureInfoModel(
+        TextureInfoModel baseColorTextureInfoModel)
     {
         this.baseColorTextureInfoModel = baseColorTextureInfoModel;
     }
@@ -173,5 +175,22 @@ public class DefaultPbrMetallicRoughnessModel extends AbstractModelElement
         }
         return modelElements;
     }
+    
+    @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove)
+    {
+        removeExtensionModelElements(modelElementsToRemove);
+        if (modelElementsToRemove.contains(baseColorTextureInfoModel)) 
+        {
+            setBaseColorTextureInfoModel(null);
+        }
+        if (modelElementsToRemove.contains(metallicRoughnessTextureInfoModel)) 
+        {
+            setBaseColorTextureInfoModel(null);
+        }
+        return false;
+    }
+    
     
 }

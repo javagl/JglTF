@@ -27,6 +27,7 @@
 package de.javagl.jgltf.model.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -109,6 +110,15 @@ public class DefaultMeshModel extends AbstractNamedModelElement
             getReferencedExtensionModelElements();
         modelElements.addAll(meshPrimitiveModels);
         return modelElements;
+    }
+    
+    @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove)
+    {
+        removeExtensionModelElements(modelElementsToRemove);
+        meshPrimitiveModels.removeAll(modelElementsToRemove);
+        return meshPrimitiveModels.isEmpty();
     }
     
 }

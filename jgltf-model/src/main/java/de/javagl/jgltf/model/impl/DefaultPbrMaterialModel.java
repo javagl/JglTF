@@ -26,6 +26,7 @@
  */
 package de.javagl.jgltf.model.impl;
 
+import java.util.Collection;
 import java.util.Set;
 
 import de.javagl.jgltf.model.ModelElement;
@@ -249,6 +250,30 @@ public final class DefaultPbrMaterialModel extends AbstractNamedModelElement
             modelElements.add(emissiveTextureInfoModel);
         }
         return modelElements;
+    }
+    
+    @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove)
+    {
+        removeExtensionModelElements(modelElementsToRemove);
+        if (modelElementsToRemove.contains(pbrMetallicRoughnessModel)) 
+        {
+            setPbrMetallicRoughnessModel(null);
+        }
+        if (modelElementsToRemove.contains(normalTextureInfoModel)) 
+        {
+            setNormalTextureInfoModel(null);
+        }
+        if (modelElementsToRemove.contains(occlusionTextureInfoModel)) 
+        {
+            setOcclusionTextureInfoModel(null);
+        }
+        if (modelElementsToRemove.contains(emissiveTextureInfoModel)) 
+        {
+            setEmissiveFactor(null);
+        }
+        return false;
     }
     
 }

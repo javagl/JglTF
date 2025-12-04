@@ -26,6 +26,7 @@
  */
 package de.javagl.jgltf.model.khr.texture_transform;
 
+import java.util.Collection;
 import java.util.Set;
 
 import de.javagl.jgltf.model.ModelElement;
@@ -120,6 +121,14 @@ public class DefaultTextureTransformModel extends AbstractModelElement
         Set<ModelElement> modelElements = 
             getReferencedExtensionModelElements();
         return modelElements;
+    }
+    
+    @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove) 
+    {
+        removeExtensionModelElements(modelElementsToRemove);
+        return false;
     }
     
 

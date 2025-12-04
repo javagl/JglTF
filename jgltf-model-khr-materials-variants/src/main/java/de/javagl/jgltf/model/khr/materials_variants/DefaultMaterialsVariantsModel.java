@@ -27,6 +27,7 @@
 package de.javagl.jgltf.model.khr.materials_variants;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -86,6 +87,14 @@ public class DefaultMaterialsVariantsModel
         Set<ModelElement> modelElements = 
             getReferencedExtensionModelElements();
         return modelElements;
+    }
+    
+    @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove) 
+    {
+        removeExtensionModelElements(modelElementsToRemove);
+        return false;
     }
     
 }

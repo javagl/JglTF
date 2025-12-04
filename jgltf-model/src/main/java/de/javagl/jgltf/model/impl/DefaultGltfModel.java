@@ -887,4 +887,26 @@ public class DefaultGltfModel extends AbstractModelElement implements GltfModel
         return modelElements;
     }
     
+    @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove)
+    {
+        removeExtensionModelElements(modelElementsToRemove);
+        
+        accessorModels.removeAll(modelElementsToRemove);
+        animationModels.removeAll(modelElementsToRemove);
+        bufferModels.removeAll(modelElementsToRemove);
+        bufferViewModels.removeAll(modelElementsToRemove);
+        cameraModels.removeAll(modelElementsToRemove);
+        imageModels.removeAll(modelElementsToRemove);
+        materialModels.removeAll(modelElementsToRemove);
+        meshModels.removeAll(modelElementsToRemove);
+        nodeModels.removeAll(modelElementsToRemove);
+        sceneModels.removeAll(modelElementsToRemove);
+        skinModels.removeAll(modelElementsToRemove);
+        textureModels.removeAll(modelElementsToRemove);
+        
+        return false;
+    }
+    
 }

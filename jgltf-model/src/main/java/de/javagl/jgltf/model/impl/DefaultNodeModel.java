@@ -27,6 +27,7 @@
 package de.javagl.jgltf.model.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -302,6 +303,30 @@ public class DefaultNodeModel extends AbstractNamedModelElement
     }
     
     @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove)
+    {
+        removeExtensionModelElements(modelElementsToRemove);
+        children.removeAll(modelElementsToRemove);
+        meshModels.removeAll(modelElementsToRemove);
+        if (modelElementsToRemove.contains(cameraModel)) 
+        {
+            setCameraModel(null);
+        }
+        if (modelElementsToRemove.contains(skinModel)) 
+        {
+            setSkinModel(null);
+        }
+        boolean removeThis = true;
+        removeThis &= children.isEmpty();
+        removeThis &= meshModels.isEmpty();
+        removeThis &= (cameraModel != null);
+        removeThis &= (skinModel != null);
+        return removeThis;
+    }
+    
+    
+    @Override
     public double[] computeLocalTransform(double result[])
     {
         return computeLocalTransform(this, result);
@@ -326,7 +351,7 @@ public class DefaultNodeModel extends AbstractNamedModelElement
         return Suppliers.createTransformSupplier(this, 
             NodeModel::computeLocalTransform);
     }
-
+    
     /**
      * Compute the local transform of the given node. The transform
      * is either taken from the {@link #getMatrix()} (if it is not

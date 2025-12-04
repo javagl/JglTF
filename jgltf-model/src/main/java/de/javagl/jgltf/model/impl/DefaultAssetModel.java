@@ -26,6 +26,7 @@
  */
 package de.javagl.jgltf.model.impl;
 
+import java.util.Collection;
 import java.util.Set;
 
 import de.javagl.jgltf.model.AssetModel;
@@ -86,5 +87,14 @@ public class DefaultAssetModel extends AbstractNamedModelElement
             getReferencedExtensionModelElements();
         return modelElements;
     }
+    
+    @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove)
+    {
+        removeExtensionModelElements(modelElementsToRemove);
+        return false;
+    }
+    
     
 }

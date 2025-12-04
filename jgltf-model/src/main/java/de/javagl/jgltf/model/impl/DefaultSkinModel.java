@@ -27,6 +27,7 @@
 package de.javagl.jgltf.model.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -184,5 +185,33 @@ public final class DefaultSkinModel extends AbstractNamedModelElement
         }
         return modelElements;
     }
+    
+    @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove)
+    {
+        removeExtensionModelElements(modelElementsToRemove);
+        boolean removeThis = false;
+        for (NodeModel joint : joints)
+        {
+            if (modelElementsToRemove.contains(joint)) 
+            {
+                joints.clear();
+                removeThis = true;
+            }
+        }
+        if (modelElementsToRemove.contains(skeleton))
+        {
+            setSkeleton(null);
+            removeThis = true;
+        }
+        if (modelElementsToRemove.contains(inverseBindMatrices))
+        {
+            setInverseBindMatrices(null);
+            removeThis = true;
+        }
+        return removeThis;
+    }
+    
 
 }

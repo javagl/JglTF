@@ -26,6 +26,7 @@
  */
 package de.javagl.jgltf.model.khr.lights_punctual;
 
+import java.util.Collection;
 import java.util.Set;
 
 import de.javagl.jgltf.model.ModelElement;
@@ -112,6 +113,14 @@ public class DefaultLightModel
         Set<ModelElement> modelElements = 
             getReferencedExtensionModelElements();
         return modelElements;
+    }
+    
+    @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove) 
+    {
+        removeExtensionModelElements(modelElementsToRemove);
+        return false;
     }
     
 }

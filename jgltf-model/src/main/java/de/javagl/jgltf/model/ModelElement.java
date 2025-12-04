@@ -26,6 +26,7 @@
  */
 package de.javagl.jgltf.model;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
@@ -91,7 +92,12 @@ public interface ModelElement
      * {@link ModelElement} objects that are directly referred to
      * by this {@link ModelElement}.
      * 
-     * @return The list
+     * @return The set
      */
     Set<ModelElement> getReferencedModelElements();
+    
+    boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove);
+    
+    
 }

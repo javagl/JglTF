@@ -26,6 +26,7 @@
  */
 package de.javagl.jgltf.model.gl.impl;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -213,6 +214,33 @@ public class DefaultTechniqueModel extends AbstractNamedModelElement
         }
         return modelElements;
     }
+    
+    @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove) 
+    {
+        removeExtensionModelElements(modelElementsToRemove);
+        boolean removeThis = false;
+        for (TechniqueParametersModel parameter : parameters.values())
+        {
+            NodeModel nodeModel = parameter.getNodeModel();
+            if (modelElementsToRemove.contains(nodeModel))
+            {
+                removeThis = true;
+            }
+            Object value = parameter.getValue();
+            if (value instanceof ModelElement)
+            {
+                ModelElement modelElement = (ModelElement) value;
+                if (modelElementsToRemove.contains(modelElement))
+                {
+                    removeThis = true;
+                }
+            }
+        }
+        return removeThis;
+    }
+    
     
 }
 

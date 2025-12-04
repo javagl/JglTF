@@ -27,6 +27,7 @@
 package de.javagl.jgltf.model.gl.impl;
 
 import java.nio.ByteBuffer;
+import java.util.Collection;
 import java.util.Set;
 
 import de.javagl.jgltf.model.BufferViewModel;
@@ -167,5 +168,20 @@ public class DefaultShaderModel extends AbstractNamedModelElement
         }
         return modelElements;
     }
+    
+    @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove) 
+    {
+        removeExtensionModelElements(modelElementsToRemove);
+        boolean removeThis = false;
+        if (modelElementsToRemove.contains(bufferViewModel))
+        {
+            setBufferViewModel(null);
+            removeThis = true;
+        }
+        return removeThis;
+    }
+    
     
 }

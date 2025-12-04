@@ -27,6 +27,7 @@
 package de.javagl.jgltf.model.impl;
 
 import java.nio.ByteBuffer;
+import java.util.Collection;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -202,4 +203,19 @@ public final class DefaultBufferViewModel extends AbstractNamedModelElement
         }
         return modelElements;
     }
+    
+    @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove) 
+    {
+        removeExtensionModelElements(modelElementsToRemove);
+        boolean removeThis = false;
+        if (modelElementsToRemove.contains(bufferModel))
+        {
+            setBufferModel(null);
+            removeThis = true;
+        }
+        return removeThis;
+    }
+
 }
