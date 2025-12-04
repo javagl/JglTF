@@ -429,7 +429,7 @@ public final class BufferStructureBuilder
      * accessors (i.e. buffer view models that are used for images) 
      * 
      * @param idPrefix The ID prefix for the {@link BufferViewModel}
-     * @param imageData The iamge data 
+     * @param imageData The image data
      * @return The {@link BufferViewModel}
      * @throws IllegalStateException When there are pending accessor models
      */
