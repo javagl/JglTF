@@ -24,6 +24,8 @@
 /jgltf-experiments-extensions
 /jgltf-impl-v2-ext-draco-mesh-compression
 /jgltf-draco-test
+/jgltf-impl-v2-ext-meshopt-compression
+/jgltf-model-ext-meshopt-compression
 # ---
 
 # Preliminary for extension experiments:
