@@ -31,54 +31,52 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Interface for all classes of the model package. This is corresponds to
- * the <code>GlTFProperty</code> of the original glTF asset.
+ * Interface for all classes of the model package. This is corresponds to the
+ * <code>GlTFProperty</code> of the original glTF asset.
  */
 public interface ModelElement
 {
     /**
-     * Returns the extensions of this element. This is a mapping from
-     * property names (extension names) to the JSON objects.
+     * Returns the extensions of this element. This is a mapping from property
+     * names (extension names) to the JSON objects.
      * 
-     * This will be a reference to the map that is stored internally.
-     * Clients should usually not access or modify this map. Library
-     * developers may access this map, for example, to remove extension
-     * information, but are then responsible for ensuring consistency
-     * by updating other model elements, or the extension model of
-     * the root glTF model. 
+     * This will be a reference to the map that is stored internally. Clients
+     * should usually not access or modify this map. Library developers may
+     * access this map, for example, to remove extension information, but are
+     * then responsible for ensuring consistency by updating other model
+     * elements, or the extension model of the root glTF model.
      * 
      * @return The extensions
      */
     Map<String, Object> getExtensions();
-    
+
     /**
-     * Returns the extras of this element. 
+     * Returns the extras of this element.
      * 
      * @return The extras
      */
     Object getExtras();
-    
+
     /**
-     * Returns an unmodifiable map containing the extension models of this 
-     * element, or <code>null</code> if this object does not have any
-     * extension models.
+     * Returns an unmodifiable map containing the extension models of this
+     * element, or <code>null</code> if this object does not have any extension
+     * models.
      * 
-     * This is a mapping from property names (extension names)
-     * to the model objects that have been created from the extension 
-     * information.
+     * This is a mapping from property names (extension names) to the model
+     * objects that have been created from the extension information.
      * 
      * @return The extension models
      */
     Map<String, Object> getExtensionModels();
-    
+
     /**
      * Returns the model object that is stored for the given extension name.
      * 
-     * If this object does not have an object for the specified extension,
-     * then <code>null</code> is returned.
+     * If this object does not have an object for the specified extension, then
+     * <code>null</code> is returned.
      * 
-     * If the extension object is not an instance of the given type, then
-     * a warning is printed and <code>null</code> is returned.
+     * If the extension object is not an instance of the given type, then a
+     * warning is printed and <code>null</code> is returned.
      * 
      * @param <T> The model object type
      * @param extensionName The extension name
@@ -86,18 +84,34 @@ public interface ModelElement
      * @return The model object
      */
     <T> T getExtensionModel(String extensionName, Class<? extends T> type);
-    
+
     /**
-     * Returns a possibly unmodifiable and possibly empty set of all 
-     * {@link ModelElement} objects that are directly referred to
-     * by this {@link ModelElement}.
+     * Returns a possibly unmodifiable and possibly empty set of all
+     * {@link ModelElement} objects that are directly referred to by this
+     * {@link ModelElement}.
      * 
      * @return The set
      */
     Set<ModelElement> getReferencedModelElements();
-    
+
+    /**
+     * Remove the given {@link ModelElement} objects from this object.
+     * 
+     * Any direct references that this model element has to one of the given
+     * elements will be removed (for example, by setting them to
+     * <code>null</code> or removing them from internal collections where
+     * appropriate)
+     * 
+     * The return value indicates whether the removal of the given model
+     * elements implies the removal of this model element. This means that this
+     * model element became "invalid" or "obsolete" due to the removal of the
+     * given elements, meaning that this model element should also be removed
+     * from all other model elements.
+     * 
+     * @param modelElementsToRemove The model elements to remove
+     * @return Whether this model element has to be removed afterwards
+     */
     boolean removeModelElements(
         Collection<? extends ModelElement> modelElementsToRemove);
-    
-    
+
 }
