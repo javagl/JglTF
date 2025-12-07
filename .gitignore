@@ -39,6 +39,12 @@
 #/jgltf-model-khr-materials-variants
 #/jgltf-model-khr-materials-clearcoat/
 #/jgltf-model-khr-texture-transform
+
+/jgltf-model-transform/.classpath
+/jgltf-model-transform/.settings
+/jgltf-model-transform/.project
+/jgltf-model-transform/target
+
 # ---
 
 /jgltf-impl-v2-ext-mesh-gpu-instancing/.classpath
