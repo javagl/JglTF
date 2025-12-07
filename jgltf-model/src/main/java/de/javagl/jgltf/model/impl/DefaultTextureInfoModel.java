@@ -110,6 +110,7 @@ public class DefaultTextureInfoModel extends AbstractNamedModelElement
         if (modelElementsToRemove.contains(textureModel))
         {
             setTextureModel(null);
+            return true;
         }
         return false;
     }

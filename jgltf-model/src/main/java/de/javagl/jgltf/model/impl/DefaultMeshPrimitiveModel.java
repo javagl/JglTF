@@ -213,7 +213,7 @@ public final class DefaultMeshPrimitiveModel extends AbstractModelElement
         Collection<? extends ModelElement> modelElementsToRemove)
     {
         removeExtensionModelElements(modelElementsToRemove);
-        boolean removeThis = true;
+        boolean removeThis = false;
         if (modelElementsToRemove.contains(indices)) 
         {
             setIndices(null);

@@ -317,11 +317,12 @@ public class DefaultNodeModel extends AbstractNamedModelElement
         {
             setSkinModel(null);
         }
-        boolean removeThis = true;
-        removeThis &= children.isEmpty();
-        removeThis &= meshModels.isEmpty();
-        removeThis &= (cameraModel != null);
-        removeThis &= (skinModel != null);
+        boolean removeThis = false;
+        if (children.isEmpty() && meshModels.isEmpty() && cameraModel == null
+            && skinModel == null)
+        {
+            removeThis = true;
+        }
         return removeThis;
     }
     
