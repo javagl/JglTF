@@ -342,8 +342,8 @@ public class GltfModelStructures
      */
     public DefaultGltfModel createDefault()
     {
-        DefaultBufferBuilderStrategy.Config config = 
-            new DefaultBufferBuilderStrategy.Config();
+        BufferBuilderConfig config = 
+            new BufferBuilderConfig();
         return create(config);
     }
     
@@ -359,8 +359,8 @@ public class GltfModelStructures
      */
     public DefaultGltfModel createBinary()
     {
-        DefaultBufferBuilderStrategy.Config config = 
-            new DefaultBufferBuilderStrategy.Config();
+        BufferBuilderConfig config = 
+            new BufferBuilderConfig();
         config.imagesInBufferViews = true;
         config.bufferViewPerAttributeAccessor = true;
         return create(config);
@@ -374,8 +374,8 @@ public class GltfModelStructures
      */
     public DefaultGltfModel createCustom()
     {
-        DefaultBufferBuilderStrategy.Config config = 
-            new DefaultBufferBuilderStrategy.Config();
+        BufferBuilderConfig config = 
+            new BufferBuilderConfig();
         
         config.bufferForAnimations = true;
         config.bufferForMeshes = true;
@@ -395,7 +395,7 @@ public class GltfModelStructures
      * @param config The configuration
      * @return The restructured model
      */
-    private DefaultGltfModel create(DefaultBufferBuilderStrategy.Config config)
+    private DefaultGltfModel create(BufferBuilderConfig config)
     {
         if (this.target == null)
         {

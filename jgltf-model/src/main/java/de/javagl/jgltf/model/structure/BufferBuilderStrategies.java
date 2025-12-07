@@ -41,8 +41,8 @@ public class BufferBuilderStrategies
      */
     public static BufferBuilderStrategy createDefault() 
     {
-        DefaultBufferBuilderStrategy.Config config = 
-            new DefaultBufferBuilderStrategy.Config();
+        BufferBuilderConfig config = 
+            new BufferBuilderConfig();
         return new DefaultBufferBuilderStrategy(config);
     }
     
@@ -54,7 +54,7 @@ public class BufferBuilderStrategies
      * @return The {@link BufferBuilderStrategy}
      */
     static BufferBuilderStrategy create(
-        DefaultBufferBuilderStrategy.Config config) 
+        BufferBuilderConfig config) 
     {
         return new DefaultBufferBuilderStrategy(config);
     }
