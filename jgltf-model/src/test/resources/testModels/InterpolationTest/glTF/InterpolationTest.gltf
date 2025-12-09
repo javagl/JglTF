@@ -1,0 +1,535 @@
+{
+  "asset": {
+    "generator": "glTF-Transform v3.4.5",
+    "version": "2.0"
+  },
+  "accessors": [
+    {
+      "type": "VEC3",
+      "componentType": 5126,
+      "count": 24,
+      "max": [
+        1,
+        1,
+        1
+      ],
+      "min": [
+        -1,
+        -1,
+        -1
+      ],
+      "bufferView": 0,
+      "byteOffset": 0
+    },
+    {
+      "type": "VEC3",
+      "componentType": 5126,
+      "count": 24,
+      "bufferView": 0,
+      "byteOffset": 12
+    },
+    {
+      "type": "VEC3",
+      "componentType": 5126,
+      "count": 4,
+      "max": [
+        1,
+        0,
+        1
+      ],
+      "min": [
+        -1,
+        0,
+        -1
+      ],
+      "bufferView": 1,
+      "byteOffset": 0
+    },
+    {
+      "type": "VEC3",
+      "componentType": 5126,
+      "count": 4,
+      "bufferView": 1,
+      "byteOffset": 12
+    },
+    {
+      "type": "VEC2",
+      "componentType": 5126,
+      "count": 4,
+      "bufferView": 1,
+      "byteOffset": 24
+    },
+    {
+      "type": "SCALAR",
+      "componentType": 5121,
+      "count": 36,
+      "bufferView": 2,
+      "byteOffset": 0
+    },
+    {
+      "type": "SCALAR",
+      "componentType": 5121,
+      "count": 6,
+      "bufferView": 2,
+      "byteOffset": 36
+    },
+    {
+      "type": "SCALAR",
+      "componentType": 5126,
+      "count": 5,
+      "max": [
+        2
+      ],
+      "min": [
+        0
+      ],
+      "bufferView": 3,
+      "byteOffset": 0
+    },
+    {
+      "type": "VEC3",
+      "componentType": 5126,
+      "count": 5,
+      "bufferView": 3,
+      "byteOffset": 20
+    },
+    {
+      "type": "VEC3",
+      "componentType": 5126,
+      "count": 15,
+      "bufferView": 3,
+      "byteOffset": 80
+    },
+    {
+      "type": "VEC4",
+      "componentType": 5126,
+      "count": 5,
+      "bufferView": 3,
+      "byteOffset": 260
+    },
+    {
+      "type": "VEC4",
+      "componentType": 5126,
+      "count": 15,
+      "bufferView": 3,
+      "byteOffset": 340
+    },
+    {
+      "type": "VEC3",
+      "componentType": 5126,
+      "count": 5,
+      "bufferView": 3,
+      "byteOffset": 580
+    },
+    {
+      "type": "VEC3",
+      "componentType": 5126,
+      "count": 15,
+      "bufferView": 3,
+      "byteOffset": 640
+    },
+    {
+      "type": "VEC3",
+      "componentType": 5126,
+      "count": 5,
+      "bufferView": 3,
+      "byteOffset": 820
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 576,
+      "byteStride": 24,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 576,
+      "byteLength": 128,
+      "byteStride": 32,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 704,
+      "byteLength": 44,
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 748,
+      "byteLength": 880
+    }
+  ],
+  "samplers": [
+    {
+      "wrapS": 10497,
+      "wrapT": 10497
+    }
+  ],
+  "textures": [
+    {
+      "source": 0,
+      "sampler": 0
+    }
+  ],
+  "images": [
+    {
+      "name": "l.jpg",
+      "uri": "InterpolationTest_img0.jpg"
+    }
+  ],
+  "buffers": [
+    {
+      "uri": "InterpolationTest_data.bin",
+      "byteLength": 1628
+    }
+  ],
+  "materials": [
+    {
+      "name": "Material",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.8,
+          0.8,
+          0.8,
+          1
+        ],
+        "roughnessFactor": 0.5,
+        "metallicFactor": 0
+      }
+    },
+    {
+      "name": "Material.009",
+      "pbrMetallicRoughness": {
+        "roughnessFactor": 0.5,
+        "metallicFactor": 0,
+        "baseColorTexture": {
+          "index": 0
+        }
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Cube",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 1,
+            "POSITION": 0
+          },
+          "mode": 4,
+          "material": 0,
+          "indices": 5
+        }
+      ]
+    },
+    {
+      "name": "Plane.001",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 3,
+            "POSITION": 2,
+            "TEXCOORD_0": 4
+          },
+          "mode": 4,
+          "material": 1,
+          "indices": 6
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "Cube",
+      "mesh": 0
+    },
+    {
+      "name": "Cube.001",
+      "translation": [
+        -3.4,
+        0,
+        0
+      ],
+      "mesh": 0
+    },
+    {
+      "name": "Cube.002",
+      "translation": [
+        3.4,
+        0,
+        0
+      ],
+      "mesh": 0
+    },
+    {
+      "name": "Cube.003",
+      "translation": [
+        0,
+        3.4,
+        0
+      ],
+      "mesh": 0
+    },
+    {
+      "name": "Cube.004",
+      "translation": [
+        3.4,
+        3.4,
+        0
+      ],
+      "mesh": 0
+    },
+    {
+      "name": "Cube.005",
+      "translation": [
+        -3.4,
+        3.4,
+        0
+      ],
+      "mesh": 0
+    },
+    {
+      "name": "Cube.006",
+      "translation": [
+        0,
+        6.8,
+        0
+      ],
+      "mesh": 0
+    },
+    {
+      "name": "Cube.008",
+      "translation": [
+        3.4,
+        6.8,
+        0
+      ],
+      "mesh": 0
+    },
+    {
+      "name": "Cube.009",
+      "translation": [
+        -3.4,
+        6.8,
+        0
+      ],
+      "mesh": 0
+    },
+    {
+      "name": "Plane",
+      "translation": [
+        0,
+        -1.7941787242889404,
+        1.0036747455596924
+      ],
+      "rotation": [
+        0.7071068286895752,
+        0,
+        0,
+        0.7071068286895752
+      ],
+      "scale": [
+        4.218648433685303,
+        1,
+        0.3652837574481964
+      ],
+      "mesh": 1
+    }
+  ],
+  "animations": [
+    {
+      "name": "Step Scale",
+      "samplers": [
+        {
+          "input": 7,
+          "output": 8,
+          "interpolation": "STEP"
+        }
+      ],
+      "channels": [
+        {
+          "sampler": 0,
+          "target": {
+            "node": 0,
+            "path": "scale"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Linear Scale",
+      "samplers": [
+        {
+          "input": 7,
+          "output": 8,
+          "interpolation": "LINEAR"
+        }
+      ],
+      "channels": [
+        {
+          "sampler": 0,
+          "target": {
+            "node": 1,
+            "path": "scale"
+          }
+        }
+      ]
+    },
+    {
+      "name": "CubicSpline Scale",
+      "samplers": [
+        {
+          "input": 7,
+          "output": 9,
+          "interpolation": "CUBICSPLINE"
+        }
+      ],
+      "channels": [
+        {
+          "sampler": 0,
+          "target": {
+            "node": 2,
+            "path": "scale"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Step Rotation",
+      "samplers": [
+        {
+          "input": 7,
+          "output": 10,
+          "interpolation": "STEP"
+        }
+      ],
+      "channels": [
+        {
+          "sampler": 0,
+          "target": {
+            "node": 3,
+            "path": "rotation"
+          }
+        }
+      ]
+    },
+    {
+      "name": "CubicSpline Rotation",
+      "samplers": [
+        {
+          "input": 7,
+          "output": 11,
+          "interpolation": "CUBICSPLINE"
+        }
+      ],
+      "channels": [
+        {
+          "sampler": 0,
+          "target": {
+            "node": 4,
+            "path": "rotation"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Linear Rotation",
+      "samplers": [
+        {
+          "input": 7,
+          "output": 10,
+          "interpolation": "LINEAR"
+        }
+      ],
+      "channels": [
+        {
+          "sampler": 0,
+          "target": {
+            "node": 5,
+            "path": "rotation"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Step Translation",
+      "samplers": [
+        {
+          "input": 7,
+          "output": 12,
+          "interpolation": "STEP"
+        }
+      ],
+      "channels": [
+        {
+          "sampler": 0,
+          "target": {
+            "node": 6,
+            "path": "translation"
+          }
+        }
+      ]
+    },
+    {
+      "name": "CubicSpline Translation",
+      "samplers": [
+        {
+          "input": 7,
+          "output": 13,
+          "interpolation": "CUBICSPLINE"
+        }
+      ],
+      "channels": [
+        {
+          "sampler": 0,
+          "target": {
+            "node": 7,
+            "path": "translation"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Linear Translation",
+      "samplers": [
+        {
+          "input": 7,
+          "output": 14,
+          "interpolation": "LINEAR"
+        }
+      ],
+      "channels": [
+        {
+          "sampler": 0,
+          "target": {
+            "node": 8,
+            "path": "translation"
+          }
+        }
+      ]
+    }
+  ],
+  "scenes": [
+    {
+      "name": "Scene",
+      "nodes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    }
+  ],
+  "scene": 0
+}
