@@ -68,6 +68,13 @@ class GltfModelPruner
     {
         Level level = Level.INFO;
 
+        logger.info("Collecting elements in glTF model...");
+
+        GltfModelElementCollector c = new GltfModelElementCollector();
+        c.process(gltfModel);
+
+        logger.info("Collecting elements in glTF model DONE");
+        
         logger.info("Building model graph...");
 
         ModelGraph g = ModelGraphs.build(gltfModel);
@@ -77,7 +84,7 @@ class GltfModelPruner
         {
             //logger.log(level, Graphs.createString(g));
         }
-
+        
         // During traversal and reachability computations, ignore the
         // GltfModel itself (because all elements are reachable from it),
         // and the AssetModel (because it can never be pruned, and does
@@ -187,7 +194,7 @@ class GltfModelPruner
             iteration++;
         }
     }
-
+    
     /**
      * Create an unspecified debug string from the given elements
      * 

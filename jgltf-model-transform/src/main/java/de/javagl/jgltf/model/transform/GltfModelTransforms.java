@@ -86,7 +86,7 @@ public class GltfModelTransforms
      * 
      * @param gltfModel The glTF model
      */
-    private static void rebuildBufferStructure(DefaultGltfModel gltfModel)
+    public static void rebuildBufferStructure(DefaultGltfModel gltfModel)
     {
         BufferBuilderStrategy bbs = BufferBuilderStrategies.createDefault();
 

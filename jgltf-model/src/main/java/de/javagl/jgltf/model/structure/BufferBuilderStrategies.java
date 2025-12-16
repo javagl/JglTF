@@ -47,6 +47,22 @@ public class BufferBuilderStrategies
     }
     
     /**
+     * Create an {@link BufferBuilderStrategy} for GLB data.
+     * Many details are not specified.
+     * 
+     * @return The {@link BufferBuilderStrategy}
+     */
+    public static BufferBuilderStrategy createBinary() 
+    {
+        BufferBuilderConfig config = 
+            new BufferBuilderConfig();
+        config.imagesInBufferViews = true;
+        config.bufferViewPerAttributeAccessor = true;
+        return new DefaultBufferBuilderStrategy(config);
+    }
+    
+    
+    /**
      * Create a default {@link BufferBuilderStrategy} with the given 
      * configuration.
      * 
