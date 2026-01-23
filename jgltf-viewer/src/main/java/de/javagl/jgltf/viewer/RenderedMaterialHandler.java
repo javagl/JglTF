@@ -37,6 +37,9 @@ import java.util.logging.Logger;
 
 import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.NodeModel;
+import de.javagl.jgltf.model.NormalTextureInfoModel;
+import de.javagl.jgltf.model.OcclusionTextureInfoModel;
+import de.javagl.jgltf.model.PbrMetallicRoughnessModel;
 import de.javagl.jgltf.model.TextureModel;
 import de.javagl.jgltf.model.gl.ProgramModel;
 import de.javagl.jgltf.model.gl.ShaderModel;
@@ -49,13 +52,13 @@ import de.javagl.jgltf.model.gl.impl.DefaultShaderModel;
 import de.javagl.jgltf.model.gl.impl.DefaultTechniqueModel;
 import de.javagl.jgltf.model.gl.impl.DefaultTechniqueParametersModel;
 import de.javagl.jgltf.model.gl.impl.TechniqueStatesModels;
+import de.javagl.jgltf.model.impl.DefaultPbrMaterialModel;
 import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.model.io.IO;
-import de.javagl.jgltf.model.v2.MaterialModelV2;
 
 /**
  * A class for creating the {@link RenderedMaterial} instances for glTF 2.0
- * {@link MaterialModelV2} objects.<br>
+ * {@link DefaultPbrMaterialModel} objects.<br>
  * <br>
  * It will lazily create the internal {@link TechniqueModel}, 
  * {@link ProgramModel} and {@link ShaderModel} instances that 
@@ -246,14 +249,14 @@ class RenderedMaterialHandler
 
     /**
      * Create a {@link RenderedMaterial} instance for the given 
-     * {@link MaterialModelV2}
+     * {@link DefaultPbrMaterialModel}
      * 
-     * @param material The {@link MaterialModelV2}
+     * @param material The {@link DefaultPbrMaterialModel}
      * @param numJoints The number of joints
      * @return The {@link RenderedMaterial}
      */
     RenderedMaterial createRenderedMaterial(
-        MaterialModelV2 material, int numJoints)
+        DefaultPbrMaterialModel material, int numJoints)
     {
         MaterialStructure materialStructure = 
             new MaterialStructure(material, numJoints);
@@ -271,6 +274,7 @@ class RenderedMaterialHandler
             values.put("isDoubleSided", 0);
         }
         
+        
         TextureModel baseColorTexture = 
             material.getBaseColorTexture();
         if (baseColorTexture != null)
@@ -284,8 +288,15 @@ class RenderedMaterialHandler
         {
             values.put("hasBaseColorTexture", 0);
         }
-        double[] baseColorFactor = material.getBaseColorFactor();
-        values.put("baseColorFactor", baseColorFactor);
+
+        double[] baseColorFactor = new double[] { 1.0, 1.0, 1.0, 1.0 };
+        PbrMetallicRoughnessModel pbrMetallicRoughness = 
+            material.getPbrMetallicRoughnessModel();
+        if (pbrMetallicRoughness != null)
+        {
+            baseColorFactor = pbrMetallicRoughness.getBaseColorFactor();
+            values.put("baseColorFactor", baseColorFactor);
+        }
         
         
         TextureModel metallicRoughnessTexture = 
@@ -301,10 +312,14 @@ class RenderedMaterialHandler
         {
             values.put("hasMetallicRoughnessTexture", 0);
         }
-        double metallicFactor = material.getMetallicFactor();
+        double metallicFactor = 1.0;
+        double roughnessFactor = 1.0;
+        if (pbrMetallicRoughness != null)
+        {
+            metallicFactor = pbrMetallicRoughness.getMetallicFactor();
+            roughnessFactor = pbrMetallicRoughness.getRoughnessFactor();
+        }
         values.put("metallicFactor", metallicFactor);
-        
-        double roughnessFactor = material.getRoughnessFactor();
         values.put("roughnessFactor", roughnessFactor);
         
         
@@ -317,7 +332,9 @@ class RenderedMaterialHandler
                 materialStructure.getNormalTexCoordSemantic());
             values.put("normalTexture", normalTexture);
             
-            double normalScale = material.getNormalScale();
+            NormalTextureInfoModel normalTextureInfo = 
+                material.getNormalTextureInfoModel();
+            double normalScale = normalTextureInfo.getScale();
             values.put("normalScale", normalScale);
         }
         else
@@ -335,7 +352,9 @@ class RenderedMaterialHandler
                 materialStructure.getOcclusionTexCoordSemantic());
             values.put("occlusionTexture", occlusionTexture);
             
-            double occlusionStrength = material.getOcclusionStrength();
+            OcclusionTextureInfoModel occlusionTextureInfo = 
+                material.getOcclusionTextureInfoModel();
+            double occlusionStrength = occlusionTextureInfo.getStrength();
             values.put("occlusionStrength", occlusionStrength);
         }
         else

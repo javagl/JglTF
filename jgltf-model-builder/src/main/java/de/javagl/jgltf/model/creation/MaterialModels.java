@@ -30,8 +30,8 @@ import java.awt.image.BufferedImage;
 
 import de.javagl.jgltf.model.MaterialModel;
 import de.javagl.jgltf.model.TextureModel;
+import de.javagl.jgltf.model.impl.DefaultPbrMaterialModel;
 import de.javagl.jgltf.model.impl.DefaultTextureModel;
-import de.javagl.jgltf.model.v2.MaterialModelV2;
 
 /**
  * Methods related to {@link MaterialModel} instances
@@ -48,14 +48,14 @@ public class MaterialModels
      * @param a The alpha component
      * @return The material model
      */
-    public static MaterialModelV2 createFromBaseColor(
+    public static DefaultPbrMaterialModel createFromBaseColor(
         double r, double g, double b, double a)
     {
         MaterialBuilder builder = MaterialBuilder.create();
         builder.setBaseColorFactor(r, g, b, a);
         builder.setDoubleSided(true);
         builder.setMetallicRoughnessFactors(0.0, 1.0);
-        MaterialModelV2 result = builder.build();
+        DefaultPbrMaterialModel result = builder.build();
         return result;
     }
 
@@ -67,14 +67,14 @@ public class MaterialModels
      * @param texCoord The optional texture coordinate index
      * @return The material model
      */
-    public static MaterialModelV2 createFromBaseColorTexture(
+    public static DefaultPbrMaterialModel createFromBaseColorTexture(
         TextureModel baseColorTexture, Integer texCoord)
     {
         MaterialBuilder builder = MaterialBuilder.create();
         builder.setBaseColorTexture(baseColorTexture, texCoord);
         builder.setDoubleSided(true);
         builder.setMetallicRoughnessFactors(0.0, 1.0);
-        MaterialModelV2 result = builder.build();
+        DefaultPbrMaterialModel result = builder.build();
         return result;
     }
     
@@ -87,14 +87,14 @@ public class MaterialModels
      * @param uri The URI for the image
      * @return The material model
      */
-    public static MaterialModelV2 createFromImageFile(
+    public static DefaultPbrMaterialModel createFromImageFile(
         String imageFileName, String uri) 
     {
         MaterialBuilder builder = MaterialBuilder.create();
         builder.setBaseColorTexture(imageFileName, uri, null);
         builder.setDoubleSided(true);
         builder.setMetallicRoughnessFactors(0.0, 1.0);
-        MaterialModelV2 result = builder.build();
+        DefaultPbrMaterialModel result = builder.build();
         return result;
     }
     
@@ -108,7 +108,7 @@ public class MaterialModels
      * @param mimeType The MIME type of the image
      * @return The material model
      */
-    public static MaterialModelV2 createFromBufferedImage(
+    public static DefaultPbrMaterialModel createFromBufferedImage(
         BufferedImage bufferedImage, String uri, String mimeType) 
     {
         DefaultTextureModel baseColorTexture = 
@@ -117,7 +117,7 @@ public class MaterialModels
         builder.setBaseColorTexture(baseColorTexture, null);
         builder.setDoubleSided(true);
         builder.setMetallicRoughnessFactors(0.0, 1.0);
-        MaterialModelV2 result = builder.build();
+        DefaultPbrMaterialModel result = builder.build();
         return result;
     }
     

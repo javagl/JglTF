@@ -56,9 +56,9 @@ import de.javagl.jgltf.model.gl.impl.DefaultShaderModel;
 import de.javagl.jgltf.model.gl.impl.DefaultTechniqueModel;
 import de.javagl.jgltf.model.gl.impl.DefaultTechniqueParametersModel;
 import de.javagl.jgltf.model.gl.impl.DefaultTechniqueStatesModel;
+import de.javagl.jgltf.model.impl.DefaultTechniqueMaterialModel;
 import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.model.io.IO;
-import de.javagl.jgltf.model.v1.MaterialModelV1;
 
 /**
  * A class containing the default {@link TechniqueModel} and 
@@ -96,7 +96,7 @@ public class DefaultModels
     /**
      * The default {@link MaterialModel}
      */
-    private static final MaterialModelV1 DEFAULT_MATERIAL_MODEL;
+    private static final DefaultTechniqueMaterialModel DEFAULT_MATERIAL_MODEL;
     
     static
     {
@@ -144,7 +144,7 @@ public class DefaultModels
 
         // Create a model for the default material
         Material material = GltfDefaults.getDefaultMaterial();
-        DEFAULT_MATERIAL_MODEL = new MaterialModelV1();
+        DEFAULT_MATERIAL_MODEL = new DefaultTechniqueMaterialModel();
         DEFAULT_MATERIAL_MODEL.setValues(material.getValues());
         DEFAULT_MATERIAL_MODEL.setTechniqueModel(DEFAULT_TECHNIQUE_MODEL);
     }
