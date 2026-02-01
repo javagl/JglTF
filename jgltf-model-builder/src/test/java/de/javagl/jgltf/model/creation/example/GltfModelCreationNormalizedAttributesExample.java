@@ -7,16 +7,25 @@ import java.awt.RenderingHints;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
 
 import de.javagl.jgltf.impl.v2.GlTF;
+import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.GltfModel;
-import de.javagl.jgltf.model.PbrMaterialModel;
+import de.javagl.jgltf.model.Quantization;
 import de.javagl.jgltf.model.SceneModel;
+import de.javagl.jgltf.model.creation.AccessorModels;
 import de.javagl.jgltf.model.creation.GltfModelBuilder;
 import de.javagl.jgltf.model.creation.MaterialModels;
-import de.javagl.jgltf.model.creation.MeshPrimitiveModels;
+import de.javagl.jgltf.model.creation.MeshPrimitiveBuilder;
 import de.javagl.jgltf.model.creation.SceneModels;
+import de.javagl.jgltf.model.impl.DefaultAccessorModel;
 import de.javagl.jgltf.model.impl.DefaultMeshPrimitiveModel;
+import de.javagl.jgltf.model.impl.DefaultPbrMaterialModel;
+import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.model.io.GltfWriter;
 import de.javagl.jgltf.model.io.v2.GltfAssetV2;
 import de.javagl.jgltf.model.io.v2.GltfAssetsV2;
@@ -25,7 +34,7 @@ import de.javagl.jgltf.model.io.v2.GltfAssetsV2;
  * A basic example for the glTF model creation.
  */
 @SuppressWarnings("javadoc")
-public class GltfModelCreationTextureExample
+public class GltfModelCreationNormalizedAttributesExample
 {
     public static void main(String[] args) throws Exception
     {
@@ -62,8 +71,27 @@ public class GltfModelCreationTextureExample
             0.0f, 0.0f,
             1.0f, 0.0f,
         };
-        DefaultMeshPrimitiveModel meshPrimitiveModel = 
-            MeshPrimitiveModels.create(indices, positions, normals, texCoords);
+        
+        // Create a mesh primitive, adding the indices, positions, and
+        // normals from the given array
+        MeshPrimitiveBuilder builder = MeshPrimitiveBuilder.create();
+        builder.setTriangles();
+        builder.setIntIndicesAsShort(IntBuffer.wrap(indices));
+        builder.addPositions3D(FloatBuffer.wrap(positions));
+        builder.addNormals3D(FloatBuffer.wrap(normals));
+        
+        // Quantize the texture coordinates into unsigned short values,
+        // create an accessor model, and assign it to the mesh primitive
+        FloatBuffer texCoordsBuffer = FloatBuffer.wrap(texCoords);
+        ShortBuffer texCoordsQuantized = 
+            Quantization.quantizeToUnsignedShortBuffer(texCoordsBuffer);
+        ByteBuffer texCoordsData = 
+            Buffers.createByteBufferFrom(texCoordsQuantized);
+        DefaultAccessorModel texCoordsAccessor = AccessorModels.create(
+            GltfConstants.GL_UNSIGNED_SHORT, "VEC2", true, texCoordsData);
+        builder.addAttribute("TEXCOORD_0", texCoordsAccessor);
+
+        DefaultMeshPrimitiveModel meshPrimitiveModel = builder.build();
         
         // Create a material from a buffered image
         BufferedImage bufferedImage = createTextureImage();
