@@ -31,6 +31,8 @@ import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.Locale;
 
+import de.javagl.jgltf.model.io.Buffers;
+
 /**
  * A class for accessing the data that is described by an accessor.
  * It allows accessing the byte buffer of the buffer view of the
@@ -292,7 +294,7 @@ public final class AccessorIntData
             int component = get(i);
             result.putInt(component);
         }
-        result.position(0);
+        Buffers.position(result, 0);
         return result;
     }
     
