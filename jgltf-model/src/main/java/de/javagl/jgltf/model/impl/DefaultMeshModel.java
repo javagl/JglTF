@@ -118,6 +118,10 @@ public class DefaultMeshModel extends AbstractNamedModelElement
     {
         removeExtensionModelElements(modelElementsToRemove);
         meshPrimitiveModels.removeAll(modelElementsToRemove);
+        for (MeshPrimitiveModel meshPrimitiveModel : meshPrimitiveModels)
+        {
+            meshPrimitiveModel.removeModelElements(modelElementsToRemove);
+        }
         return meshPrimitiveModels.isEmpty();
     }
     

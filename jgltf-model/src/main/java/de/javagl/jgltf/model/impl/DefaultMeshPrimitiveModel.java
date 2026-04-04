@@ -102,6 +102,17 @@ public final class DefaultMeshPrimitiveModel extends AbstractModelElement
     }
     
     /**
+     * Remove the specified {@link AccessorModel} from the attributes
+     * 
+     * @param name The name of the attribute
+     * @return The removed {@link AccessorModel}, or <code>null</code>
+     */
+    public AccessorModel removeAttribute(String name) 
+    {
+        return attributes.remove(name);
+    }
+    
+    /**
      * Set the {@link AccessorModel} for the indices 
      * 
      * @param indices The indices

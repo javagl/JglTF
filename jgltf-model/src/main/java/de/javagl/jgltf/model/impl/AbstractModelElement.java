@@ -253,13 +253,13 @@ public abstract class AbstractModelElement implements ModelElement
     }
     
     
-//    @Override
-//    public boolean removeModelElements(
-//        Collection<? extends ModelElement> modelElementsToRemove)
-//    {
-//        System.out.println("XXX DEFAULT IMPLEMENTATION OF removeModelElements FOR "+this);
-//        return false;
-//    }
+    @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove)
+    {
+        System.out.println("XXX DEFAULT IMPLEMENTATION OF removeModelElements FOR "+this);
+        return false;
+    }
     // TODO to be called at the start of removeModelElements
     protected final void removeExtensionModelElements(
         Collection<? extends ModelElement> modelElementsToRemove)
