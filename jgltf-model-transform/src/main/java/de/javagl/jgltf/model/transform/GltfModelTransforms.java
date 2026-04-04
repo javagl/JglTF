@@ -55,8 +55,7 @@ public class GltfModelTransforms
      */
     public static void prune(DefaultGltfModel gltfModel)
     {
-        GltfModelPruner.prune(gltfModel, null);
-        rebuildBufferStructure(gltfModel);
+        removeAll(gltfModel, null);
     }
 
     /**
@@ -72,10 +71,28 @@ public class GltfModelTransforms
     public static void removeAll(DefaultGltfModel gltfModel,
         Collection<? extends ModelElement> toRemove)
     {
+        GltfModelElementCollector c = new GltfModelElementCollector();
+        c.process(gltfModel);
         GltfModelPruner.prune(gltfModel, toRemove);
         rebuildBufferStructure(gltfModel);
     }
 
+    /**
+     * Revalidate the given glTF model.
+     * 
+     * This will ensure that the top-level lists of the model and the buffer
+     * structure take into account any accessors or images that have been
+     * added to model elements.  
+     * 
+     * @param gltfModel The glTF model
+     */
+    public static void revalidate(DefaultGltfModel gltfModel)
+    {
+        GltfModelElementCollector c = new GltfModelElementCollector();
+        c.process(gltfModel);
+        rebuildBufferStructure(gltfModel);
+    }
+    
     /**
      * Rebuild the buffer structure for the given glTF model.
      * 
@@ -86,7 +103,7 @@ public class GltfModelTransforms
      * 
      * @param gltfModel The glTF model
      */
-    public static void rebuildBufferStructure(DefaultGltfModel gltfModel)
+    private static void rebuildBufferStructure(DefaultGltfModel gltfModel)
     {
         BufferBuilderStrategy bbs = BufferBuilderStrategies.createDefault();
 

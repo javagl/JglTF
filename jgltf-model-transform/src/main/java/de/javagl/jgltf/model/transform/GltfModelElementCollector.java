@@ -180,6 +180,8 @@ class GltfModelElementCollector
      */
     void process(DefaultGltfModel gltfModel)
     {
+        logger.info("Collecting elements in glTF model...");
+
         this.gltfModel = gltfModel;
         this.processed.clear();
 
@@ -209,6 +211,8 @@ class GltfModelElementCollector
         this.accessorModelsSet.addAll(gltfModel.getAccessorModels());
 
         addModelElement(gltfModel);
+        
+        logger.info("Collecting elements in glTF model DONE");
     }
 
     /**

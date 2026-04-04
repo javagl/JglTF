@@ -68,13 +68,6 @@ class GltfModelPruner
     {
         Level level = Level.INFO;
 
-        logger.info("Collecting elements in glTF model...");
-
-        GltfModelElementCollector c = new GltfModelElementCollector();
-        c.process(gltfModel);
-
-        logger.info("Collecting elements in glTF model DONE");
-        
         logger.info("Building model graph...");
 
         ModelGraph g = ModelGraphs.build(gltfModel);
