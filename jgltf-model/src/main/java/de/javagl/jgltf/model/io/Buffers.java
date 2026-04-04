@@ -27,6 +27,7 @@
 package de.javagl.jgltf.model.io;
 
 import java.io.InputStream;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.DoubleBuffer;
@@ -109,16 +110,16 @@ public class Buffers
                     "The new limit is " + newLimit + ", but the capacity is "
                     + byteBuffer.capacity());
             }
-            byteBuffer.limit(newLimit);
-            byteBuffer.position(position);
+            Buffers.limit(byteBuffer, newLimit);
+            Buffers.position(byteBuffer, position);
             ByteBuffer slice = byteBuffer.slice();
             slice.order(byteBuffer.order());
             return slice;
         }
         finally
         {
-            byteBuffer.limit(oldLimit);
-            byteBuffer.position(oldPosition);
+            Buffers.limit(byteBuffer, oldLimit);
+            Buffers.position(byteBuffer, oldPosition);
         }
     }
     
@@ -148,7 +149,7 @@ public class Buffers
         ByteBuffer byteBuffer = ByteBuffer.allocateDirect(length);
         byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
         byteBuffer.put(data, offset, length);
-        byteBuffer.position(0);
+        Buffers.position(byteBuffer, 0);
         return byteBuffer;
     }
     
@@ -208,7 +209,7 @@ public class Buffers
         {
             newByteBuffer.put(byteBuffer.slice());
         }
-        newByteBuffer.position(0);
+        Buffers.position(newByteBuffer, 0);
         return newByteBuffer;
     }
     
@@ -373,6 +374,93 @@ public class Buffers
         }
     }
     
+    //=========================================================================
+    // The following methods are intended for handling an incompatibility 
+    // between Java 8 and later Java versions: The return type of these
+    // methods on the 'Buffer' class has changed, which can lead to
+    // a NoSuchMethodError when calling these methods on the return
+    // value of another call. The best summary that I found for this is
+    // in https://issues.apache.org/jira/browse/MRESOLVER-85 
+    
+    /**
+     * Calls 'buffer.position(newPosition)'
+     * 
+     * @param buffer The buffer
+     * @param newPosition The new position
+     * @return The buffer
+     */
+    public static Buffer position(Buffer buffer, int newPosition)
+    {
+        return buffer.position(newPosition);
+    }
+    
+    /**
+     * Calls 'buffer.limit(newLimit)'
+     * 
+     * @param buffer The buffer
+     * @param newLimit The new limit
+     * @return The buffer
+     */
+    public static Buffer limit(Buffer buffer, int newLimit)
+    {
+        return buffer.limit(newLimit);
+    }
+    
+    /**
+     * Calls 'buffer.flip()'
+     * 
+     * @param buffer The buffer
+     * @return The buffer
+     */
+    public static Buffer flip(Buffer buffer)
+    {
+        return buffer.flip();
+    }
+    
+    /**
+     * Calls 'buffer.clear()'
+     * 
+     * @param buffer The buffer
+     * @return The buffer
+     */
+    public static Buffer clear(Buffer buffer)
+    {
+        return buffer.clear();
+    }
+    
+    /**
+     * Calls 'buffer.mark()'
+     * 
+     * @param buffer The buffer
+     * @return The buffer
+     */
+    public static Buffer mark(Buffer buffer)
+    {
+        return buffer.mark();
+    }
+
+    /**
+     * Calls 'buffer.reset()'
+     * 
+     * @param buffer The buffer
+     * @return The buffer
+     */
+    public static Buffer reset(Buffer buffer)
+    {
+        return buffer.reset();
+    }
+    
+    /**
+     * Calls 'buffer.rewind()'
+     * 
+     * @param buffer The buffer
+     * @return The buffer
+     */
+    public static Buffer rewind(Buffer buffer)
+    {
+        return buffer.rewind();
+    }
+
     /**
      * Private constructor to prevent instantiation
      */
