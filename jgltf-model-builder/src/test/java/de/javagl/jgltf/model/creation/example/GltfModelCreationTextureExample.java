@@ -10,13 +10,13 @@ import java.io.IOException;
 
 import de.javagl.jgltf.impl.v2.GlTF;
 import de.javagl.jgltf.model.GltfModel;
-import de.javagl.jgltf.model.PbrMaterialModel;
 import de.javagl.jgltf.model.SceneModel;
 import de.javagl.jgltf.model.creation.GltfModelBuilder;
 import de.javagl.jgltf.model.creation.MaterialModels;
 import de.javagl.jgltf.model.creation.MeshPrimitiveModels;
 import de.javagl.jgltf.model.creation.SceneModels;
 import de.javagl.jgltf.model.impl.DefaultMeshPrimitiveModel;
+import de.javagl.jgltf.model.impl.DefaultPbrMaterialModel;
 import de.javagl.jgltf.model.io.GltfWriter;
 import de.javagl.jgltf.model.io.v2.GltfAssetV2;
 import de.javagl.jgltf.model.io.v2.GltfAssetsV2;
