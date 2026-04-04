@@ -45,6 +45,11 @@
 /jgltf-model-transform/.project
 /jgltf-model-transform/target
 
+/jgltf-model-extensions/.classpath
+/jgltf-model-extensions/.settings
+/jgltf-model-extensions/.project
+/jgltf-model-extensions/target
+
 # ---
 
 /jgltf-impl-v2-ext-mesh-gpu-instancing/.classpath
