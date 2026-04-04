@@ -155,7 +155,7 @@ final class BinaryAssetCreatorV1
                 return shader.getShaderData(); 
             },
             binaryGltfByteBuffer);
-        binaryGltfByteBuffer.position(0);
+        Buffers.position(binaryGltfByteBuffer, 0);
 
         // For all existing BufferViews, create new ones that are updated to 
         // refer to the new binary glTF buffer, with the appropriate offset
