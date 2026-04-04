@@ -106,6 +106,7 @@ import java.nio.charset.Charset;
 import java.util.logging.Logger;
 
 import de.javagl.jgltf.model.GltfConstants;
+import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.viewer.GlContext;
 
 /**
@@ -151,10 +152,10 @@ class GlContextLwjgl implements GlContext
                 .order(ByteOrder.nativeOrder())
                 .asIntBuffer();
         }
-        uniformIntBuffer.position(0);
-        uniformIntBuffer.limit(uniformIntBuffer.capacity());
+        Buffers.position(uniformIntBuffer, 0);
+        Buffers.limit(uniformIntBuffer, uniformIntBuffer.capacity());
         uniformIntBuffer.put(value);
-        uniformIntBuffer.flip();
+        Buffers.flip(uniformIntBuffer);
         return uniformIntBuffer;
     }
 
@@ -176,10 +177,10 @@ class GlContextLwjgl implements GlContext
                 .order(ByteOrder.nativeOrder())
                 .asFloatBuffer();
         }
-        uniformFloatBuffer.position(0);
-        uniformFloatBuffer.limit(uniformFloatBuffer.capacity());
+        Buffers.position(uniformFloatBuffer, 0);
+        Buffers.limit(uniformFloatBuffer, uniformFloatBuffer.capacity());
         uniformFloatBuffer.put(value);
-        uniformFloatBuffer.flip();
+        Buffers.flip(uniformFloatBuffer);
         return uniformFloatBuffer;
     }
 
@@ -465,7 +466,7 @@ class GlContextLwjgl implements GlContext
         int glBufferView = glGenBuffers();
         glBindBuffer(target, glBufferView);
         ByteBuffer data = bufferViewData.slice();
-        data.limit(byteLength);
+        Buffers.limit(data, byteLength);
         glBufferData(target, bufferViewData, GL_STATIC_DRAW);
         return glBufferView;
     }
