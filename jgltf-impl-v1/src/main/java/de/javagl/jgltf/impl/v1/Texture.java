@@ -65,17 +65,12 @@ public class Texture
      * Valid values: [6406, 6407, 6408, 6409, 6410] 
      * 
      * @param format The format to set
-     * @throws IllegalArgumentException If the given value does not meet
-     * the given constraints
      * 
      */
     public void setFormat(Integer format) {
         if (format == null) {
             this.format = format;
             return ;
-        }
-        if (((((format!= 6406)&&(format!= 6407))&&(format!= 6408))&&(format!= 6409))&&(format!= 6410)) {
-            throw new IllegalArgumentException((("Invalid value for format: "+ format)+", valid: [6406, 6407, 6408, 6409, 6410]"));
         }
         this.format = format;
     }
@@ -109,17 +104,12 @@ public class Texture
      * Valid values: [6406, 6407, 6408, 6409, 6410] 
      * 
      * @param internalFormat The internalFormat to set
-     * @throws IllegalArgumentException If the given value does not meet
-     * the given constraints
      * 
      */
     public void setInternalFormat(Integer internalFormat) {
         if (internalFormat == null) {
             this.internalFormat = internalFormat;
             return ;
-        }
-        if (((((internalFormat!= 6406)&&(internalFormat!= 6407))&&(internalFormat!= 6408))&&(internalFormat!= 6409))&&(internalFormat!= 6410)) {
-            throw new IllegalArgumentException((("Invalid value for internalFormat: "+ internalFormat)+", valid: [6406, 6407, 6408, 6409, 6410]"));
         }
         this.internalFormat = internalFormat;
     }
@@ -201,17 +191,12 @@ public class Texture
      * Valid values: [3553] 
      * 
      * @param target The target to set
-     * @throws IllegalArgumentException If the given value does not meet
-     * the given constraints
      * 
      */
     public void setTarget(Integer target) {
         if (target == null) {
             this.target = target;
             return ;
-        }
-        if (target!= 3553) {
-            throw new IllegalArgumentException((("Invalid value for target: "+ target)+", valid: [3553]"));
         }
         this.target = target;
     }
@@ -245,17 +230,12 @@ public class Texture
      * Valid values: [5121, 33635, 32819, 32820] 
      * 
      * @param type The type to set
-     * @throws IllegalArgumentException If the given value does not meet
-     * the given constraints
      * 
      */
     public void setType(Integer type) {
         if (type == null) {
             this.type = type;
             return ;
-        }
-        if ((((type!= 5121)&&(type!= 33635))&&(type!= 32819))&&(type!= 32820)) {
-            throw new IllegalArgumentException((("Invalid value for type: "+ type)+", valid: [5121, 33635, 32819, 32820]"));
         }
         this.type = type;
     }

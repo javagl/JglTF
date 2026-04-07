@@ -73,17 +73,12 @@ public class AnimationSampler
      * Valid values: [LINEAR] 
      * 
      * @param interpolation The interpolation to set
-     * @throws IllegalArgumentException If the given value does not meet
-     * the given constraints
      * 
      */
     public void setInterpolation(String interpolation) {
         if (interpolation == null) {
             this.interpolation = interpolation;
             return ;
-        }
-        if (!"LINEAR".equals(interpolation)) {
-            throw new IllegalArgumentException((("Invalid value for interpolation: "+ interpolation)+", valid: [LINEAR]"));
         }
         this.interpolation = interpolation;
     }
