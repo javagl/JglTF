@@ -123,8 +123,11 @@ public class ExtensionModels
                 logger.info("  converted implementation " + impl);
                 logger.info("  to model                 " + extensionModel);
                 
-                abstractModelElement.addExtensionModel(extensionName,
-                    extensionModel);
+                if (extensionModel != null)
+                {
+                    abstractModelElement.addExtensionModel(extensionName,
+                        extensionModel);
+                }
             }
         }
     }
