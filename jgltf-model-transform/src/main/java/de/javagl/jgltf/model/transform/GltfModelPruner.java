@@ -151,7 +151,7 @@ class GltfModelPruner
             if (logger.isLoggable(level))
             {
                 logger.log(level,
-                    createString("Total elements to removel", currentToRemove));
+                    createString("Total elements to remove:", currentToRemove));
             }
 
             allRemoved.addAll(currentToRemove);
