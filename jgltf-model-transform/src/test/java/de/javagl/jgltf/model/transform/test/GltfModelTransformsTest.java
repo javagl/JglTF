@@ -14,7 +14,6 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import de.javagl.jgltf.model.ModelElement;
-import de.javagl.jgltf.model.impl.DefaultAccessorModel;
 import de.javagl.jgltf.model.impl.DefaultGltfModel;
 import de.javagl.jgltf.model.impl.DefaultMeshModel;
 import de.javagl.jgltf.model.impl.DefaultMeshPrimitiveModel;
@@ -42,9 +41,11 @@ public class GltfModelTransformsTest
     public static void main(String[] args) throws IOException
     {
         LoggerUtil.initLogging();
-        //testRemoveTexture();
-        //testRemoveTexCoordAccessor();
+        testRemoveTexture();
+        testRemoveTexCoordAccessor();
+        testRemoveMaterial();
         testAddTexture();
+        testRemoveAnimationValuesAccessor();
     }
 
     /**
@@ -82,7 +83,7 @@ public class GltfModelTransformsTest
 
         runTest(gltfModel, name, modifiedName, () -> 
         {
-            // Removing the TEXCOORDS accessor will make the assed invalid
+            // Removing the TEXCOORDS accessor will make the asset invalid
             // because the material requires texture coordinates. Set the
             // material to null explicitly.
             DefaultMeshModel m0 = gltfModel.getMeshModel(0);
@@ -90,15 +91,34 @@ public class GltfModelTransformsTest
                 (DefaultMeshPrimitiveModel) m0.getMeshPrimitiveModels().get(0);
             m0p0.setMaterialModel(null);
             
-            DefaultAccessorModel am2 = gltfModel.getAccessorModel(2);
+            ModelElement am2 = gltfModel.getAccessorModel(2);
             Set<ModelElement> toRemove = new LinkedHashSet<ModelElement>();
             toRemove.add(am2);
             GltfModelTransforms.removeAll(gltfModel, toRemove);
         });
     }
 
-    
+    /**
+     * Run a test to remove a material
+     *  
+     * @throws IOException If an IO error occurs
+     */
+    private static void testRemoveMaterial() throws IOException
+    {
+        String name = "TexturedSquare";
+        String modifiedName = name + "-removedMaterial";
+        DefaultGltfModel gltfModel =
+            GltfTestModelCreation.createTexturedSquare();
 
+        runTest(gltfModel, name, modifiedName, () -> 
+        {
+            ModelElement mm0 = gltfModel.getMaterialModel(0);
+            Set<ModelElement> toRemove = new LinkedHashSet<ModelElement>();
+            toRemove.add(mm0);
+            GltfModelTransforms.removeAll(gltfModel, toRemove);
+        });
+    }
+    
     /**
      * Run a test to remove a texture
      * 
@@ -121,6 +141,28 @@ public class GltfModelTransformsTest
             m0p0.setMaterialModel(materialModel);
             
             GltfModelTransforms.revalidate(gltfModel);
+        });
+    }
+    
+    
+    /**
+     * Run a test to remove an animation values accessor
+     * 
+     * @throws IOException If an IO error occurs
+     */
+    private static void testRemoveAnimationValuesAccessor() throws IOException
+    {
+        String name = "AnimatedSquare";
+        String modifiedName = name + "-removedAnimationValues";
+        DefaultGltfModel gltfModel =
+            GltfTestModelCreation.createAnimatedSquare();
+
+        runTest(gltfModel, name, modifiedName, () -> 
+        {
+            ModelElement am3 = gltfModel.getAccessorModel(3);
+            Set<ModelElement> toRemove = new LinkedHashSet<ModelElement>();
+            toRemove.add(am3);
+            GltfModelTransforms.removeAll(gltfModel, toRemove);
         });
     }
     
