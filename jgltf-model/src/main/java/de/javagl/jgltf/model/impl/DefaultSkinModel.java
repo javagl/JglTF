@@ -197,6 +197,7 @@ public final class DefaultSkinModel extends AbstractNamedModelElement
             {
                 joints.clear();
                 removeThis = true;
+                break;
             }
         }
         if (modelElementsToRemove.contains(skeleton))
