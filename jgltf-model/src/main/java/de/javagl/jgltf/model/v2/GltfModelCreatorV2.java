@@ -1138,9 +1138,12 @@ public class GltfModelCreatorV2
             }
             
             Integer inverseBindMatricesIndex = skin.getInverseBindMatrices();
-            AccessorModel inverseBindMatrices = 
-                gltfModel.getAccessorModel(inverseBindMatricesIndex);
-            skinModel.setInverseBindMatrices(inverseBindMatrices);
+            if (inverseBindMatricesIndex != null)
+            {
+                AccessorModel inverseBindMatrices = 
+                    gltfModel.getAccessorModel(inverseBindMatricesIndex);
+                skinModel.setInverseBindMatrices(inverseBindMatrices);
+            }
         }
     }
     

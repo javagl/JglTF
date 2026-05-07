@@ -124,8 +124,7 @@ public final class DefaultSkinModel extends AbstractNamedModelElement
      */
     public void setInverseBindMatrices(AccessorModel inverseBindMatrices)
     {
-        this.inverseBindMatrices = Objects.requireNonNull(
-            inverseBindMatrices, "The inverseBindMatrices may not be null");
+        this.inverseBindMatrices = inverseBindMatrices;
     }
     
 
