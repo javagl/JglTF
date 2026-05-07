@@ -110,6 +110,8 @@ public class GltfModelTransforms
         for (AccessorModel am : gltfModel.getAccessorModels())
         {
             DefaultAccessorModel dam = (DefaultAccessorModel) am;
+            // Reset any byte stride that may have been assigned previously
+            dam.setByteStride(dam.getElementSizeInBytes());
             dam.setBufferViewModel(null);
         }
         gltfModel.clearBufferModels();
