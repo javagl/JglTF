@@ -27,15 +27,17 @@
 package de.javagl.jgltf.obj.model;
 
 import de.javagl.jgltf.model.MaterialModel;
+import de.javagl.jgltf.model.PbrMaterialModel.AlphaMode;
 import de.javagl.jgltf.model.TextureModel;
-import de.javagl.jgltf.model.v2.MaterialModelV2;
-import de.javagl.jgltf.model.v2.MaterialModelV2.AlphaMode;
+import de.javagl.jgltf.model.impl.DefaultPbrMaterialModel;
+import de.javagl.jgltf.model.impl.DefaultPbrMetallicRoughnessModel;
+import de.javagl.jgltf.model.impl.DefaultTextureInfoModel;
 import de.javagl.obj.FloatTuple;
 import de.javagl.obj.Mtl;
 import de.javagl.obj.ReadableObj;
 
 /**
- * A class for providing {@link MaterialModelV2} instances that are used when
+ * A class for providing {@link DefaultPbrMaterialModel} instances that are used when
  * converting an OBJ into a glTF model.
  */
 class MtlMaterialHandlerV2 implements MtlMaterialHandler
@@ -65,7 +67,7 @@ class MtlMaterialHandlerV2 implements MtlMaterialHandler
         {
             return createMaterialWithTexture(mtl);
         }
-        MaterialModelV2 material = createMaterialWithColor(
+        DefaultPbrMaterialModel material = createMaterialWithColor(
             true, 0.75f, 0.75f, 0.75f);
         if (mtl == null)
         {
@@ -74,7 +76,7 @@ class MtlMaterialHandlerV2 implements MtlMaterialHandler
 
         // If there is an MTL, try to translate some of the MTL
         // information into reasonable PBR information
-        float baseColorFactor[] = new float[] { 1.0f, 1.0f, 1.0f, 1.0f };
+        double baseColorFactor[] = new double[] { 1.0f, 1.0f, 1.0f, 1.0f };
         FloatTuple ambientColor = mtl.getKd();
         if (ambientColor != null)
         {
@@ -91,13 +93,16 @@ class MtlMaterialHandlerV2 implements MtlMaterialHandler
                 material.setAlphaMode(AlphaMode.BLEND);
             }
         }
-        material.setBaseColorFactor(baseColorFactor);
-
+        
+        DefaultPbrMetallicRoughnessModel metallicRoughness = 
+            new DefaultPbrMetallicRoughnessModel();
+        metallicRoughness.setBaseColorFactor(baseColorFactor);
         Float shininess = mtl.getNs();
         if (shininess != null)
         {
-            material.setMetallicFactor(shininess / 128f);
+            metallicRoughness.setMetallicFactor(shininess / 128f);
         }
+        material.setPbrMetallicRoughnessModel(metallicRoughness);
 
         material.setDoubleSided(true);
         return material;
@@ -118,21 +123,35 @@ class MtlMaterialHandlerV2 implements MtlMaterialHandler
         TextureModel textureModel = 
             textureModelHandler.getTextureModel(imageUri);
         
-        MaterialModelV2 material = new MaterialModelV2();
-        material.setBaseColorTexture(textureModel);
-        material.setMetallicFactor(0.0f);
+        DefaultPbrMaterialModel material = new DefaultPbrMaterialModel();
+        DefaultPbrMetallicRoughnessModel metallicRoughness = 
+            new DefaultPbrMetallicRoughnessModel();
+        material.setPbrMetallicRoughnessModel(metallicRoughness);
+        
+        DefaultTextureInfoModel textureInfo = new DefaultTextureInfoModel();
+        textureInfo.setTextureModel(textureModel);
+        metallicRoughness.setBaseColorTexture(textureInfo);
+
+        metallicRoughness.setMetallicFactor(0.0f);
+        metallicRoughness.setRoughnessFactor(1.0f);
+        
         material.setDoubleSided(true);
         return material;
     }
     
     @Override
-    public MaterialModelV2 createMaterialWithColor(
-        boolean withNormals, float r, float g, float b)
+    public DefaultPbrMaterialModel createMaterialWithColor(
+        boolean withNormals, double r, double g, double b)
     {
-        MaterialModelV2 material = new MaterialModelV2();
-        material.setRoughnessFactor(0.0f);
-        material.setMetallicFactor(0.0f);
-        material.setBaseColorFactor(new float[] { r, g, b, 1.0f });
+        DefaultPbrMaterialModel material = new DefaultPbrMaterialModel();
+        
+        DefaultPbrMetallicRoughnessModel metallicRoughness = 
+            new DefaultPbrMetallicRoughnessModel();
+        material.setPbrMetallicRoughnessModel(metallicRoughness);
+
+        metallicRoughness.setMetallicFactor(0.0f);
+        metallicRoughness.setRoughnessFactor(1.0f);
+        metallicRoughness.setBaseColorFactor(new double[] { r, g, b, 1.0f });
         material.setDoubleSided(true);
         return material;
     }

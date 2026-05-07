@@ -14,11 +14,11 @@ import de.javagl.jgltf.model.creation.SceneModels;
 import de.javagl.jgltf.model.impl.DefaultGltfModel;
 import de.javagl.jgltf.model.impl.DefaultMeshModel;
 import de.javagl.jgltf.model.impl.DefaultMeshPrimitiveModel;
+import de.javagl.jgltf.model.impl.DefaultPbrMaterialModel;
 import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.model.io.GltfWriter;
 import de.javagl.jgltf.model.io.v2.GltfAssetV2;
 import de.javagl.jgltf.model.io.v2.GltfAssetsV2;
-import de.javagl.jgltf.model.v2.MaterialModelV2;
 
 /**
  * Basic tests and examples for the glTF model creation with morph targets
@@ -74,14 +74,14 @@ public class GltfModelCreationMorphTargetsExample
             meshPrimitiveBuilder.build();
 
         // Create a material, and assign it to the mesh primitive
-        MaterialModelV2 materialModel = 
+        DefaultPbrMaterialModel materialModel = 
             MaterialModels.createFromBaseColor(1.0f, 0.9f, 0.9f, 1.0f);
         meshPrimitiveModel.setMaterialModel(materialModel);
 
         // Create a mesh with the mesh primitive, assigning
         // the morph target weights
         DefaultMeshModel meshModel = new DefaultMeshModel();
-        meshModel.setWeights(new float[] { 0.0f, 0.25f } );
+        meshModel.setWeights(new double[] { 0.0f, 0.25f } );
         meshModel.addMeshPrimitiveModel(meshPrimitiveModel);
         
         // Create a scene that only contains the given mesh

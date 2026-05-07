@@ -57,9 +57,9 @@ import de.javagl.jgltf.model.gl.TechniqueParametersModel;
 import de.javagl.jgltf.model.gl.TechniqueStatesFunctionsModel;
 import de.javagl.jgltf.model.gl.TechniqueStatesModel;
 import de.javagl.jgltf.model.gl.impl.TechniqueStatesModels;
-import de.javagl.jgltf.model.v1.MaterialModelV1;
+import de.javagl.jgltf.model.impl.DefaultPbrMaterialModel;
+import de.javagl.jgltf.model.impl.DefaultTechniqueMaterialModel;
 import de.javagl.jgltf.model.v1.gl.DefaultModels;
-import de.javagl.jgltf.model.v2.MaterialModelV2;
 import de.javagl.jgltf.viewer.Morphing.MorphableAttribute;
 
 /**
@@ -147,7 +147,7 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
         Objects.requireNonNull(viewConfiguration,
             "The viewConfiguration may not be null");
 
-        float rtcCenter[] = CesiumRtcUtils.extractRtcCenterFromModel(gltfModel);
+        double rtcCenter[] = CesiumRtcUtils.extractRtcCenterFromModel(gltfModel);
         if (rtcCenter != null)
         {
             // NOTE: The RTC center is not really APPLIED here during 
@@ -279,25 +279,25 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
     {
         if (materialModel == null)
         {
-            MaterialModelV1 defaultMaterialModel = 
-                (MaterialModelV1) DefaultModels.getDefaultMaterialModel();
+            DefaultTechniqueMaterialModel defaultMaterialModel = 
+                (DefaultTechniqueMaterialModel) DefaultModels.getDefaultMaterialModel();
             TechniqueModel techniqueModel = 
                 defaultMaterialModel.getTechniqueModel();
             Map<String, Object> values = defaultMaterialModel.getValues();
             return new DefaultRenderedMaterial(techniqueModel, values);
         }
         
-        if (materialModel instanceof MaterialModelV1)
+        if (materialModel instanceof DefaultTechniqueMaterialModel)
         {
-            MaterialModelV1 materialModelV1 = (MaterialModelV1)materialModel;
+            DefaultTechniqueMaterialModel materialModelV1 = (DefaultTechniqueMaterialModel)materialModel;
             TechniqueModel techniqueModel = 
                 materialModelV1.getTechniqueModel();
             Map<String, Object> values = materialModelV1.getValues();
             return new DefaultRenderedMaterial(techniqueModel, values);
         }
-        if (materialModel instanceof MaterialModelV2)
+        if (materialModel instanceof DefaultPbrMaterialModel)
         {
-            MaterialModelV2 materialModelV2 = (MaterialModelV2)materialModel;
+            DefaultPbrMaterialModel DefaultPbrMaterialModel = (DefaultPbrMaterialModel)materialModel;
             SkinModel skinModel = nodeModel.getSkinModel();
             int numJoints = 0;
             if (skinModel != null)
@@ -305,7 +305,7 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
                 numJoints = skinModel.getJoints().size();
             }
             return materialModelHandler.createRenderedMaterial(
-                materialModelV2, numJoints);
+                DefaultPbrMaterialModel, numJoints);
         }
         logger.severe("Unknown material model type: " + materialModel);
         return null;

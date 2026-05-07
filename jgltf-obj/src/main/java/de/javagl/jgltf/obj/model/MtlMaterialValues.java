@@ -35,19 +35,19 @@ import java.util.Map;
 
 import de.javagl.jgltf.model.TextureModel;
 import de.javagl.jgltf.model.gl.TechniqueModel;
-import de.javagl.jgltf.model.v1.MaterialModelV1;
+import de.javagl.jgltf.model.impl.DefaultTechniqueMaterialModel;
 import de.javagl.obj.FloatTuple;
 import de.javagl.obj.FloatTuples;
 import de.javagl.obj.Mtl;
 
 /**
- * Methods to create the {@link MaterialModelV1#getValues() material values} 
+ * Methods to create the {@link DefaultTechniqueMaterialModel#getValues() material values} 
  * from an MTL
  */
 class MtlMaterialValues
 {
     /**
-     * Create the {@link MaterialModelV1#getValues() material values} for the 
+     * Create the {@link DefaultTechniqueMaterialModel#getValues() material values} for the 
      * given MTL data, matching to the {@link TechniqueModel} instances that
      * are contained in the {@link ObjTechniqueModels}
      * 
@@ -149,7 +149,7 @@ class MtlMaterialValues
      * @return The values
      */
     static Map<String, Object> createDefaultMaterialValues(
-        float r, float g, float b)
+        double r, double g, double b)
     {
         Map<String, Object> materialValues = 
             new LinkedHashMap<String, Object>();

@@ -59,9 +59,13 @@ import de.javagl.jgltf.model.MaterialModel;
 import de.javagl.jgltf.model.MeshModel;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
 import de.javagl.jgltf.model.NodeModel;
+import de.javagl.jgltf.model.NormalTextureInfoModel;
+import de.javagl.jgltf.model.OcclusionTextureInfoModel;
 import de.javagl.jgltf.model.Optionals;
+import de.javagl.jgltf.model.PbrMetallicRoughnessModel;
 import de.javagl.jgltf.model.SceneModel;
 import de.javagl.jgltf.model.SkinModel;
+import de.javagl.jgltf.model.TextureInfoModel;
 import de.javagl.jgltf.model.TextureModel;
 import de.javagl.jgltf.model.gl.ProgramModel;
 import de.javagl.jgltf.model.gl.ShaderModel;
@@ -90,12 +94,16 @@ import de.javagl.jgltf.model.impl.DefaultImageModel;
 import de.javagl.jgltf.model.impl.DefaultMeshModel;
 import de.javagl.jgltf.model.impl.DefaultMeshPrimitiveModel;
 import de.javagl.jgltf.model.impl.DefaultNodeModel;
+import de.javagl.jgltf.model.impl.DefaultNormalTextureInfoModel;
+import de.javagl.jgltf.model.impl.DefaultOcclusionTextureInfoModel;
+import de.javagl.jgltf.model.impl.DefaultPbrMaterialModel;
+import de.javagl.jgltf.model.impl.DefaultPbrMetallicRoughnessModel;
 import de.javagl.jgltf.model.impl.DefaultSceneModel;
 import de.javagl.jgltf.model.impl.DefaultSkinModel;
+import de.javagl.jgltf.model.impl.DefaultTechniqueMaterialModel;
+import de.javagl.jgltf.model.impl.DefaultTextureInfoModel;
 import de.javagl.jgltf.model.impl.DefaultTextureModel;
 import de.javagl.jgltf.model.v1.GltfModelV1;
-import de.javagl.jgltf.model.v1.MaterialModelV1;
-import de.javagl.jgltf.model.v2.MaterialModelV2;
 
 /**
  * A class for modifying the structure of a glTF model.<br>
@@ -240,14 +248,14 @@ public class GltfModelStructures
         {
             materialModelsMap = computeMapping(
                 source.getMaterialModels(),
-                MaterialModelV1::new,
+                DefaultTechniqueMaterialModel::new,
                 target::addMaterialModel);
         } 
         else
         {
             materialModelsMap = computeMapping(
                 source.getMaterialModels(),
-                MaterialModelV2::new,
+                DefaultPbrMaterialModel::new,
                 target::addMaterialModel);
         }
             
@@ -387,7 +395,7 @@ public class GltfModelStructures
     {
         if (this.target == null)
         {
-            throw new GltfException("The 'prepare' method has not bee called");
+            throw new GltfException("The 'prepare' method has not been called");
         }
         Level level = Level.FINE;
         if (logger.isLoggable(level)) 
@@ -604,7 +612,7 @@ public class GltfModelStructures
                         (DefaultMeshPrimitiveModel) sourceMeshPrimitiveModel);
                 targetMeshModel.addMeshPrimitiveModel(targetMeshPrimitiveModel);
             }
-            float[] weights = sourceMeshModel.getWeights();
+            double[] weights = sourceMeshModel.getWeights();
             targetMeshModel.setWeights(Optionals.clone(weights));
         }
     }
@@ -706,11 +714,11 @@ public class GltfModelStructures
             DefaultCameraModel targetCamera = cameraModelsMap.get(sourceCamera);
             targetNodeModel.setCameraModel(targetCamera);
 
-            float matrix[] = sourceNodeModel.getMatrix();
-            float translation[] = sourceNodeModel.getTranslation();
-            float rotation[] = sourceNodeModel.getRotation();
-            float scale[] = sourceNodeModel.getScale();
-            float weights[] = sourceNodeModel.getWeights();
+            double matrix[] = sourceNodeModel.getMatrix();
+            double translation[] = sourceNodeModel.getTranslation();
+            double rotation[] = sourceNodeModel.getRotation();
+            double scale[] = sourceNodeModel.getScale();
+            double weights[] = sourceNodeModel.getWeights();
             
             targetNodeModel.setMatrix(Optionals.clone(matrix));
             targetNodeModel.setTranslation(Optionals.clone(translation));
@@ -961,10 +969,10 @@ public class GltfModelStructures
         List<MaterialModel> sourceMaterialModels = source.getMaterialModels();
         for (int i = 0; i < sourceMaterialModels.size(); i++)
         {
-            MaterialModelV1 sourceMaterialModel = 
-                (MaterialModelV1) sourceMaterialModels.get(i);
-            MaterialModelV1 targetMaterialModel = 
-                (MaterialModelV1) materialModelsMap.get(sourceMaterialModel);
+            DefaultTechniqueMaterialModel sourceMaterialModel = 
+                (DefaultTechniqueMaterialModel) sourceMaterialModels.get(i);
+            DefaultTechniqueMaterialModel targetMaterialModel = 
+                (DefaultTechniqueMaterialModel) materialModelsMap.get(sourceMaterialModel);
             
             copyGltfChildOfRootPropertyElements(
                 sourceMaterialModel, targetMaterialModel);            
@@ -973,15 +981,15 @@ public class GltfModelStructures
     }
     
     /**
-     * Initialize the given {@link MaterialModelV1} based on the given
-     * {@link MaterialModelV1}
+     * Initialize the given {@link DefaultTechniqueMaterialModel} based on the given
+     * {@link DefaultTechniqueMaterialModel}
      * 
-     * @param sourceMaterialModel The source {@link MaterialModelV1}
-     * @param targetMaterialModel The target {@link MaterialModelV1}
+     * @param sourceMaterialModel The source {@link DefaultTechniqueMaterialModel}
+     * @param targetMaterialModel The target {@link DefaultTechniqueMaterialModel}
      */
     private void initMaterialModel(
-        MaterialModelV1 sourceMaterialModel,
-        MaterialModelV1 targetMaterialModel)
+        DefaultTechniqueMaterialModel sourceMaterialModel,
+        DefaultTechniqueMaterialModel targetMaterialModel)
     {
         TechniqueModel sourceTechniqueModel = 
             sourceMaterialModel.getTechniqueModel();
@@ -1028,10 +1036,10 @@ public class GltfModelStructures
         List<MaterialModel> sourceMaterialModels = source.getMaterialModels();
         for (int i = 0; i < sourceMaterialModels.size(); i++)
         {
-            MaterialModelV2 sourceMaterialModel = 
-                (MaterialModelV2) sourceMaterialModels.get(i);
-            MaterialModelV2 targetMaterialModel = 
-                (MaterialModelV2) materialModelsMap.get(sourceMaterialModel);
+            DefaultPbrMaterialModel sourceMaterialModel = 
+                (DefaultPbrMaterialModel) sourceMaterialModels.get(i);
+            DefaultPbrMaterialModel targetMaterialModel = 
+                (DefaultPbrMaterialModel) materialModelsMap.get(sourceMaterialModel);
             
             copyGltfChildOfRootPropertyElements(
                 sourceMaterialModel, targetMaterialModel);            
@@ -1040,88 +1048,125 @@ public class GltfModelStructures
     }
     
     /**
-     * Initialize the given {@link MaterialModelV2} based on the given
-     * {@link MaterialModelV2}
+     * Initialize the given {@link DefaultPbrMaterialModel} based on the given
+     * {@link DefaultPbrMaterialModel}
      * 
-     * @param sourceMaterialModel The source {@link MaterialModelV2}
-     * @param targetMaterialModel The target {@link MaterialModelV2}
+     * @param sourceMaterial The source {@link DefaultPbrMaterialModel}
+     * @param targetMaterial The target {@link DefaultPbrMaterialModel}
      */
     private void initMaterialModel(
-        MaterialModelV2 sourceMaterialModel, 
-        MaterialModelV2 targetMaterialModel)
+        DefaultPbrMaterialModel sourceMaterial, 
+        DefaultPbrMaterialModel targetMaterial)
     {
-        targetMaterialModel.setAlphaMode(
-            sourceMaterialModel.getAlphaMode());
-        targetMaterialModel.setAlphaCutoff(
-            sourceMaterialModel.getAlphaCutoff());
-        
-        targetMaterialModel.setDoubleSided(
-            sourceMaterialModel.isDoubleSided());
-        
-        TextureModel sourceBaseColorTexture = 
-            sourceMaterialModel.getBaseColorTexture();
-        DefaultTextureModel targetBaseColorTexture = 
-            textureModelsMap.get(sourceBaseColorTexture);
-        targetMaterialModel.setBaseColorTexture(
-            targetBaseColorTexture);
-        targetMaterialModel.setBaseColorTexcoord(
-            sourceMaterialModel.getBaseColorTexcoord());
-        
-        float[] baseColorFactor = sourceMaterialModel.getBaseColorFactor();
-        targetMaterialModel.setBaseColorFactor(
-            Optionals.clone(baseColorFactor));
+        targetMaterial.setAlphaMode(sourceMaterial.getAlphaMode());
+        targetMaterial.setAlphaCutoff(sourceMaterial.getAlphaCutoff());
 
-        TextureModel sourceMetallicRoughnessTexture = 
-            sourceMaterialModel.getMetallicRoughnessTexture();
-        DefaultTextureModel targetMetallicRoughnessTexture = 
-            textureModelsMap.get(sourceMetallicRoughnessTexture);
-        targetMaterialModel.setMetallicRoughnessTexture(
-            targetMetallicRoughnessTexture);
-        targetMaterialModel.setMetallicRoughnessTexcoord(
-            sourceMaterialModel.getMetallicRoughnessTexcoord());
+        targetMaterial.setDoubleSided(sourceMaterial.isDoubleSided());
 
-        targetMaterialModel.setMetallicFactor(
-            sourceMaterialModel.getMetallicFactor());
-        targetMaterialModel.setRoughnessFactor(
-            sourceMaterialModel.getRoughnessFactor());
+        PbrMetallicRoughnessModel sourcePbrMetallicRoughness =
+            sourceMaterial.getPbrMetallicRoughnessModel();
+        if (sourcePbrMetallicRoughness != null)
+        {
+            DefaultPbrMetallicRoughnessModel targetPbrMetallicRoughness =
+                new DefaultPbrMetallicRoughnessModel();
 
-        TextureModel sourceNormalTexture = 
-            sourceMaterialModel.getNormalTexture();
-        DefaultTextureModel targetNormalTexture = 
-            textureModelsMap.get(sourceNormalTexture);
-        targetMaterialModel.setNormalTexture(
-            targetNormalTexture);
-        targetMaterialModel.setNormalTexcoord(
-            sourceMaterialModel.getNormalTexcoord());
-        
-        targetMaterialModel.setNormalScale(
-            sourceMaterialModel.getNormalScale());
+            TextureInfoModel sourceBaseColorTextureInfo =
+                sourcePbrMetallicRoughness.getBaseColorTextureInfoModel();
+            if (sourceBaseColorTextureInfo != null)
+            {
+                TextureModel sourceBaseColorTexture =
+                    sourceBaseColorTextureInfo.getTextureModel();
 
-        TextureModel sourceOcclusionTexture = 
-            sourceMaterialModel.getOcclusionTexture();
-        DefaultTextureModel targetOcclusionTexture = 
-            textureModelsMap.get(sourceOcclusionTexture);
-        targetMaterialModel.setOcclusionTexture(
-            targetOcclusionTexture);
-        targetMaterialModel.setOcclusionTexcoord(
-            sourceMaterialModel.getOcclusionTexcoord());
-        
-        targetMaterialModel.setOcclusionStrength(
-            sourceMaterialModel.getOcclusionStrength());
-        
+                DefaultTextureModel targetBaseColorTexture =
+                    textureModelsMap.get(sourceBaseColorTexture);
 
-        TextureModel sourceEmissiveTexture = 
-            sourceMaterialModel.getEmissiveTexture();
-        DefaultTextureModel targetEmissiveTexture = 
-            textureModelsMap.get(sourceEmissiveTexture);
-        targetMaterialModel.setEmissiveTexture(
-            targetEmissiveTexture);
-        targetMaterialModel.setEmissiveTexcoord(
-            sourceMaterialModel.getEmissiveTexcoord());
-        
-        float emissiveFactor[] = sourceMaterialModel.getEmissiveFactor();
-        targetMaterialModel.setEmissiveFactor(
-            Optionals.clone(emissiveFactor));
+                DefaultTextureInfoModel targetBaseColorTextureInfo =
+                    new DefaultTextureInfoModel();
+                targetBaseColorTextureInfo.setTextureModel(
+                    targetBaseColorTexture);
+                targetBaseColorTextureInfo.setTexCoord(
+                    sourceBaseColorTextureInfo.getTexCoord());
+
+                targetPbrMetallicRoughness.setBaseColorTexture(
+                    targetBaseColorTextureInfo);
+
+                targetPbrMetallicRoughness.setMetallicFactor(
+                    sourcePbrMetallicRoughness.getMetallicFactor());
+                targetPbrMetallicRoughness.setRoughnessFactor(
+                    sourcePbrMetallicRoughness.getRoughnessFactor());
+
+                double[] sourceBaseColorFactor = sourcePbrMetallicRoughness.getBaseColorFactor();
+                targetPbrMetallicRoughness.setBaseColorFactor(
+                    Optionals.clone(sourceBaseColorFactor));
+            }
+            targetMaterial.setPbrMetallicRoughnessModel(
+                targetPbrMetallicRoughness);
+        }
+
+        NormalTextureInfoModel sourceNormalTextureInfo =
+            sourceMaterial.getNormalTextureInfoModel();
+        if (sourceNormalTextureInfo != null)
+        {
+            DefaultNormalTextureInfoModel targetNormalTextureInfo =
+                new DefaultNormalTextureInfoModel();
+
+            TextureModel sourceNormalTexture =
+                sourceNormalTextureInfo.getTextureModel();
+            DefaultTextureModel targetNormalTexture =
+                textureModelsMap.get(sourceNormalTexture);
+            targetNormalTextureInfo.setTextureModel(targetNormalTexture);
+            targetNormalTextureInfo.setTexCoord(
+                sourceNormalTextureInfo.getTexCoord());
+
+            targetNormalTextureInfo.setScale(
+                sourceNormalTextureInfo.getScale());
+
+            targetMaterial.setNormalTextureInfoModel(targetNormalTextureInfo);
+        }
+
+        OcclusionTextureInfoModel sourceOcclusionTextureInfo =
+            sourceMaterial.getOcclusionTextureInfoModel();
+        if (sourceOcclusionTextureInfo != null)
+        {
+            DefaultOcclusionTextureInfoModel targetOcclusionTextureInfo =
+                new DefaultOcclusionTextureInfoModel();
+
+            TextureModel sourceOcclusionTexture =
+                sourceOcclusionTextureInfo.getTextureModel();
+            DefaultTextureModel targetOcclusionTexture =
+                textureModelsMap.get(sourceOcclusionTexture);
+            targetOcclusionTextureInfo.setTextureModel(targetOcclusionTexture);
+            targetOcclusionTextureInfo.setTexCoord(
+                sourceOcclusionTextureInfo.getTexCoord());
+
+            targetOcclusionTextureInfo.setStrength(
+                sourceOcclusionTextureInfo.getStrength());
+
+            targetMaterial.setOcclusionTextureInfoModel(
+                targetOcclusionTextureInfo);
+        }
+
+        TextureInfoModel sourceEmissiveTextureInfo =
+            sourceMaterial.getEmissiveTextureInfoModel();
+        if (sourceEmissiveTextureInfo != null)
+        {
+            DefaultTextureInfoModel targetEmissiveTextureInfo =
+                new DefaultTextureInfoModel();
+
+            TextureModel sourceEmissiveTexture =
+                sourceEmissiveTextureInfo.getTextureModel();
+            DefaultTextureModel targetEmissiveTexture =
+                textureModelsMap.get(sourceEmissiveTexture);
+            targetEmissiveTextureInfo.setTextureModel(targetEmissiveTexture);
+            targetEmissiveTextureInfo.setTexCoord(
+                sourceEmissiveTextureInfo.getTexCoord());
+
+            targetMaterial.setEmissiveTextureInfoModel(
+                targetEmissiveTextureInfo);
+        }
+
+        double emissiveFactor[] = sourceMaterial.getEmissiveFactor();
+        targetMaterial.setEmissiveFactor(Optionals.clone(emissiveFactor));
     }
     
     

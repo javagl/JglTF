@@ -3,7 +3,7 @@
  * 
  * Do not modify this class. It is automatically generated
  * with JsonModelGen (https://github.com/javagl/JsonModelGen)
- * Copyright (c) 2016 Marco Hutter - http://www.javagl.de
+ * Copyright (c) 2016-2021 Marco Hutter - http://www.javagl.de
  */
 
 package de.javagl.jgltf.impl.v1;
@@ -32,8 +32,7 @@ public class TechniqueStates
      */
     private List<Integer> enable;
     /**
-     * Arguments for fixed-function rendering state functions other than 
-     * `enable()`/`disable()`. (optional) 
+     * The functions of this TechniqueStates (optional) 
      * 
      */
     private TechniqueStatesFunctions functions;
@@ -139,8 +138,7 @@ public class TechniqueStates
     }
 
     /**
-     * Arguments for fixed-function rendering state functions other than 
-     * `enable()`/`disable()`. (optional) 
+     * The functions of this TechniqueStates (optional) 
      * 
      * @param functions The functions to set
      * 
@@ -154,8 +152,7 @@ public class TechniqueStates
     }
 
     /**
-     * Arguments for fixed-function rendering state functions other than 
-     * `enable()`/`disable()`. (optional) 
+     * The functions of this TechniqueStates (optional) 
      * 
      * @return The functions
      * 

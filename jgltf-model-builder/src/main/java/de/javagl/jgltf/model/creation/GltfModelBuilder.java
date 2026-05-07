@@ -45,6 +45,7 @@ import de.javagl.jgltf.model.MaterialModel;
 import de.javagl.jgltf.model.MeshModel;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
 import de.javagl.jgltf.model.NodeModel;
+import de.javagl.jgltf.model.PbrMaterialModel;
 import de.javagl.jgltf.model.SceneModel;
 import de.javagl.jgltf.model.SkinModel;
 import de.javagl.jgltf.model.TextureModel;
@@ -65,12 +66,11 @@ import de.javagl.jgltf.model.impl.DefaultMeshModel;
 import de.javagl.jgltf.model.impl.DefaultNodeModel;
 import de.javagl.jgltf.model.impl.DefaultSceneModel;
 import de.javagl.jgltf.model.impl.DefaultSkinModel;
+import de.javagl.jgltf.model.impl.DefaultTechniqueMaterialModel;
 import de.javagl.jgltf.model.impl.DefaultTextureModel;
 import de.javagl.jgltf.model.structure.BufferBuilderStrategies;
 import de.javagl.jgltf.model.structure.BufferBuilderStrategy;
 import de.javagl.jgltf.model.v1.GltfModelV1;
-import de.javagl.jgltf.model.v1.MaterialModelV1;
-import de.javagl.jgltf.model.v2.MaterialModelV2;
 
 /**
  * A class for building {@link GltfModel} instances.<br>
@@ -387,10 +387,10 @@ public class GltfModelBuilder
         boolean added = materialModelsSet.add(materialModel);
         if (added)
         {
-            if (materialModel instanceof MaterialModelV1)
+            if (materialModel instanceof DefaultTechniqueMaterialModel)
             {
-                MaterialModelV1 materialModelV1 = 
-                    (MaterialModelV1)materialModel;
+                DefaultTechniqueMaterialModel materialModelV1 = 
+                    (DefaultTechniqueMaterialModel)materialModel;
                 
                 addTechniqueModel(materialModelV1.getTechniqueModel());
                 
@@ -404,15 +404,15 @@ public class GltfModelBuilder
                     }
                 }
             }
-            if (materialModel instanceof MaterialModelV2)
+            if (materialModel instanceof PbrMaterialModel)
             {
-                MaterialModelV2 materialModelV2 = 
-                    (MaterialModelV2)materialModel;
-                addTextureModel(materialModelV2.getBaseColorTexture());
-                addTextureModel(materialModelV2.getOcclusionTexture());
-                addTextureModel(materialModelV2.getMetallicRoughnessTexture());
-                addTextureModel(materialModelV2.getEmissiveTexture());
-                addTextureModel(materialModelV2.getNormalTexture());
+                PbrMaterialModel pbrMaterialModel = 
+                    (PbrMaterialModel)materialModel;
+                addTextureModel(pbrMaterialModel.getBaseColorTexture());
+                addTextureModel(pbrMaterialModel.getOcclusionTexture());
+                addTextureModel(pbrMaterialModel.getMetallicRoughnessTexture());
+                addTextureModel(pbrMaterialModel.getEmissiveTexture());
+                addTextureModel(pbrMaterialModel.getNormalTexture());
             }
         }
     }

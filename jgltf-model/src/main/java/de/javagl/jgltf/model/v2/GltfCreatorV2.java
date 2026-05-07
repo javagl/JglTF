@@ -67,9 +67,9 @@ import de.javagl.jgltf.model.AccessorData;
 import de.javagl.jgltf.model.AccessorDatas;
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.AnimationModel;
-import de.javagl.jgltf.model.AssetModel;
 import de.javagl.jgltf.model.AnimationModel.Channel;
 import de.javagl.jgltf.model.AnimationModel.Sampler;
+import de.javagl.jgltf.model.AssetModel;
 import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.CameraModel;
@@ -85,11 +85,15 @@ import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.NamedModelElement;
 import de.javagl.jgltf.model.NodeModel;
 import de.javagl.jgltf.model.Optionals;
+import de.javagl.jgltf.model.PbrMaterialModel;
+import de.javagl.jgltf.model.PbrMaterialModel.AlphaMode;
+import de.javagl.jgltf.model.PbrMetallicRoughnessModel;
 import de.javagl.jgltf.model.SceneModel;
 import de.javagl.jgltf.model.SkinModel;
+import de.javagl.jgltf.model.TextureInfoModel;
 import de.javagl.jgltf.model.TextureModel;
 import de.javagl.jgltf.model.impl.DefaultNodeModel;
-import de.javagl.jgltf.model.v2.MaterialModelV2.AlphaMode;
+import de.javagl.jgltf.model.impl.DefaultPbrMaterialModel;
 
 /**
  * A class for creating the {@link GlTF version 2.0 glTF} from a 
@@ -598,7 +602,7 @@ public class GltfCreatorV2
     
     /**
      * Create the {@link Material} for the given {@link MaterialModel}.
-     * If the given {@link MaterialModel} is not a {@link MaterialModelV2},
+     * If the given {@link MaterialModel} is not a {@link DefaultPbrMaterialModel},
      * then a warning is printed and <code>null</code> is returned.
      * 
      * @param materialModel The {@link MaterialModel}
@@ -606,10 +610,10 @@ public class GltfCreatorV2
      */
     private Material createMaterial(MaterialModel materialModel)
     {
-        if (materialModel instanceof MaterialModelV2)
+        if (materialModel instanceof DefaultPbrMaterialModel)
         {
-            MaterialModelV2 materialModelV2 = (MaterialModelV2)materialModel;
-            return createMaterialV2(materialModelV2);
+            DefaultPbrMaterialModel DefaultPbrMaterialModel = (DefaultPbrMaterialModel)materialModel;
+            return createMaterialV2(DefaultPbrMaterialModel);
         }
         // TODO It should be possible to use a glTF 1.0 material model here
         logger.severe("Cannot store glTF 1.0 material in glTF 2.0");
@@ -617,12 +621,12 @@ public class GltfCreatorV2
     }
     
     /**
-     * Create the {@link Material} for the given {@link MaterialModelV2}
+     * Create the {@link Material} for the given {@link PbrMaterialModel}
      * 
-     * @param materialModel The {@link MaterialModelV2}
+     * @param materialModel The {@link PbrMaterialModel}
      * @return The {@link Material}
      */
-    private Material createMaterialV2(MaterialModelV2 materialModel)
+    private Material createMaterialV2(PbrMaterialModel materialModel)
     {
         Material material = new Material();
         transferGltfChildOfRootPropertyElements(materialModel, material);
@@ -642,39 +646,59 @@ public class GltfCreatorV2
         }
         material.setDoubleSided(materialModel.isDoubleSided());
         
-        MaterialPbrMetallicRoughness pbrMetallicRoughness = 
-            new MaterialPbrMetallicRoughness();
-        material.setPbrMetallicRoughness(pbrMetallicRoughness);
-
-        pbrMetallicRoughness.setBaseColorFactor(
-            materialModel.getBaseColorFactor());
-        TextureModel baseColorTexture = 
-            materialModel.getBaseColorTexture();
-        if (baseColorTexture != null)
+        PbrMetallicRoughnessModel pbrMetallicRoughnessModel =
+            materialModel.getPbrMetallicRoughnessModel();
+        if (pbrMetallicRoughnessModel != null)
         {
-            TextureInfo baseColorTextureInfo = new TextureInfo();
-            baseColorTextureInfo.setIndex(
-                textureIndices.get(baseColorTexture));
-            baseColorTextureInfo.setTexCoord(
-                materialModel.getBaseColorTexcoord());
-            pbrMetallicRoughness.setBaseColorTexture(baseColorTextureInfo);
-        }
+            MaterialPbrMetallicRoughness pbrMetallicRoughness =
+                new MaterialPbrMetallicRoughness();
+            material.setPbrMetallicRoughness(pbrMetallicRoughness);
 
-        pbrMetallicRoughness.setMetallicFactor(
-            materialModel.getMetallicFactor());
-        pbrMetallicRoughness.setRoughnessFactor(
-            materialModel.getRoughnessFactor());
-        TextureModel metallicRoughnessTexture = 
-            materialModel.getMetallicRoughnessTexture();
-        if (metallicRoughnessTexture != null)
-        {
-            TextureInfo metallicRoughnessTextureInfo = new TextureInfo();
-            metallicRoughnessTextureInfo.setIndex(
-                textureIndices.get(metallicRoughnessTexture));
-            metallicRoughnessTextureInfo.setTexCoord(
-                materialModel.getMetallicRoughnessTexcoord());
-            pbrMetallicRoughness.setMetallicRoughnessTexture(
-                metallicRoughnessTextureInfo);
+            pbrMetallicRoughness.setBaseColorFactor(
+                pbrMetallicRoughnessModel.getBaseColorFactor());
+
+            TextureInfoModel baseColorTextureInfoModel =
+                pbrMetallicRoughnessModel.getBaseColorTextureInfoModel();
+            if (baseColorTextureInfoModel != null)
+            {
+                TextureModel baseColorTexture =
+                    baseColorTextureInfoModel.getTextureModel();
+                if (baseColorTexture != null)
+                {
+                    TextureInfo baseColorTextureInfo = new TextureInfo();
+                    baseColorTextureInfo
+                        .setIndex(textureIndices.get(baseColorTexture));
+                    baseColorTextureInfo
+                        .setTexCoord(baseColorTextureInfoModel.getTexCoord());
+                    pbrMetallicRoughness
+                        .setBaseColorTexture(baseColorTextureInfo);
+                }
+            }
+
+            pbrMetallicRoughness.setMetallicFactor(
+                pbrMetallicRoughnessModel.getMetallicFactor());
+            pbrMetallicRoughness.setRoughnessFactor(
+                pbrMetallicRoughnessModel.getRoughnessFactor());
+            TextureInfoModel metallicRoughnessTextureInfoModel =
+                pbrMetallicRoughnessModel
+                    .getMetallicRoughnessTextureInfoModel();
+            if (metallicRoughnessTextureInfoModel != null)
+            {
+                TextureModel metallicRoughnessTexture =
+                    metallicRoughnessTextureInfoModel.getTextureModel();
+                if (metallicRoughnessTexture != null)
+                {
+                    TextureInfo metallicRoughnessTextureInfo =
+                        new TextureInfo();
+                    metallicRoughnessTextureInfo
+                        .setIndex(textureIndices.get(metallicRoughnessTexture));
+                    metallicRoughnessTextureInfo.setTexCoord(
+                        metallicRoughnessTextureInfoModel.getTexCoord());
+                    pbrMetallicRoughness.setMetallicRoughnessTexture(
+                        metallicRoughnessTextureInfo);
+                }
+            }
+
         }
             
         TextureModel normalTexture = materialModel.getNormalTexture();
@@ -1092,16 +1116,16 @@ public class GltfCreatorV2
      * @param array The array
      * @return The list
      */
-    private static List<Float> toList(float array[])
+    private static List<Double> toList(double array[])
     {
         if (array == null)
         {
             return null;
         }
-        List<Float> list = new ArrayList<Float>();
-        for (float f : array)
+        List<Double> list = new ArrayList<Double>();
+        for (double d : array)
         {
-            list.add(f);
+            list.add(d);
         }
         return list;
     }

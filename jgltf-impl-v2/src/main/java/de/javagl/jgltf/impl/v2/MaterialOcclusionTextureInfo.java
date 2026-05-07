@@ -26,7 +26,7 @@ public class MaterialOcclusionTextureInfo
      * Maximum: 1.0 (inclusive) 
      * 
      */
-    private Float strength;
+    private Double strength;
 
     /**
      * A scalar multiplier controlling the amount of occlusion applied. 
@@ -40,7 +40,7 @@ public class MaterialOcclusionTextureInfo
      * the given constraints
      * 
      */
-    public void setStrength(Float strength) {
+    public void setStrength(Double strength) {
         if (strength == null) {
             this.strength = strength;
             return ;
@@ -64,7 +64,7 @@ public class MaterialOcclusionTextureInfo
      * @return The strength
      * 
      */
-    public Float getStrength() {
+    public Double getStrength() {
         return this.strength;
     }
 
@@ -75,8 +75,8 @@ public class MaterialOcclusionTextureInfo
      * @return The default strength
      * 
      */
-    public Float defaultStrength() {
-        return  1.0F;
+    public Double defaultStrength() {
+        return  1.0D;
     }
 
 }

@@ -27,12 +27,16 @@
 package de.javagl.jgltf.model.creation;
 
 import de.javagl.jgltf.model.ImageModel;
+import de.javagl.jgltf.model.PbrMaterialModel.AlphaMode;
 import de.javagl.jgltf.model.TextureModel;
-import de.javagl.jgltf.model.v2.MaterialModelV2;
-import de.javagl.jgltf.model.v2.MaterialModelV2.AlphaMode;
+import de.javagl.jgltf.model.impl.DefaultNormalTextureInfoModel;
+import de.javagl.jgltf.model.impl.DefaultOcclusionTextureInfoModel;
+import de.javagl.jgltf.model.impl.DefaultPbrMaterialModel;
+import de.javagl.jgltf.model.impl.DefaultPbrMetallicRoughnessModel;
+import de.javagl.jgltf.model.impl.DefaultTextureInfoModel;
 
 /**
- * A class for building {@link MaterialModelV2} instances
+ * A class for building {@link DefaultPbrMaterialModel} instances
  */
 public class MaterialBuilder
 {
@@ -47,16 +51,22 @@ public class MaterialBuilder
     }
     
     /**
-     * The {@link MaterialModelV2} that is currently being built
+     * The {@link DefaultPbrMaterialModel} that is currently being built
      */
-    private MaterialModelV2 materialModel;
+    private DefaultPbrMaterialModel materialModel;
+    
+    /**
+     * The {@link DefaultPbrMetallicRoughnessModel}
+     */
+    private DefaultPbrMetallicRoughnessModel metallicRoughnessModel;
     
     /**
      * Private constructor
      */
     private MaterialBuilder()
     {
-        materialModel = new MaterialModelV2();
+        materialModel = new DefaultPbrMaterialModel();
+        metallicRoughnessModel = new DefaultPbrMetallicRoughnessModel();
     }
     
     /**
@@ -69,9 +79,10 @@ public class MaterialBuilder
      * @return This builder
      */
     public MaterialBuilder setBaseColorFactor(
-        float r, float g, float b, float a)
+        double r, double g, double b, double a)
     {
-        materialModel.setBaseColorFactor(new float[] { r, g, b, a });
+        metallicRoughnessModel.setBaseColorFactor(new double[] { r, g, b, a });
+        materialModel.setPbrMetallicRoughnessModel(metallicRoughnessModel);
         return this;
     }
     
@@ -102,8 +113,11 @@ public class MaterialBuilder
     public MaterialBuilder setBaseColorTexture(
         TextureModel baseColorTexture, Integer texCoord)
     {
-        materialModel.setBaseColorTexture(baseColorTexture);
-        materialModel.setBaseColorTexcoord(texCoord);
+        DefaultTextureInfoModel textureInfo = new DefaultTextureInfoModel();
+        textureInfo.setTextureModel(baseColorTexture);
+        textureInfo.setTexCoord(texCoord);
+        metallicRoughnessModel.setBaseColorTexture(textureInfo);
+        materialModel.setPbrMetallicRoughnessModel(metallicRoughnessModel);
         return this;
     }
     
@@ -115,10 +129,11 @@ public class MaterialBuilder
      * @return This builder
      */
     public MaterialBuilder setMetallicRoughnessFactors(
-        float metallicFactor, float roughnessFactor)
+        double metallicFactor, double roughnessFactor)
     {
-        materialModel.setMetallicFactor(metallicFactor);
-        materialModel.setRoughnessFactor(roughnessFactor);
+        metallicRoughnessModel.setMetallicFactor(metallicFactor);
+        metallicRoughnessModel.setRoughnessFactor(roughnessFactor);
+        materialModel.setPbrMetallicRoughnessModel(metallicRoughnessModel);
         return this;
     }
     
@@ -149,8 +164,11 @@ public class MaterialBuilder
     public MaterialBuilder setMetallicRoughnessTexture(
         TextureModel metallicRoughnessTexture, Integer texCoord)
     {
-        materialModel.setMetallicRoughnessTexture(metallicRoughnessTexture);
-        materialModel.setMetallicRoughnessTexcoord(texCoord);
+        DefaultTextureInfoModel textureInfo = new DefaultTextureInfoModel();
+        textureInfo.setTextureModel(metallicRoughnessTexture);
+        textureInfo.setTexCoord(texCoord);
+        metallicRoughnessModel.setMetallicRoughnessTextureInfo(textureInfo);
+        materialModel.setPbrMetallicRoughnessModel(metallicRoughnessModel);
         return this;
     }
 
@@ -166,7 +184,7 @@ public class MaterialBuilder
      */
     public MaterialBuilder setNormalTexture(
         String fileName, String uri, 
-        float scale, Integer texCoord)
+        double scale, Integer texCoord)
     {
         TextureModel textureModel = 
             TextureModels.createFromImageFile(fileName, uri);
@@ -182,11 +200,14 @@ public class MaterialBuilder
      * @return This builder
      */
     public MaterialBuilder setNormalTexture(
-        TextureModel normalTexture, float scale, Integer texCoord)
+        TextureModel normalTexture, double scale, Integer texCoord)
     {
-        materialModel.setNormalTexture(normalTexture);
-        materialModel.setNormalScale(scale);
-        materialModel.setNormalTexcoord(texCoord);
+        DefaultNormalTextureInfoModel textureInfo = 
+            new DefaultNormalTextureInfoModel();
+        textureInfo.setTextureModel(normalTexture);
+        textureInfo.setTexCoord(texCoord);
+        textureInfo.setScale(scale);
+        materialModel.setNormalTextureInfoModel(textureInfo);
         return this;
     }
 
@@ -202,7 +223,7 @@ public class MaterialBuilder
      */
     public MaterialBuilder setOcclusionTexture(
         String fileName, String uri, 
-        float strength, Integer texCoord)
+        double strength, Integer texCoord)
     {
         TextureModel textureModel = 
             TextureModels.createFromImageFile(fileName, uri);
@@ -218,11 +239,14 @@ public class MaterialBuilder
      * @return This builder
      */
     public MaterialBuilder setOcclusionTexture(
-        TextureModel occlusionTexture, float strength, Integer texCoord)
+        TextureModel occlusionTexture, double strength, Integer texCoord)
     {
-        materialModel.setOcclusionTexture(occlusionTexture);
-        materialModel.setOcclusionStrength(strength);
-        materialModel.setOcclusionTexcoord(texCoord);
+        DefaultOcclusionTextureInfoModel textureInfo = 
+            new DefaultOcclusionTextureInfoModel();
+        textureInfo.setTextureModel(occlusionTexture);
+        textureInfo.setTexCoord(texCoord);
+        textureInfo.setStrength(strength);
+        materialModel.setOcclusionTextureInfoModel(textureInfo);
         return this;
     }
 
@@ -240,7 +264,7 @@ public class MaterialBuilder
      */
     public MaterialBuilder setEmissiveTexture(
         String fileName, String uri, 
-        float r, float g, float b, Integer texCoord)
+        double r, double g, double b, Integer texCoord)
     {
         TextureModel textureModel = 
             TextureModels.createFromImageFile(fileName, uri);
@@ -258,11 +282,14 @@ public class MaterialBuilder
      * @return This builder
      */
     public MaterialBuilder setEmissiveTexture(TextureModel emissiveTexture, 
-        float r, float g, float b, Integer texCoord)
+        double r, double g, double b, Integer texCoord)
     {
-        materialModel.setEmissiveTexture(emissiveTexture);
-        materialModel.setEmissiveFactor(new float[] { r, g, b });
-        materialModel.setEmissiveTexcoord(texCoord);
+        DefaultTextureInfoModel textureInfo = 
+            new DefaultTextureInfoModel();
+        textureInfo.setTextureModel(emissiveTexture);
+        textureInfo.setTexCoord(texCoord);
+        materialModel.setEmissiveTextureInfoModel(textureInfo);
+        materialModel.setEmissiveFactor(new double[] { r, g, b });
         return this;
     }
     
@@ -284,7 +311,7 @@ public class MaterialBuilder
      * @param alphaCutoff The alpha cutoff
      * @return This builder
      */
-    public MaterialBuilder setAlphaCutoff(float alphaCutoff)
+    public MaterialBuilder setAlphaCutoff(double alphaCutoff)
     {
         materialModel.setAlphaCutoff(alphaCutoff);
         return this;
@@ -303,14 +330,15 @@ public class MaterialBuilder
     }
 
     /**
-     * Create the {@link MaterialModelV2} instance with the current state
+     * Create the {@link DefaultPbrMaterialModel} instance with the current state
      * 
-     * @return The {@link MaterialModelV2}
+     * @return The {@link DefaultPbrMaterialModel}
      */
-    public MaterialModelV2 build()
+    public DefaultPbrMaterialModel build()
     {
-        MaterialModelV2 result = materialModel;
-        materialModel = new MaterialModelV2();
+        DefaultPbrMaterialModel result = materialModel;
+        materialModel = new DefaultPbrMaterialModel();
+        metallicRoughnessModel = new DefaultPbrMetallicRoughnessModel();
         return result;
     }
 }

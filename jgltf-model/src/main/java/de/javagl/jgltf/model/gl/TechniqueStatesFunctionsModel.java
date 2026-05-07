@@ -43,7 +43,7 @@ public interface TechniqueStatesFunctionsModel
      * 
      * @return The blend color
      */
-    float[] getBlendColor();
+    double[] getBlendColor();
     
     /**
      * Returns the blend equation
@@ -92,7 +92,7 @@ public interface TechniqueStatesFunctionsModel
      *  
      * @return The depth range
      */
-    float[] getDepthRange();
+    double[] getDepthRange();
     
     /**
      * Returns the front face
@@ -106,12 +106,12 @@ public interface TechniqueStatesFunctionsModel
      * 
      * @return The line width
      */
-    float[] getLineWidth();
+    double[] getLineWidth();
     
     /**
      * Returns the polygon offset
      * 
      * @return The polygon offset
      */
-    float[] getPolygonOffset();
+    double[] getPolygonOffset();
 }

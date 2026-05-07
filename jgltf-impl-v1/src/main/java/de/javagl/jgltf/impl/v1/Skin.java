@@ -3,7 +3,7 @@
  * 
  * Do not modify this class. It is automatically generated
  * with JsonModelGen (https://github.com/javagl/JsonModelGen)
- * Copyright (c) 2016 Marco Hutter - http://www.javagl.de
+ * Copyright (c) 2016-2021 Marco Hutter - http://www.javagl.de
  */
 
 package de.javagl.jgltf.impl.v1;
@@ -32,7 +32,7 @@ public class Skin
      * &nbsp;&nbsp;The elements of this array (optional) 
      * 
      */
-    private float[] bindShapeMatrix;
+    private double[] bindShapeMatrix;
     /**
      * The ID of the accessor containing the floating-point 4x4 inverse-bind 
      * matrices. (required) 
@@ -62,7 +62,7 @@ public class Skin
      * the given constraints
      * 
      */
-    public void setBindShapeMatrix(float[] bindShapeMatrix) {
+    public void setBindShapeMatrix(double[] bindShapeMatrix) {
         if (bindShapeMatrix == null) {
             this.bindShapeMatrix = bindShapeMatrix;
             return ;
@@ -88,7 +88,7 @@ public class Skin
      * @return The bindShapeMatrix
      * 
      */
-    public float[] getBindShapeMatrix() {
+    public double[] getBindShapeMatrix() {
         return this.bindShapeMatrix;
     }
 
@@ -99,8 +99,8 @@ public class Skin
      * @return The default bindShapeMatrix
      * 
      */
-    public float[] defaultBindShapeMatrix() {
-        return new float[] { 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F };
+    public double[] defaultBindShapeMatrix() {
+        return new double[] { 1.0D, 0.0D, 0.0D, 0.0D, 0.0D, 1.0D, 0.0D, 0.0D, 0.0D, 0.0D, 1.0D, 0.0D, 0.0D, 0.0D, 0.0D, 1.0D };
     }
 
     /**

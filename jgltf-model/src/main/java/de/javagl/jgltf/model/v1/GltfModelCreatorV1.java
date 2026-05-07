@@ -121,6 +121,7 @@ import de.javagl.jgltf.model.impl.DefaultMeshPrimitiveModel;
 import de.javagl.jgltf.model.impl.DefaultNodeModel;
 import de.javagl.jgltf.model.impl.DefaultSceneModel;
 import de.javagl.jgltf.model.impl.DefaultSkinModel;
+import de.javagl.jgltf.model.impl.DefaultTechniqueMaterialModel;
 import de.javagl.jgltf.model.impl.DefaultTextureModel;
 import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.model.io.GltfAsset;
@@ -424,7 +425,7 @@ public class GltfModelCreatorV1
         Map<String, Material> materials = Optionals.of(gltf.getMaterials());
         for (int i = 0; i < materials.size(); i++)
         {
-            gltfModel.addMaterialModel(new MaterialModelV1());
+            gltfModel.addMaterialModel(new DefaultTechniqueMaterialModel());
         }
     }
     
@@ -473,7 +474,7 @@ public class GltfModelCreatorV1
         for (Entry<String, Skin> entry : skins.entrySet())
         {
             Skin skin = entry.getValue();
-            float[] bindShapeMatrix = skin.getBindShapeMatrix();
+            double[] bindShapeMatrix = skin.getBindShapeMatrix();
             DefaultSkinModel skinModel = new DefaultSkinModel();
             skinModel.setBindShapeMatrix(bindShapeMatrix);
             gltfModel.addSkinModel(skinModel);
@@ -1008,10 +1009,10 @@ public class GltfModelCreatorV1
                 nodeModel.setCameraModel(cameraModel);
             }
             
-            float matrix[] = node.getMatrix();
-            float translation[] = node.getTranslation();
-            float rotation[] = node.getRotation();
-            float scale[] = node.getScale();
+            double matrix[] = node.getMatrix();
+            double translation[] = node.getTranslation();
+            double rotation[] = node.getRotation();
+            double scale[] = node.getScale();
             nodeModel.setMatrix(Optionals.clone(matrix));
             nodeModel.setTranslation(Optionals.clone(translation));
             nodeModel.setRotation(Optionals.clone(rotation));
@@ -1377,8 +1378,8 @@ public class GltfModelCreatorV1
         {
             String materialId = entry.getKey();
             Material material = entry.getValue();
-            MaterialModelV1 materialModel = 
-                (MaterialModelV1) get("materials", 
+            DefaultTechniqueMaterialModel materialModel = 
+                (DefaultTechniqueMaterialModel) get("materials", 
                     materialId, gltfModel::getMaterialModel);
             
             transferGltfChildOfRootPropertyElements(material, materialModel);
