@@ -39,13 +39,18 @@ import java.nio.ShortBuffer;
 import javax.imageio.ImageIO;
 import javax.swing.JLabel;
 
+import de.javagl.jgltf.model.AccessorModel;
+import de.javagl.jgltf.model.AnimationModel.Channel;
 import de.javagl.jgltf.model.AnimationModel.Interpolation;
+import de.javagl.jgltf.model.AnimationModel.Sampler;
 import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.NodeModel;
 import de.javagl.jgltf.model.creation.AccessorModels;
 import de.javagl.jgltf.model.creation.GltfModelBuilder;
 import de.javagl.jgltf.model.impl.DefaultAccessorModel;
 import de.javagl.jgltf.model.impl.DefaultAnimationModel;
+import de.javagl.jgltf.model.impl.DefaultAnimationModel.DefaultChannel;
+import de.javagl.jgltf.model.impl.DefaultAnimationModel.DefaultSampler;
 import de.javagl.jgltf.model.impl.DefaultGltfModel;
 import de.javagl.jgltf.model.impl.DefaultImageModel;
 import de.javagl.jgltf.model.impl.DefaultMeshModel;
@@ -54,6 +59,7 @@ import de.javagl.jgltf.model.impl.DefaultNodeModel;
 import de.javagl.jgltf.model.impl.DefaultPbrMaterialModel;
 import de.javagl.jgltf.model.impl.DefaultPbrMetallicRoughnessModel;
 import de.javagl.jgltf.model.impl.DefaultSceneModel;
+import de.javagl.jgltf.model.impl.DefaultSkinModel;
 import de.javagl.jgltf.model.impl.DefaultTextureInfoModel;
 import de.javagl.jgltf.model.impl.DefaultTextureModel;
 import de.javagl.jgltf.model.io.Buffers;
@@ -109,9 +115,9 @@ class GltfTestModelCreation
         // Create the mesh primitive model
         DefaultMeshPrimitiveModel meshPrimitiveModel =
             createSquareMeshPrimitiveWithTexcoords();
-        
+
         // Assign a material
-        DefaultPbrMaterialModel materialModel = 
+        DefaultPbrMaterialModel materialModel =
             createBaseColorTextureMaterialModel();
         meshPrimitiveModel.setMaterialModel(materialModel);
 
@@ -134,7 +140,7 @@ class GltfTestModelCreation
         // Create the mesh primitive model
         DefaultMeshPrimitiveModel meshPrimitiveModel =
             createSquareMeshPrimitiveWithTexcoords();
-        
+
         DefaultSceneModel sceneModel = createSceneWith(meshPrimitiveModel);
 
         // Create the glTF model
@@ -144,7 +150,6 @@ class GltfTestModelCreation
         return gltfModel;
     }
 
-    
     /**
      * Create an textured square including a KHR_materials_clearcoat texture
      * 
@@ -157,7 +162,7 @@ class GltfTestModelCreation
             createSquareMeshPrimitiveWithTexcoords();
 
         // Assign a material
-        DefaultPbrMaterialModel materialModel = 
+        DefaultPbrMaterialModel materialModel =
             createBaseColorTextureMaterialModel();
         meshPrimitiveModel.setMaterialModel(materialModel);
 
@@ -172,7 +177,6 @@ class GltfTestModelCreation
         return gltfModel;
     }
 
-    
     /**
      * Create a scene model with a single node with a single mesh with the given
      * mesh primitive model
@@ -209,10 +213,10 @@ class GltfTestModelCreation
             createSquareMeshPrimitiveWithTexcoords();
 
         // Assign a material
-        DefaultPbrMaterialModel materialModel = 
+        DefaultPbrMaterialModel materialModel =
             createBaseColorTextureMaterialModel();
         meshPrimitiveModel.setMaterialModel(materialModel);
-        
+
         // Create a mesh model with the mesh primitive
         DefaultMeshModel meshModel = new DefaultMeshModel();
         meshModel.addMeshPrimitiveModel(meshPrimitiveModel);
@@ -285,11 +289,13 @@ class GltfTestModelCreation
      */
     private static DefaultAccessorModel craeteSquareIndices()
     {
+        // @formatter:off
         short[] indices = new short[]
         { 
             0, 1, 2, 
             1, 3, 2
         };
+        // @formatter:on
         DefaultAccessorModel indicesAccessorModel =
             AccessorModels.createUnsignedShortScalar(ShortBuffer.wrap(indices));
         return indicesAccessorModel;
@@ -303,6 +309,7 @@ class GltfTestModelCreation
     private static DefaultAccessorModel createSquarePositions()
     {
         // Create the positions accessor
+        // @formatter:off
         float[] positions = new float[]
         {   
             0.0f, 0.0f, 0.0f, 
@@ -310,6 +317,7 @@ class GltfTestModelCreation
             0.0f, 1.0f, 0.0f,
             1.0f, 1.0f, 0.0f 
         };
+        // @formatter:on
         DefaultAccessorModel positionsAccessorModel =
             AccessorModels.createFloat3D(FloatBuffer.wrap(positions));
         return positionsAccessorModel;
@@ -322,6 +330,7 @@ class GltfTestModelCreation
      */
     private static DefaultAccessorModel createSquareTexCoords()
     {
+        // @formatter:off
         float[] texCoords = new float[]
         { 
             0.0f, 1.0f, 
@@ -329,6 +338,7 @@ class GltfTestModelCreation
             0.0f, 0.0f, 
             1.0f, 0.0f 
         };
+        // @formatter:on
         DefaultAccessorModel texCoordsAccessorModel =
             AccessorModels.createFloat2D(FloatBuffer.wrap(texCoords));
         return texCoordsAccessorModel;
@@ -345,13 +355,12 @@ class GltfTestModelCreation
     {
         // Create the times accessor
         float[] times = new float[]
-        { 
-            0.0f, 1.0f, 2.0f, 3.0f, 4.0f 
-        };
+        { 0.0f, 1.0f, 2.0f, 3.0f, 4.0f };
         DefaultAccessorModel timesAccessorModel =
             AccessorModels.createFloatScalar(FloatBuffer.wrap(times));
 
         // Create the rotation accessor
+        // @formatter:off
         float[] rotations = new float[]
         { 
             0.0f, 0.0f, 0.0f, 1.0f, 
@@ -360,6 +369,7 @@ class GltfTestModelCreation
             0.0f, 0.0f, 0.707f, -0.707f, 
             0.0f, 0.0f, 0.0f, 1.0f 
         };
+        // @formatter:on
         DefaultAccessorModel rotationsAccessorModel =
             AccessorModels.createFloat4D(FloatBuffer.wrap(rotations));
 
@@ -547,7 +557,202 @@ class GltfTestModelCreation
         String result = sb.toString();
         return result;
     }
-    
+
+    /**
+     * Create a glTF model with a simple skin and animation.
+     * 
+     * (This corresponds to the 'SimpleSkin' sample asset)
+     * 
+     * @return The model
+     */
+    public static DefaultGltfModel createSimpleSkin()
+    {
+        // Create the mesh primitive model
+        DefaultMeshPrimitiveModel meshPrimitiveModel =
+            new DefaultMeshPrimitiveModel(GltfConstants.GL_TRIANGLES);
+
+        // Create the indices, positions, joints, and weights
+        // @formatter:off
+        short[] indices = new short[] 
+        { 
+            0, 1, 3, 
+            0, 3, 2, 
+            2, 3, 5, 
+            2, 5, 4,
+            4, 5, 7, 
+            4, 7, 6, 
+            6, 7, 9, 
+            6, 9, 8 
+        };
+        // @formatter:on
+        AccessorModel indicesAccessorModel =
+            AccessorModels.createUnsignedShortScalar(ShortBuffer.wrap(indices));
+
+        // @formatter:off
+        float[] positions = new float[] 
+        {
+            -0.5F, 0.0F, 0.0F, 
+             0.5F, 0.0F, 0.0F, 
+            -0.5F, 0.5F, 0.0F, 
+             0.5F, 0.5F, 0.0F, 
+            -0.5F, 1.0F, 0.0F, 
+             0.5F, 1.0F, 0.0F, 
+            -0.5F, 1.5F, 0.0F, 
+             0.5F, 1.5F, 0.0F, 
+            -0.5F, 2.0F, 0.0F, 
+             0.5F, 2.0F, 0.0F 
+        };
+        // @formatter:on
+        AccessorModel positionAccessorModel =
+            AccessorModels.createFloat3D(FloatBuffer.wrap(positions));
+
+        // @formatter:off
+        short[] joints = new short[] 
+        { 
+            0, 0, 0, 0, 
+            0, 0, 0, 0, 
+            0, 1, 0, 0, 
+            0, 1, 0, 0, 
+            0, 1, 0, 0, 
+            0, 1, 0, 0, 
+            0, 1, 0, 0, 
+            0, 1, 0, 0, 
+            0, 1, 0, 0, 
+            0, 1, 0, 0 
+        };
+        // @formatter:on
+        AccessorModel jointsAccessorModel =
+            AccessorModels.create(GltfConstants.GL_UNSIGNED_SHORT, "VEC4",
+                false, Buffers.createByteBufferFrom(ShortBuffer.wrap(joints)));
+
+        // @formatter:off
+        float[] wights = new float[] 
+        { 
+            1.0F,  0.0F,  0.0F, 0.0F, 
+            1.0F,  0.0F,  0.0F, 0.0F, 
+            0.75F, 0.25F, 0.0F, 0.0F,
+            0.75F, 0.25F, 0.0F, 0.0F, 
+            0.5F,  0.5F,  0.0F, 0.0F, 
+            0.5F,  0.5F,  0.0F, 0.0F, 
+            0.25F, 0.75F, 0.0F, 0.0F, 
+            0.25F, 0.75F, 0.0F, 0.0F, 
+            0.0F,  1.0F,  0.0F, 0.0F, 
+            0.0F,  1.0F,  0.0F, 0.0F 
+        };
+        // @formatter:on
+        AccessorModel weightsAccessorModel =
+            AccessorModels.createFloat4D(FloatBuffer.wrap(wights));
+
+        // Assign indices, positions, joints, and weights to the mesh
+        // primitive model
+        meshPrimitiveModel.setIndices(indicesAccessorModel);
+        meshPrimitiveModel.putAttribute("POSITION", positionAccessorModel);
+        meshPrimitiveModel.putAttribute("JOINTS_0", jointsAccessorModel);
+        meshPrimitiveModel.putAttribute("WEIGHTS_0", weightsAccessorModel);
+
+        // Create a mesh model with the mesh primitive
+        DefaultMeshModel meshModel = new DefaultMeshModel();
+        meshModel.addMeshPrimitiveModel(meshPrimitiveModel);
+
+        // Create the skin model
+        DefaultSkinModel skinModel = new DefaultSkinModel();
+        // @formatter:off
+        float[] ibm = new float[] 
+        { 
+            1.0F,  0.0F, 0.0F, 0.0F, 
+            0.0F,  1.0F, 0.0F, 0.0F, 
+            0.0F,  0.0F, 1.0F, 0.0F, 
+            0.0F,  0.0F, 0.0F, 1.0F, 
+            
+            1.0F,  0.0F, 0.0F, 0.0F,
+            0.0F,  1.0F, 0.0F, 0.0F, 
+            0.0F,  0.0F, 1.0F, 0.0F, 
+            0.0F, -1.0F, 0.0F, 1.0F 
+        };
+        // @formatter:on
+        AccessorModel ibmAccessorModel =
+            AccessorModels.create(GltfConstants.GL_FLOAT, "MAT4", false,
+                Buffers.createByteBufferFrom(FloatBuffer.wrap(ibm)));
+        skinModel.setInverseBindMatrices(ibmAccessorModel);
+
+        // Create the joint node models and assign them to the skin
+        DefaultNodeModel jointNodeModel0 = new DefaultNodeModel();
+        DefaultNodeModel jointNodeModel1 = new DefaultNodeModel();
+        jointNodeModel1.setTranslation(new double[]
+        { 0.0D, 1.0D, 0.0D });
+        jointNodeModel0.addChild(jointNodeModel1);
+        skinModel.addJoint(jointNodeModel0);
+        skinModel.addJoint(jointNodeModel1);
+
+        // Create the main node model and assign the mesh and skin to it
+        DefaultNodeModel nodeModel = new DefaultNodeModel();
+        nodeModel.addMeshModel(meshModel);
+        nodeModel.setSkinModel(skinModel);
+
+        // Create the animation model
+        DefaultAnimationModel animationModel = new DefaultAnimationModel();
+
+        // @formatter:off
+        float[] times = new float[] 
+        { 
+            0.0F, 
+            0.5F, 
+            1.0F, 
+            1.5F, 
+            2.0F, 
+            2.5F, 
+            3.0F,
+            3.5F, 
+            4.0F, 
+            4.5F, 
+            5.0F, 
+            5.5F 
+        };
+        // @formatter:on
+        AccessorModel timesAcessorModel =
+            AccessorModels.createFloatScalar(FloatBuffer.wrap(times));
+
+        // @formatter:off
+        float[] rotations = new float[] 
+        { 
+            0.0F, 0.0F,  0.0F,   1.0F, 
+            0.0F, 0.0F,  0.383F, 0.924F, 
+            0.0F, 0.0F,  0.707F, 0.707F, 
+            0.0F, 0.0F,  0.707F, 0.707F, 
+            0.0F, 0.0F,  0.383F, 0.924F, 
+            0.0F, 0.0F,  0.0F,   1.0F, 
+            0.0F, 0.0F,  0.0F,   1.0F, 
+            0.0F, 0.0F, -0.383F, 0.924F, 
+            0.0F, 0.0F, -0.707F, 0.707F, 
+            0.0F, 0.0F, -0.707F, 0.707F, 
+            0.0F, 0.0F, -0.383F, 0.924F, 
+            0.0F, 0.0F,  0.0F,   1.0F 
+        };
+        // @formatter:on
+        AccessorModel rotationsAccessorModel =
+            AccessorModels.createFloat4D(FloatBuffer.wrap(rotations));
+
+        // Let the animation model rotate the jointNodeModel1
+        Sampler sampler = new DefaultSampler(timesAcessorModel,
+            Interpolation.LINEAR, rotationsAccessorModel);
+        Channel channel =
+            new DefaultChannel(sampler, jointNodeModel1, "rotation");
+        animationModel.addChannel(channel);
+
+        // Create a scene model with the main node and root joint node
+        DefaultSceneModel sceneModel = new DefaultSceneModel();
+        sceneModel.addNode(nodeModel);
+        sceneModel.addNode(jointNodeModel0);
+
+        // Create the glTF model
+        GltfModelBuilder gltfModelBuilder = GltfModelBuilder.create();
+        gltfModelBuilder.addSceneModel(sceneModel);
+        gltfModelBuilder.addAnimationModel(animationModel);
+        DefaultGltfModel gltfModel = gltfModelBuilder.build();
+        return gltfModel;
+
+    }
+
     /**
      * Private constructor to prevent instantiation
      */

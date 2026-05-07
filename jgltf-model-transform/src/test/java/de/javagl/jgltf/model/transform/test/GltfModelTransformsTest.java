@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import de.javagl.jgltf.model.MeshPrimitiveModel;
 import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.impl.DefaultGltfModel;
 import de.javagl.jgltf.model.impl.DefaultMeshModel;
@@ -46,6 +47,8 @@ public class GltfModelTransformsTest
         testRemoveMaterial();
         testAddTexture();
         testRemoveAnimationValuesAccessor();
+        testRemoveSkinAnimationTimesAccessor();
+        testRemoveSkinAttributes();
     }
 
     /**
@@ -146,7 +149,8 @@ public class GltfModelTransformsTest
     
     
     /**
-     * Run a test to remove an animation values accessor
+     * Run a test to remove an animation values accessor from the animated
+     * square
      * 
      * @throws IOException If an IO error occurs
      */
@@ -163,6 +167,60 @@ public class GltfModelTransformsTest
             Set<ModelElement> toRemove = new LinkedHashSet<ModelElement>();
             toRemove.add(am3);
             GltfModelTransforms.removeAll(gltfModel, toRemove);
+        });
+    }
+
+    
+    /**
+     * Run a test to remove an animation values accessor from the simple skin
+     * 
+     * @throws IOException If an IO error occurs
+     */
+    private static void testRemoveSkinAnimationTimesAccessor() throws IOException
+    {
+        String name = "SimpleSkin";
+        String modifiedName = name + "-removedAnimationTimes";
+        DefaultGltfModel gltfModel =
+            GltfTestModelCreation.createSimpleSkin();
+
+        runTest(gltfModel, name, modifiedName, () -> 
+        {
+            ModelElement am4 = gltfModel.getAccessorModel(4);
+            Set<ModelElement> toRemove = new LinkedHashSet<ModelElement>();
+            toRemove.add(am4);
+            
+            DefaultMeshModel mm0 = gltfModel.getMeshModel(0);
+            MeshPrimitiveModel mpm0 = mm0.getMeshPrimitiveModels().get(0);
+            DefaultMeshPrimitiveModel mpm = (DefaultMeshPrimitiveModel) mpm0;
+            mpm.removeAttribute("JOINTS_0");
+            mpm.removeAttribute("WEIGHTS_0");
+            
+            GltfModelTransforms.removeAll(gltfModel, toRemove);
+        });
+    }
+    
+    
+    /**
+     * Run a test to remove the skin attribute accessors from the simple skin
+     * 
+     * @throws IOException If an IO error occurs
+     */
+    private static void testRemoveSkinAttributes() throws IOException
+    {
+        String name = "SimpleSkin";
+        String modifiedName = name + "-removedSkinAttributes";
+        DefaultGltfModel gltfModel =
+            GltfTestModelCreation.createSimpleSkin();
+
+        runTest(gltfModel, name, modifiedName, () -> 
+        {
+            DefaultMeshModel mm0 = gltfModel.getMeshModel(0);
+            MeshPrimitiveModel mpm0 = mm0.getMeshPrimitiveModels().get(0);
+            DefaultMeshPrimitiveModel mpm = (DefaultMeshPrimitiveModel) mpm0;
+            mpm.removeAttribute("JOINTS_0");
+            mpm.removeAttribute("WEIGHTS_0");
+            
+            GltfModelTransforms.prune(gltfModel);
         });
     }
     
