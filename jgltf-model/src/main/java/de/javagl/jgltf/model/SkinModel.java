@@ -76,7 +76,11 @@ public interface SkinModel extends NamedModelElement
      * The result will be written to the given array, as a 4x4 matrix in 
      * column major order. If the given array is <code>null</code> or does
      * not have a length of 16, then a new array with length 16 will be 
-     * created and returned. 
+     * created and returned.<br>
+     * <br>
+     * This method may only be called when this model actually has inverse 
+     * bind matrices, as indicated by {@link #getInverseBindMatrices()}
+     * returning a non-<code>null</code> value.  
      *  
      * @param index The index of the joint
      * @param result The result array
