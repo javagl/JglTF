@@ -3,7 +3,6 @@
   "accessors" : {
     "accessor_0" : {
       "bufferView" : "bufferView_0",
-      "byteOffset" : 0,
       "byteStride" : 2,
       "componentType" : 5123,
       "count" : 36,
@@ -13,7 +12,6 @@
     },
     "accessor_1" : {
       "bufferView" : "bufferView_1",
-      "byteOffset" : 0,
       "byteStride" : 12,
       "componentType" : 5126,
       "count" : 24,
