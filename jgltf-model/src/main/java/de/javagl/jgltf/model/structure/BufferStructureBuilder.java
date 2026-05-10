@@ -27,6 +27,7 @@
 package de.javagl.jgltf.model.structure;
 
 import java.nio.ByteBuffer;
+import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
@@ -193,6 +194,32 @@ public final class BufferStructureBuilder
         int componentType = GltfConstants.GL_FLOAT;
         ByteBuffer byteBuffer = 
             Buffers.createByteBufferFrom(FloatBuffer.wrap(data));        
+        return createAccessorModel(idPrefix, componentType, type, byteBuffer);
+    }
+    
+    /**
+     * Create an {@link AccessorModel} in the {@link BufferStructure} that 
+     * is currently being built.
+     * 
+     * @param idPrefix The ID prefix of the {@link AccessorModel} 
+     * @param data The actual data
+     * @param type The type of the data, as a string corresponding to
+     * the {@link ElementType} of the accessor
+     * @return The {@link AccessorModel}
+     */
+    public AccessorModel createAccessorModel(
+        String idPrefix, double data[], String type)
+    {
+        ElementType elementType = ElementType.valueOf(type);
+        int numComponents = elementType.getNumComponents();
+        if (data.length % numComponents != 0)
+        {
+            throw new IllegalArgumentException("Invalid data for type " + type
+                + ". The data.length is not divisble by " + numComponents);
+        }
+        int componentType = GltfConstants.GL_DOUBLE;
+        ByteBuffer byteBuffer = 
+            Buffers.createByteBufferFrom(DoubleBuffer.wrap(data));        
         return createAccessorModel(idPrefix, componentType, type, byteBuffer);
     }
     
