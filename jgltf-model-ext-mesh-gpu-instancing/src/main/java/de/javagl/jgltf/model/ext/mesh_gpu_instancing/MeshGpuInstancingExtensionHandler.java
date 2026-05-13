@@ -35,6 +35,7 @@ import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.NodeModel;
 import de.javagl.jgltf.model.extensions.ExtensionHandler;
+import de.javagl.jgltf.model.v2.ModelElementsV2;
 
 /**
  * Implementation of an {@link ExtensionHandler} for 
@@ -73,6 +74,8 @@ public class MeshGpuInstancingExtensionHandler implements ExtensionHandler
         GlTFMeshGpuInstancing impl = (GlTFMeshGpuInstancing) object;
         DefaultMeshGpuInstancingModel model = 
             new DefaultMeshGpuInstancingModel();
+        ModelElementsV2.transferGltfPropertyElementsToModel(
+            impl, model);
         
         Map<String, Integer> attributes = impl.getAttributes();
         if (attributes != null)
@@ -96,6 +99,8 @@ public class MeshGpuInstancingExtensionHandler implements ExtensionHandler
     {
         GlTFMeshGpuInstancing impl = new GlTFMeshGpuInstancing();
         MeshGpuInstancingModel model = (MeshGpuInstancingModel) modelObject;
+        ModelElementsV2.transferGltfPropertyElementsFromModel(
+            model, impl);
         
         List<AccessorModel> accessorModels = gltfModel.getAccessorModels();
         Map<String, AccessorModel> attributes = model.getAttributes();

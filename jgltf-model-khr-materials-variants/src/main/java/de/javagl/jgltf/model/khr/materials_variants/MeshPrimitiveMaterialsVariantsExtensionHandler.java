@@ -38,6 +38,7 @@ import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.MaterialModel;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
 import de.javagl.jgltf.model.extensions.ExtensionHandler;
+import de.javagl.jgltf.model.v2.ModelElementsV2;
 
 /**
  * Implementation of an {@link ExtensionHandler} for the 
@@ -79,6 +80,8 @@ public class MeshPrimitiveMaterialsVariantsExtensionHandler
             new DefaultMeshPrimitiveMaterialsVariantsModel();
         MeshPrimitiveMaterialsVariants impl =
             (MeshPrimitiveMaterialsVariants) object;
+        ModelElementsV2.transferGltfPropertyElementsToModel(
+            impl, model);
 
         Map<String, Object> extensionModels = gltfModel.getExtensionModels();
         MaterialsVariantsModel materialVariantsModel =
@@ -116,6 +119,8 @@ public class MeshPrimitiveMaterialsVariantsExtensionHandler
             (DefaultMeshPrimitiveMaterialsVariantsModel)modelObject;
         MeshPrimitiveMaterialsVariants impl =
             new MeshPrimitiveMaterialsVariants();
+        ModelElementsV2.transferGltfPropertyElementsFromModel(
+            model, impl);
         
         Map<String, Object> extensionModels = gltfModel.getExtensionModels();
         MaterialsVariantsModel materialVariantsModel =

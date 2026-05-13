@@ -42,6 +42,7 @@ import de.javagl.jgltf.model.impl.DefaultNormalTextureInfoModel;
 import de.javagl.jgltf.model.impl.DefaultTextureInfoModel;
 import de.javagl.jgltf.model.impl.TextureInfoModels;
 import de.javagl.jgltf.model.impl.TextureInfos;
+import de.javagl.jgltf.model.v2.ModelElementsV2;
 
 /**
  * Implementation of an {@link ExtensionHandler} for the
@@ -80,6 +81,8 @@ public class MaterialsClearcoatExtensionHandler implements ExtensionHandler
         DefaultMaterialsClearcoatModel model =
             new DefaultMaterialsClearcoatModel();
         MaterialMaterialsClearcoat impl = (MaterialMaterialsClearcoat) object;
+        ModelElementsV2.transferGltfPropertyElementsToModel(
+            impl, model);
 
         List<TextureModel> textureModels = gltfModel.getTextureModels();
 
@@ -130,6 +133,8 @@ public class MaterialsClearcoatExtensionHandler implements ExtensionHandler
         DefaultMaterialsClearcoatModel model =
             (DefaultMaterialsClearcoatModel)modelObject;
         MaterialMaterialsClearcoat impl = new MaterialMaterialsClearcoat();
+        ModelElementsV2.transferGltfPropertyElementsFromModel(
+            model, impl);
 
         impl.setClearcoatFactor(model.getClearcoatFactor());
         impl.setClearcoatRoughnessFactor(model.getClearcoatRoughnessFactor());

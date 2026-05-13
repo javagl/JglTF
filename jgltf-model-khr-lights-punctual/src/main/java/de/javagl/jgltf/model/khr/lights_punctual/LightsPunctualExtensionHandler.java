@@ -73,6 +73,8 @@ public class LightsPunctualExtensionHandler implements ExtensionHandler
     {
         DefaultLightsPunctualModel model = new DefaultLightsPunctualModel();
         GlTFLightsPunctual impl = (GlTFLightsPunctual) object;
+        ModelElementsV2.transferGltfPropertyElementsToModel(
+            impl, model);
         
         List<Light> lights = impl.getLights();
         for (Light light : lights)
@@ -108,8 +110,10 @@ public class LightsPunctualExtensionHandler implements ExtensionHandler
     {
         DefaultLightsPunctualModel model = 
             (DefaultLightsPunctualModel) modelObject;
-        
         GlTFLightsPunctual impl = new GlTFLightsPunctual();
+        ModelElementsV2.transferGltfPropertyElementsFromModel(
+            model, impl);
+        
         List<LightModel> lightModels = model.getLightModels();
         for (LightModel lightModel : lightModels)
         {

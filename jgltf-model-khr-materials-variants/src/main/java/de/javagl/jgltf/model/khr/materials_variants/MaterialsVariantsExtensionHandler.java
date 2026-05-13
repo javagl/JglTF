@@ -32,6 +32,7 @@ import de.javagl.jgltf.impl.v2.khr.materials_variants.GlTFMaterialsVariants;
 import de.javagl.jgltf.impl.v2.khr.materials_variants.GlTFMaterialsVariantsPropertiesVariantsItems;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.extensions.ExtensionHandler;
+import de.javagl.jgltf.model.v2.ModelElementsV2;
 
 /**
  * Implementation of an {@link ExtensionHandler} for the 
@@ -71,6 +72,9 @@ public class MaterialsVariantsExtensionHandler implements ExtensionHandler
         DefaultMaterialsVariantsModel model = 
             new DefaultMaterialsVariantsModel();
         GlTFMaterialsVariants impl = (GlTFMaterialsVariants) object;
+        ModelElementsV2.transferGltfPropertyElementsToModel(
+            impl, model);
+        
         List<GlTFMaterialsVariantsPropertiesVariantsItems> variants = 
             impl.getVariants();
         for (GlTFMaterialsVariantsPropertiesVariantsItems variant : variants)
@@ -86,6 +90,9 @@ public class MaterialsVariantsExtensionHandler implements ExtensionHandler
         DefaultMaterialsVariantsModel model = 
             (DefaultMaterialsVariantsModel) modelObject;
         GlTFMaterialsVariants impl = new GlTFMaterialsVariants();
+        ModelElementsV2.transferGltfPropertyElementsFromModel(
+            model, impl);
+        
         List<String> names = model.getNames();
         for (String name : names)
         {

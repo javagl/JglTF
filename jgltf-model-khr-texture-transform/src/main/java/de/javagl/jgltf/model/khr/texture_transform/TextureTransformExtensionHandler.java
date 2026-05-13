@@ -31,6 +31,7 @@ import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.TextureInfoModel;
 import de.javagl.jgltf.model.extensions.ExtensionHandler;
+import de.javagl.jgltf.model.v2.ModelElementsV2;
 
 /**
  * Implementation of an {@link ExtensionHandler} for 
@@ -70,6 +71,8 @@ public class TextureTransformExtensionHandler implements ExtensionHandler
             new DefaultTextureTransformModel();
         TextureInfoTextureTransform impl = 
             (TextureInfoTextureTransform) object;
+        ModelElementsV2.transferGltfPropertyElementsToModel(
+            impl, model);
         model.setOffset(Optionals.clone(impl.getOffset()));
         model.setRotation(impl.getRotation());
         model.setScale(Optionals.clone(impl.getScale()));
@@ -84,6 +87,8 @@ public class TextureTransformExtensionHandler implements ExtensionHandler
             (DefaultTextureTransformModel)modelObject;
         TextureInfoTextureTransform impl = 
             new TextureInfoTextureTransform();
+        ModelElementsV2.transferGltfPropertyElementsFromModel(
+            model, impl);
         impl.setOffset(Optionals.clone(model.getOffset()));
         impl.setRotation(model.getRotation());
         impl.setScale(Optionals.clone(model.getScale()));
