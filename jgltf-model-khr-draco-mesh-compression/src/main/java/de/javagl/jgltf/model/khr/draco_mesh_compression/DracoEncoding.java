@@ -115,7 +115,7 @@ class DracoEncoding
                 (DefaultAccessorModel) attributes.get(attributeName);
             if (accessorModel == null)
             {
-                logger.warning("Could find attribute " + attributeName
+                logger.warning("Could not find attribute " + attributeName
                     + " in mesh primitive - skipping");
                 continue;
             }
@@ -140,7 +140,7 @@ class DracoEncoding
         {
             result.dracoData = Draco.encode(mesh, dracoEncodeOptions);
             logger.log(level,
-                "Ecoded to " + result.dracoData.length + " bytes");
+                "Draco encoding created " + result.dracoData.length + " bytes");
         }
         catch (DrakoException e)
         {

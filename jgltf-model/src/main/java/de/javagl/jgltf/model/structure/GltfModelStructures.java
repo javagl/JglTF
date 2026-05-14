@@ -67,6 +67,7 @@ import de.javagl.jgltf.model.PbrMaterialModel;
 import de.javagl.jgltf.model.SceneModel;
 import de.javagl.jgltf.model.SkinModel;
 import de.javagl.jgltf.model.TextureModel;
+import de.javagl.jgltf.model.extensions.ExtensionModel;
 import de.javagl.jgltf.model.extensions.ExtensionModels;
 import de.javagl.jgltf.model.gl.ProgramModel;
 import de.javagl.jgltf.model.gl.ShaderModel;
@@ -422,7 +423,7 @@ public class GltfModelStructures
         {
             throw new GltfException("The 'prepare' method has not been called");
         }
-        Level level = Level.INFO;
+        Level level = Level.FINE;
         // @formatter:off
         if (logger.isLoggable(level)) 
         {
@@ -452,6 +453,21 @@ public class GltfModelStructures
         }
         target.addBufferViewModels(bbs.getBufferViewModels());
         target.addBufferModels(bbs.getBufferModels());
+        
+        DefaultExtensionsModel extensionsModel = target.getExtensionsModel();
+        for (ModelElement modelElement : modelElementMap.values())
+        {
+            if (modelElement instanceof ExtensionModel)
+            {
+                ExtensionModel extensionModel = (ExtensionModel) modelElement;
+                String extensionName = extensionModel.getExtensionName();
+                extensionsModel.addExtensionUsed(extensionName);
+                if (extensionModel.isRequired())
+                {
+                    extensionsModel.addExtensionRequired(extensionName);
+                }
+            }
+        }
         
         DefaultGltfModel result = target;
         this.source = null;

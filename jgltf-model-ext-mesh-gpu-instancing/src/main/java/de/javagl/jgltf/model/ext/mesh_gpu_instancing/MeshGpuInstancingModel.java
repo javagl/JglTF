@@ -30,11 +30,12 @@ import java.util.Map;
 
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.ModelElement;
+import de.javagl.jgltf.model.extensions.ExtensionModel;
 
 /**
  * Interface for a model of the <code>EXT_mesh_gpu_instancing</code> extension
  */
-public interface MeshGpuInstancingModel extends ModelElement
+public interface MeshGpuInstancingModel extends ModelElement, ExtensionModel
 {
     /**
      * Returns an unmodifiable map that contains the attributes that store

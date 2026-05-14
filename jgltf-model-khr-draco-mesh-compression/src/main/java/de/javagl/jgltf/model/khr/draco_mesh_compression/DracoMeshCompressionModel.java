@@ -29,12 +29,15 @@ package de.javagl.jgltf.model.khr.draco_mesh_compression;
 import java.util.Set;
 
 import de.javagl.jgltf.model.NamedModelElement;
+import de.javagl.jgltf.model.extensions.ExtensionModel;
 
 /**
- * Interface for the model representation of draco compression information
+ * Interface for the model representation of the 
+ * <code>KHR_draco_mesh_compression</code> information
  * associated with a mesh primitive.
  */
-public interface DracoMeshCompressionModel extends NamedModelElement
+public interface DracoMeshCompressionModel
+    extends NamedModelElement, ExtensionModel
 {
     /**
      * Returns the {@link DracoOptions}

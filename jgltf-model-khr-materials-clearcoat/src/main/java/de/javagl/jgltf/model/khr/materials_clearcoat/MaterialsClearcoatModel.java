@@ -29,12 +29,13 @@ package de.javagl.jgltf.model.khr.materials_clearcoat;
 import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.NormalTextureInfoModel;
 import de.javagl.jgltf.model.TextureInfoModel;
+import de.javagl.jgltf.model.extensions.ExtensionModel;
 
 /**
  * Interface for a model of the <code>KHR_materials_clearcoat</code> extension
  * that is found in the material of a glTF
  */
-public interface MaterialsClearcoatModel extends ModelElement
+public interface MaterialsClearcoatModel extends ModelElement, ExtensionModel
 {
     /**
      * The clearcoat layer intensity.

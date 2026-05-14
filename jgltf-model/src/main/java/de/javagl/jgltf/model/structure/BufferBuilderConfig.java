@@ -11,7 +11,7 @@ class BufferBuilderConfig
     /**
      * Whether to create one buffer view for each attribute accessor
      */
-    boolean bufferViewPerAttributeAccessor = false;
+    boolean bufferViewPerAttributeAccessor = true;
     
     /**
      * Whether to create one buffer per mesh primitive

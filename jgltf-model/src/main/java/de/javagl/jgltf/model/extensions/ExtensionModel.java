@@ -24,23 +24,32 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package de.javagl.jgltf.model.khr.materials_variants;
-
-import java.util.List;
+package de.javagl.jgltf.model.extensions;
 
 import de.javagl.jgltf.model.ModelElement;
-import de.javagl.jgltf.model.extensions.ExtensionModel;
 
 /**
- * Interface for a model of the <code>KHR_materials_variants</code> extension
- * that is found at the top-level of a glTF
+ * Interface for all classes that represent an extension. 
+ * 
+ * Classes implementing this interface will usually also implement the
+ * {@link ModelElement} interface.
  */
-public interface MaterialsVariantsModel extends ModelElement, ExtensionModel
+public interface ExtensionModel
 {
     /**
-     * Returns an unmodifiable list containing the material variant names
+     * Returns the extension name that will be inserted into the 
+     * 'extensionsUsed' of the glTF model.
      * 
-     * @return The material variant names
+     * @return The extension name
      */
-    List<String> getNames();
+    String getExtensionName();
+    
+    /**
+     * Returns whether this extension is required, meaning that it should
+     * be part of the glTF 'extensionsRequired' declaration when it is
+     * part of a glTF model.
+     * 
+     * @return Whether the extension is required
+     */
+    boolean isRequired();
 }

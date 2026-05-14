@@ -170,5 +170,16 @@ public class DefaultMaterialsClearcoatModel
         return false;
     }
     
+    @Override
+    public String getExtensionName()
+    {
+        return "KHR_materials_clearcoat";
+    }
+    
+    @Override
+    public boolean isRequired()
+    {
+        return false;
+    }
     
 }
