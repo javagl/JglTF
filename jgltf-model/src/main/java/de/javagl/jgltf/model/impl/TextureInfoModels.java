@@ -27,10 +27,12 @@
 package de.javagl.jgltf.model.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import de.javagl.jgltf.impl.v2.MaterialNormalTextureInfo;
 import de.javagl.jgltf.impl.v2.MaterialOcclusionTextureInfo;
 import de.javagl.jgltf.impl.v2.TextureInfo;
+import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.NormalTextureInfoModel;
 import de.javagl.jgltf.model.OcclusionTextureInfoModel;
 import de.javagl.jgltf.model.TextureInfoModel;
@@ -133,6 +135,114 @@ public class TextureInfoModels
         textureInfoModel.setTexCoord(textureInfo.getTexCoord());
         textureInfoModel.setStrength(textureInfo.getStrength());
         return textureInfoModel;
+    }
+
+    /**
+     * Create a copy of the given {@link TextureInfoModel}, 
+     * returning <code>null</code> if the input is <code>null</code>.
+     * 
+     * The given model element map will be used to find the objects that
+     * should be placed into the copy, for all model elements of the
+     * input.
+     * 
+     * The copy that is returned will also be placed into this map.
+     * 
+     * @param input The input
+     * @param modelElementMap The model element map 
+     * @return The copy
+     */
+    public static DefaultTextureInfoModel copy(
+        TextureInfoModel input, 
+        Map<ModelElement, ModelElement> modelElementMap)
+    {
+        if (input == null)
+        {
+            return null;
+        }
+        DefaultTextureInfoModel output =
+            new DefaultTextureInfoModel();
+        modelElementMap.put(input, output);
+        ModelElementsV2.transferGltfPropertyElements(input, output);
+
+        TextureModel inputTextureModel = input.getTextureModel();
+        TextureModel outputTextureModel = 
+            (TextureModel) modelElementMap.get(inputTextureModel);
+        output.setTextureModel(outputTextureModel);
+        output.setTexCoord(input.getTexCoord());
+        return output;
+    }
+
+    /**
+     * Create a copy of the given {@link NormalTextureInfoModel}, 
+     * returning <code>null</code> if the input is <code>null</code>.
+     * 
+     * The given model element map will be used to find the objects that
+     * should be placed into the copy, for all model elements of the
+     * input.
+     * 
+     * The copy that is returned will also be placed into this map.
+     * 
+     * @param input The input
+     * @param modelElementMap The model element map 
+     * @return The copy
+     */
+    public static DefaultNormalTextureInfoModel copy(
+        NormalTextureInfoModel input, 
+        Map<ModelElement, ModelElement> modelElementMap)
+    {
+        if (input == null)
+        {
+            return null;
+        }
+        DefaultNormalTextureInfoModel output =
+            new DefaultNormalTextureInfoModel();
+        modelElementMap.put(input, output);
+        ModelElementsV2.transferGltfPropertyElements(input, output);
+
+        TextureModel inputTextureModel = input.getTextureModel();
+        TextureModel outputTextureModel = 
+            (TextureModel) modelElementMap.get(inputTextureModel);
+        output.setTextureModel(outputTextureModel);
+        output.setTexCoord(input.getTexCoord());
+        output.setScale(input.getScale());
+        return output;
+    }
+    
+    
+    /**
+     * Create a copy of the given {@link OcclusionTextureInfoModel}, 
+     * returning <code>null</code> if the input is <code>null</code>.
+     * 
+     * The given model element map will be used to find the objects that
+     * should be placed into the copy, for all model elements of the
+     * input.
+     * 
+     * The copy that is returned will also be placed into this map.
+     * 
+     * @param input The input
+     * @param modelElementMap The model element map 
+     * @return The copy
+     */
+    public static DefaultOcclusionTextureInfoModel copy(
+        OcclusionTextureInfoModel input, 
+        Map<ModelElement, ModelElement> modelElementMap)
+    {
+        if (input == null)
+        {
+            return null;
+        }
+        DefaultOcclusionTextureInfoModel output =
+            new DefaultOcclusionTextureInfoModel();
+        modelElementMap.put(input, output);
+        ModelElementsV2.transferGltfPropertyElements(input, output);
+
+        TextureModel inputTextureModel = input.getTextureModel();
+        TextureModel outputTextureModel = 
+            (TextureModel) modelElementMap.get(inputTextureModel);
+        output.setTextureModel(outputTextureModel);
+        output.setTexCoord(input.getTexCoord());
+        output.setStrength(input.getStrength());
+        return output;
     }
     
     /**

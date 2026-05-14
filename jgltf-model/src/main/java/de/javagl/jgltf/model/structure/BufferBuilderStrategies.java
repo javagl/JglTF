@@ -69,8 +69,7 @@ public class BufferBuilderStrategies
      * @param config The configuration
      * @return The {@link BufferBuilderStrategy}
      */
-    static BufferBuilderStrategy create(
-        BufferBuilderConfig config) 
+    static BufferBuilderStrategy create(BufferBuilderConfig config)  
     {
         return new DefaultBufferBuilderStrategy(config);
     }

@@ -99,6 +99,20 @@ public class ModelElementsV2
     }
 
     /**
+     * Transfer the extensions and extras from the given model element to
+     * the given target
+     * 
+     * @param sourceModelElement The source model element
+     * @param targetModelElement The target model element
+     */
+    public static void transferGltfPropertyElements(
+        ModelElement sourceModelElement, AbstractModelElement targetModelElement)
+    {
+        targetModelElement.setExtensions(sourceModelElement.getExtensions());
+        targetModelElement.setExtras(sourceModelElement.getExtras());
+    }
+    
+    /**
      * Private constructor to prevent instantiation
      */
     private ModelElementsV2()

@@ -30,6 +30,7 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -46,7 +47,9 @@ import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.GltfException;
 import de.javagl.jgltf.model.GltfModel;
-import de.javagl.jgltf.model.impl.DefaultMeshPrimitiveModel;
+import de.javagl.jgltf.model.MeshPrimitiveModel;
+import de.javagl.jgltf.model.creation.AccessorModels;
+import de.javagl.jgltf.model.impl.DefaultAccessorModel;
 import de.javagl.jgltf.model.io.Buffers;
 
 /**
@@ -66,48 +69,52 @@ class DracoDecoding
     private static final Level level = Level.INFO;
 
     /**
-     * Decode the draco extension data of the given mesh primitive model
-     * 
-     * @param gltfModel The glTF model
-     * @param meshPrimitiveModel The mesh primitive model
-     * @param impl The implementation object
+     * Internal class for the decoded draco data of one mesh primitive
      */
-    public static void decode(GltfModel gltfModel,
-        DefaultMeshPrimitiveModel meshPrimitiveModel,
-        MeshPrimitiveDracoMeshCompression impl)
+    static class Result
     {
-        try
-        {
-            decodeInternal(gltfModel, meshPrimitiveModel, impl);
-        }
-        catch (GltfException e)
-        {
-            logger.log(Level.SEVERE, e.getMessage(), e);
-        }
-    }
+        /**
+         * The indices
+         */
+        DefaultAccessorModel indices;
 
+        /**
+         * The attributes
+         */
+        final Map<String, DefaultAccessorModel> attributes =
+            new LinkedHashMap<String, DefaultAccessorModel>();
+    }
+    
     /**
-     * Internal method of {@link #decode}
+     * Decode the draco extension data of the given mesh primitive model.
+     * 
+     * If the data cannot be decoded, an error is printed and <code>null</code>
+     * is returned.
      * 
      * @param gltfModel The glTF model
      * @param meshPrimitiveModel The mesh primitive model
      * @param impl The implementation object
-     * @throws GltfException If the data could not be decoded
+     * @return The result
      */
-    private static void decodeInternal(GltfModel gltfModel,
-        DefaultMeshPrimitiveModel meshPrimitiveModel,
+    static Result decode(GltfModel gltfModel,
+        MeshPrimitiveModel meshPrimitiveModel,
         MeshPrimitiveDracoMeshCompression impl)
     {
+        Result result = new Result();
+
         // Read the draco mesh from the buffer view
         int bufferViewIndex = impl.getBufferView();
         DracoMesh dracoMesh = readDracoMesh(gltfModel, bufferViewIndex);
+        if (dracoMesh == null)
+        {
+            return null;
+        }
 
-        // Fill the indices accessor with the indices from the draco mesh
-        AccessorModel indicesAccessorModel = meshPrimitiveModel.getIndices();
+        // Create the accessor model for the indices
         int dracoIndices[] = dracoMesh.getIndices().toArray();
-        AccessorDataBuffers.fillFromInt(indicesAccessorModel,
-            IntBuffer.wrap(dracoIndices));
-
+        result.indices = AccessorModels
+            .createUnsignedShortScalar(IntBuffer.wrap(dracoIndices));
+        
         // Process all draco attributes. The specification requires them
         // to be a subset of the actual attributes.
         Map<String, Integer> dracoAttributes = impl.getAttributes();
@@ -124,6 +131,10 @@ class DracoDecoding
 
             PointAttribute pointAttribute =
                 obtainAttribute(dracoMesh, attributeName, attributeId);
+            if (pointAttribute == null)
+            {
+                continue;
+            }
 
             logger.log(level, "  attribute " + attributeName);
             logger.log(level, "  attributeId " + attributeId);
@@ -131,15 +142,23 @@ class DracoDecoding
 
             // Fill the accessor with the data from the point attribute
             AccessorModel accessorModel = attributes.get(attributeName);
-            fill(accessorModel, pointAttribute);
-
+            DefaultAccessorModel decodedAccessorModel =
+                createDecoded(accessorModel, pointAttribute);
+            if (decodedAccessorModel != null)
+            {
+                result.attributes.put(attributeName, decodedAccessorModel);
+            }
             logger.log(level,
                 "Decoding draco attribute " + attributeName + " DONE");
         }
+        return result;
     }
 
     /**
-     * Read the Draco mesh from the specified buffer view data
+     * Read the Draco mesh from the specified buffer view data.
+     * 
+     * If the mesh cannot be decoded, an error is printed and <code>null</code>
+     * is returned.
      * 
      * @param gltfModel The glTF model
      * @param bufferViewIndex The buffer view index
@@ -157,22 +176,24 @@ class DracoDecoding
         ByteBuffer bufferViewData = bufferViewModel.getBufferViewData();
         byte bufferViewDataArray[] = new byte[bufferViewData.remaining()];
         bufferViewData.slice().get(bufferViewDataArray);
-        DracoMesh dracoMesh = null;
         try
         {
-            dracoMesh = (DracoMesh) Draco.decode(bufferViewDataArray);
+            DracoMesh dracoMesh = (DracoMesh) Draco.decode(bufferViewDataArray);
+            return dracoMesh;
         }
         catch (DrakoException e)
         {
-            throw new GltfException("Could not decode draco mesh", e);
+            logger.log(Level.SEVERE, "Could not decode draco mesh", e);
+            return null;
         }
-        logger.log(level,
-            "Reading draco mesh from buffer view " + bufferViewIndex + " DONE");
-        return dracoMesh;
+
     }
 
     /**
      * Obtains the point attribute with the given ID from the given draco mesh.
+     * 
+     * If the attribute cannot be found, then an error is printed and
+     * <code>null</code> is returned.
      * 
      * @param dracoMesh The draco mesh
      * @param gltfAttribute The glTF attribute name. Only used for potential
@@ -181,7 +202,6 @@ class DracoDecoding
      *        stored as the value in the
      *        {@link MeshPrimitiveDracoMeshCompression#getAttributes()}
      * @return The point attribute
-     * @throws GltfException If the attribute is not found
      */
     private static PointAttribute obtainAttribute(DracoMesh dracoMesh,
         String gltfAttribute, int id)
@@ -194,49 +214,59 @@ class DracoDecoding
                 return attribute;
             }
         }
-        throw new GltfException("Could not obtain attribute " + gltfAttribute
+        logger.severe("Could not obtain attribute " + gltfAttribute
             + " with unique ID " + id + " from draco mesh");
+        return null;
     }
 
     /**
-     * Fill the given accessor model with the data that is read from the given
-     * point attribute
+     * Create an accessor model with the data that was decoded from the given
+     * point attribute.
      * 
-     * @param accessorModel The accessor model
+     * If the attribute cannot be decoded, an error is printed and
+     * <code>null</code> is returned.
+     * 
+     * @param accessorModel The template accessor model
      * @param pointAttribute The point attribute
-     * @throws GltfException If the types are incompatible
+     * @return The result
      */
-    private static void fill(AccessorModel accessorModel,
-        PointAttribute pointAttribute)
+    private static DefaultAccessorModel createDecoded(
+        AccessorModel accessorModel, PointAttribute pointAttribute)
     {
-        Class<?> componentType = accessorModel.getComponentDataType();
+        Class<?> componentDataType = accessorModel.getComponentDataType();
+        int componentType = accessorModel.getComponentType();
+        String type = accessorModel.getElementType().toString();
+        boolean normalized = accessorModel.isNormalized();
         int componentCount = accessorModel.getElementType().getNumComponents();
         int count = accessorModel.getCount();
-        if (componentType == byte.class)
+        if (componentDataType == byte.class)
         {
             ByteBuffer attributeData =
                 readByteDracoAttribute(pointAttribute, count, componentCount);
-            AccessorDataBuffers.fill(accessorModel, attributeData);
+            DefaultAccessorModel result = AccessorModels.create(componentType,
+                type, normalized, attributeData);
+            return result;
         }
-        else if (componentType == short.class)
+        else if (componentDataType == short.class)
         {
             ShortBuffer attributeData =
                 readShortDracoAttribute(pointAttribute, count, componentCount);
-            AccessorDataBuffers.fill(accessorModel, attributeData);
+            DefaultAccessorModel result = AccessorModels.create(componentType,
+                type, normalized, Buffers.createByteBufferFrom(attributeData));
+            return result;
         }
-        else if (componentType == float.class)
+        else if (componentDataType == float.class)
         {
             FloatBuffer attributeData =
                 readFloatDracoAttribute(pointAttribute, count, componentCount);
-            AccessorDataBuffers.fill(accessorModel, attributeData);
+            DefaultAccessorModel result = AccessorModels.create(componentType,
+                type, normalized, Buffers.createByteBufferFrom(attributeData));
+            return result;
         }
-        else
-        {
-            throw new GltfException(
-                "Expected component type to be byte, short, or float, but was "
-                    + componentType);
-        }
-
+        logger.severe(
+            "Expected component type to be byte, short, or float, but was "
+                + componentType);
+        return null;
     }
 
     /**

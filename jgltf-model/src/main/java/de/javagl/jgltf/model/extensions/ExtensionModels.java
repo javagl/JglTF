@@ -26,6 +26,7 @@
  */
 package de.javagl.jgltf.model.extensions;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
@@ -49,6 +50,27 @@ public class ExtensionModels
     private static final Logger logger =
         Logger.getLogger(ExtensionModels.class.getName());
 
+    /**
+     * Call {@link ExtensionHandler#preprocess(GltfModel, ExtensionProcessing)}
+     * with the given model and extension processing instance on all known
+     * extension handlers.
+     * 
+     * @param gltfModel The glTF model
+     * @param extensionProcessing The {@link ExtensionProcessing}
+     */
+    public static void preprocess(GltfModel gltfModel,
+        ExtensionProcessing extensionProcessing)
+    {
+        ExtensionHandlerRegistry extensionHandlerRegistry =
+            ExtensionHandlerRegistries.get();
+        List<ExtensionHandler> extensionHandlers =
+            extensionHandlerRegistry.getAll();
+        for (ExtensionHandler extensionHandler : extensionHandlers)
+        {
+            extensionHandler.preprocess(gltfModel, extensionProcessing);
+        }
+    }    
+    
     /**
      * Process the extensions of the given model element (with the given class) 
      * that is contained in the given glTF model.<br>
@@ -194,6 +216,75 @@ public class ExtensionModels
         }
     }
     
+
+    /**
+     * Copy all extension model elements that are contained in the given source
+     * element, and add the copies to the given target.<br>
+     * <br>
+     * Note: An implementation detail is that this assumes that the given target 
+     * element extends the {@link AbstractModelElement} class.<br>
+     * <br>
+     * This will examine all extension objects that are stored in the given 
+     * source {@link ModelElement}. For each extension object, it will look up
+     * an {@link ExtensionHandler} in the {@link ExtensionHandlerRegistry}.
+     * When an extension handler is found, then it will be used for 
+     * copying the extension object, using {@link ExtensionHandler#copy},
+     * and the copy to the {@link ModelElement#getExtensionModels()} of the
+     * model element.<br>
+     * <br>
+     * 
+     * @param gltfModel The {@link GltfModel}
+     * @param sourceModelElement The source {@link ModelElement}
+     * @param targetModelElement The target {@link ModelElement}
+     * @param modelClass The class of the {@link ModelElement}
+     * @param modelElementMap The mapping from source to target model elements
+     * that will be passed to {@link ExtensionHandler#copy} 
+     */
+    public static void copyExtensionModels(
+        GltfModel gltfModel, 
+        ModelElement sourceModelElement, 
+        ModelElement targetModelElement,
+        Class<?> modelClass,
+        Map<ModelElement, ModelElement> modelElementMap)
+    {
+        if (!(targetModelElement instanceof AbstractModelElement))
+        {
+            logger
+                .warning("Could not process extensions of " + targetModelElement
+                    + ": The object is not an AbstractModelElement");
+            return;
+        }
+        AbstractModelElement abstractTargetModelElement =
+            (AbstractModelElement) targetModelElement;
+
+        Map<String, Object> sourceExtensionModels =
+            sourceModelElement.getExtensionModels();
+        if (sourceExtensionModels == null || sourceExtensionModels.isEmpty())
+        {
+            return;
+        }
+        ExtensionHandlerRegistry extensionHandlerRegistry =
+            ExtensionHandlerRegistries.get();
+        for (Entry<String, Object> entry : sourceExtensionModels.entrySet())
+        {
+            String extensionName = entry.getKey();
+            ExtensionHandler extensionHandler =
+                extensionHandlerRegistry.get(modelClass, extensionName);
+            if (extensionHandler == null)
+            {
+                continue;
+            }
+            logger.info(
+                "Copy extension " + extensionName + " with extension handler "
+                    + extensionHandler + " for " + modelClass);
+
+            Object sourceExtensionModelObject = entry.getValue();
+            Object targetExtensionModelObject = extensionHandler.copy(gltfModel,
+                sourceExtensionModelObject, modelElementMap);
+            abstractTargetModelElement.addExtensionModel(extensionName,
+                targetExtensionModelObject);
+        }
+    }
     
     /**
      * Private constructor to prevent instantiation
@@ -202,4 +293,6 @@ public class ExtensionModels
     {
         // Private constructor to prevent instantiation
     }
+
+
 }

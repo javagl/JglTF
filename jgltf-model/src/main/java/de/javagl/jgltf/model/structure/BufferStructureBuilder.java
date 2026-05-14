@@ -88,11 +88,11 @@ public final class BufferStructureBuilder
     private final List<DefaultBufferViewModel> currentBufferViewModels;
     
     /**
-     * The mapping from buffer view objects that are intended for images
-     * (and do not have associated accessors) to their data
+     * The mapping from buffer view objects that do not have associated 
+     * accessors to their data
      */
     private final Map<DefaultBufferViewModel, ByteBuffer> 
-        imageBufferViewDataMap;
+        standaloneBufferViewDataMap;
     
     /**
      * Default constructor
@@ -102,7 +102,7 @@ public final class BufferStructureBuilder
         this.bufferStructure = new BufferStructure();
         this.currentAccessorModels = new ArrayList<DefaultAccessorModel>();
         this.currentBufferViewModels = new ArrayList<DefaultBufferViewModel>();
-        this.imageBufferViewDataMap = 
+        this.standaloneBufferViewDataMap = 
             new LinkedHashMap<DefaultBufferViewModel, ByteBuffer>();
     }
     
@@ -426,35 +426,60 @@ public final class BufferStructureBuilder
      * is currently being built.<br>
      * <br>
      * This is intended for buffer view models that do not have associated
-     * accessors (i.e. buffer view models that are used for images) 
+     * accessors (e.g. buffer view models that are used for images or
+     * by extensions) 
      * 
      * @param idPrefix The ID prefix for the {@link BufferViewModel}
-     * @param imageData The image data
+     * @param bufferViewData The buffer view data
      * @return The {@link BufferViewModel}
      * @throws IllegalStateException When there are pending accessor models
      */
-    public BufferViewModel createImageBufferViewModel(
-        String idPrefix, ByteBuffer imageData)
+    public BufferViewModel createStandaloneBufferViewModel(
+        String idPrefix, ByteBuffer bufferViewData)
     {
-        Objects.requireNonNull(imageData, "The imageData may not be null");
+        Objects.requireNonNull(bufferViewData, 
+            "The bufferViewData may not be null");
         if (!currentAccessorModels.isEmpty())
         {
             throw new IllegalStateException(
                 "Cannot create an image buffer view model with "
                 + currentAccessorModels.size() + " pending accessors");
         }
-        
+
         DefaultBufferViewModel bufferViewModel =
             new DefaultBufferViewModel(null);
-        bufferViewModel.setByteLength(imageData.capacity());
-
-        imageBufferViewDataMap.put(bufferViewModel, imageData);
-        bufferStructure.addBufferViewModel(
-            bufferViewModel, idPrefix, Collections.emptyList());
-        currentBufferViewModels.add(bufferViewModel);
+        addStandaloneBufferViewModel(idPrefix, bufferViewModel, bufferViewData);
         return bufferViewModel;
     }
-    
+
+    /**
+     * Add a standalone {@link BufferViewModel} in the {@link BufferStructure}
+     * that is currently being built.<br>
+     * <br>
+     * This is intended for buffer view models that do not have associated
+     * accessors (e.g. buffer view models that are used for images or by
+     * extensions).<br>
+     * <br>
+     * The byte length of the given buffer view will be set to be the 
+     * capacity of the given data buffer.
+     * 
+     * @param idPrefix The ID prefix for the {@link BufferViewModel}
+     * @param bufferViewModel The buffer view model
+     * @param bufferViewData The buffer view data
+     */
+    public void addStandaloneBufferViewModel(String idPrefix,
+        DefaultBufferViewModel bufferViewModel, ByteBuffer bufferViewData)
+    {
+        Objects.requireNonNull(bufferViewModel,
+            "The bufferViewModel may not be null");
+        Objects.requireNonNull(bufferViewData,
+            "The bufferViewData may not be null");
+        bufferViewModel.setByteLength(bufferViewData.capacity());
+        standaloneBufferViewDataMap.put(bufferViewModel, bufferViewData);
+        bufferStructure.addBufferViewModel(bufferViewModel, idPrefix,
+            Collections.emptyList());
+        currentBufferViewModels.add(bufferViewModel);
+    }    
     
     /**
      * Create a {@link BufferModel} in the {@link BufferStructure} that 
@@ -520,7 +545,7 @@ public final class BufferStructureBuilder
         }
         BufferStructureProcessor bufferStructureProcessor = 
             new BufferStructureProcessor(
-                bufferStructure, imageBufferViewDataMap);
+                bufferStructure, standaloneBufferViewDataMap);
         bufferStructureProcessor.process();
         return bufferStructure;
     }

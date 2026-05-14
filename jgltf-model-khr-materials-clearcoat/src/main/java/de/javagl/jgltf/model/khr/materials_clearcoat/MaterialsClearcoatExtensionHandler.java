@@ -27,12 +27,14 @@
 package de.javagl.jgltf.model.khr.materials_clearcoat;
 
 import java.util.List;
+import java.util.Map;
 
 import de.javagl.jgltf.impl.v2.MaterialNormalTextureInfo;
 import de.javagl.jgltf.impl.v2.TextureInfo;
 import de.javagl.jgltf.impl.v2.khr.materials_clearcoat.MaterialMaterialsClearcoat;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.MaterialModel;
+import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.NormalTextureInfoModel;
 import de.javagl.jgltf.model.TextureInfoModel;
 import de.javagl.jgltf.model.TextureModel;
@@ -159,5 +161,49 @@ public class MaterialsClearcoatExtensionHandler implements ExtensionHandler
         
         return impl;
     }
+    
+    @Override
+    public Object copy(GltfModel gltfModel, Object modelObject,
+        Map<ModelElement, ModelElement> modelElementMap)
+    {
+        MaterialsClearcoatModel inputModel =
+            (MaterialsClearcoatModel)modelObject;
+        DefaultMaterialsClearcoatModel outputModel = 
+            new DefaultMaterialsClearcoatModel();
+        modelElementMap.put(inputModel, outputModel);
+        
+        outputModel.setClearcoatFactor(inputModel.getClearcoatFactor());
+        outputModel.setClearcoatRoughnessFactor(
+            inputModel.getClearcoatRoughnessFactor());
+
+        TextureInfoModel inputClearcoatTextureInfoModel = 
+            inputModel.getClearcoatTextureInfoModel();
+        TextureInfoModel outputClearcoatTextureInfoModel =
+            TextureInfoModels.copy(
+                inputClearcoatTextureInfoModel, modelElementMap);
+        outputModel.setClearcoatTextureInfoModel(
+            outputClearcoatTextureInfoModel);
+
+        
+        TextureInfoModel inputClearcoatRoughnessTextureInfoModel =
+            inputModel.getClearcoatRoughnessTextureInfoModel();
+        TextureInfoModel outputClearcoatRoughnessTextureInfoModel = 
+            TextureInfoModels.copy(
+                inputClearcoatRoughnessTextureInfoModel, modelElementMap);
+        outputModel.setClearcoatRoughnessTextureInfoModel(
+            outputClearcoatRoughnessTextureInfoModel);
+        
+        NormalTextureInfoModel inputClearcoatNormalTextureInfoModel =
+            inputModel.getClearcoatNormalTextureInfoModel();
+        NormalTextureInfoModel outputClearcoatNormalTextureInfoModel =
+            TextureInfoModels.copy(
+                inputClearcoatNormalTextureInfoModel, modelElementMap);
+        outputModel.setClearcoatNormalTextureInfoModel(
+            outputClearcoatNormalTextureInfoModel);
+        
+        return outputModel;
+    }
+    
+    
 
 }

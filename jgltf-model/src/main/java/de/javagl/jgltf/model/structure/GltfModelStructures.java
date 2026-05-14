@@ -39,7 +39,6 @@ import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.javagl.jgltf.impl.v2.GlTFProperty;
 import de.javagl.jgltf.model.AccessorData;
 import de.javagl.jgltf.model.AccessorDatas;
 import de.javagl.jgltf.model.AccessorModel;
@@ -196,6 +195,12 @@ public class GltfModelStructures
     private Map<TechniqueModel, DefaultTechniqueModel> techniqueModelsMap;
     
     /**
+     * The mapping from ALL elements in the source to elements in the target
+     */
+    private Map<ModelElement, ModelElement> modelElementMap;
+
+    
+    /**
      * Default constructor
      */
     public GltfModelStructures()
@@ -284,6 +289,18 @@ public class GltfModelStructures
             source.getTextureModels(),
             DefaultTextureModel::new,
             target::addTextureModel);
+
+        modelElementMap = new LinkedHashMap<ModelElement, ModelElement>();
+        modelElementMap.putAll(accessorModelsMap);
+        modelElementMap.putAll(animationModelsMap);
+        modelElementMap.putAll(cameraModelsMap);
+        modelElementMap.putAll(imageModelsMap);
+        modelElementMap.putAll(materialModelsMap);
+        modelElementMap.putAll(meshModelsMap);
+        modelElementMap.putAll(nodeModelsMap);
+        modelElementMap.putAll(sceneModelsMap);
+        modelElementMap.putAll(skinModelsMap);
+        modelElementMap.putAll(textureModelsMap);
         
         if (sourceV1 != null && targetV1 != null) 
         {
@@ -299,6 +316,10 @@ public class GltfModelStructures
                 sourceV1.getTechniqueModels(), 
                 DefaultTechniqueModel::new, 
                 targetV1::addTechniqueModel);
+            
+            modelElementMap.putAll(shaderModelsMap);
+            modelElementMap.putAll(programModelsMap);
+            modelElementMap.putAll(techniqueModelsMap);
         }
         
         copyGltfPropertyElements(source, target);
@@ -401,7 +422,8 @@ public class GltfModelStructures
         {
             throw new GltfException("The 'prepare' method has not been called");
         }
-        Level level = Level.FINE;
+        Level level = Level.INFO;
+        // @formatter:off
         if (logger.isLoggable(level)) 
         {
             StringBuilder sb = new StringBuilder();
@@ -419,6 +441,7 @@ public class GltfModelStructures
             sb.append("  imagesInBufferViews : " + config.imagesInBufferViews + "\n");
             logger.log(level, sb.toString());
         }
+        // @formatter:on
         
         BufferBuilderStrategy bbs = BufferBuilderStrategies.create(config);
         bbs.process(target);
@@ -447,9 +470,9 @@ public class GltfModelStructures
         shaderModelsMap = null;
         programModelsMap = null;
         techniqueModelsMap = null;
+        modelElementMap = null;
         
         return result;
-        
     }
     
     /**
@@ -635,6 +658,7 @@ public class GltfModelStructures
         int mode = sourceMeshPrimitiveModel.getMode();
         DefaultMeshPrimitiveModel targetMeshPrimitiveModel =
             new DefaultMeshPrimitiveModel(mode);
+        modelElementMap.put(sourceMeshPrimitiveModel, targetMeshPrimitiveModel);
         
         AccessorModel sourceIndices =
             sourceMeshPrimitiveModel.getIndices();
@@ -1504,21 +1528,8 @@ public class GltfModelStructures
         }
         AbstractModelElement targetModelElement = 
             (AbstractModelElement) targetElement;
-        GlTFProperty gltfProperty = new GlTFProperty();
-        ExtensionModels.createExtensionImpls(
-            this.source, sourceElement, modelClass, gltfProperty);
-        Map<String, Object> extensions = gltfProperty.getExtensions();
-        if (extensions != null)
-        {
-            for (Entry<String, Object> entry : extensions.entrySet())
-            {
-                String key = entry.getKey();
-                Object value = entry.getValue();
-                targetModelElement.addExtension(key, value);            
-            }
-        }
-        ExtensionModels.createExtensionModels(
-            this.target, targetElement, modelClass);
+        ExtensionModels.copyExtensionModels(source, sourceElement,
+            targetModelElement, modelClass, modelElementMap);
     }
     
     /**
