@@ -14,8 +14,7 @@
     "max" : [ 1.0, 1.0, 1.0 ],
     "min" : [ -1.0, -1.0, -1.0 ]
   }, {
-    "bufferView" : 1,
-    "byteOffset" : 288,
+    "bufferView" : 2,
     "componentType" : 5126,
     "count" : 24,
     "type" : "VEC3",
@@ -27,19 +26,23 @@
     "version" : "2.0"
   },
   "buffers" : [ {
-    "uri" : "Box0.bin",
+    "uri" : "buffer0.bin",
     "byteLength" : 648
   } ],
   "bufferViews" : [ {
     "buffer" : 0,
-    "byteOffset" : 576,
+    "byteOffset" : 0,
     "byteLength" : 72,
     "target" : 34963
   }, {
     "buffer" : 0,
-    "byteOffset" : 0,
-    "byteLength" : 576,
-    "byteStride" : 12,
+    "byteOffset" : 72,
+    "byteLength" : 288,
+    "target" : 34962
+  }, {
+    "buffer" : 0,
+    "byteOffset" : 360,
+    "byteLength" : 288,
     "target" : 34962
   } ],
   "materials" : [ {

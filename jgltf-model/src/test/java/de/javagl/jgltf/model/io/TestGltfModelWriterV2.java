@@ -51,8 +51,8 @@ public class TestGltfModelWriterV2
             outputPath.toString(), "Box.gltf");
         
         TestUtils.assertFileEquals(
-            inputPath.toString(), "Box0.bin", 
-            outputPath.toString(), "Box0.bin");
+            inputPath.toString(), "buffer0.bin", 
+            outputPath.toString(), "buffer0.bin");
     }
     
     @Test

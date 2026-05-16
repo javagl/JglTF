@@ -33,7 +33,7 @@
     "version" : "2.0"
   },
   "buffers" : [ {
-    "uri" : "buffer.bin",
+    "uri" : "buffer0.bin",
     "byteLength" : 840
   } ],
   "bufferViews" : [ {

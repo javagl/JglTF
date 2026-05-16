@@ -19,8 +19,7 @@
       "min" : [ 0.0, 0.0, 0.0 ]
     },
     "accessor_2" : {
-      "bufferView" : "bufferView_1",
-      "byteOffset" : 288,
+      "bufferView" : "bufferView_2",
       "byteStride" : 12,
       "componentType" : 5126,
       "count" : 24,
@@ -29,9 +28,8 @@
       "min" : [ -1.0, -1.0, -1.0 ]
     },
     "accessor_3" : {
-      "bufferView" : "bufferView_1",
-      "byteOffset" : 576,
-      "byteStride" : 12,
+      "bufferView" : "bufferView_3",
+      "byteStride" : 8,
       "componentType" : 5126,
       "count" : 24,
       "type" : "VEC2",
@@ -46,7 +44,7 @@
   "buffers" : {
     "buffer_0" : {
       "uri" : "buffer0.bin",
-      "byteLength" : 936
+      "byteLength" : 840
     }
   },
   "bufferViews" : {
@@ -59,7 +57,19 @@
     "bufferView_1" : {
       "buffer" : "buffer_0",
       "byteOffset" : 72,
-      "byteLength" : 864,
+      "byteLength" : 288,
+      "target" : 34962
+    },
+    "bufferView_2" : {
+      "buffer" : "buffer_0",
+      "byteOffset" : 360,
+      "byteLength" : 288,
+      "target" : 34962
+    },
+    "bufferView_3" : {
+      "buffer" : "buffer_0",
+      "byteOffset" : 648,
+      "byteLength" : 192,
       "target" : 34962
     }
   },
