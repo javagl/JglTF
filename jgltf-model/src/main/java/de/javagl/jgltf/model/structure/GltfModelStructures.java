@@ -1520,7 +1520,7 @@ public class GltfModelStructures
         Set<Class<?>> types = computeModelElementInterfaceTypes(sourceType);
         for (Class<?> type : types)
         {
-            logger.fine("Copying extension models based on type " + type);
+            logger.finer("Copying extension models based on type " + type);
             copyExtensionModels(sourceElement, targetElement, type);
         }
     }
