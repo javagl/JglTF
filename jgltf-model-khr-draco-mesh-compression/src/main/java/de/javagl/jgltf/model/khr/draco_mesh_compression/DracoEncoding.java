@@ -28,7 +28,9 @@ package de.javagl.jgltf.model.khr.draco_mesh_compression;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -106,10 +108,24 @@ class DracoEncoding
         int indices[] = toIntArray(indicesAccessorModel);
         mesh.getIndices().addRange(indices);
 
-        Set<String> encodedAttributes = model.getAttributes();
+        // Apparently the 'Drako' draco compression expects the POSITION
+        // attribute to be the FIRST one in the mesh. Ensure this here:
+        Set<String> attributesToEncode = model.getAttributes();
+        List<String> orderedAttributesToEncode = new ArrayList<String>();
+        for (String attributeName : attributesToEncode)
+        {
+            if ("POSITION".equals(attributeName))
+            {
+                orderedAttributesToEncode.add(0, attributeName);
+            }
+            else
+            {
+                orderedAttributesToEncode.add(attributeName);
+            }
+        }
         Map<String, AccessorModel> attributes =
             meshPrimitiveModel.getAttributes();
-        for (String attributeName : encodedAttributes)
+        for (String attributeName : orderedAttributesToEncode)
         {
             DefaultAccessorModel accessorModel =
                 (DefaultAccessorModel) attributes.get(attributeName);
@@ -126,8 +142,7 @@ class DracoEncoding
             }
             PointAttribute pointAttribute =
                 toAttribute(attributeType, accessorModel);
-            mesh.addAttribute(pointAttribute);
-            int attributeId = mesh.getNamedAttributeId(attributeType);
+            int attributeId = mesh.addAttribute(pointAttribute);
             result.dracoAttributeIds.put(attributeName, attributeId);
         }
 
