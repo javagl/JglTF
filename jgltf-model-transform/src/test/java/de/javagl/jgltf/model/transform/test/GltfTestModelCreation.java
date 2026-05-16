@@ -47,6 +47,7 @@ import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.NodeModel;
 import de.javagl.jgltf.model.creation.AccessorModels;
 import de.javagl.jgltf.model.creation.GltfModelBuilder;
+import de.javagl.jgltf.model.ext.mesh_gpu_instancing.DefaultMeshGpuInstancingModel;
 import de.javagl.jgltf.model.impl.DefaultAccessorModel;
 import de.javagl.jgltf.model.impl.DefaultAnimationModel;
 import de.javagl.jgltf.model.impl.DefaultAnimationModel.DefaultChannel;
@@ -177,6 +178,59 @@ class GltfTestModelCreation
         return gltfModel;
     }
 
+    /**
+     * Create an textured square that uses EXT_mesh_gpu_instancing
+     * 
+     * @return The model
+     */
+    public static DefaultGltfModel createTexturedSquareInstanced()
+    {
+        // Create the mesh primitive model
+        DefaultMeshPrimitiveModel meshPrimitiveModel =
+            createSquareMeshPrimitiveWithTexcoords();
+
+        // Assign a material
+        DefaultPbrMaterialModel materialModel =
+            createBaseColorTextureMaterialModel();
+        meshPrimitiveModel.setMaterialModel(materialModel);
+
+        // Create a mesh with the primitive
+        DefaultMeshModel meshModel = new DefaultMeshModel();
+        meshModel.addMeshPrimitiveModel(meshPrimitiveModel);
+        
+        // Create a node with the mesh
+        DefaultNodeModel nodeModel = new DefaultNodeModel();
+        nodeModel.addMeshModel(meshModel);
+        
+        // Create the instancing extension with some translation
+        DefaultMeshGpuInstancingModel meshGpuInstancing = 
+            new DefaultMeshGpuInstancingModel();
+        float translations[] =
+        {
+            0.0f, 0.0f, 0.0f,
+            1.5f, 0.0f, 0.0f,
+            3.0f, 0.0f, 0.0f
+        };
+        DefaultAccessorModel translationAccessorModel = 
+            AccessorModels.createFloat3D(FloatBuffer.wrap(translations));
+        meshGpuInstancing.setAttribute("TRANSLATION", translationAccessorModel);
+
+        // Assign the instancing extension to the node
+        nodeModel.addExtensionModel("EXT_mesh_gpu_instancing", 
+            meshGpuInstancing);
+        
+        // Create a scene with the node
+        DefaultSceneModel sceneModel = new DefaultSceneModel();
+        sceneModel.addNode(nodeModel);
+        
+        // Create the glTF model
+        GltfModelBuilder gltfModelBuilder = GltfModelBuilder.create();
+        gltfModelBuilder.addSceneModel(sceneModel);
+        DefaultGltfModel gltfModel = gltfModelBuilder.build();
+        return gltfModel;
+    }
+
+    
     /**
      * Create a scene model with a single node with a single mesh with the given
      * mesh primitive model

@@ -49,6 +49,7 @@ public class GltfModelTransformsTest
         testRemoveAnimationValuesAccessor();
         testRemoveSkinAnimationTimesAccessor();
         testRemoveSkinAttributes();
+        testRemoveInstancingAcessor();
     }
 
     /**
@@ -225,6 +226,26 @@ public class GltfModelTransformsTest
     }
     
     
+    /**
+     * Run a test to remove an accessor that is used for instancing
+     *  
+     * @throws IOException If an IO error occurs
+     */
+    private static void testRemoveInstancingAcessor() throws IOException
+    {
+        String name = "TexturedSquareInstanced";
+        String modifiedName = name + "-removedInstancingAccessor";
+        DefaultGltfModel gltfModel =
+            GltfTestModelCreation.createTexturedSquareInstanced();
+
+        runTest(gltfModel, name, modifiedName, () -> 
+        {
+            ModelElement mm0 = gltfModel.getMaterialModel(0);
+            Set<ModelElement> toRemove = new LinkedHashSet<ModelElement>();
+            toRemove.add(mm0);
+            GltfModelTransforms.removeAll(gltfModel, toRemove);
+        });
+    }
     
     
     
