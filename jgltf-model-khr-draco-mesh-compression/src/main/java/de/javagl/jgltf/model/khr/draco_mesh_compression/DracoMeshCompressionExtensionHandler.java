@@ -81,14 +81,15 @@ public class DracoMeshCompressionExtensionHandler implements ExtensionHandler
     public Object convertToModel(GltfModel gltfModel, Object owningModelObject,
         Object object)
     {
-        DefaultMeshPrimitiveModel meshPrimitiveModel =
-            (DefaultMeshPrimitiveModel) owningModelObject;
         DefaultDracoMeshCompressionModel model =
             new DefaultDracoMeshCompressionModel();
         MeshPrimitiveDracoMeshCompression impl =
             (MeshPrimitiveDracoMeshCompression) object;
         ModelElementsV2.transferGltfPropertyElementsToModel(impl, model);
 
+        DefaultMeshPrimitiveModel meshPrimitiveModel =
+            (DefaultMeshPrimitiveModel) owningModelObject;
+        
         DracoDecoding.Result result =
             DracoDecoding.decode(gltfModel, meshPrimitiveModel, impl);
         meshPrimitiveModel.setIndices(result.indices);
@@ -134,6 +135,10 @@ public class DracoMeshCompressionExtensionHandler implements ExtensionHandler
         modelElementMap.put(inputModel, outputModel);
         ModelElementsV2.transferGltfPropertyElements(inputModel, outputModel);
 
+        // This will only copy the public properties. 
+        // The draco attribute IDs and the draco buffer view are NOT copied 
+        // here. They are assigned to the resulting object only during 
+        // preprocessing 
         for (String attribute : inputModel.getAttributes())
         {
             outputModel.addAttribute(attribute);
