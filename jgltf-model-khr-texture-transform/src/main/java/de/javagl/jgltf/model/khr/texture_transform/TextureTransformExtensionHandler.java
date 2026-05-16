@@ -63,7 +63,7 @@ public class TextureTransformExtensionHandler implements ExtensionHandler
     @Override
     public Class<?> getModelClass()
     {
-        return DefaultTextureTransformModel.class;
+        return TextureTransformModel.class;
     }
 
     @Override

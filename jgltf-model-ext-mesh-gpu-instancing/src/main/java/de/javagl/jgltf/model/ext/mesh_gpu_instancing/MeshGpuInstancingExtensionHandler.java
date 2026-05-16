@@ -65,7 +65,7 @@ public class MeshGpuInstancingExtensionHandler implements ExtensionHandler
     @Override
     public Class<?> getModelClass()
     {
-        return DefaultMeshGpuInstancingModel.class;
+        return MeshGpuInstancingModel.class;
     }
 
     @Override
