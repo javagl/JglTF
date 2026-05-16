@@ -69,7 +69,7 @@ class DracoEncoding
     /**
      * The default log level
      */
-    private static final Level level = Level.INFO;
+    private static final Level level = Level.FINE;
 
     /**
      * Internal class for the encoded draco data of one mesh primitive
@@ -115,7 +115,7 @@ class DracoEncoding
                 (DefaultAccessorModel) attributes.get(attributeName);
             if (accessorModel == null)
             {
-                logger.warning("Could not find attribute " + attributeName
+                logger.info("Could not find attribute " + attributeName
                     + " in mesh primitive - skipping");
                 continue;
             }
