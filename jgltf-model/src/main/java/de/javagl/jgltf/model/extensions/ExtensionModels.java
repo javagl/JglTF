@@ -121,13 +121,14 @@ public class ExtensionModels
             ExtensionHandler extensionHandler =
                 extensionHandlerRegistry.get(modelClass, extensionName);
 
+            if (extensionHandler == null)
+            {
+                logger.info("No extension handler found for " + extensionName);
+                continue;
+            }
             logger.fine("Found extension " + extensionName
                 + " with extension handler " + extensionHandler);
 
-            if (extensionHandler == null)
-            {
-                continue;
-            }
             Class<?> implClass = extensionHandler.getImplClass();
 
             // Try to convert the object, printing a warning when
@@ -195,13 +196,13 @@ public class ExtensionModels
             ExtensionHandler extensionHandler =
                 extensionHandlerRegistry.get(modelClass, extensionName);
 
-            logger.fine("Found extension " + extensionName
-                + " with extension handler " + extensionHandler);
-
             if (extensionHandler == null)
             {
+                logger.info("No extension handler found for " + extensionName);
                 continue;
             }
+            logger.fine("Found extension " + extensionName
+                + " with extension handler " + extensionHandler);
             
             Object impl = extensionHandler.convertToImpl(
                 gltfModel, modelObject);
@@ -274,7 +275,7 @@ public class ExtensionModels
             {
                 continue;
             }
-            logger.info(
+            logger.fine(
                 "Copy extension " + extensionName + " with extension handler "
                     + extensionHandler + " for " + modelClass);
 
