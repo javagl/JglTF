@@ -123,16 +123,11 @@ public class TechniqueParameters
      * 
      * @param type The type to set
      * @throws NullPointerException If the given value is <code>null</code>
-     * @throws IllegalArgumentException If the given value does not meet
-     * the given constraints
      * 
      */
     public void setType(Integer type) {
         if (type == null) {
             throw new NullPointerException((("Invalid value for type: "+ type)+", may not be null"));
-        }
-        if (((((((((((((((((((((type!= 5120)&&(type!= 5121))&&(type!= 5122))&&(type!= 5123))&&(type!= 5124))&&(type!= 5125))&&(type!= 5126))&&(type!= 35664))&&(type!= 35665))&&(type!= 35666))&&(type!= 35667))&&(type!= 35668))&&(type!= 35669))&&(type!= 35670))&&(type!= 35671))&&(type!= 35672))&&(type!= 35673))&&(type!= 35674))&&(type!= 35675))&&(type!= 35676))&&(type!= 35678)) {
-            throw new IllegalArgumentException((("Invalid value for type: "+ type)+", valid: [5120, 5121, 5122, 5123, 5124, 5125, 5126, 35664, 35665, 35666, 35667, 35668, 35669, 35670, 35671, 35672, 35673, 35674, 35675, 35676, 35678]"));
         }
         this.type = type;
     }

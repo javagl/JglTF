@@ -62,16 +62,11 @@ public class Shader
      * 
      * @param type The type to set
      * @throws NullPointerException If the given value is <code>null</code>
-     * @throws IllegalArgumentException If the given value does not meet
-     * the given constraints
      * 
      */
     public void setType(Integer type) {
         if (type == null) {
             throw new NullPointerException((("Invalid value for type: "+ type)+", may not be null"));
-        }
-        if ((type!= 35632)&&(type!= 35633)) {
-            throw new IllegalArgumentException((("Invalid value for type: "+ type)+", valid: [35632, 35633]"));
         }
         this.type = type;
     }
