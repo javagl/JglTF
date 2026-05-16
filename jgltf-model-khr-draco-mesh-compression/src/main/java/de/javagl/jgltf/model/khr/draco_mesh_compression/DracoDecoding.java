@@ -249,18 +249,18 @@ class DracoDecoding
         }
         else if (componentDataType == short.class)
         {
-            ShortBuffer attributeData =
+            ByteBuffer attributeData =
                 readShortDracoAttribute(pointAttribute, count, componentCount);
             DefaultAccessorModel result = AccessorModels.create(componentType,
-                type, normalized, Buffers.createByteBufferFrom(attributeData));
+                type, normalized, attributeData);
             return result;
         }
         else if (componentDataType == float.class)
         {
-            FloatBuffer attributeData =
+            ByteBuffer attributeData =
                 readFloatDracoAttribute(pointAttribute, count, componentCount);
             DefaultAccessorModel result = AccessorModels.create(componentType,
-                type, normalized, Buffers.createByteBufferFrom(attributeData));
+                type, normalized, attributeData);
             return result;
         }
         logger.severe(
@@ -304,7 +304,7 @@ class DracoDecoding
      * @param componentCount The component count
      * @return The resulting data, as a short buffer
      */
-    private static ShortBuffer readShortDracoAttribute(
+    private static ByteBuffer readShortDracoAttribute(
         PointAttribute pointAttribute, int count, int componentCount)
     {
         short p[] = new short[componentCount];
@@ -320,7 +320,7 @@ class DracoDecoding
                 attributeDataShort.put(i * componentCount + c, p[c]);
             }
         }
-        return attributeDataShort;
+        return attributeData;
     }
 
     /**
@@ -332,7 +332,7 @@ class DracoDecoding
      * @param componentCount The component count
      * @return The resulting data, as a float buffer
      */
-    private static FloatBuffer readFloatDracoAttribute(
+    private static ByteBuffer readFloatDracoAttribute(
         PointAttribute pointAttribute, int count, int componentCount)
     {
         float p[] = new float[componentCount];
@@ -349,7 +349,7 @@ class DracoDecoding
                 attributeDataFloat.put(offset0 + c, p[c]);
             }
         }
-        return attributeDataFloat;
+        return attributeData;
     }
 
     /**
