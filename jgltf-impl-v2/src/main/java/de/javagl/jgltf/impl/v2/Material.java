@@ -246,17 +246,12 @@ public class Material
      * Valid values: [OPAQUE, MASK, BLEND] 
      * 
      * @param alphaMode The alphaMode to set
-     * @throws IllegalArgumentException If the given value does not meet
-     * the given constraints
      * 
      */
     public void setAlphaMode(String alphaMode) {
         if (alphaMode == null) {
             this.alphaMode = alphaMode;
             return ;
-        }
-        if (((!"OPAQUE".equals(alphaMode))&&(!"MASK".equals(alphaMode)))&&(!"BLEND".equals(alphaMode))) {
-            throw new IllegalArgumentException((("Invalid value for alphaMode: "+ alphaMode)+", valid: [OPAQUE, MASK, BLEND]"));
         }
         this.alphaMode = alphaMode;
     }

@@ -62,16 +62,11 @@ public class AnimationChannelTarget
      * 
      * @param path The path to set
      * @throws NullPointerException If the given value is <code>null</code>
-     * @throws IllegalArgumentException If the given value does not meet
-     * the given constraints
      * 
      */
     public void setPath(String path) {
         if (path == null) {
             throw new NullPointerException((("Invalid value for path: "+ path)+", may not be null"));
-        }
-        if (((!"translation".equals(path))&&(!"rotation".equals(path)))&&(!"scale".equals(path))) {
-            throw new IllegalArgumentException((("Invalid value for path: "+ path)+", valid: [translation, rotation, scale]"));
         }
         this.path = path;
     }

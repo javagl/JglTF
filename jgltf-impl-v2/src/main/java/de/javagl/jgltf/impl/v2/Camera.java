@@ -106,16 +106,11 @@ public class Camera
      * 
      * @param type The type to set
      * @throws NullPointerException If the given value is <code>null</code>
-     * @throws IllegalArgumentException If the given value does not meet
-     * the given constraints
      * 
      */
     public void setType(String type) {
         if (type == null) {
             throw new NullPointerException((("Invalid value for type: "+ type)+", may not be null"));
-        }
-        if ((!"perspective".equals(type))&&(!"orthographic".equals(type))) {
-            throw new IllegalArgumentException((("Invalid value for type: "+ type)+", valid: [perspective, orthographic]"));
         }
         this.type = type;
     }

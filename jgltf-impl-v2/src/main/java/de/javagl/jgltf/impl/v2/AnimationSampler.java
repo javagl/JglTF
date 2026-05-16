@@ -70,17 +70,12 @@ public class AnimationSampler
      * Valid values: [LINEAR, STEP, CUBICSPLINE] 
      * 
      * @param interpolation The interpolation to set
-     * @throws IllegalArgumentException If the given value does not meet
-     * the given constraints
      * 
      */
     public void setInterpolation(String interpolation) {
         if (interpolation == null) {
             this.interpolation = interpolation;
             return ;
-        }
-        if (((!"LINEAR".equals(interpolation))&&(!"STEP".equals(interpolation)))&&(!"CUBICSPLINE".equals(interpolation))) {
-            throw new IllegalArgumentException((("Invalid value for interpolation: "+ interpolation)+", valid: [LINEAR, STEP, CUBICSPLINE]"));
         }
         this.interpolation = interpolation;
     }

@@ -114,17 +114,12 @@ public class Buffer
      * Valid values: [arraybuffer, text] 
      * 
      * @param type The type to set
-     * @throws IllegalArgumentException If the given value does not meet
-     * the given constraints
      * 
      */
     public void setType(String type) {
         if (type == null) {
             this.type = type;
             return ;
-        }
-        if ((!"arraybuffer".equals(type))&&(!"text".equals(type))) {
-            throw new IllegalArgumentException((("Invalid value for type: "+ type)+", valid: [arraybuffer, text]"));
         }
         this.type = type;
     }

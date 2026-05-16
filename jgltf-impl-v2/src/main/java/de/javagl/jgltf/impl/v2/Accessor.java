@@ -160,16 +160,11 @@ public class Accessor
      * 
      * @param componentType The componentType to set
      * @throws NullPointerException If the given value is <code>null</code>
-     * @throws IllegalArgumentException If the given value does not meet
-     * the given constraints
      * 
      */
     public void setComponentType(Integer componentType) {
         if (componentType == null) {
             throw new NullPointerException((("Invalid value for componentType: "+ componentType)+", may not be null"));
-        }
-        if ((((((componentType!= 5120)&&(componentType!= 5121))&&(componentType!= 5122))&&(componentType!= 5123))&&(componentType!= 5125))&&(componentType!= 5126)&&(componentType!= 5130)&&(componentType!= 5131)) {
-            throw new IllegalArgumentException((("Invalid value for componentType: "+ componentType)+", valid: [5120, 5121, 5122, 5123, 5125, 5126, 5130, 5131]"));
         }
         this.componentType = componentType;
     }
@@ -262,16 +257,11 @@ public class Accessor
      * 
      * @param type The type to set
      * @throws NullPointerException If the given value is <code>null</code>
-     * @throws IllegalArgumentException If the given value does not meet
-     * the given constraints
      * 
      */
     public void setType(String type) {
         if (type == null) {
             throw new NullPointerException((("Invalid value for type: "+ type)+", may not be null"));
-        }
-        if (((((((!"SCALAR".equals(type))&&(!"VEC2".equals(type)))&&(!"VEC3".equals(type)))&&(!"VEC4".equals(type)))&&(!"MAT2".equals(type)))&&(!"MAT3".equals(type)))&&(!"MAT4".equals(type))) {
-            throw new IllegalArgumentException((("Invalid value for type: "+ type)+", valid: [SCALAR, VEC2, VEC3, VEC4, MAT2, MAT3, MAT4]"));
         }
         this.type = type;
     }

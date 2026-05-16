@@ -149,17 +149,12 @@ public class BufferView
      * Valid values: [34962, 34963] 
      * 
      * @param target The target to set
-     * @throws IllegalArgumentException If the given value does not meet
-     * the given constraints
      * 
      */
     public void setTarget(Integer target) {
         if (target == null) {
             this.target = target;
             return ;
-        }
-        if ((target!= 34962)&&(target!= 34963)) {
-            throw new IllegalArgumentException((("Invalid value for target: "+ target)+", valid: [34962, 34963]"));
         }
         this.target = target;
     }
