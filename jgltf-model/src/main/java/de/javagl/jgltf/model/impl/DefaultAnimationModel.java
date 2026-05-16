@@ -27,12 +27,16 @@
 package de.javagl.jgltf.model.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.AnimationModel;
+import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.NodeModel;
 
 /**
@@ -193,5 +197,63 @@ public class DefaultAnimationModel extends AbstractNamedModelElement
     {
         return Collections.unmodifiableList(channels);
     }
+    
+    
+    @Override
+    public Set<ModelElement> getReferencedModelElements()
+    {
+        Set<ModelElement> modelElements = 
+            getReferencedExtensionModelElements();
+        for (Channel channel : channels)
+        {
+            NodeModel nodeModel = channel.getNodeModel();
+            if (nodeModel != null)
+            {
+                modelElements.add(nodeModel);
+            }
+            Sampler sampler = channel.getSampler();
+            AccessorModel input = sampler.getInput();
+            if (input != null)
+            {
+                modelElements.add(input);
+            }
+            AccessorModel output = sampler.getOutput();
+            if (output != null)
+            {
+                modelElements.add(output);
+            }
+        }
+        return modelElements;
+    }
+    
+    @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove)
+    {
+        removeExtensionModelElements(modelElementsToRemove);
+        Set<Channel> channelsToRemove = new LinkedHashSet<Channel>();
+        for (Channel channel : channels)
+        {
+            NodeModel nodeModel = channel.getNodeModel();
+            if (modelElementsToRemove.contains(nodeModel))
+            {
+                channelsToRemove.add(channel);
+            }
+            Sampler sampler = channel.getSampler();
+            AccessorModel input = sampler.getInput();
+            if (modelElementsToRemove.contains(input))
+            {
+                channelsToRemove.add(channel);
+            }
+            AccessorModel output = sampler.getOutput();
+            if (modelElementsToRemove.contains(output))
+            {
+                channelsToRemove.add(channel);
+            }
+        }
+        channels.removeAll(channelsToRemove);
+        return !channelsToRemove.isEmpty();
+    }
+    
     
 }

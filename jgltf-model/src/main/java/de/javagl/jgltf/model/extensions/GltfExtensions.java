@@ -27,6 +27,8 @@
 package de.javagl.jgltf.model.extensions;
 
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -38,41 +40,68 @@ import de.javagl.jgltf.model.io.JacksonUtils;
 public class GltfExtensions
 {
     /**
+     * The logger used in this class
+     */
+    private static final Logger logger =
+        Logger.getLogger(GltfExtensions.class.getName());
+
+    /**
      * Obtain the specified extension object from the given glTF property.
      * 
-     * If the given glTF object does not have an extension with the
-     * given name, or this object cannot be converted to the given
-     * target type, then <code>null</code> is returned.
-     *  
+     * If the given glTF object does not have an extension with the given name,
+     * or this object cannot be converted to the given target type, then
+     * <code>null</code> is returned.
+     * 
      * @param <T> The type of the extension object
      * 
      * @param gltfProperty The glTF property
      * @param extensionName The extension name
      * @param extensionType The extension type
      * @return The extension object, or <code>null</code>
-     * @throws IllegalArgumentException If the given glTF property is neither
-     * a <code>de.javagl.jgltf.impl.v1.GlTFProperty</code> nor a
-     * a <code>de.javagl.jgltf.impl.v2.GlTFProperty</code>
+     * @throws IllegalArgumentException If the given glTF property is neither a
+     *         <code>de.javagl.jgltf.impl.v1.GlTFProperty</code> nor a a
+     *         <code>de.javagl.jgltf.impl.v2.GlTFProperty</code>
      */
-    public static <T> T obtain(
-        Object gltfProperty, String extensionName, Class<T> extensionType)
+    public static <T> T obtain(Object gltfProperty, String extensionName,
+        Class<T> extensionType)
     {
         if (gltfProperty instanceof de.javagl.jgltf.impl.v1.GlTFProperty)
         {
-            de.javagl.jgltf.impl.v1.GlTFProperty gltfPropertyV1 = 
+            de.javagl.jgltf.impl.v1.GlTFProperty gltfPropertyV1 =
                 (de.javagl.jgltf.impl.v1.GlTFProperty) gltfProperty;
             Map<String, Object> extensions = gltfPropertyV1.getExtensions();
             return obtainInternal(extensions, extensionName, extensionType);
         }
         if (gltfProperty instanceof de.javagl.jgltf.impl.v2.GlTFProperty)
         {
-            de.javagl.jgltf.impl.v2.GlTFProperty gltfPropertyV2 = 
+            de.javagl.jgltf.impl.v2.GlTFProperty gltfPropertyV2 =
                 (de.javagl.jgltf.impl.v2.GlTFProperty) gltfProperty;
             Map<String, Object> extensions = gltfPropertyV2.getExtensions();
             return obtainInternal(extensions, extensionName, extensionType);
         }
         throw new IllegalArgumentException(
             "Not a valid glTF property: " + gltfProperty);
+    }
+
+    /**
+     * Obtain the specified extension object from the given map of raw
+     * (unprocessed) extension information.
+     * 
+     * If the given extensions are <code>null</code>, or do not contain an
+     * extension with the given name, or the object cannot be converted to the
+     * given target type, then <code>null</code> is returned.
+     * 
+     * @param <T> The type of the extension object
+     * 
+     * @param extensions The extensions
+     * @param extensionName The extension name
+     * @param extensionType The extension type
+     * @return The extension object, or <code>null</code>
+     */
+    public static <T> T obtainExtension(Map<String, Object> extensions,
+        String extensionName, Class<T> extensionType)
+    {
+        return obtainInternal(extensions, extensionName, extensionType);
     }
 
     /**
@@ -83,10 +112,9 @@ public class GltfExtensions
      * @param extensionName The extension name
      * @param extensionType The extension type
      * @return The extension object, or <code>null</code> if it cannot be
-     * obtained
+     *         obtained
      */
-    private static <T> T obtainInternal(
-        Map<String, Object> extensions,
+    private static <T> T obtainInternal(Map<String, Object> extensions,
         String extensionName, Class<T> extensionType)
     {
         if (extensions == null)
@@ -100,7 +128,7 @@ public class GltfExtensions
         }
         return convertValueOptional(object, extensionType);
     }
-    
+
     /**
      * Convert the given object to the given target type
      * 
@@ -116,17 +144,19 @@ public class GltfExtensions
         ObjectMapper objectMapper = JacksonUtils.createObjectMapper();
         return objectMapper.convertValue(object, type);
     }
-    
+
     /**
-     * Convert the given object to the given target type, returning 
-     * <code>null</code> if the conversion failed
+     * Convert the given object to the given target type, returning
+     * <code>null</code> and printing a warning if the conversion failed.
+     * 
+     * This method is not part of the public API.
      * 
      * @param <T> The target type
      * @param object The object
      * @param type The target type
      * @return The result
      */
-    private static <T> T convertValueOptional(Object object, Class<T> type)
+    public static <T> T convertValueOptional(Object object, Class<T> type)
     {
         try
         {
@@ -134,12 +164,12 @@ public class GltfExtensions
         }
         catch (IllegalArgumentException e)
         {
+            logger.log(Level.WARNING,
+                "Could not convert " + object + " to " + type, e);
             return null;
         }
     }
-    
 
-    
     /**
      * Private constructor to prevent instantiation
      */

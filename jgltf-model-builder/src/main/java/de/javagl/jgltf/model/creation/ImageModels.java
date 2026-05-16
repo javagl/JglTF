@@ -220,6 +220,30 @@ public class ImageModels
     }
 
     /**
+     * Create a simple "label" image with the given size that just shows
+     * the given text.
+     * 
+     * The given text may be a HTML string.
+     * 
+     * @param uri The URI for the image model
+     * @param sizeX The size of the image in x-direction
+     * @param sizeY The size of the image in y-direction
+     * @param font The font
+     * @param text The text
+     * @param foregroundColor The foreground color 
+     * @param backgroundColor The background color
+     * @return The image model
+     */
+    public static DefaultImageModel createLabel(String uri, int sizeX,
+        int sizeY, Font font, String text, Color foregroundColor,
+        Color backgroundColor)
+    {
+        BufferedImage image = createImageWithText(sizeX, sizeY, font, text,
+            foregroundColor, backgroundColor);
+        return createFromBufferedImage(uri, "image/png", image);
+    }
+    
+    /**
      * Creates a buffered image with the given size that shows the given
      * text.<br>
      * <br>

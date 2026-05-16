@@ -7,7 +7,8 @@
 .idea
 *.iml
 
-/jgltf-obj-multimesh
+# Internal experiments
+# ---
 /jgltf-converter
 /jgltf-viewer-demo
 /jgltf-viewer-lwjgl3
@@ -16,22 +17,86 @@
 /JglTF
 /jgltf-jgltfifier
 /jgltf-asset-creator
-
-# Preliminary for extension experiments:
 # ---
-/jgltf-impl-v2-khr-lights-punctual
-/jgltf-impl-v2-khr-materials-variants
-/jgltf-impl-v2-khr-materials-clearcoat
-/jgltf-impl-v2-khr-texture-transform
-/jgltf-impl-v2-ext-draco-mesh-compression
 
-/jgltf-model-khr-lights-punctual
-/jgltf-model-khr-materials-variants
-/jgltf-model-khr-materials-clearcoat/
-/jgltf-model-khr-texture-transform
-
+# Extension experiments:
+# ---
+/jgltf-experiments-extensions
 /jgltf-draco-test
+/jgltf-impl-v2-ext-meshopt-compression
+/jgltf-model-ext-meshopt-compression
 # ---
+
+/jgltf-model-transform/.classpath
+/jgltf-model-transform/.settings
+/jgltf-model-transform/.project
+/jgltf-model-transform/target
+/jgltf-model-transform/data
+
+/jgltf-model-extensions/.classpath
+/jgltf-model-extensions/.settings
+/jgltf-model-extensions/.project
+/jgltf-model-extensions/target
+
+/jgltf-impl-v2-khr-draco-mesh-compression/.classpath
+/jgltf-impl-v2-khr-draco-mesh-compression/.settings
+/jgltf-impl-v2-khr-draco-mesh-compression/.project
+/jgltf-impl-v2-khr-draco-mesh-compression/target
+
+/jgltf-impl-v2-ext-mesh-gpu-instancing/.classpath
+/jgltf-impl-v2-ext-mesh-gpu-instancing/.settings
+/jgltf-impl-v2-ext-mesh-gpu-instancing/.project
+/jgltf-impl-v2-ext-mesh-gpu-instancing/target
+
+/jgltf-impl-v2-khr-lights-punctual/.classpath
+/jgltf-impl-v2-khr-lights-punctual/.settings
+/jgltf-impl-v2-khr-lights-punctual/.project
+/jgltf-impl-v2-khr-lights-punctual/target
+
+/jgltf-impl-v2-khr-materials-variants/.classpath
+/jgltf-impl-v2-khr-materials-variants/.settings
+/jgltf-impl-v2-khr-materials-variants/.project
+/jgltf-impl-v2-khr-materials-variants/target
+
+/jgltf-impl-v2-khr-materials-clearcoat/.classpath
+/jgltf-impl-v2-khr-materials-clearcoat/.settings
+/jgltf-impl-v2-khr-materials-clearcoat/.project
+/jgltf-impl-v2-khr-materials-clearcoat/target
+
+/jgltf-impl-v2-khr-texture-transform/.classpath
+/jgltf-impl-v2-khr-texture-transform/.settings
+/jgltf-impl-v2-khr-texture-transform/.project
+/jgltf-impl-v2-khr-texture-transform/target
+
+/jgltf-model-ext-mesh-gpu-instancing/.classpath
+/jgltf-model-ext-mesh-gpu-instancing/.settings
+/jgltf-model-ext-mesh-gpu-instancing/.project
+/jgltf-model-ext-mesh-gpu-instancing/target
+
+/jgltf-model-khr-lights-punctual/.classpath
+/jgltf-model-khr-lights-punctual/.settings
+/jgltf-model-khr-lights-punctual/.project
+/jgltf-model-khr-lights-punctual/target
+
+/jgltf-model-khr-materials-variants/.classpath
+/jgltf-model-khr-materials-variants/.settings
+/jgltf-model-khr-materials-variants/.project
+/jgltf-model-khr-materials-variants/target
+
+/jgltf-model-khr-materials-clearcoat/.classpath
+/jgltf-model-khr-materials-clearcoat/.settings
+/jgltf-model-khr-materials-clearcoat/.project
+/jgltf-model-khr-materials-clearcoat/target
+
+/jgltf-model-khr-texture-transform/.classpath
+/jgltf-model-khr-texture-transform/.settings
+/jgltf-model-khr-texture-transform/.project
+/jgltf-model-khr-texture-transform/target
+
+/jgltf-model-khr-draco-mesh-compression/.classpath
+/jgltf-model-khr-draco-mesh-compression/.settings
+/jgltf-model-khr-draco-mesh-compression/.project
+/jgltf-model-khr-draco-mesh-compression/target
 
 /jgltf-browser/.classpath
 /jgltf-browser/.settings
@@ -104,11 +169,6 @@
 /jgltf-impl-v2-ext-structural-metadata/.settings
 /jgltf-impl-v2-ext-structural-metadata/.project
 /jgltf-impl-v2-ext-structural-metadata/target
-
-/jgltf-impl-v2-ext-mesh-gpu-instancing/.classpath
-/jgltf-impl-v2-ext-mesh-gpu-instancing/.settings
-/jgltf-impl-v2-ext-mesh-gpu-instancing/.project
-/jgltf-impl-v2-ext-mesh-gpu-instancing/target
 
 /jgltf-impl-v2-ext-instance-features/.classpath
 /jgltf-impl-v2-ext-instance-features/.settings

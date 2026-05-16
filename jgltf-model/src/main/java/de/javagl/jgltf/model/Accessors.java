@@ -96,10 +96,12 @@ public class Accessors
             case GltfConstants.GL_BYTE: return 1;
             case GltfConstants.GL_UNSIGNED_BYTE: return 1;
             case GltfConstants.GL_SHORT: return 2;
+            case GltfConstants.GL_HALF: return 2;
             case GltfConstants.GL_UNSIGNED_SHORT: return 2;
             case GltfConstants.GL_INT: return 4;
             case GltfConstants.GL_UNSIGNED_INT: return 4;
             case GltfConstants.GL_FLOAT: return 4;
+            case GltfConstants.GL_DOUBLE: return 8;
             default:
                 break;
         }
@@ -115,9 +117,11 @@ public class Accessors
      * GL_UNSIGNED_BYTE  : byte.class
      * GL_SHORT          : short.class 
      * GL_UNSIGNED_SHORT : short.class
+     * GL_HALF           : short.class 
      * GL_INT            : int.class 
      * GL_UNSIGNED_INT   : int.class
      * GL_FLOAT          : float.class
+     * GL_DOUBLE         : double.class
      * </code></pre>
      *  
      * @param componentType The component type
@@ -134,9 +138,11 @@ public class Accessors
             case GltfConstants.GL_UNSIGNED_BYTE: return byte.class;
             case GltfConstants.GL_SHORT: return short.class;
             case GltfConstants.GL_UNSIGNED_SHORT: return short.class;
+            case GltfConstants.GL_HALF: return short.class;
             case GltfConstants.GL_INT: return int.class;
             case GltfConstants.GL_UNSIGNED_INT: return int.class;
             case GltfConstants.GL_FLOAT: return float.class;
+            case GltfConstants.GL_DOUBLE: return double.class;
             default:
                 break;
         }

@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import de.javagl.jgltf.impl.v2.GlTF;
 import de.javagl.jgltf.model.GltfModel;
+import de.javagl.jgltf.model.PbrMaterialModel;
 import de.javagl.jgltf.model.SceneModel;
 import de.javagl.jgltf.model.creation.GltfModelBuilder;
 import de.javagl.jgltf.model.creation.MaterialModels;
@@ -11,7 +12,6 @@ import de.javagl.jgltf.model.creation.MeshPrimitiveModels;
 import de.javagl.jgltf.model.creation.SceneModels;
 import de.javagl.jgltf.model.impl.DefaultGltfModel;
 import de.javagl.jgltf.model.impl.DefaultMeshPrimitiveModel;
-import de.javagl.jgltf.model.impl.DefaultPbrMaterialModel;
 import de.javagl.jgltf.model.io.GltfWriter;
 import de.javagl.jgltf.model.io.v2.GltfAssetV2;
 import de.javagl.jgltf.model.io.v2.GltfAssetsV2;
@@ -46,7 +46,7 @@ public class GltfModelCreationBasicExample
             MeshPrimitiveModels.create(indices, positions, null, null);
         
         // Create a material, and assign it to the mesh primitive
-        DefaultPbrMaterialModel materialModel = 
+        PbrMaterialModel materialModel = 
             MaterialModels.createFromBaseColor(1.0f, 0.0f, 0.0f, 1.0f);
         meshPrimitiveModel.setMaterialModel(materialModel);
         

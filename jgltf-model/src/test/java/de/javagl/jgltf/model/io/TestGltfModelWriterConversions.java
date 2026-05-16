@@ -149,7 +149,7 @@ public class TestGltfModelWriterConversions
     public void testGltfEmbeddedToGltfEmbeddedV1() throws IOException 
     {
         String testModelName = "unitCubeTextured";
-        String versionString = "v2";
+        String versionString = "v1";
         GltfFlavor inputFlavor = GltfFlavor.EMBEDDED;
         GltfFlavor outputFlavor = GltfFlavor.EMBEDDED;
         GltfModelWriterConversions.readAndWriteModel(

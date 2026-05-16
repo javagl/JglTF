@@ -39,6 +39,7 @@ import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.NodeModel;
 import de.javagl.jgltf.model.NormalTextureInfoModel;
 import de.javagl.jgltf.model.OcclusionTextureInfoModel;
+import de.javagl.jgltf.model.PbrMaterialModel;
 import de.javagl.jgltf.model.PbrMetallicRoughnessModel;
 import de.javagl.jgltf.model.TextureModel;
 import de.javagl.jgltf.model.gl.ProgramModel;
@@ -256,7 +257,7 @@ class RenderedMaterialHandler
      * @return The {@link RenderedMaterial}
      */
     RenderedMaterial createRenderedMaterial(
-        DefaultPbrMaterialModel material, int numJoints)
+        PbrMaterialModel material, int numJoints)
     {
         MaterialStructure materialStructure = 
             new MaterialStructure(material, numJoints);

@@ -308,13 +308,13 @@ public interface PbrMaterialModel extends MaterialModel
      * 
      * @return The alpha cutoff
      */
-    double getAlphaCutoff();
+    Double getAlphaCutoff();
 
     /**
      * Returns whether the material is double sided
      *
      * @return Whether the material is double sided
      */
-    boolean isDoubleSided();
+    Boolean isDoubleSided();
     
 }

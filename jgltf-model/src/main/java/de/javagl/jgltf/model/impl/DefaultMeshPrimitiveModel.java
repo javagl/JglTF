@@ -27,15 +27,20 @@
 package de.javagl.jgltf.model.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Set;
 
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.MaterialModel;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
+import de.javagl.jgltf.model.ModelElement;
 
 /**
  * Implementation of a {@link MeshPrimitiveModel}
@@ -94,6 +99,17 @@ public final class DefaultMeshPrimitiveModel extends AbstractModelElement
         Objects.requireNonNull(
             accessorModel, "The accessorModel may not be null");
         return attributes.put(name, accessorModel);
+    }
+    
+    /**
+     * Remove the specified {@link AccessorModel} from the attributes
+     * 
+     * @param name The name of the attribute
+     * @return The removed {@link AccessorModel}, or <code>null</code>
+     */
+    public AccessorModel removeAttribute(String name) 
+    {
+        return attributes.remove(name);
     }
     
     /**
@@ -176,5 +192,87 @@ public final class DefaultMeshPrimitiveModel extends AbstractModelElement
         return Collections.unmodifiableList(targets);
     }
 
+    @Override
+    public Set<ModelElement> getReferencedModelElements()
+    {
+        Set<ModelElement> modelElements = 
+            getReferencedExtensionModelElements();
+        if (indices != null)
+        {
+            modelElements.add(indices);
+        }
+        for (AccessorModel accessorModel : attributes.values())
+        {
+            modelElements.add(accessorModel);
+        }
+        for (Map<String, AccessorModel> target : targets)
+        {
+            for (AccessorModel accessorModel : target.values())
+            {
+                modelElements.add(accessorModel);
+            }
+        }
+        if (materialModel != null)
+        {
+            modelElements.add(materialModel);
+        }
+        return modelElements;
+    }
+    
+    @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove)
+    {
+        removeExtensionModelElements(modelElementsToRemove);
+        boolean removeThis = false;
+        if (modelElementsToRemove.contains(indices)) 
+        {
+            setIndices(null);
+            removeThis = true;
+        }
+        
+        Set<String> attributeKeysToRemove = new LinkedHashSet<String>();
+        for (Entry<String, AccessorModel> entry : attributes.entrySet())
+        {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            if (modelElementsToRemove.contains(value))
+            {
+                attributeKeysToRemove.add(key);
+            }
+        }
+        for (String attributeKeyToRemove : attributeKeysToRemove)
+        {
+            attributes.remove(attributeKeyToRemove);
+        }
+        if (attributes.isEmpty())
+        {
+            removeThis = true;
+        }
+        
+        Set<Map<String, AccessorModel>> targetsToRemove = 
+            new LinkedHashSet<Map<String, AccessorModel>>();
+        for (Map<String, AccessorModel> target : targets)
+        {
+            for (String attributeKeyToRemove : attributeKeysToRemove)
+            {
+                if (target.containsKey(attributeKeyToRemove))
+                {
+                    targetsToRemove.add(target);
+                }
+            }
+            for (Entry<String, AccessorModel> entry : target.entrySet())
+            {
+                Object value = entry.getValue();
+                if (modelElementsToRemove.contains(value))
+                {
+                    targetsToRemove.add(target);
+                }
+            }
+        }
+        targets.removeAll(targetsToRemove);        
+        return removeThis;
+    }
+    
 
 }

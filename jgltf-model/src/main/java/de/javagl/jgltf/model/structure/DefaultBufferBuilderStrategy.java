@@ -27,11 +27,13 @@
 package de.javagl.jgltf.model.structure;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import de.javagl.jgltf.model.AccessorModel;
@@ -43,7 +45,10 @@ import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.MeshModel;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
+import de.javagl.jgltf.model.ModelElements;
 import de.javagl.jgltf.model.SkinModel;
+import de.javagl.jgltf.model.extensions.ExtensionModels;
+import de.javagl.jgltf.model.extensions.ExtensionProcessing;
 import de.javagl.jgltf.model.impl.DefaultAccessorModel;
 import de.javagl.jgltf.model.impl.DefaultBufferModel;
 import de.javagl.jgltf.model.impl.DefaultBufferViewModel;
@@ -56,149 +61,104 @@ import de.javagl.jgltf.model.impl.UriStrings;
 class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
 {
     // TODO Try to retain the names of the model elements, if they are present
-    
+
     /**
      * The {@link BufferStructureBuilder} that is used internally
      */
     private final BufferStructureBuilder bufferStructureBuilder;
-    
+
     /**
      * The {@link BufferStructure} that stores the results
      */
     private BufferStructure bufferStructure;
-    
+
     /**
-     * The set of {@link ImageModel} instances that have already been 
-     * processed
+     * The set of {@link ImageModel} instances that have already been processed
      */
     private final Set<ImageModel> processedImageModels;
-    
+
     /**
-     * The set of {@link AccessorModel} instances that have already been 
+     * The set of {@link AccessorModel} instances that have already been
      * processed
      */
     private final Set<AccessorModel> processedAccessorModels;
-    
+
     /**
-     * A mapping from image models to buffer views that may have been
-     * created for them.
+     * A mapping from image models to buffer views that may have been created
+     * for them.
      */
     private final Map<ImageModel, BufferViewModel> imageBufferViews;
-    
+
     /**
      * A mapping from image models to the URI that they had originally.
      */
     private final Map<ImageModel, String> imageUriStrings;
-    
+
     /**
      * A mapping from image models to the URI that they had originally.
      */
     private final Set<String> existingImageUriStrings;
 
     /**
-     * A <b>package-private</b> class storing the configuration settings
-     */
-    static class Config
-    {
-        /**
-         * Whether to create one buffer per mesh primitive
-         */
-        boolean bufferPerMeshPrimitive = false;
-        
-        /**
-         * Whether to create one buffer per mesh
-         */
-        boolean bufferPerMesh = false;
-        
-        /**
-         * Whether to create one buffer for all meshes
-         */
-        boolean bufferForMeshes = false;
-
-        /**
-         * Whether to create one buffer per animation
-         */
-        boolean bufferPerAnimation = false;
-        
-        /**
-         * Whether to create one buffer for all animations
-         */
-        boolean bufferForAnimations = false;
-        
-        /**
-         * Whether to create one buffer per skin
-         */
-        boolean bufferPerSkin = false;
-        
-        /**
-         * Whether to create one buffer for all skins
-         */
-        boolean bufferForSkins = false;
-        
-        /**
-         * Whether images should be stored in buffer views
-         */
-        boolean imagesInBufferViews = false;
-        
-        /**
-         * Whether to create one buffer per image
-         */
-        boolean bufferPerImage = false;
-        
-        /**
-         * Whether to create one buffer for all images
-         */
-        boolean bufferForImages = false;
-
-        /**
-         * Whether to create one buffer for all additional accessors
-         */
-        boolean bufferForAdditionalAccessors = false;
-    }
-    
-    /**
      * The configuration settings
      */
-    private final Config config;
+    private final BufferBuilderConfig config;
     
     /**
      * Default constructor
      * 
-     * @param config The configuration 
+     * @param config The configuration
      */
-    DefaultBufferBuilderStrategy(Config config)
+    DefaultBufferBuilderStrategy(BufferBuilderConfig config)
     {
         this.config = config;
 
-        bufferStructureBuilder = new BufferStructureBuilder(); 
+        bufferStructureBuilder = new BufferStructureBuilder();
         processedImageModels = new LinkedHashSet<ImageModel>();
         processedAccessorModels = new LinkedHashSet<AccessorModel>();
         imageBufferViews = new LinkedHashMap<ImageModel, BufferViewModel>();
         imageUriStrings = new LinkedHashMap<ImageModel, String>();
         existingImageUriStrings = new LinkedHashSet<String>();
     }
-    
-    
+
     @Override
     public void process(GltfModel gltfModel)
     {
+        ExtensionProcessing extensionProcessing = new ExtensionProcessing()
+        {
+            @Override
+            public void acceptAccessorEncoding(
+                List<? extends AccessorModel> accessorModels,
+                DefaultBufferViewModel bufferViewModel,
+                ByteBuffer bufferViewData)
+            {
+                bufferStructureBuilder.addStandaloneBufferViewModel("extension",
+                    bufferViewModel, bufferViewData);
+                processedAccessorModels.addAll(accessorModels);
+            }
+        };
+        ExtensionModels.preprocess(gltfModel, extensionProcessing);
+        
         processMeshModels(gltfModel.getMeshModels());
         processAnimationModels(gltfModel.getAnimationModels());
         processSkinModels(gltfModel.getSkinModels());
         processImageModels(gltfModel.getImageModels());
-        processAccessorModels(gltfModel.getAccessorModels());
+
+        Set<AccessorModel> extensionAccessorModels = ModelElements
+            .collectReferencedModelElements(gltfModel, AccessorModel.class);
+        extensionAccessorModels.removeAll(processedAccessorModels);
+        processAccessorModels(extensionAccessorModels);
+        
         commitBuffer();
         bufferStructure = bufferStructureBuilder.build();
     }
-    
-    
+
     /**
      * Process the given {@link MeshModel} instances
      * 
      * @param meshModels The {@link MeshModel} instances
      */
-    private void processMeshModels(
-        Collection<? extends MeshModel> meshModels)
+    private void processMeshModels(Collection<? extends MeshModel> meshModels)
     {
         if (config.bufferForMeshes)
         {
@@ -225,7 +185,7 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
         {
             commitBuffer();
         }
-        List<MeshPrimitiveModel> meshPrimitives = 
+        List<MeshPrimitiveModel> meshPrimitives =
             meshModel.getMeshPrimitiveModels();
         for (MeshPrimitiveModel meshPrimitiveModel : meshPrimitives)
         {
@@ -236,14 +196,14 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
             commitBuffer();
         }
     }
-    
+
     /**
      * Process the given {@link MeshPrimitiveModel}
      * 
      * @param meshPrimitiveModel The {@link MeshPrimitiveModel}
      */
-    private void processMeshPrimitiveModel(
-        MeshPrimitiveModel meshPrimitiveModel)
+    private void
+        processMeshPrimitiveModel(MeshPrimitiveModel meshPrimitiveModel)
     {
         if (config.bufferPerMeshPrimitive)
         {
@@ -252,31 +212,22 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
         AccessorModel indices = meshPrimitiveModel.getIndices();
         if (indices != null)
         {
-            if (!processedAccessorModels.contains(indices))
+            processAccessorModelOnce("indices", indices);
+            commitArrayElementBufferView("indices");
+        }
+        Map<String, AccessorModel> attributes =
+            meshPrimitiveModel.getAttributes();
+        for (Entry<String, AccessorModel> entry : attributes.entrySet())
+        {
+            AccessorModel attribute = entry.getValue();
+            processAccessorModelOnce("attribute", attribute);
+            if (config.bufferViewPerAttributeAccessor)
             {
-                bufferStructureBuilder.addAccessorModel("indices", 
-                    (DefaultAccessorModel)indices);
-                processedAccessorModels.add(indices);
-                bufferStructureBuilder.createArrayElementBufferViewModel(
-                    "indices");
+                commitArrayBufferView("attributes");
             }
         }
-        Collection<AccessorModel> attributes = 
-            meshPrimitiveModel.getAttributes().values();
-        for (AccessorModel attribute : attributes)
-        {
-            if (!processedAccessorModels.contains(attribute))
-            {
-                bufferStructureBuilder.addAccessorModel("attribute", 
-                    (DefaultAccessorModel)attribute);
-                processedAccessorModels.add(attribute);
-            }
-        }
-        if (bufferStructureBuilder.getNumCurrentAccessorModels() > 0)
-        {
-            bufferStructureBuilder.createArrayBufferViewModel("attributes");
-        }
-        
+        commitArrayBufferView("attributes");
+
         List<Map<String, AccessorModel>> targets =
             meshPrimitiveModel.getTargets();
         if (!targets.isEmpty())
@@ -285,18 +236,10 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
             {
                 for (AccessorModel targetValue : target.values())
                 {
-                    if (!processedAccessorModels.contains(targetValue))
-                    {
-                        bufferStructureBuilder.addAccessorModel("target",
-                            (DefaultAccessorModel) targetValue);
-                        processedAccessorModels.add(targetValue);
-                    }
+                    processAccessorModelOnce("target", targetValue);
                 }
             }
-            if (bufferStructureBuilder.getNumCurrentAccessorModels() > 0)
-            {
-                bufferStructureBuilder.createArrayBufferViewModel("targets");
-            }
+            commitArrayBufferView("targets");
         }
         if (config.bufferPerMeshPrimitive)
         {
@@ -304,6 +247,7 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
         }
     }
     
+
     /**
      * Process the given {@link AnimationModel} instances
      * 
@@ -316,18 +260,18 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
         {
             commitBuffer();
         }
-         for (AnimationModel animationModel : animationModels)
-         {
-             processAnimationModel(animationModel);
-         }
-         if (config.bufferForAnimations)
-         {
-             commitBuffer();
-         }
+        for (AnimationModel animationModel : animationModels)
+        {
+            processAnimationModel(animationModel);
+        }
+        if (config.bufferForAnimations)
+        {
+            commitBuffer();
+        }
     }
-    
+
     /**
-     * Process the given {@link AnimationModel} 
+     * Process the given {@link AnimationModel}
      * 
      * @param animationModel The {@link AnimationModel}
      */
@@ -342,40 +286,22 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
             Sampler sampler = channel.getSampler();
             AccessorModel input = sampler.getInput();
             AccessorModel output = sampler.getOutput();
-            if (!processedAccessorModels.contains(input))
-            {
-                bufferStructureBuilder.addAccessorModel(
-                    "animation input", (DefaultAccessorModel) input);
-                processedAccessorModels.add(input);
-            }
-            if (!processedAccessorModels.contains(output))
-            {
-                bufferStructureBuilder.addAccessorModel(
-                    "animation output", (DefaultAccessorModel) output);
-                processedAccessorModels.add(output);
-            }
+            processAccessorModelOnce("animation input", input);
+            processAccessorModelOnce("animation output", output);
         }
-        // Only if any of the channels caused accessors to be added that
-        // was NOT already processed while handling other animations, then
-        // create a new buffer view for the newly added accessors
-        if (bufferStructureBuilder.getNumCurrentAccessorModels() > 0)
-        {
-            bufferStructureBuilder.createBufferViewModel("animation", null);
-        }
+        commitBufferView("animation");
         if (config.bufferPerAnimation)
         {
             commitBuffer();
         }
     }
-    
 
     /**
      * Process the given {@link SkinModel} instances
      * 
      * @param skinModels The {@link SkinModel} instances
      */
-    private void processSkinModels(
-        Collection<? extends SkinModel> skinModels)
+    private void processSkinModels(Collection<? extends SkinModel> skinModels)
     {
         if (config.bufferForSkins)
         {
@@ -390,9 +316,9 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
             commitBuffer();
         }
     }
-    
+
     /**
-     * Process the given {@link SkinModel} 
+     * Process the given {@link SkinModel}
      * 
      * @param skinModel The {@link SkinModel}
      */
@@ -403,14 +329,12 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
             commitBuffer();
         }
         AccessorModel ibm = skinModel.getInverseBindMatrices();
-        if (ibm != null) 
+        if (ibm != null)
         {
             if (!processedAccessorModels.contains(ibm))
             {
-                bufferStructureBuilder.addAccessorModel(
-                    "inverse bind matrices", (DefaultAccessorModel) ibm);
-                processedAccessorModels.add(ibm);
-                bufferStructureBuilder.createBufferViewModel("skin", null);
+                processAccessorModelOnce("inverse bind matrices", ibm);
+                commitBufferView("skin");        
             }
         }
         if (config.bufferPerSkin)
@@ -424,8 +348,8 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
      * 
      * @param imageModels The {@link ImageModel} instances
      */
-    private void processImageModels(
-        Collection<? extends ImageModel> imageModels)
+    private void
+        processImageModels(Collection<? extends ImageModel> imageModels)
     {
         if (config.bufferForImages)
         {
@@ -440,9 +364,9 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
             commitBuffer();
         }
     }
-    
+
     /**
-     * Process the given {@link ImageModel} 
+     * Process the given {@link ImageModel}
      * 
      * @param imageModel The {@link ImageModel}
      */
@@ -453,7 +377,7 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
             return;
         }
         processedImageModels.add(imageModel);
-        
+
         String uri = imageModel.getUri();
         if (uri != null)
         {
@@ -461,25 +385,23 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
             existingImageUriStrings.add(uri);
         }
 
-        if (config.bufferPerImage) 
+        if (config.bufferPerImage)
         {
             commitBuffer();
         }
         if (config.imagesInBufferViews)
         {
             ByteBuffer imageData = imageModel.getImageData();
-            BufferViewModel bufferViewModel = 
-                bufferStructureBuilder.createImageBufferViewModel(
-                    "image", imageData);
+            BufferViewModel bufferViewModel = bufferStructureBuilder
+                .createStandaloneBufferViewModel("image", imageData);
             imageBufferViews.put(imageModel, bufferViewModel);
         }
-        if (config.bufferPerImage) 
+        if (config.bufferPerImage)
         {
             commitBuffer();
         }
     }
-    
-    
+
     /**
      * Process the given {@link AccessorModel} instances
      * 
@@ -503,7 +425,7 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
     }
 
     /**
-     * Process the given {@link AccessorModel} 
+     * Process the given {@link AccessorModel}
      * 
      * @param accessorModel The {@link AccessorModel}
      */
@@ -513,12 +435,72 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
         {
             return;
         }
-        processedAccessorModels.add(accessorModel);
-        bufferStructureBuilder.addAccessorModel("additional", 
+        processAccessorModelOnce("additional", accessorModel);
+        commitBufferView("additional");        
+    }
+
+    /**
+     * Process the given accessor model once.
+     * 
+     * This will add the given accessor model to the buffer structure builder
+     * if it has not been added yet.
+     * 
+     * @param idPrefix The ID prefix
+     * @param accessorModel The accessor model
+     */
+    private void processAccessorModelOnce(String idPrefix,
+        AccessorModel accessorModel)
+    {
+        if (processedAccessorModels.contains(accessorModel))
+        {
+            return;
+        }
+        bufferStructureBuilder.addAccessorModel(idPrefix,
             (DefaultAccessorModel) accessorModel);
-        bufferStructureBuilder.createBufferViewModel("additional", null); 
+        processedAccessorModels.add(accessorModel);
+    }
+
+    /**
+     * Commit the currently pending accessor models into an array element
+     * buffer view (for indices)
+     * 
+     * @param idPrefix The ID prefix
+     */
+    private void commitArrayElementBufferView(String idPrefix)
+    {
+        if (bufferStructureBuilder.getNumCurrentAccessorModels() > 0)
+        {
+            bufferStructureBuilder.createArrayElementBufferViewModel(idPrefix);
+        }
     }
     
+    /**
+     * Commit the currently pending accessor models into an array buffer view
+     * (for vertex attributes)
+     * 
+     * @param idPrefix The ID prefix
+     */
+    private void commitArrayBufferView(String idPrefix)
+    {
+        if (bufferStructureBuilder.getNumCurrentAccessorModels() > 0)
+        {
+            bufferStructureBuilder.createArrayBufferViewModel(idPrefix);
+        }
+    }
+    
+    /**
+     * Commit the currently pending accessor models into a buffer view
+     * (for a buffer view without a target)
+     * 
+     * @param idPrefix The ID prefix
+     */
+    private void commitBufferView(String idPrefix)
+    {
+        if (bufferStructureBuilder.getNumCurrentAccessorModels() > 0)
+        {
+            bufferStructureBuilder.createBufferViewModel(idPrefix, null);
+        }
+    }
     
     /**
      * Commit the currently pending buffer view models into a buffer
@@ -532,9 +514,7 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
             bufferStructureBuilder.createBufferModel("buffer", uri);
         }
     }
-    
-    
-    
+
     @Override
     public List<DefaultAccessorModel> getAccessorModels()
     {
@@ -543,7 +523,13 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
             throw new IllegalStateException(
                 "No input model has been processed");
         }
-        return bufferStructure.getAccessorModels();
+        List<DefaultAccessorModel> allAccessorModels =
+            new ArrayList<DefaultAccessorModel>();
+        for (AccessorModel accessorModel : processedAccessorModels)
+        {
+            allAccessorModels.add((DefaultAccessorModel) accessorModel);
+        }
+        return allAccessorModels;
     }
 
     @Override
@@ -567,34 +553,30 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
         }
         return bufferStructure.getBufferModels();
     }
-    
+
     @Override
     public void validateImageModel(DefaultImageModel imageModel)
     {
-        BufferViewModel imageBufferViewModel = 
-            imageBufferViews.get(imageModel);
+        BufferViewModel imageBufferViewModel = imageBufferViews.get(imageModel);
         if (imageBufferViewModel == null)
         {
             String oldUriString = imageUriStrings.get(imageModel);
             String newUriString = oldUriString;
-            if (oldUriString == null) 
+            if (oldUriString == null)
             {
-                newUriString = UriStrings.createImageUriString(
-                    imageModel, existingImageUriStrings);
+                newUriString = UriStrings.createImageUriString(imageModel,
+                    existingImageUriStrings);
                 existingImageUriStrings.add(newUriString);
                 imageUriStrings.put(imageModel, newUriString);
             }
             imageModel.setUri(newUriString);
             imageModel.setBufferViewModel(null);
-        } 
-        else 
+        }
+        else
         {
             imageModel.setBufferViewModel(imageBufferViewModel);
             imageModel.setUri(null);
         }
     }
 
-    
-   
-    
 }

@@ -27,10 +27,13 @@
 package de.javagl.jgltf.model.impl;
 
 import java.nio.ByteBuffer;
+import java.util.Collection;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.BufferViewModel;
+import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.io.Buffers;
 
 /**
@@ -187,6 +190,32 @@ public final class DefaultBufferViewModel extends AbstractNamedModelElement
     public Integer getTarget()
     {
         return target;
+    }
+
+    @Override
+    public Set<ModelElement> getReferencedModelElements()
+    {
+        Set<ModelElement> modelElements = 
+            getReferencedExtensionModelElements();
+        if (bufferModel != null)
+        {
+            modelElements.add(bufferModel);
+        }
+        return modelElements;
+    }
+    
+    @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove) 
+    {
+        removeExtensionModelElements(modelElementsToRemove);
+        boolean removeThis = false;
+        if (modelElementsToRemove.contains(bufferModel))
+        {
+            setBufferModel(null);
+            removeThis = true;
+        }
+        return removeThis;
     }
 
 }

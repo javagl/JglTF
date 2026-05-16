@@ -37,14 +37,14 @@ public class DefaultOcclusionTextureInfoModel extends DefaultTextureInfoModel
     /**
      * The occlusion strength
      */
-    private double strength;
+    private Double strength;
     
     /**
      * Creates a new instance
      */
     public DefaultOcclusionTextureInfoModel()
     {
-        strength = 1.0;
+        // Default constructor
     }
 
     /**
@@ -52,13 +52,13 @@ public class DefaultOcclusionTextureInfoModel extends DefaultTextureInfoModel
      * 
      * @param strength The strength
      */
-    public void setStrength(double strength)
+    public void setStrength(Double strength)
     {
         this.strength = strength;
     }
     
     @Override
-    public double getStrength()
+    public Double getStrength()
     {
         return strength;
     }

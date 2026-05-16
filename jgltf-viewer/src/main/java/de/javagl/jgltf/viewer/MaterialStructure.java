@@ -28,10 +28,7 @@ package de.javagl.jgltf.viewer;
 
 import java.util.Objects;
 
-import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.PbrMaterialModel;
-import de.javagl.jgltf.model.PbrMetallicRoughnessModel;
-import de.javagl.jgltf.model.TextureInfoModel;
 import de.javagl.jgltf.model.impl.DefaultPbrMaterialModel;
 
 /**

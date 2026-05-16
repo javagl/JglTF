@@ -26,6 +26,10 @@
  */
 package de.javagl.jgltf.model.impl;
 
+import java.util.Collection;
+import java.util.Set;
+
+import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.NormalTextureInfoModel;
 import de.javagl.jgltf.model.OcclusionTextureInfoModel;
 import de.javagl.jgltf.model.PbrMaterialModel;
@@ -71,12 +75,12 @@ public final class DefaultPbrMaterialModel extends AbstractNamedModelElement
     /**
      * The alpha cutoff
      */
-    private double alphaCutoff;
+    private Double alphaCutoff;
 
     /**
      * Whether the material is double sided
      */
-    private boolean doubleSided;
+    private Boolean doubleSided;
 
     /**
      * Creates a new instance with default values
@@ -87,13 +91,10 @@ public final class DefaultPbrMaterialModel extends AbstractNamedModelElement
         normalTextureInfoModel = null;
         occlusionTextureInfoModel = null;
         emissiveTextureInfoModel = null;
-        
-        emissiveFactor = new double[]{0.0, 0.0, 0.0 };
-
-        alphaMode = AlphaMode.OPAQUE;
-        alphaCutoff = 0.5;
-
-        doubleSided = false;
+        emissiveFactor = null;
+        alphaMode = null;
+        alphaCutoff = null;
+        doubleSided = null;
     }
 
     @Override
@@ -196,7 +197,7 @@ public final class DefaultPbrMaterialModel extends AbstractNamedModelElement
     }
 
     @Override
-    public double getAlphaCutoff()
+    public Double getAlphaCutoff()
     {
         return alphaCutoff;
     }
@@ -206,13 +207,13 @@ public final class DefaultPbrMaterialModel extends AbstractNamedModelElement
      *
      * @param alphaCutoff The alpha cutoff
      */
-    public void setAlphaCutoff(double alphaCutoff)
+    public void setAlphaCutoff(Double alphaCutoff)
     {
         this.alphaCutoff = alphaCutoff;
     }
 
     @Override
-    public boolean isDoubleSided()
+    public Boolean isDoubleSided()
     {
         return doubleSided;
     }
@@ -222,8 +223,57 @@ public final class DefaultPbrMaterialModel extends AbstractNamedModelElement
      *
      * @param doubleSided Whether the material is double sided
      */
-    public void setDoubleSided(boolean doubleSided)
+    public void setDoubleSided(Boolean doubleSided)
     {
         this.doubleSided = doubleSided;
     }
+    
+    @Override
+    public Set<ModelElement> getReferencedModelElements()
+    {
+        Set<ModelElement> modelElements = 
+            getReferencedExtensionModelElements();
+        if (pbrMetallicRoughnessModel != null)
+        {
+            modelElements.add(pbrMetallicRoughnessModel);
+        }
+        if (normalTextureInfoModel != null)
+        {
+            modelElements.add(normalTextureInfoModel);
+        }
+        if (occlusionTextureInfoModel != null)
+        {
+            modelElements.add(occlusionTextureInfoModel);
+        }
+        if (emissiveTextureInfoModel != null)
+        {
+            modelElements.add(emissiveTextureInfoModel);
+        }
+        return modelElements;
+    }
+    
+    @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove)
+    {
+        removeExtensionModelElements(modelElementsToRemove);
+        if (modelElementsToRemove.contains(pbrMetallicRoughnessModel)) 
+        {
+            setPbrMetallicRoughnessModel(null);
+        }
+        if (modelElementsToRemove.contains(normalTextureInfoModel)) 
+        {
+            setNormalTextureInfoModel(null);
+        }
+        if (modelElementsToRemove.contains(occlusionTextureInfoModel)) 
+        {
+            setOcclusionTextureInfoModel(null);
+        }
+        if (modelElementsToRemove.contains(emissiveTextureInfoModel)) 
+        {
+            setEmissiveFactor(null);
+        }
+        return false;
+    }
+    
 }

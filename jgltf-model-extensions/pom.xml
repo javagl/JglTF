@@ -1,0 +1,51 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>de.javagl</groupId>
+    <artifactId>jgltf-parent</artifactId>
+    <version>2.0.5-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>jgltf-model-extensions</artifactId>
+  <packaging>jar</packaging>
+
+  <dependencies>
+    <dependency>
+      <groupId>de.javagl</groupId>
+      <artifactId>jgltf-model-ext-mesh-gpu-instancing</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>de.javagl</groupId>
+      <artifactId>jgltf-model-ext-meshopt-compression</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>de.javagl</groupId>
+      <artifactId>jgltf-model-khr-draco-mesh-compression</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>de.javagl</groupId>
+      <artifactId>jgltf-model-khr-lights-punctual</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>de.javagl</groupId>
+      <artifactId>jgltf-model-khr-materials-clearcoat</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>de.javagl</groupId>
+      <artifactId>jgltf-model-khr-materials-variants</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>de.javagl</groupId>
+      <artifactId>jgltf-model-khr-texture-transform</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
+
+</project>
