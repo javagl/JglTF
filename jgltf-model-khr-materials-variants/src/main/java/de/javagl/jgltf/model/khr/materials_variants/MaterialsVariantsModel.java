@@ -29,12 +29,13 @@ package de.javagl.jgltf.model.khr.materials_variants;
 import java.util.List;
 
 import de.javagl.jgltf.model.ModelElement;
+import de.javagl.jgltf.model.extensions.ExtensionModel;
 
 /**
  * Interface for a model of the <code>KHR_materials_variants</code> extension
  * that is found at the top-level of a glTF
  */
-public interface MaterialsVariantsModel extends ModelElement
+public interface MaterialsVariantsModel extends ModelElement, ExtensionModel
 {
     /**
      * Returns an unmodifiable list containing the material variant names

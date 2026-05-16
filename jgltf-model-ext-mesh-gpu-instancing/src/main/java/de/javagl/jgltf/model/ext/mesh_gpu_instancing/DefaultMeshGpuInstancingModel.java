@@ -117,5 +117,16 @@ public class DefaultMeshGpuInstancingModel extends AbstractModelElement
         return attributes.isEmpty();
     }
     
+    @Override
+    public String getExtensionName()
+    {
+        return "EXT_mesh_gpu_instancing";
+    }
+    
+    @Override
+    public boolean isRequired()
+    {
+        return false;
+    }
     
 }

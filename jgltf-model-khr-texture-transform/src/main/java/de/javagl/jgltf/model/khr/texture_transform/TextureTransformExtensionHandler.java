@@ -26,11 +26,15 @@
  */
 package de.javagl.jgltf.model.khr.texture_transform;
 
+import java.util.Map;
+
 import de.javagl.jgltf.impl.v2.khr.texture_transform.TextureInfoTextureTransform;
 import de.javagl.jgltf.model.GltfModel;
+import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.TextureInfoModel;
 import de.javagl.jgltf.model.extensions.ExtensionHandler;
+import de.javagl.jgltf.model.v2.ModelElementsV2;
 
 /**
  * Implementation of an {@link ExtensionHandler} for 
@@ -59,7 +63,7 @@ public class TextureTransformExtensionHandler implements ExtensionHandler
     @Override
     public Class<?> getModelClass()
     {
-        return DefaultTextureTransformModel.class;
+        return TextureTransformModel.class;
     }
 
     @Override
@@ -70,6 +74,8 @@ public class TextureTransformExtensionHandler implements ExtensionHandler
             new DefaultTextureTransformModel();
         TextureInfoTextureTransform impl = 
             (TextureInfoTextureTransform) object;
+        ModelElementsV2.transferGltfPropertyElementsToModel(
+            impl, model);
         model.setOffset(Optionals.clone(impl.getOffset()));
         model.setRotation(impl.getRotation());
         model.setScale(Optionals.clone(impl.getScale()));
@@ -84,10 +90,31 @@ public class TextureTransformExtensionHandler implements ExtensionHandler
             (DefaultTextureTransformModel)modelObject;
         TextureInfoTextureTransform impl = 
             new TextureInfoTextureTransform();
+        ModelElementsV2.transferGltfPropertyElementsFromModel(
+            model, impl);
         impl.setOffset(Optionals.clone(model.getOffset()));
         impl.setRotation(model.getRotation());
         impl.setScale(Optionals.clone(model.getScale()));
         impl.setTexCoord(model.getTexCoord());
         return impl;
+    }
+    
+    @Override
+    public Object copy(GltfModel gltfModel, Object modelObject,
+        Map<ModelElement, ModelElement> modelElementMap)
+    {
+        TextureTransformModel inputModel = 
+            (TextureTransformModel)modelObject;
+        DefaultTextureTransformModel outputModel = 
+            new DefaultTextureTransformModel();
+        ModelElementsV2.transferGltfPropertyElements(inputModel, outputModel);
+        modelElementMap.put(inputModel, outputModel);
+        
+        outputModel.setOffset(Optionals.clone(inputModel.getOffset()));
+        outputModel.setRotation(inputModel.getRotation());
+        outputModel.setScale(Optionals.clone(inputModel.getScale()));
+        outputModel.setTexCoord(inputModel.getTexCoord());
+        
+        return outputModel;
     }
 }

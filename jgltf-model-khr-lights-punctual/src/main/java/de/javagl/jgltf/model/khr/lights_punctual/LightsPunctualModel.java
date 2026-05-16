@@ -29,11 +29,12 @@ package de.javagl.jgltf.model.khr.lights_punctual;
 import java.util.List;
 
 import de.javagl.jgltf.model.ModelElement;
+import de.javagl.jgltf.model.extensions.ExtensionModel;
 
 /**
  * Interface for a model that describes <code>EXT_lights_punctual</code>
  */
-public interface LightsPunctualModel extends ModelElement
+public interface LightsPunctualModel extends ModelElement, ExtensionModel
 {
     /**
      * Returns an unmodifiable list containing the {@link LightModel} instances

@@ -26,9 +26,11 @@
  */
 package de.javagl.jgltf.model.transform;
 
+import java.nio.ByteBuffer;
 import java.util.Collection;
 
 import de.javagl.jgltf.model.AccessorModel;
+import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.impl.DefaultAccessorModel;
@@ -110,9 +112,25 @@ public class GltfModelTransforms
         for (AccessorModel am : gltfModel.getAccessorModels())
         {
             DefaultAccessorModel dam = (DefaultAccessorModel) am;
+            
             // Reset any byte stride that may have been assigned previously
             dam.setByteStride(dam.getElementSizeInBytes());
             dam.setBufferViewModel(null);
+        }
+        
+        // If any image model referred to a buffer view, then store the
+        // buffer view data as the image data, and set the buffer view
+        // to null.
+        for (ImageModel im : gltfModel.getImageModels())
+        {
+            DefaultImageModel dim = (DefaultImageModel) im;
+            BufferViewModel bufferViewModel = dim.getBufferViewModel();
+            if (bufferViewModel != null)
+            {
+                ByteBuffer bufferViewData = bufferViewModel.getBufferViewData();
+                dim.setImageData(bufferViewData);
+                dim.setBufferViewModel(null);
+            }
         }
         gltfModel.clearBufferModels();
         gltfModel.clearBufferViewModels();

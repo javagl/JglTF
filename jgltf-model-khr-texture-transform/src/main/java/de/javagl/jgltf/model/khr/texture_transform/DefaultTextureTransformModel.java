@@ -131,5 +131,16 @@ public class DefaultTextureTransformModel extends AbstractModelElement
         return false;
     }
     
+    @Override
+    public String getExtensionName()
+    {
+        return "KHR_texture_transform";
+    }
+    
+    @Override
+    public boolean isRequired()
+    {
+        return true;
+    }
 
 }

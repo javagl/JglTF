@@ -260,7 +260,7 @@ public class GltfModelCreatorV1
     private static DefaultAccessorModel createAccessorModel(Accessor accessor)
     {
         Integer componentType = accessor.getComponentType();
-        Integer byteOffset = accessor.getByteOffset();
+        int byteOffset = Optionals.of(accessor.getByteOffset(), 0);
         Integer count = accessor.getCount();
         ElementType elementType = ElementType.forString(accessor.getType());
         Integer byteStride = accessor.getByteStride();

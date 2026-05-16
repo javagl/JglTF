@@ -33,8 +33,10 @@ import java.util.Map.Entry;
 import de.javagl.jgltf.impl.v2.ext.mesh_gpu_instancing.GlTFMeshGpuInstancing;
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.GltfModel;
+import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.NodeModel;
 import de.javagl.jgltf.model.extensions.ExtensionHandler;
+import de.javagl.jgltf.model.v2.ModelElementsV2;
 
 /**
  * Implementation of an {@link ExtensionHandler} for 
@@ -63,7 +65,7 @@ public class MeshGpuInstancingExtensionHandler implements ExtensionHandler
     @Override
     public Class<?> getModelClass()
     {
-        return DefaultMeshGpuInstancingModel.class;
+        return MeshGpuInstancingModel.class;
     }
 
     @Override
@@ -73,6 +75,8 @@ public class MeshGpuInstancingExtensionHandler implements ExtensionHandler
         GlTFMeshGpuInstancing impl = (GlTFMeshGpuInstancing) object;
         DefaultMeshGpuInstancingModel model = 
             new DefaultMeshGpuInstancingModel();
+        ModelElementsV2.transferGltfPropertyElementsToModel(
+            impl, model);
         
         Map<String, Integer> attributes = impl.getAttributes();
         if (attributes != null)
@@ -96,6 +100,8 @@ public class MeshGpuInstancingExtensionHandler implements ExtensionHandler
     {
         GlTFMeshGpuInstancing impl = new GlTFMeshGpuInstancing();
         MeshGpuInstancingModel model = (MeshGpuInstancingModel) modelObject;
+        ModelElementsV2.transferGltfPropertyElementsFromModel(
+            model, impl);
         
         List<AccessorModel> accessorModels = gltfModel.getAccessorModels();
         Map<String, AccessorModel> attributes = model.getAttributes();
@@ -109,5 +115,28 @@ public class MeshGpuInstancingExtensionHandler implements ExtensionHandler
         
         return impl;
     }
+    
+    @Override
+    public Object copy(GltfModel gltfModel, Object modelObject,
+        Map<ModelElement, ModelElement> modelElementMap)
+    {
+        MeshGpuInstancingModel inputModel =
+            (MeshGpuInstancingModel) modelObject;
+        DefaultMeshGpuInstancingModel outputModel =
+            new DefaultMeshGpuInstancingModel();
+        modelElementMap.put(inputModel, outputModel);
+        ModelElementsV2.transferGltfPropertyElements(inputModel, outputModel);
 
+        Map<String, AccessorModel> inputAttributes = inputModel.getAttributes();
+        for (Entry<String, AccessorModel> entry : inputAttributes.entrySet())
+        {
+            String key = entry.getKey();
+            AccessorModel inputValue = entry.getValue();
+            AccessorModel outputValue =
+                (AccessorModel) modelElementMap.get(inputValue);
+            outputModel.setAttribute(key, outputValue);
+        }
+
+        return outputModel;
+    }
 }

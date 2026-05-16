@@ -423,7 +423,10 @@ public class GltfCreatorV1
         
         accessor.setBufferView(bufferViewId);
         
-        accessor.setByteOffset(accessorModel.getByteOffset());
+        if (accessorModel.getByteOffset() != 0)
+        {
+            accessor.setByteOffset(accessorModel.getByteOffset());
+        }
         accessor.setComponentType(accessorModel.getComponentType());
         accessor.setCount(accessorModel.getCount());
         accessor.setType(accessorModel.getElementType().toString());

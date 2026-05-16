@@ -27,11 +27,12 @@
 package de.javagl.jgltf.model.khr.texture_transform;
 
 import de.javagl.jgltf.model.ModelElement;
+import de.javagl.jgltf.model.extensions.ExtensionModel;
 
 /**
  * Interface for a model of the <code>KHR_texture_transform</code> extension
  */
-public interface TextureTransformModel extends ModelElement
+public interface TextureTransformModel extends ModelElement, ExtensionModel
 {
     /**
      * Set the offset to be a <b>reference</b> to the given array. 

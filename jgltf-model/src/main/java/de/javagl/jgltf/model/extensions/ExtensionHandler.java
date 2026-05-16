@@ -26,6 +26,8 @@
  */
 package de.javagl.jgltf.model.extensions;
 
+import java.util.Map;
+
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.ModelElement;
 
@@ -88,4 +90,39 @@ public interface ExtensionHandler
      * @return The implementation object
      */
     Object convertToImpl(GltfModel gltfModel, Object modelObject);
+
+    /**
+     * Copy the given model object.
+     * 
+     * This will create a copy of the given model object. The given model
+     * element map can be used for looking up existing copies for all
+     * model elements that exist in the source, in order to construct
+     * the target from these copies.
+     * 
+     * The copy that is returned should also be placed into this map.
+     * 
+     * @param gltfModel The model that contains the object
+     * @param modelObject The model object
+     * @param modelElementMap The model element map
+     * @return The copy
+     */
+    Object copy(GltfModel gltfModel, Object modelObject,
+        Map<ModelElement, ModelElement> modelElementMap);
+    
+    /**
+     * A preliminary function that can be used for preprocessing a glTF model.
+     * 
+     * For most implementations, this will be a no-op. For the draco mesh
+     * compression extension, this will inform the given 
+     * {@link ExtensionProcessing} about the accessor models that are
+     * draco-encoded.
+     * 
+     * @param gltfModel The model
+     * @param extensionProcessing The {@link ExtensionProcessing}
+     */
+    default void preprocess(GltfModel gltfModel,
+        ExtensionProcessing extensionProcessing) 
+    {
+        // Empty default implementation
+    }
 }

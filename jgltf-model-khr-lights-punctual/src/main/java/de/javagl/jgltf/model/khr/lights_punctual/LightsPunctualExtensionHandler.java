@@ -27,11 +27,13 @@
 package de.javagl.jgltf.model.khr.lights_punctual;
 
 import java.util.List;
+import java.util.Map;
 
 import de.javagl.jgltf.impl.v2.khr.lights_punctual.GlTFLightsPunctual;
 import de.javagl.jgltf.impl.v2.khr.lights_punctual.Light;
 import de.javagl.jgltf.impl.v2.khr.lights_punctual.LightSpot;
 import de.javagl.jgltf.model.GltfModel;
+import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.extensions.ExtensionHandler;
 import de.javagl.jgltf.model.extensions.ExtensionModels;
@@ -73,6 +75,8 @@ public class LightsPunctualExtensionHandler implements ExtensionHandler
     {
         DefaultLightsPunctualModel model = new DefaultLightsPunctualModel();
         GlTFLightsPunctual impl = (GlTFLightsPunctual) object;
+        ModelElementsV2.transferGltfPropertyElementsToModel(
+            impl, model);
         
         List<Light> lights = impl.getLights();
         for (Light light : lights)
@@ -108,8 +112,10 @@ public class LightsPunctualExtensionHandler implements ExtensionHandler
     {
         DefaultLightsPunctualModel model = 
             (DefaultLightsPunctualModel) modelObject;
-        
         GlTFLightsPunctual impl = new GlTFLightsPunctual();
+        ModelElementsV2.transferGltfPropertyElementsFromModel(
+            model, impl);
+        
         List<LightModel> lightModels = model.getLightModels();
         for (LightModel lightModel : lightModels)
         {
@@ -137,6 +143,48 @@ public class LightsPunctualExtensionHandler implements ExtensionHandler
             impl.addLights(light);
         }
         return impl;
+    }
+    
+    @Override
+    public Object copy(GltfModel gltfModel, Object modelObject,
+        Map<ModelElement, ModelElement> modelElementMap)
+    {
+        DefaultLightsPunctualModel inputModel =
+            (DefaultLightsPunctualModel) modelObject;
+
+        DefaultLightsPunctualModel outputModel =
+            new DefaultLightsPunctualModel();
+        modelElementMap.put(inputModel, outputModel);
+        ModelElementsV2.transferGltfPropertyElements(inputModel, outputModel);
+
+        List<LightModel> inputLightModels = inputModel.getLightModels();
+        for (LightModel inputLightModel : inputLightModels)
+        {
+            DefaultLightModel outputLightModel = new DefaultLightModel();
+            modelElementMap.put(inputLightModel, outputLightModel);
+            ModelElementsV2.transferGltfPropertyElements(
+                inputLightModel, outputLightModel);
+
+            outputLightModel
+                .setColor(Optionals.clone(inputLightModel.getColor()));
+            outputLightModel.setIntensity(inputLightModel.getIntensity());
+            outputLightModel.setRange(inputLightModel.getRange());
+
+            LightSpotModel inputLightSpotModel = inputLightModel.getSpot();
+            if (inputLightSpotModel != null)
+            {
+                DefaultLightSpotModel outputLightSpotModel =
+                    new DefaultLightSpotModel();
+
+                outputLightSpotModel
+                    .setInnerConeAngle(inputLightSpotModel.getInnerConeAngle());
+                outputLightSpotModel
+                    .setOuterConeAngle(inputLightSpotModel.getOuterConeAngle());
+                outputLightModel.setSpot(outputLightSpotModel);
+            }
+            outputModel.addLightModel(outputLightModel);
+        }
+        return outputModel;
     }
 
 }

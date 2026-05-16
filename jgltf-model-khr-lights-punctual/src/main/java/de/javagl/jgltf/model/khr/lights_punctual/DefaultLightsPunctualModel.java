@@ -98,4 +98,15 @@ public class DefaultLightsPunctualModel extends AbstractModelElement
         return lightModels.isEmpty();
     }
     
+    @Override
+    public String getExtensionName()
+    {
+        return "KHR_draco_mesh_compression";
+    }
+    
+    @Override
+    public boolean isRequired()
+    {
+        return false;
+    }
 }

@@ -27,11 +27,14 @@
 package de.javagl.jgltf.model.khr.materials_variants;
 
 import java.util.List;
+import java.util.Map;
 
 import de.javagl.jgltf.impl.v2.khr.materials_variants.GlTFMaterialsVariants;
 import de.javagl.jgltf.impl.v2.khr.materials_variants.GlTFMaterialsVariantsPropertiesVariantsItems;
 import de.javagl.jgltf.model.GltfModel;
+import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.extensions.ExtensionHandler;
+import de.javagl.jgltf.model.v2.ModelElementsV2;
 
 /**
  * Implementation of an {@link ExtensionHandler} for the 
@@ -71,6 +74,9 @@ public class MaterialsVariantsExtensionHandler implements ExtensionHandler
         DefaultMaterialsVariantsModel model = 
             new DefaultMaterialsVariantsModel();
         GlTFMaterialsVariants impl = (GlTFMaterialsVariants) object;
+        ModelElementsV2.transferGltfPropertyElementsToModel(
+            impl, model);
+        
         List<GlTFMaterialsVariantsPropertiesVariantsItems> variants = 
             impl.getVariants();
         for (GlTFMaterialsVariantsPropertiesVariantsItems variant : variants)
@@ -86,6 +92,9 @@ public class MaterialsVariantsExtensionHandler implements ExtensionHandler
         DefaultMaterialsVariantsModel model = 
             (DefaultMaterialsVariantsModel) modelObject;
         GlTFMaterialsVariants impl = new GlTFMaterialsVariants();
+        ModelElementsV2.transferGltfPropertyElementsFromModel(
+            model, impl);
+        
         List<String> names = model.getNames();
         for (String name : names)
         {
@@ -95,6 +104,25 @@ public class MaterialsVariantsExtensionHandler implements ExtensionHandler
             impl.addVariants(element);
         }
         return impl;
+    }
+    
+    @Override
+    public Object copy(GltfModel gltfModel, Object modelObject,
+        Map<ModelElement, ModelElement> modelElementMap)
+    {
+        MaterialsVariantsModel inputModel = 
+            (MaterialsVariantsModel) modelObject;
+        DefaultMaterialsVariantsModel outputModel = 
+            new DefaultMaterialsVariantsModel();
+        ModelElementsV2.transferGltfPropertyElements(inputModel, outputModel);
+        modelElementMap.put(inputModel, outputModel);
+        
+        List<String> names = inputModel.getNames();
+        for (String name : names)
+        {
+            outputModel.addName(name);
+        }
+        return outputModel;
     }
     
 }

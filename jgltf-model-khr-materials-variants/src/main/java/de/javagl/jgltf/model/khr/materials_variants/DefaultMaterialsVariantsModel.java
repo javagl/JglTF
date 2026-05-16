@@ -97,5 +97,16 @@ public class DefaultMaterialsVariantsModel
         return false;
     }
     
+    @Override
+    public String getExtensionName()
+    {
+        return "KHR_materials_variants";
+    }
+    
+    @Override
+    public boolean isRequired()
+    {
+        return false;
+    }
 }
 

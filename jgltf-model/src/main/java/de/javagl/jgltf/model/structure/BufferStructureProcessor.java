@@ -66,27 +66,27 @@ class BufferStructureProcessor
     private final BufferStructure bufferStructure;
 
     /**
-     * The mapping from buffer view objects that are intended for images
-     * (and do not have associated accessors) to their data
+     * The mapping from buffer view objects that do not have associated 
+     * accessors to their data
      */
     private final Map<DefaultBufferViewModel, ByteBuffer> 
-        imageBufferViewDataMap;
+        standaloneBufferViewDataMap;
     
     /**
      * Creates a new instance 
      * 
      * @param bufferStructure The {@link BufferStructure}
-     * @param imageBufferViewDataMap The mapping from buffer view objects
-     * that are used for images to their data
+     * @param standaloneBufferViewDataMap The mapping from buffer view objects
+     * that to not have associated accessors, to their data
      */
     BufferStructureProcessor(BufferStructure bufferStructure, 
-        Map<DefaultBufferViewModel, ByteBuffer> imageBufferViewDataMap)
+        Map<DefaultBufferViewModel, ByteBuffer> standaloneBufferViewDataMap)
     {
         this.bufferStructure = Objects.requireNonNull(
             bufferStructure, "The bufferStructure may not be null");
-        this.imageBufferViewDataMap = Objects.requireNonNull(
-            imageBufferViewDataMap, 
-            "The imageBufferViewDataMap may not be null");
+        this.standaloneBufferViewDataMap = Objects.requireNonNull(
+            standaloneBufferViewDataMap, 
+            "The standaloneBufferViewDataMap may not be null");
     }
     
     /**
@@ -194,11 +194,11 @@ class BufferStructureProcessor
             }
             
             // Handle buffer view models that do not have associated
-            // accessors, and are only used for images
+            // accessors (used for images and in extensions)
             if (accessorModels.isEmpty())
             {
                 ByteBuffer bufferViewData = 
-                    imageBufferViewDataMap.get(bufferViewModel);
+                    standaloneBufferViewDataMap.get(bufferViewModel);
                 bufferViewModel.setByteLength(bufferViewData.capacity());
                 accumulatedBufferBytes += bufferViewData.capacity();
                 bufferElements.add(bufferViewData);

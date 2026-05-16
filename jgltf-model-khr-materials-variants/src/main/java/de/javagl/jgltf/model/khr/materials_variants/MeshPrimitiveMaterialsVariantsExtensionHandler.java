@@ -27,17 +27,21 @@
 package de.javagl.jgltf.model.khr.materials_variants;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 
 import de.javagl.jgltf.impl.v2.khr.materials_variants.MeshPrimitiveMaterialsVariants;
 import de.javagl.jgltf.impl.v2.khr.materials_variants.MeshPrimitiveMaterialsVariantsPropertiesMappingsItems;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.MaterialModel;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
+import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.extensions.ExtensionHandler;
+import de.javagl.jgltf.model.v2.ModelElementsV2;
 
 /**
  * Implementation of an {@link ExtensionHandler} for the 
@@ -47,6 +51,12 @@ import de.javagl.jgltf.model.extensions.ExtensionHandler;
 public class MeshPrimitiveMaterialsVariantsExtensionHandler 
     implements ExtensionHandler
 {
+    /**
+     * The logger used in this class
+     */
+    private static final Logger logger =
+        Logger.getLogger(MeshPrimitiveMaterialsVariantsExtensionHandler.class.getName());
+    
     @Override
     public String getExtensionName()
     {
@@ -70,6 +80,29 @@ public class MeshPrimitiveMaterialsVariantsExtensionHandler
     {
         return MeshPrimitiveMaterialsVariantsModel.class;
     }
+    
+    /**
+     * Returns the variant names from the KHR_materials_variants extension
+     * object in the given model
+     *  
+     * @param gltfModel The model
+     * @return The result
+     */
+    private static List<String> getVariantNamesFrom(GltfModel gltfModel)
+    {
+        Map<String, Object> extensionModels = gltfModel.getExtensionModels();
+        MaterialsVariantsModel materialVariantsModel =
+            (MaterialsVariantsModel) extensionModels
+                .get("KHR_materials_variants");
+        if (materialVariantsModel == null)
+        {
+            logger.severe("Could not find top-level KHR_materials_variants "
+                + "extension object");
+            return Collections.emptyList();
+        }
+        List<String> variantNames = materialVariantsModel.getNames();
+        return variantNames;
+    }
 
     @Override
     public Object convertToModel(
@@ -79,12 +112,10 @@ public class MeshPrimitiveMaterialsVariantsExtensionHandler
             new DefaultMeshPrimitiveMaterialsVariantsModel();
         MeshPrimitiveMaterialsVariants impl =
             (MeshPrimitiveMaterialsVariants) object;
+        ModelElementsV2.transferGltfPropertyElementsToModel(
+            impl, model);
 
-        Map<String, Object> extensionModels = gltfModel.getExtensionModels();
-        MaterialsVariantsModel materialVariantsModel =
-            (MaterialsVariantsModel) extensionModels
-                .get("KHR_materials_variants");
-        List<String> variantNames = materialVariantsModel.getNames();
+        List<String> variantNames = getVariantNamesFrom(gltfModel);
 
         List<MaterialModel> materialModels = gltfModel.getMaterialModels();
 
@@ -116,12 +147,10 @@ public class MeshPrimitiveMaterialsVariantsExtensionHandler
             (DefaultMeshPrimitiveMaterialsVariantsModel)modelObject;
         MeshPrimitiveMaterialsVariants impl =
             new MeshPrimitiveMaterialsVariants();
+        ModelElementsV2.transferGltfPropertyElementsFromModel(
+            model, impl);
         
-        Map<String, Object> extensionModels = gltfModel.getExtensionModels();
-        MaterialsVariantsModel materialVariantsModel =
-            (MaterialsVariantsModel) extensionModels
-                .get("KHR_materials_variants");
-        List<String> variantNames = materialVariantsModel.getNames();
+        List<String> variantNames = getVariantNamesFrom(gltfModel);
         
         List<MaterialModel> materialModels = gltfModel.getMaterialModels();        
         Map<MaterialModel, List<Integer>> variantIndicesPerMaterial = 
@@ -165,6 +194,32 @@ public class MeshPrimitiveMaterialsVariantsExtensionHandler
             impl.addMappings(element);
         }
         return impl;
+    }
+    
+    @Override
+    public Object copy(GltfModel gltfModel, Object modelObject,
+        Map<ModelElement, ModelElement> modelElementMap)
+    {
+        MeshPrimitiveMaterialsVariantsModel inputModel =
+            (MeshPrimitiveMaterialsVariantsModel) modelObject;
+        DefaultMeshPrimitiveMaterialsVariantsModel outputModel =
+            new DefaultMeshPrimitiveMaterialsVariantsModel();
+        ModelElementsV2.transferGltfPropertyElements(inputModel, outputModel);
+        modelElementMap.put(inputModel, outputModel);
+
+        List<String> variantNames = getVariantNamesFrom(gltfModel);
+
+        for (String variantName : variantNames)
+        {
+            String mappingName = inputModel.getName(variantName);
+            MaterialModel inputMaterialModel =
+                inputModel.getMaterialModel(variantName);
+            MaterialModel outputMaterialModel =
+                (MaterialModel) modelElementMap.get(inputMaterialModel);
+            outputModel.setMaterialForVariant(variantName, outputMaterialModel,
+                mappingName);
+        }
+        return outputModel;
     }
     
 }

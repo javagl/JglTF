@@ -22,35 +22,26 @@
 # Extension experiments:
 # ---
 /jgltf-experiments-extensions
-/jgltf-impl-v2-ext-draco-mesh-compression
 /jgltf-draco-test
 /jgltf-impl-v2-ext-meshopt-compression
 /jgltf-model-ext-meshopt-compression
 # ---
 
-# Preliminary for extension experiments:
-# ---
-#/jgltf-impl-v2-khr-lights-punctual
-#/jgltf-impl-v2-khr-materials-variants
-#/jgltf-impl-v2-khr-materials-clearcoat
-#/jgltf-impl-v2-khr-texture-transform
-#
-#/jgltf-model-khr-lights-punctual
-#/jgltf-model-khr-materials-variants
-#/jgltf-model-khr-materials-clearcoat/
-#/jgltf-model-khr-texture-transform
-
 /jgltf-model-transform/.classpath
 /jgltf-model-transform/.settings
 /jgltf-model-transform/.project
 /jgltf-model-transform/target
+/jgltf-model-transform/data
 
 /jgltf-model-extensions/.classpath
 /jgltf-model-extensions/.settings
 /jgltf-model-extensions/.project
 /jgltf-model-extensions/target
 
-# ---
+/jgltf-impl-v2-khr-draco-mesh-compression/.classpath
+/jgltf-impl-v2-khr-draco-mesh-compression/.settings
+/jgltf-impl-v2-khr-draco-mesh-compression/.project
+/jgltf-impl-v2-khr-draco-mesh-compression/target
 
 /jgltf-impl-v2-ext-mesh-gpu-instancing/.classpath
 /jgltf-impl-v2-ext-mesh-gpu-instancing/.settings
@@ -101,6 +92,11 @@
 /jgltf-model-khr-texture-transform/.settings
 /jgltf-model-khr-texture-transform/.project
 /jgltf-model-khr-texture-transform/target
+
+/jgltf-model-khr-draco-mesh-compression/.classpath
+/jgltf-model-khr-draco-mesh-compression/.settings
+/jgltf-model-khr-draco-mesh-compression/.project
+/jgltf-model-khr-draco-mesh-compression/target
 
 /jgltf-browser/.classpath
 /jgltf-browser/.settings

@@ -257,10 +257,20 @@ public abstract class AbstractModelElement implements ModelElement
     public boolean removeModelElements(
         Collection<? extends ModelElement> modelElementsToRemove)
     {
-        System.out.println("XXX DEFAULT IMPLEMENTATION OF removeModelElements FOR "+this);
+        logger.info("Using default implementation of "
+            + "removeModelElements for " + this);
         return false;
     }
-    // TODO to be called at the start of removeModelElements
+    
+    /**
+     * A generic base implementation of the model element removal function
+     * for all extension model objects.
+     * 
+     * Implementors of this class should call this function in their
+     * {@link #removeModelElements(Collection)} implementation.
+     * 
+     * @param modelElementsToRemove The model elements to remove
+     */
     protected final void removeExtensionModelElements(
         Collection<? extends ModelElement> modelElementsToRemove)
     {
