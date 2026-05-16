@@ -76,7 +76,7 @@ public class DracoOptions
     }
 
     /**
-     * The position quantzation bits
+     * The position quantization bits
      */
     private int positionBits;
     
