@@ -26,6 +26,8 @@
  */
 package de.javagl.jgltf.model.creation;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.image.BufferedImage;
 
 import de.javagl.jgltf.model.ImageModel;
@@ -104,6 +106,33 @@ public class TextureModels
     {
         ImageModel imageModel = 
             ImageModels.createLabel(uri, sizeX, sizeY, fontSize, text);
+        return createFromImage(imageModel);
+    }
+
+    /**
+     * Create a simple "label" texture with the given size that just shows
+     * the given text.
+     * 
+     * The given text may be a HTML string.
+     * 
+     * @param uri The URI for the image model
+     * @param sizeX The size of the image in x-direction
+     * @param sizeY The size of the image in y-direction
+     * @param font The font
+     * @param text The text
+     * @param foregroundColor The foreground color
+     * @param backgroundColor The background color
+     * @return The texture model
+     */
+    public static DefaultTextureModel createLabel(
+        String uri,
+        int sizeX, int sizeY,
+        Font font, String text,
+        Color foregroundColor,
+        Color backgroundColor) 
+    {
+        ImageModel imageModel = ImageModels.createLabel(uri, sizeX, sizeY, font,
+            text, foregroundColor, backgroundColor);
         return createFromImage(imageModel);
     }
     
