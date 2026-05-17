@@ -66,13 +66,14 @@ class GltfModelPruner
     static void prune(DefaultGltfModel gltfModel,
         Collection<? extends ModelElement> toRemove)
     {
-        Level level = Level.INFO;
+        Level level = Level.FINE;
 
-        logger.info("Building model graph...");
+        logger.log(level, "Building model graph...");
 
         ModelGraph g = ModelGraphs.build(gltfModel);
 
-        logger.info("Building model graph DONE");
+        logger.log(level, "Building model graph DONE");
+
         if (logger.isLoggable(level))
         {
             //logger.log(level, Graphs.createString(g));
@@ -143,7 +144,7 @@ class GltfModelPruner
             // If there is nothing to remove, stop the iteration
             if (currentToRemove.isEmpty())
             {
-                logger.info("No more elements to remove after iteration "
+                logger.log(level, "No more elements to remove after iteration "
                     + iteration + ", DONE");
                 break;
             }
@@ -183,7 +184,7 @@ class GltfModelPruner
                 g.removeVertex(v);
             }
 
-            logger.info("Iteration " + iteration + " DONE");
+            logger.log(level, "Iteration " + iteration + " DONE");
             iteration++;
         }
     }

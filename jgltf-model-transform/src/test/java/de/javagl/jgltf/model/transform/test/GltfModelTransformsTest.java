@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import de.javagl.jgltf.model.MeshPrimitiveModel;
 import de.javagl.jgltf.model.ModelElement;
@@ -28,6 +29,12 @@ import de.javagl.jgltf.model.transform.GltfModelTransforms;
  */
 public class GltfModelTransformsTest
 {
+    /**
+     * The logger used in this class
+     */
+    private static final Logger logger =
+        Logger.getLogger(GltfModelTransformsTest.class.getName());
+    
     /**
      * The base directory for the files that are written
      */
@@ -267,6 +274,9 @@ public class GltfModelTransformsTest
     {
         File originalFile = prepareOutput(name, ".glb");
         File modifiedFile = prepareOutput(modifiedName, ".gltf");
+        
+        logger.info("Transforming " + name);
+        logger.info("        into " + modifiedName);
 
         GltfModelWriter w = new GltfModelWriter();
         w.writeBinary(gltfModel, originalFile);

@@ -78,7 +78,7 @@ public class ExtensionHandlerRegistries
         List<ExtensionHandler> result = new ArrayList<ExtensionHandler>();
         for (ExtensionHandler extensionHandler : extensionHandlers)
         {
-            logger.info("Found ExtensionHandler: "
+            logger.fine("Found ExtensionHandler: "
                 + extensionHandler.getExtensionName() + " for "
                 + extensionHandler.getImplClass().getSimpleName() + " as " 
                 + extensionHandler.getModelClass().getSimpleName() + " on "

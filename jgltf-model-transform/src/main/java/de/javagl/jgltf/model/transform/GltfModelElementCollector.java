@@ -180,7 +180,7 @@ class GltfModelElementCollector
      */
     void process(DefaultGltfModel gltfModel)
     {
-        logger.info("Collecting elements in glTF model...");
+        logger.fine("Collecting elements in glTF model...");
 
         this.gltfModel = gltfModel;
         this.processed.clear();
@@ -212,7 +212,7 @@ class GltfModelElementCollector
 
         addModelElement(gltfModel);
         
-        logger.info("Collecting elements in glTF model DONE");
+        logger.fine("Collecting elements in glTF model DONE");
     }
 
     /**
@@ -335,7 +335,7 @@ class GltfModelElementCollector
             boolean added = set.add(d);
             if (added)
             {
-                logger.info("Adding missing model: " + modelElement);
+                logger.fine("Adding missing model: " + modelElement);
                 adder.accept(gltfModel, d);
             }
         }
