@@ -40,6 +40,12 @@ import de.javagl.jgltf.model.impl.DefaultBufferViewModel;
  * For now, this interface is tailored for the case of extensions that
  * provide the data of accessors, meaning that the accessors do not have
  * an associated buffer view (i.e. Draco compression).
+ * 
+ * TODO: The 'acceptAccessorEncoding' function should probably rather be
+ * an 'acceptBufferView(..., optionalEncodedAccessorModels)' function.
+ * Extensions may use this to add arbitrary buffer views that are outside
+ * of the buffer structure builder mechanism (and optionally say which
+ * accessors are encoded with these buffer views)
  */
 public interface ExtensionProcessing
 {
