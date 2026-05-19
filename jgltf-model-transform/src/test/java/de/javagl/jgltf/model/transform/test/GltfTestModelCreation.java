@@ -202,20 +202,9 @@ class GltfTestModelCreation
         DefaultNodeModel nodeModel = new DefaultNodeModel();
         nodeModel.addMeshModel(meshModel);
         
-        // Create the instancing extension with some translation
-        DefaultMeshGpuInstancingModel meshGpuInstancing = 
-            new DefaultMeshGpuInstancingModel();
-        float translations[] =
-        {
-            0.0f, 0.0f, 0.0f,
-            1.5f, 0.0f, 0.0f,
-            3.0f, 0.0f, 0.0f
-        };
-        DefaultAccessorModel translationAccessorModel = 
-            AccessorModels.createFloat3D(FloatBuffer.wrap(translations));
-        meshGpuInstancing.setAttribute("TRANSLATION", translationAccessorModel);
-
         // Assign the instancing extension to the node
+        DefaultMeshGpuInstancingModel meshGpuInstancing = 
+            createMeshGpuInstancing();
         nodeModel.addExtensionModel("EXT_mesh_gpu_instancing", 
             meshGpuInstancing);
         
@@ -228,6 +217,28 @@ class GltfTestModelCreation
         gltfModelBuilder.addSceneModel(sceneModel);
         DefaultGltfModel gltfModel = gltfModelBuilder.build();
         return gltfModel;
+    }
+
+    /**
+     * Create a simple mesh GPU instancing instance
+     * 
+     * @return The instance
+     */
+    static DefaultMeshGpuInstancingModel createMeshGpuInstancing()
+    {
+        // Create the instancing extension with some translation
+        DefaultMeshGpuInstancingModel meshGpuInstancing = 
+            new DefaultMeshGpuInstancingModel();
+        float translations[] =
+        {
+            0.0f, 0.0f, 0.0f,
+            1.5f, 0.0f, 0.0f,
+            3.0f, 0.0f, 0.0f
+        };
+        DefaultAccessorModel translationAccessorModel = 
+            AccessorModels.createFloat3D(FloatBuffer.wrap(translations));
+        meshGpuInstancing.setAttribute("TRANSLATION", translationAccessorModel);
+        return meshGpuInstancing;
     }
 
     

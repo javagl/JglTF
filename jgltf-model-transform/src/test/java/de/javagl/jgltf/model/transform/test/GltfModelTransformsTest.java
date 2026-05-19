@@ -18,10 +18,12 @@ import de.javagl.jgltf.model.MaterialModel;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
 import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.NodeModel;
+import de.javagl.jgltf.model.ext.mesh_gpu_instancing.DefaultMeshGpuInstancingModel;
 import de.javagl.jgltf.model.impl.DefaultAnimationModel;
 import de.javagl.jgltf.model.impl.DefaultGltfModel;
 import de.javagl.jgltf.model.impl.DefaultMeshModel;
 import de.javagl.jgltf.model.impl.DefaultMeshPrimitiveModel;
+import de.javagl.jgltf.model.impl.DefaultNodeModel;
 import de.javagl.jgltf.model.impl.DefaultPbrMaterialModel;
 import de.javagl.jgltf.model.impl.DefaultTextureInfoModel;
 import de.javagl.jgltf.model.impl.DefaultTextureModel;
@@ -66,7 +68,8 @@ public class GltfModelTransformsTest
         testRemoveSkinAnimationTimesAccessor();
         testRemoveSkinAttributes();
         testAddAnimation();
-        testRemoveInstancingAcessor();
+        testRemoveInstancingAccessor();
+        testAddInstancing();
     }
 
     /**
@@ -281,6 +284,8 @@ public class GltfModelTransformsTest
             Set<ModelElement> toRemove = new LinkedHashSet<ModelElement>();
             toRemove.add(am4);
             
+            // Optional: Remove the attributes for the skin (would cause
+            // a validation warning otherwise)
             DefaultMeshModel mm0 = gltfModel.getMeshModel(0);
             MeshPrimitiveModel mpm0 = mm0.getMeshPrimitiveModels().get(0);
             DefaultMeshPrimitiveModel mpm = (DefaultMeshPrimitiveModel) mpm0;
@@ -317,8 +322,7 @@ public class GltfModelTransformsTest
     }
     
     /**
-     * Run a test to remove an animation values accessor from the animated
-     * square
+     * Run a test to add an animation 
      * 
      * @throws IOException If an IO error occurs
      */
@@ -340,13 +344,12 @@ public class GltfModelTransformsTest
     }
 
     
-    
     /**
      * Run a test to remove an accessor that is used for instancing
      *  
      * @throws IOException If an IO error occurs
      */
-    private static void testRemoveInstancingAcessor() throws IOException
+    private static void testRemoveInstancingAccessor() throws IOException
     {
         String name = "TexturedSquareInstanced";
         String modifiedName = name + "-removedInstancingAccessor";
@@ -359,6 +362,32 @@ public class GltfModelTransformsTest
             Set<ModelElement> toRemove = new LinkedHashSet<ModelElement>();
             toRemove.add(mm0);
             GltfModelTransforms.removeAll(gltfModel, toRemove);
+        });
+    }
+    
+    /**
+     * Run a test to add GPU instancing to a node
+     *  
+     * @throws IOException If an IO error occurs
+     */
+    private static void testAddInstancing() throws IOException
+    {
+        String name = "TexturedSquare";
+        String modifiedName = name + "-addedInstancing";
+        DefaultGltfModel gltfModel =
+            GltfTestModelCreation.createTexturedSquare();
+
+        runTest(gltfModel, name, modifiedName, () -> 
+        {
+            DefaultNodeModel n0 = gltfModel.getNodeModel(0);
+            
+            // Assign the instancing extension to the node
+            DefaultMeshGpuInstancingModel meshGpuInstancing = 
+                GltfTestModelCreation.createMeshGpuInstancing();
+            n0.addExtensionModel("EXT_mesh_gpu_instancing", 
+                meshGpuInstancing);
+            
+            GltfModelTransforms.revalidate(gltfModel);
         });
     }
     
