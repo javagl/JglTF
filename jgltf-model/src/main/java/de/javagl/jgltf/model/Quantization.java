@@ -114,7 +114,7 @@ public class Quantization
      * @param byteBuffer The input buffer
      * @param floatBuffer The output buffer
      */
-    private static void dequantizeByteBuffer(ByteBuffer byteBuffer,
+    public static void dequantizeByteBuffer(ByteBuffer byteBuffer,
         FloatBuffer floatBuffer)
     {
         for (int i = 0; i < byteBuffer.capacity(); i++)
@@ -147,7 +147,7 @@ public class Quantization
      * @param byteBuffer The input buffer
      * @param floatBuffer The output buffer
      */
-    private static void dequantizeUnsignedByteBuffer(ByteBuffer byteBuffer,
+    public static void dequantizeUnsignedByteBuffer(ByteBuffer byteBuffer,
         FloatBuffer floatBuffer)
     {
         for (int i = 0; i < byteBuffer.capacity(); i++)
@@ -179,7 +179,7 @@ public class Quantization
      * @param shortBuffer The input buffer
      * @param floatBuffer The output buffer
      */
-    private static void dequantizeShortBuffer(ShortBuffer shortBuffer,
+    public static void dequantizeShortBuffer(ShortBuffer shortBuffer,
         FloatBuffer floatBuffer)
     {
         for (int i = 0; i < shortBuffer.capacity(); i++)
@@ -212,7 +212,7 @@ public class Quantization
      * @param shortBuffer The input buffer
      * @param floatBuffer The output buffer
      */
-    private static void dequantizeUnsignedShortBuffer(ShortBuffer shortBuffer,
+    public static void dequantizeUnsignedShortBuffer(ShortBuffer shortBuffer,
         FloatBuffer floatBuffer)
     {
         for (int i = 0; i < shortBuffer.capacity(); i++)
@@ -293,7 +293,7 @@ public class Quantization
      * @param floatBuffer The input buffer
      * @param byteBuffer The output buffer
      */
-    private static void quantizeToByteBuffer(FloatBuffer floatBuffer,
+    public static void quantizeToByteBuffer(FloatBuffer floatBuffer,
         ByteBuffer byteBuffer)
     {
         for (int i = 0; i < floatBuffer.capacity(); i++)
@@ -324,7 +324,7 @@ public class Quantization
      * @param floatBuffer The input buffer
      * @param byteBuffer The output buffer
      */
-    private static void quantizeToUnsignedByteBuffer(FloatBuffer floatBuffer,
+    public static void quantizeToUnsignedByteBuffer(FloatBuffer floatBuffer,
         ByteBuffer byteBuffer)
     {
         for (int i = 0; i < floatBuffer.capacity(); i++)
@@ -354,7 +354,7 @@ public class Quantization
      * @param floatBuffer The input buffer
      * @param shortBuffer The output buffer
      */
-    private static void quantizeToShortBuffer(FloatBuffer floatBuffer,
+    public static void quantizeToShortBuffer(FloatBuffer floatBuffer,
         ShortBuffer shortBuffer)
     {
         for (int i = 0; i < floatBuffer.capacity(); i++)
@@ -385,7 +385,7 @@ public class Quantization
      * @param floatBuffer The input buffer
      * @param shortBuffer The output buffer
      */
-    private static void quantizeToUnsignedShortBuffer(FloatBuffer floatBuffer,
+    public static void quantizeToUnsignedShortBuffer(FloatBuffer floatBuffer,
         ShortBuffer shortBuffer)
     {
         for (int i = 0; i < floatBuffer.capacity(); i++)
