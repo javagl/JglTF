@@ -14,14 +14,20 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import de.javagl.jgltf.model.MaterialModel;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
 import de.javagl.jgltf.model.ModelElement;
+import de.javagl.jgltf.model.NodeModel;
+import de.javagl.jgltf.model.impl.DefaultAnimationModel;
 import de.javagl.jgltf.model.impl.DefaultGltfModel;
 import de.javagl.jgltf.model.impl.DefaultMeshModel;
 import de.javagl.jgltf.model.impl.DefaultMeshPrimitiveModel;
 import de.javagl.jgltf.model.impl.DefaultPbrMaterialModel;
+import de.javagl.jgltf.model.impl.DefaultTextureInfoModel;
 import de.javagl.jgltf.model.impl.DefaultTextureModel;
 import de.javagl.jgltf.model.io.GltfModelWriter;
+import de.javagl.jgltf.model.khr.materials_clearcoat.DefaultMaterialsClearcoatModel;
+import de.javagl.jgltf.model.khr.materials_clearcoat.MaterialsClearcoatModel;
 import de.javagl.jgltf.model.transform.GltfModelTransforms;
 
 /**
@@ -53,9 +59,13 @@ public class GltfModelTransformsTest
         testRemoveTexCoordAccessor();
         testRemoveMaterial();
         testAddTexture();
+        testRemoveClearcoatTexture();
+        testRemoveClearcoatTextureInfo();
+        testRemoveClearcoatTextureInfoTexture();
         testRemoveAnimationValuesAccessor();
         testRemoveSkinAnimationTimesAccessor();
         testRemoveSkinAttributes();
+        testAddAnimation();
         testRemoveInstancingAcessor();
     }
 
@@ -155,6 +165,80 @@ public class GltfModelTransformsTest
         });
     }
     
+    /**
+     * Run a test to remove a texture
+     * 
+     * @throws IOException If an IO error occurs
+     */
+    private static void testRemoveClearcoatTexture() throws IOException
+    {
+        String name = "TexturedSquareWithClearcoat";
+        String modifiedName = name + "-removedClearcoatTexture";
+        DefaultGltfModel gltfModel =
+            GltfTestModelCreation.createTexturedSquareWithClearcoat();
+
+        runTest(gltfModel, name, modifiedName, () -> 
+        {
+            DefaultTextureModel tm = gltfModel.getTextureModel(0);
+            Set<ModelElement> toRemove = new LinkedHashSet<ModelElement>();
+            toRemove.add(tm);
+            GltfModelTransforms.removeAll(gltfModel, toRemove);
+        });
+    }
+    
+    /**
+     * Run a test to remove a texture by setting the clearcoat texture 
+     * info texture to <code>null</code>
+     * 
+     * @throws IOException If an IO error occurs
+     */
+    private static void testRemoveClearcoatTextureInfoTexture()
+        throws IOException
+    {
+        String name = "TexturedSquareWithClearcoat";
+        String modifiedName = name + "-removedClearcoatTextureInfoTexture";
+        DefaultGltfModel gltfModel =
+            GltfTestModelCreation.createTexturedSquareWithClearcoat();
+
+        runTest(gltfModel, name, modifiedName, () ->
+        {
+            MaterialModel m0 = gltfModel.getMaterialModel(0);
+
+            MaterialsClearcoatModel c = m0.getExtensionModel(
+                "KHR_materials_clearcoat", MaterialsClearcoatModel.class);
+            DefaultTextureInfoModel cti =
+                (DefaultTextureInfoModel) c.getClearcoatTextureInfoModel();
+            cti.setTextureModel(null);
+            GltfModelTransforms.prune(gltfModel);
+        });
+    }    
+    
+    /**
+     * Run a test to remove a texture by setting the clearcoat texture info to 
+     * <code>null</code>
+     * 
+     * @throws IOException If an IO error occurs
+     */
+    private static void testRemoveClearcoatTextureInfo()
+        throws IOException
+    {
+        String name = "TexturedSquareWithClearcoat";
+        String modifiedName = name + "-removedClearcoatTextureInfo";
+        DefaultGltfModel gltfModel =
+            GltfTestModelCreation.createTexturedSquareWithClearcoat();
+
+        runTest(gltfModel, name, modifiedName, () ->
+        {
+            MaterialModel m0 = gltfModel.getMaterialModel(0);
+            
+            DefaultMaterialsClearcoatModel c = m0.getExtensionModel(
+                "KHR_materials_clearcoat", DefaultMaterialsClearcoatModel.class);
+            c.setClearcoatTextureInfoModel(null);
+            GltfModelTransforms.prune(gltfModel);
+            
+        });
+    }    
+    
     
     /**
      * Run a test to remove an animation values accessor from the animated
@@ -231,6 +315,30 @@ public class GltfModelTransformsTest
             GltfModelTransforms.prune(gltfModel);
         });
     }
+    
+    /**
+     * Run a test to remove an animation values accessor from the animated
+     * square
+     * 
+     * @throws IOException If an IO error occurs
+     */
+    private static void testAddAnimation() throws IOException
+    {
+        String name = "TexturedSquare";
+        String modifiedName = name + "-addedAnimation";
+        DefaultGltfModel gltfModel =
+            GltfTestModelCreation.createTexturedSquare();
+
+        runTest(gltfModel, name, modifiedName, () -> 
+        {
+            NodeModel n0 = gltfModel.getNodeModel(0);
+            DefaultAnimationModel animationModel = 
+                GltfTestModelCreation.createSimpleRotationAnimation(n0);
+            gltfModel.addAnimationModel(animationModel);
+            GltfModelTransforms.revalidate(gltfModel);
+        });
+    }
+
     
     
     /**

@@ -404,7 +404,7 @@ class GltfTestModelCreation
      * @param nodeModel The node
      * @return The animation model
      */
-    private static DefaultAnimationModel
+    static DefaultAnimationModel
         createSimpleRotationAnimation(NodeModel nodeModel)
     {
         // Create the times accessor

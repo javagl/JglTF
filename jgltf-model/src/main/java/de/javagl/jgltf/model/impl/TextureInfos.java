@@ -52,7 +52,7 @@ public class TextureInfos
     /**
      * Create a {@link TextureInfo} from the given
      * {@link TextureInfoModel}, or <code>null</code> if the given
-     * texture info is <code>null</code>.
+     * texture info or its texture model is <code>null</code>.
      * 
      * @param gltfModel The {@link GltfModel}
      * @param textureInfoModel The {@link TextureInfoModel}
@@ -66,12 +66,17 @@ public class TextureInfos
         {
             return null;
         }
+        TextureModel textureModel = textureInfoModel.getTextureModel();
+        if (textureModel == null)
+        {
+            return null;
+        }
+        
         TextureInfo textureInfo =
             new TextureInfo();
         ModelElementsV2.transferGltfPropertyElementsFromModel(textureInfoModel,
             textureInfo);
 
-        TextureModel textureModel = textureInfoModel.getTextureModel();
         List<TextureModel> textureModels = gltfModel.getTextureModels(); 
         int index = textureModels.indexOf(textureModel);
         textureInfo.setIndex(index);
@@ -87,7 +92,7 @@ public class TextureInfos
     /**
      * Create a {@link MaterialNormalTextureInfo} from the given
      * {@link NormalTextureInfoModel}, or <code>null</code> if the given
-     * texture info is <code>null</code>.
+     * texture info or its texture model is <code>null</code>.
      * 
      * @param gltfModel The {@link GltfModel}
      * @param textureInfoModel The {@link NormalTextureInfoModel}
@@ -101,12 +106,16 @@ public class TextureInfos
         {
             return null;
         }
+        TextureModel textureModel = textureInfoModel.getTextureModel();
+        if (textureModel == null)
+        {
+            return null;
+        }
         MaterialNormalTextureInfo textureInfo =
             new MaterialNormalTextureInfo();
         ModelElementsV2.transferGltfPropertyElementsFromModel(textureInfoModel,
             textureInfo);
 
-        TextureModel textureModel = textureInfoModel.getTextureModel();
         List<TextureModel> textureModels = gltfModel.getTextureModels(); 
         int index = textureModels.indexOf(textureModel);
         textureInfo.setIndex(index);
@@ -123,7 +132,7 @@ public class TextureInfos
     /**
      * Create a {@link MaterialOcclusionTextureInfo} from the given
      * {@link OcclusionTextureInfoModel}, or <code>null</code> if the given
-     * texture info is <code>null</code>.
+     * texture info or its texture model is <code>null</code>.
      * 
      * @param gltfModel The {@link GltfModel}
      * @param textureInfoModel The {@link OcclusionTextureInfoModel}
@@ -137,12 +146,16 @@ public class TextureInfos
         {
             return null;
         }
+        TextureModel textureModel = textureInfoModel.getTextureModel();
+        if (textureModel == null)
+        {
+            return null;
+        }
         MaterialOcclusionTextureInfo textureInfo =
             new MaterialOcclusionTextureInfo();
         ModelElementsV2.transferGltfPropertyElementsFromModel(textureInfoModel,
             textureInfo);
 
-        TextureModel textureModel = textureInfoModel.getTextureModel();
         List<TextureModel> textureModels = gltfModel.getTextureModels(); 
         int index = textureModels.indexOf(textureModel);
         textureInfo.setIndex(index);
