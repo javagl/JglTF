@@ -326,6 +326,40 @@ public class MathUtils
     }
     
     /**
+     * Fills the given array with the values for a scalar-last quaternion that
+     * describes the rotation around the specified axis, about the given 
+     * angle in radians.
+     * 
+     * @param x The x-component of the axis
+     * @param y The y-component of the axis
+     * @param z The z-component of the axis
+     * @param angleRad The angle, in radians
+     * @param q The quaternion
+     */
+    public static void axisAngleRadToQuaternion(double x,
+        double y, double z, double angleRad, double q[])
+    {
+        double halfAngleRad = angleRad * 0.5f;
+        double s = Math.sin(halfAngleRad);
+
+        double lenSquared = x * x + y * y + z * z;
+        if (lenSquared < EPSILON)
+        {
+            q[0] = 0.0;
+            q[1] = 0.0;
+            q[2] = 0.0;
+            q[3] = 1.0;
+            return;
+        }
+
+        double invLen = 1.0 / Math.sqrt(lenSquared);
+        q[0] = x * invLen * s;
+        q[1] = y * invLen * s;
+        q[2] = z * invLen * s;
+        q[3] = Math.cos(halfAngleRad);
+    }
+    
+    /**
      * Inverts the given matrix and writes the result into the given target
      * matrix. If the given matrix is not invertible, then the target matrix 
      * will be set to identity.  
