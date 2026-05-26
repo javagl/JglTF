@@ -35,6 +35,10 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.swing.JLabel;
@@ -132,6 +136,50 @@ class GltfTestModelCreation
     }
 
     /**
+     * Create a textured square
+     * 
+     * @return The model
+     */
+    public static DefaultGltfModel createMorphedSquare()
+    {
+        // Create the mesh primitive model
+        DefaultMeshPrimitiveModel meshPrimitiveModel =
+            createSquareMeshPrimitive();
+        
+        // Add the morph targets
+        List<Map<String, AccessorModel>> morphTargets = 
+            createSquareMeshPrimitiveMorphTargets();
+        for (Map<String, AccessorModel> morphTarget : morphTargets)
+        {
+            meshPrimitiveModel.addTarget(morphTarget);
+        }
+
+        // Create a mesh model with the mesh primitive
+        DefaultMeshModel meshModel = new DefaultMeshModel();
+        meshModel.addMeshPrimitiveModel(meshPrimitiveModel);
+
+        // Create a node model with the mesh
+        DefaultNodeModel nodeModel = new DefaultNodeModel();
+        nodeModel.addMeshModel(meshModel);
+
+        // Create a scene model with the node
+        DefaultSceneModel sceneModel = new DefaultSceneModel();
+        sceneModel.addNode(nodeModel);
+        
+        // Create a morph target animation
+        DefaultAnimationModel animationModel = 
+            createMorphAnimationModel(nodeModel);
+
+        // Create the glTF model
+        GltfModelBuilder gltfModelBuilder = GltfModelBuilder.create();
+        gltfModelBuilder.addSceneModel(sceneModel);
+        gltfModelBuilder.addAnimationModel(animationModel);
+        DefaultGltfModel gltfModel = gltfModelBuilder.build();
+        return gltfModel;
+    }
+
+    
+    /**
      * Create a square with texture coordinates, but without a material
      * 
      * @return The model
@@ -197,21 +245,21 @@ class GltfTestModelCreation
         // Create a mesh with the primitive
         DefaultMeshModel meshModel = new DefaultMeshModel();
         meshModel.addMeshPrimitiveModel(meshPrimitiveModel);
-        
+
         // Create a node with the mesh
         DefaultNodeModel nodeModel = new DefaultNodeModel();
         nodeModel.addMeshModel(meshModel);
-        
+
         // Assign the instancing extension to the node
-        DefaultMeshGpuInstancingModel meshGpuInstancing = 
+        DefaultMeshGpuInstancingModel meshGpuInstancing =
             createMeshGpuInstancing();
-        nodeModel.addExtensionModel("EXT_mesh_gpu_instancing", 
+        nodeModel.addExtensionModel("EXT_mesh_gpu_instancing",
             meshGpuInstancing);
-        
+
         // Create a scene with the node
         DefaultSceneModel sceneModel = new DefaultSceneModel();
         sceneModel.addNode(nodeModel);
-        
+
         // Create the glTF model
         GltfModelBuilder gltfModelBuilder = GltfModelBuilder.create();
         gltfModelBuilder.addSceneModel(sceneModel);
@@ -227,21 +275,16 @@ class GltfTestModelCreation
     static DefaultMeshGpuInstancingModel createMeshGpuInstancing()
     {
         // Create the instancing extension with some translation
-        DefaultMeshGpuInstancingModel meshGpuInstancing = 
+        DefaultMeshGpuInstancingModel meshGpuInstancing =
             new DefaultMeshGpuInstancingModel();
         float translations[] =
-        {
-            0.0f, 0.0f, 0.0f,
-            1.5f, 0.0f, 0.0f,
-            3.0f, 0.0f, 0.0f
-        };
-        DefaultAccessorModel translationAccessorModel = 
+        { 0.0f, 0.0f, 0.0f, 1.5f, 0.0f, 0.0f, 3.0f, 0.0f, 0.0f };
+        DefaultAccessorModel translationAccessorModel =
             AccessorModels.createFloat3D(FloatBuffer.wrap(translations));
         meshGpuInstancing.setAttribute("TRANSLATION", translationAccessorModel);
         return meshGpuInstancing;
     }
 
-    
     /**
      * Create a scene model with a single node with a single mesh with the given
      * mesh primitive model
@@ -345,6 +388,90 @@ class GltfTestModelCreation
         meshPrimitiveModel.putAttribute("TEXCOORD_0", texCoordsAccessorModel);
 
         return meshPrimitiveModel;
+    }
+
+    /**
+     * Create morph targets for the square mesh primitive model
+     * 
+     * @return The morph targets
+     */
+    private static List<Map<String, AccessorModel>>
+        createSquareMeshPrimitiveMorphTargets()
+    {
+        Map<String, AccessorModel> target0 =
+            new LinkedHashMap<String, AccessorModel>();
+
+        // @formatter:off
+        float[] displacements0 = new float[]
+        { 
+             0.0f, 0.0f, 0.0f, 
+             0.0f, 0.0f, 0.0f, 
+            -1.0f, 1.0f, 0.0f, 
+            -0.5f, 0.5f, 0.0f 
+        };
+        // @formatter:on
+        AccessorModel displacementsAccessorModel0 =
+            AccessorModels.createFloat3D(FloatBuffer.wrap(displacements0));
+        target0.put("POSITION", displacementsAccessorModel0);
+
+        // @formatter:off
+        float[] displacements1 = new float[]
+        { 
+            0.0f, 0.0f, 0.0f, 
+            0.0f, 0.0f, 0.0f, 
+            0.5f, 0.5f, 0.0f, 
+            1.0f, 1.0f, 0.0f 
+        };
+        // @formatter:on
+        AccessorModel displacementsAccessorModel1 =
+            AccessorModels.createFloat3D(FloatBuffer.wrap(displacements1));
+        Map<String, AccessorModel> target1 =
+            new LinkedHashMap<String, AccessorModel>();
+        target1.put("POSITION", displacementsAccessorModel1);
+
+        return Arrays.asList(target0, target1);
+    }
+
+    /**
+     * Create an animation of the TWO morph targets for the given node
+     * 
+     * @param nodeModel The node model
+     * @return The animation model
+     */
+    private static DefaultAnimationModel
+        createMorphAnimationModel(NodeModel nodeModel)
+    {
+        DefaultAnimationModel animationModel = new DefaultAnimationModel();
+
+        // @formatter:off
+        float[] times = new float[]
+        { 
+            0.0f, 1.0f, 2.0f, 3.0f, 4.0f 
+        };
+        // @formatter:on
+        AccessorModel timesAccessorModel =
+            AccessorModels.createFloatScalar(FloatBuffer.wrap(times));
+
+        // @formatter:off
+        float[] weights = new float[]
+        { 
+            0.0f, 0.0f, 
+            1.0f, 0.0f, 
+            1.0f, 1.0f, 
+            0.0f, 1.0f, 
+            0.0f, 0.0f 
+        };
+        // @formatter:on
+        AccessorModel weightsAccessorModel =
+            AccessorModels.createFloatScalar(FloatBuffer.wrap(weights));
+
+        Sampler sampler = new DefaultAnimationModel.DefaultSampler(
+            timesAccessorModel, Interpolation.LINEAR, weightsAccessorModel);
+        Channel channel = new DefaultAnimationModel.DefaultChannel(sampler,
+            nodeModel, "weights");
+        animationModel.addChannel(channel);
+        return animationModel;
+
     }
 
     /**

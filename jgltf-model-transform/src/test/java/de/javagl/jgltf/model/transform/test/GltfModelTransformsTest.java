@@ -69,6 +69,8 @@ public class GltfModelTransformsTest
         testRemoveSkinAttributes();
         testAddAnimation();
         testRemoveInstancingAccessor();
+        testRemoveMorphAnimationTimesAccessor();
+        testRemoveMorphTargetAccessor();
         testAddInstancing();
     }
 
@@ -361,6 +363,50 @@ public class GltfModelTransformsTest
             ModelElement mm0 = gltfModel.getMaterialModel(0);
             Set<ModelElement> toRemove = new LinkedHashSet<ModelElement>();
             toRemove.add(mm0);
+            GltfModelTransforms.removeAll(gltfModel, toRemove);
+        });
+    }
+    
+    /**
+     * Run a test to remove an accessor that is used for morphing animation
+     *  
+     * @throws IOException If an IO error occurs
+     */
+    private static void testRemoveMorphAnimationTimesAccessor() throws IOException
+    {
+        String name = "MorphedSquare";
+        String modifiedName = name + "-removedMorphAnimationTimesAccessor";
+        DefaultGltfModel gltfModel =
+            GltfTestModelCreation.createMorphedSquare();
+
+        runTest(gltfModel, name, modifiedName, () -> 
+        {
+            ModelElement am4 = gltfModel.getAccessorModel(4);
+            Set<ModelElement> toRemove = new LinkedHashSet<ModelElement>();
+            toRemove.add(am4);
+            DefaultNodeModel n0 = gltfModel.getNodeModel(0);
+            n0.setWeights(new double[] { 0.12, 0.34 });
+            GltfModelTransforms.removeAll(gltfModel, toRemove);
+        });
+    }
+
+    /**
+     * Run a test to remove an accessor that is used for morphing animation
+     *  
+     * @throws IOException If an IO error occurs
+     */
+    private static void testRemoveMorphTargetAccessor() throws IOException
+    {
+        String name = "MorphedSquare";
+        String modifiedName = name + "-removedMorphTargetAccessor";
+        DefaultGltfModel gltfModel =
+            GltfTestModelCreation.createMorphedSquare();
+
+        runTest(gltfModel, name, modifiedName, () -> 
+        {
+            ModelElement am2 = gltfModel.getAccessorModel(2);
+            Set<ModelElement> toRemove = new LinkedHashSet<ModelElement>();
+            toRemove.add(am2);
             GltfModelTransforms.removeAll(gltfModel, toRemove);
         });
     }

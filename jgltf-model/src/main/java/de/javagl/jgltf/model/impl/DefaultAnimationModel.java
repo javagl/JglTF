@@ -31,11 +31,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.AnimationModel;
+import de.javagl.jgltf.model.MeshModel;
+import de.javagl.jgltf.model.MeshPrimitiveModel;
 import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.NodeModel;
 
@@ -250,10 +253,53 @@ public class DefaultAnimationModel extends AbstractNamedModelElement
             {
                 channelsToRemove.add(channel);
             }
+            
+            // When one of the removed elements is used in a morph target of
+            // a mesh primitive that is affected by this channel, then the 
+            // channel has to be removed
+            if (isAnyUsedInMorphTarget(nodeModel, modelElementsToRemove))
+            {
+                channelsToRemove.add(channel);
+            }
         }
         channels.removeAll(channelsToRemove);
         return !channelsToRemove.isEmpty();
     }
     
+    /**
+     * Returns whether any of the given model elements to remove is used
+     * in a morph target of any mesh primitive that is contained in the
+     * meshes of the given node.
+     * 
+     * @param nodeModel The node
+     * @param modelElementsToRemove The model elements to remove
+     * @return Whether any morph target is affected
+     */
+    private static boolean isAnyUsedInMorphTarget(NodeModel nodeModel,
+        Collection<? extends ModelElement> modelElementsToRemove)
+    {
+        List<MeshModel> meshModels = nodeModel.getMeshModels();
+        for (MeshModel meshModel : meshModels)
+        {
+            List<MeshPrimitiveModel> meshPrimitiveModels =
+                meshModel.getMeshPrimitiveModels();
+            for (MeshPrimitiveModel meshPrimitiveModel : meshPrimitiveModels)
+            {
+                List<Map<String, AccessorModel>> targets =
+                    meshPrimitiveModel.getTargets();
+                for (Map<String, AccessorModel> target : targets)
+                {
+                    for (AccessorModel targetValue : target.values())
+                    {
+                        if (modelElementsToRemove.contains(targetValue))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }    
     
 }
