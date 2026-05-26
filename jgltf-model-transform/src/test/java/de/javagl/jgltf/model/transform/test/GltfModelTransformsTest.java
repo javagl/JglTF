@@ -109,18 +109,11 @@ public class GltfModelTransformsTest
 
         runTest(gltfModel, name, modifiedName, () -> 
         {
-            // Removing the TEXCOORDS accessor will make the asset invalid
-            // because the material requires texture coordinates. Set the
-            // material to null explicitly.
-            DefaultMeshModel m0 = gltfModel.getMeshModel(0);
-            DefaultMeshPrimitiveModel m0p0 = 
-                (DefaultMeshPrimitiveModel) m0.getMeshPrimitiveModels().get(0);
-            m0p0.setMaterialModel(null);
-            
             ModelElement am2 = gltfModel.getAccessorModel(2);
             Set<ModelElement> toRemove = new LinkedHashSet<ModelElement>();
             toRemove.add(am2);
             GltfModelTransforms.removeAll(gltfModel, toRemove);
+            GltfModelTransforms.prune(gltfModel);
         });
     }
 

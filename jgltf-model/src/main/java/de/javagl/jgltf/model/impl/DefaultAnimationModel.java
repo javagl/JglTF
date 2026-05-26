@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.AnimationModel;
@@ -48,6 +49,12 @@ import de.javagl.jgltf.model.NodeModel;
 public class DefaultAnimationModel extends AbstractNamedModelElement
     implements AnimationModel
 {
+    /**
+     * The logger used in this class
+     */
+    private static final Logger logger =
+        Logger.getLogger(DefaultAnimationModel.class.getName());
+    
     /**
      * Default implementation of a 
      * {@link de.javagl.jgltf.model.AnimationModel.Sampler}
@@ -259,6 +266,8 @@ public class DefaultAnimationModel extends AbstractNamedModelElement
             // channel has to be removed
             if (isAnyUsedInMorphTarget(nodeModel, modelElementsToRemove))
             {
+                logger.fine("Removal morph target accessor "
+                    + "requires removal of animation");
                 channelsToRemove.add(channel);
             }
         }
