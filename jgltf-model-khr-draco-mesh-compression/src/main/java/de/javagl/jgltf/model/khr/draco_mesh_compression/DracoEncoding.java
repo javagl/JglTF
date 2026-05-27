@@ -28,6 +28,7 @@ package de.javagl.jgltf.model.khr.draco_mesh_compression;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -46,12 +47,10 @@ import com.openize.drako.DracoMesh;
 import com.openize.drako.DrakoException;
 import com.openize.drako.PointAttribute;
 
-import de.javagl.jgltf.model.AccessorByteData;
 import de.javagl.jgltf.model.AccessorData;
 import de.javagl.jgltf.model.AccessorFloatData;
-import de.javagl.jgltf.model.AccessorIntData;
 import de.javagl.jgltf.model.AccessorModel;
-import de.javagl.jgltf.model.AccessorShortData;
+import de.javagl.jgltf.model.AccessorDataOps;
 import de.javagl.jgltf.model.ElementType;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
@@ -290,76 +289,10 @@ class DracoEncoding
     private static int[] toIntArray(AccessorModel accessorModel)
     {
         AccessorData accessorData = accessorModel.getAccessorData();
-        Class<?> componentType = accessorData.getComponentType();
-        if (componentType == byte.class)
-        {
-            AccessorByteData accessorByteData = (AccessorByteData) accessorData;
-            return toIntArray(accessorByteData);
-        }
-        else if (componentType == short.class)
-        {
-            AccessorShortData accessorShortData =
-                (AccessorShortData) accessorData;
-            return toIntArray(accessorShortData);
-        }
-        else if (componentType == int.class)
-        {
-            AccessorIntData accessorIntData = (AccessorIntData) accessorData;
-            return toIntArray(accessorIntData);
-        }
-        logger.severe("Invalid component type: " + componentType);
-        return null;
-    }
-
-    /**
-     * Return the data from the given accessor data as an integer array
-     * 
-     * @param accessorByteData The accessor data
-     * @return The array
-     */
-    private static int[] toIntArray(AccessorByteData accessorByteData)
-    {
-        int count = accessorByteData.getNumElements();
-        int indices[] = new int[count];
-        for (int i = 0; i < count; i++)
-        {
-            indices[i] = accessorByteData.getInt(i);
-        }
-        return indices;
-    }
-
-    /**
-     * Return the data from the given accessor data as an integer array
-     * 
-     * @param accessorShortData The accessor data
-     * @return The array
-     */
-    private static int[] toIntArray(AccessorShortData accessorShortData)
-    {
-        int count = accessorShortData.getNumElements();
-        int indices[] = new int[count];
-        for (int i = 0; i < count; i++)
-        {
-            indices[i] = accessorShortData.getInt(i);
-        }
-        return indices;
-    }
-
-    /**
-     * Return the data from the given accessor data as an integer array
-     * 
-     * @param accessorIntData The accessor data
-     * @return The array
-     */
-    private static int[] toIntArray(AccessorIntData accessorIntData)
-    {
-        int count = accessorIntData.getNumElements();
-        int indices[] = new int[count];
-        for (int i = 0; i < count; i++)
-        {
-            indices[i] = accessorIntData.get(i);
-        }
-        return indices;
+        int n = accessorData.getTotalNumComponents();
+        int result[] = new int[n];
+        AccessorDataOps.readAsInts(accessorData, IntBuffer.wrap(result));
+        return result;
     }
 
     /**

@@ -99,7 +99,8 @@ public class AccessorDatas
     /**
      * Create an {@link AccessorData} depending on the given component type.
      * This will return an {@link AccessorByteData}, {@link AccessorShortData},
-     * {@link AccessorIntData} or {@link AccessorFloatData}
+     * {@link AccessorIntData}, {@link AccessorFloatData}, or
+     * {@link AccessorDoubleData}
      * 
      * @param componentType The component type, as a GL constant (for example,
      * <code>GL_UNSIGNED_SHORT</code> or <code>GL_FLOAT</code>)
