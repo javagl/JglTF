@@ -39,7 +39,7 @@ import de.javagl.jgltf.model.io.Buffers;
  * Unless otherwise noted, none of the arguments to these methods may be
  * <code>null</code>.
  */
-public class AccessorDataOps
+public class AccessorDataBuffers
 {
     /**
      * Read the data from the given accessor data, write it into the given
@@ -398,7 +398,7 @@ public class AccessorDataOps
     /**
      * Private constructor to prevent instantiation
      */
-    private AccessorDataOps()
+    private AccessorDataBuffers()
     {
         // Private constructor to prevent instantiation
     }

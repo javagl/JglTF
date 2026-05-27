@@ -50,7 +50,7 @@ import com.openize.drako.PointAttribute;
 import de.javagl.jgltf.model.AccessorData;
 import de.javagl.jgltf.model.AccessorFloatData;
 import de.javagl.jgltf.model.AccessorModel;
-import de.javagl.jgltf.model.AccessorDataOps;
+import de.javagl.jgltf.model.AccessorDataBuffers;
 import de.javagl.jgltf.model.ElementType;
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
@@ -291,7 +291,7 @@ class DracoEncoding
         AccessorData accessorData = accessorModel.getAccessorData();
         int n = accessorData.getTotalNumComponents();
         int result[] = new int[n];
-        AccessorDataOps.readAsInts(accessorData, IntBuffer.wrap(result));
+        AccessorDataBuffers.readAsInts(accessorData, IntBuffer.wrap(result));
         return result;
     }
 

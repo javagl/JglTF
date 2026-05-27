@@ -33,7 +33,7 @@ import de.javagl.jgltf.model.AccessorByteData;
 import de.javagl.jgltf.model.AccessorData;
 import de.javagl.jgltf.model.AccessorFloatData;
 import de.javagl.jgltf.model.AccessorIntData;
-import de.javagl.jgltf.model.AccessorDataOps;
+import de.javagl.jgltf.model.AccessorDataBuffers;
 import de.javagl.jgltf.model.AccessorShortData;
 
 /**
@@ -69,7 +69,7 @@ class AccessorSparseUtils
     {
         int n = accessorData.getTotalNumComponents();
         int result[] = new int[n];
-        AccessorDataOps.readAsInts(accessorData, IntBuffer.wrap(result));
+        AccessorDataBuffers.readAsInts(accessorData, IntBuffer.wrap(result));
         return result;
     }
 

@@ -31,7 +31,7 @@ import java.nio.IntBuffer;
 import de.javagl.jgltf.model.AccessorData;
 import de.javagl.jgltf.model.AccessorFloatData;
 import de.javagl.jgltf.model.AccessorModel;
-import de.javagl.jgltf.model.AccessorDataOps;
+import de.javagl.jgltf.model.AccessorDataBuffers;
 import de.javagl.jgltf.model.ElementType;
 import de.javagl.jgltf.model.GltfConstants;
 
@@ -63,7 +63,7 @@ public class NormalComputation
             AccessorData indicesAccessorData = 
                 indicesAccessorModel.getAccessorData();
             indices = new int[indicesAccessorData.getTotalNumComponents()];
-            AccessorDataOps.readAsInts(
+            AccessorDataBuffers.readAsInts(
                 indicesAccessorData, IntBuffer.wrap(indices));
         } 
         else
