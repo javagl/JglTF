@@ -111,6 +111,57 @@ class GltfTestModelCreation
     }
 
     /**
+     * Create two animated squares
+     * 
+     * @return The model
+     */
+    public static DefaultGltfModel createTwoAnimatedSquares()
+    {
+        // Create the mesh primitive model
+        DefaultMeshPrimitiveModel meshPrimitiveModel =
+            createSquareMeshPrimitive();
+
+        // Create a mesh model with the mesh primitive
+        DefaultMeshModel meshModel = new DefaultMeshModel();
+        meshModel.addMeshPrimitiveModel(meshPrimitiveModel);
+
+        DefaultNodeModel nodeModelA = new DefaultNodeModel();
+        nodeModelA.addMeshModel(meshModel);
+
+        DefaultNodeModel baseNodeModelA = new DefaultNodeModel();
+        baseNodeModelA.setTranslation(new double[]
+        { -1.5, 0.0, 0.0 });
+        baseNodeModelA.addChild(nodeModelA);
+
+        DefaultNodeModel nodeModelB = new DefaultNodeModel();
+        nodeModelB.addMeshModel(meshModel);
+
+        DefaultNodeModel baseNodeModelB = new DefaultNodeModel();
+        baseNodeModelB.setTranslation(new double[]
+        { 1.5, 0.0, 0.0 });
+        baseNodeModelB.addChild(nodeModelB);
+
+        DefaultNodeModel rootNodeModel = new DefaultNodeModel();
+        rootNodeModel.addChild(baseNodeModelA);
+        rootNodeModel.addChild(baseNodeModelB);
+
+        // Create a scene model with the node
+        DefaultSceneModel sceneModel = new DefaultSceneModel();
+        sceneModel.addNode(rootNodeModel);
+
+        // Create the animation model
+        DefaultAnimationModel animationModel =
+            createSimpleTranslationAnimation(nodeModelA, nodeModelB);
+
+        // Create the glTF model
+        GltfModelBuilder gltfModelBuilder = GltfModelBuilder.create();
+        gltfModelBuilder.addSceneModel(sceneModel);
+        gltfModelBuilder.addAnimationModel(animationModel);
+        DefaultGltfModel gltfModel = gltfModelBuilder.build();
+        return gltfModel;
+    }
+
+    /**
      * Create a textured square
      * 
      * @return The model
@@ -145,9 +196,9 @@ class GltfTestModelCreation
         // Create the mesh primitive model
         DefaultMeshPrimitiveModel meshPrimitiveModel =
             createSquareMeshPrimitive();
-        
+
         // Add the morph targets
-        List<Map<String, AccessorModel>> morphTargets = 
+        List<Map<String, AccessorModel>> morphTargets =
             createSquareMeshPrimitiveMorphTargets();
         for (Map<String, AccessorModel> morphTarget : morphTargets)
         {
@@ -165,9 +216,9 @@ class GltfTestModelCreation
         // Create a scene model with the node
         DefaultSceneModel sceneModel = new DefaultSceneModel();
         sceneModel.addNode(nodeModel);
-        
+
         // Create a morph target animation
-        DefaultAnimationModel animationModel = 
+        DefaultAnimationModel animationModel =
             createMorphAnimationModel(nodeModel);
 
         // Create the glTF model
@@ -178,7 +229,6 @@ class GltfTestModelCreation
         return gltfModel;
     }
 
-    
     /**
      * Create a square with texture coordinates, but without a material
      * 
@@ -465,10 +515,9 @@ class GltfTestModelCreation
         AccessorModel weightsAccessorModel =
             AccessorModels.createFloatScalar(FloatBuffer.wrap(weights));
 
-        Sampler sampler = new DefaultAnimationModel.DefaultSampler(
-            timesAccessorModel, Interpolation.LINEAR, weightsAccessorModel);
-        Channel channel = new DefaultAnimationModel.DefaultChannel(sampler,
-            nodeModel, "weights");
+        Sampler sampler = new DefaultSampler(timesAccessorModel,
+            Interpolation.LINEAR, weightsAccessorModel);
+        Channel channel = new DefaultChannel(sampler, nodeModel, "weights");
         animationModel.addChannel(channel);
         return animationModel;
 
@@ -567,13 +616,69 @@ class GltfTestModelCreation
 
         // Create the animation model with one channel and sampler for rotation
         DefaultAnimationModel animationModel = new DefaultAnimationModel();
-        DefaultAnimationModel.DefaultSampler sampler =
-            new DefaultAnimationModel.DefaultSampler(timesAccessorModel,
-                Interpolation.LINEAR, rotationsAccessorModel);
-        DefaultAnimationModel.DefaultChannel channel =
-            new DefaultAnimationModel.DefaultChannel(sampler, nodeModel,
-                "rotation");
+        Sampler sampler = new DefaultSampler(timesAccessorModel,
+            Interpolation.LINEAR, rotationsAccessorModel);
+        Channel channel = new DefaultChannel(sampler, nodeModel, "rotation");
         animationModel.addChannel(channel);
+
+        return animationModel;
+    }
+
+    /**
+     * Create a simple animation model that applies a translation to the given
+     * nodes.
+     * 
+     * @param nodeModelA The first node
+     * @param nodeModelB The second node
+     * @return The animation model
+     */
+    static DefaultAnimationModel createSimpleTranslationAnimation(
+        NodeModel nodeModelA, NodeModel nodeModelB)
+    {
+        // Create the times accessor
+        float[] times = new float[]
+        { 0.0f, 1.0f, 2.0f, 3.0f, 4.0f };
+        DefaultAccessorModel timesAccessorModel =
+            AccessorModels.createFloatScalar(FloatBuffer.wrap(times));
+
+        // Create the translation accessors
+        // @formatter:off
+        float[] translationsA = new float[]
+        { 
+            0.0f, 0.0f, 0.0f, 
+            0.0f, 0.5f, 0.0f, 
+            0.0f, 1.0f, 0.0f, 
+            0.0f, 0.5f, 0.0f, 
+            0.0f, 0.0f, 0.0f, 
+        };
+        float[] translationsB = new float[]
+        { 
+            0.0f,  0.0f, 0.0f, 
+            0.0f, -0.5f, 0.0f, 
+            0.0f, -1.0f, 0.0f, 
+            0.0f, -0.5f, 0.0f, 
+            0.0f,  0.0f, 0.0f, 
+        };
+        // @formatter:on
+        DefaultAccessorModel translationsAccessorModelA =
+            AccessorModels.createFloat3D(FloatBuffer.wrap(translationsA));
+        DefaultAccessorModel translationsAccessorModelB =
+            AccessorModels.createFloat3D(FloatBuffer.wrap(translationsB));
+
+        // Create the animation model
+        DefaultAnimationModel animationModel = new DefaultAnimationModel();
+
+        Sampler samplerA = new DefaultSampler(timesAccessorModel,
+            Interpolation.LINEAR, translationsAccessorModelA);
+        Channel channelA =
+            new DefaultChannel(samplerA, nodeModelA, "translation");
+        animationModel.addChannel(channelA);
+
+        Sampler samplerB = new DefaultSampler(timesAccessorModel,
+            Interpolation.LINEAR, translationsAccessorModelB);
+        Channel channelB =
+            new DefaultChannel(samplerB, nodeModelB, "translation");
+        animationModel.addChannel(channelB);
 
         return animationModel;
     }

@@ -272,7 +272,8 @@ public class DefaultAnimationModel extends AbstractNamedModelElement
             }
         }
         channels.removeAll(channelsToRemove);
-        return !channelsToRemove.isEmpty();
+        boolean removeThis = channels.isEmpty();
+        return removeThis;
     }
     
     /**
