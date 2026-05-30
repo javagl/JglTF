@@ -68,6 +68,7 @@ import de.javagl.jgltf.model.impl.DefaultSkinModel;
 import de.javagl.jgltf.model.impl.DefaultTextureInfoModel;
 import de.javagl.jgltf.model.impl.DefaultTextureModel;
 import de.javagl.jgltf.model.io.Buffers;
+import de.javagl.jgltf.model.khr.draco_mesh_compression.DefaultDracoMeshCompressionModel;
 import de.javagl.jgltf.model.khr.materials_clearcoat.DefaultMaterialsClearcoatModel;
 
 /**
@@ -186,6 +187,55 @@ class GltfTestModelCreation
         return gltfModel;
     }
 
+    /**
+     * Create a textured square that uses instancing and draco compression
+     * 
+     * @return The model
+     */
+    public static DefaultGltfModel createTexturedSquareInstancedDraco()
+    {
+        // Create the mesh primitive model
+        DefaultMeshPrimitiveModel meshPrimitiveModel =
+            createSquareMeshPrimitiveWithTexcoords();
+        
+        // Assign draco mesh compression to the mesh primitive
+        DefaultDracoMeshCompressionModel dracoMeshCompressionModel =
+            new DefaultDracoMeshCompressionModel();
+        dracoMeshCompressionModel.addAttribute("POSITION");
+        dracoMeshCompressionModel.addAttribute("TEXCOORD_0");
+        meshPrimitiveModel.addExtensionModel("KHR_draco_mesh_compression",
+            dracoMeshCompressionModel);
+        
+        // Assign a material
+        DefaultPbrMaterialModel materialModel =
+            createBaseColorTextureMaterialModel();
+        meshPrimitiveModel.setMaterialModel(materialModel);
+
+        // Create a mesh model with the mesh primitive
+        DefaultMeshModel meshModel = new DefaultMeshModel();
+        meshModel.addMeshPrimitiveModel(meshPrimitiveModel);
+
+        // Create a node model with the mesh
+        DefaultNodeModel nodeModel = new DefaultNodeModel();
+        nodeModel.addMeshModel(meshModel);
+        
+        // Assign the instancing extension to the node
+        DefaultMeshGpuInstancingModel meshGpuInstancing =
+            createMeshGpuInstancing();
+        nodeModel.addExtensionModel("EXT_mesh_gpu_instancing",
+            meshGpuInstancing);
+
+        // Create a scene model with the node
+        DefaultSceneModel sceneModel = new DefaultSceneModel();
+        sceneModel.addNode(nodeModel);
+        
+        // Create the glTF model
+        GltfModelBuilder gltfModelBuilder = GltfModelBuilder.create();
+        gltfModelBuilder.addSceneModel(sceneModel);
+        DefaultGltfModel gltfModel = gltfModelBuilder.build();
+        return gltfModel;
+    }
+    
     /**
      * Create a textured square
      * 
@@ -327,8 +377,14 @@ class GltfTestModelCreation
         // Create the instancing extension with some translation
         DefaultMeshGpuInstancingModel meshGpuInstancing =
             new DefaultMeshGpuInstancingModel();
+        // @formatter:off
         float translations[] =
-        { 0.0f, 0.0f, 0.0f, 1.5f, 0.0f, 0.0f, 3.0f, 0.0f, 0.0f };
+        { 
+            0.0f, 0.0f, 0.0f, 
+            1.5f, 0.0f, 0.0f, 
+            3.0f, 0.0f, 0.0f 
+        };
+        // @formatter:on
         DefaultAccessorModel translationAccessorModel =
             AccessorModels.createFloat3D(FloatBuffer.wrap(translations));
         meshGpuInstancing.setAttribute("TRANSLATION", translationAccessorModel);

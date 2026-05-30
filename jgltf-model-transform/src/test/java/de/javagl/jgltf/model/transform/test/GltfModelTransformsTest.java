@@ -12,6 +12,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.javagl.jgltf.model.MaterialModel;
@@ -28,6 +30,7 @@ import de.javagl.jgltf.model.impl.DefaultPbrMaterialModel;
 import de.javagl.jgltf.model.impl.DefaultTextureInfoModel;
 import de.javagl.jgltf.model.impl.DefaultTextureModel;
 import de.javagl.jgltf.model.io.GltfModelWriter;
+import de.javagl.jgltf.model.khr.draco_mesh_compression.DefaultDracoMeshCompressionModel;
 import de.javagl.jgltf.model.khr.materials_clearcoat.DefaultMaterialsClearcoatModel;
 import de.javagl.jgltf.model.khr.materials_clearcoat.MaterialsClearcoatModel;
 import de.javagl.jgltf.model.transform.GltfModelTransforms;
@@ -44,9 +47,14 @@ public class GltfModelTransformsTest
         Logger.getLogger(GltfModelTransformsTest.class.getName());
 
     /**
+     * The log level
+     */
+    private static Level level = Level.FINE;
+    
+    /**
      * The base directory for the files that are written
      */
-    private static final Path BASE_DIR = Paths.get("./data/");
+    private static Path basePath = Paths.get("./data/");
 
     /**
      * The entry point
@@ -57,6 +65,8 @@ public class GltfModelTransformsTest
     public static void main(String[] args) throws IOException
     {
         LoggerUtil.initLogging();
+        level = Level.INFO;
+        
         testRemoveTexture();
         testRemoveTexCoordAccessor();
         testRemoveMaterial();
@@ -73,7 +83,20 @@ public class GltfModelTransformsTest
         testRemoveMorphAnimationTimesAccessor();
         testRemoveMorphTargetAccessor();
         testAddInstancing();
+        testAddDraco();
+        testRemoveDraco();
+    }
 
+    /**
+     * Set the base directory for writing the files.
+     * 
+     * Only called from tests!
+     * 
+     * @param directory The directory
+     */
+    static void setBaseDirectory(String directory)
+    {
+        basePath = Paths.get(directory);
     }
 
     /**
@@ -81,19 +104,19 @@ public class GltfModelTransformsTest
      * 
      * @throws IOException If an IO error occurs
      */
-    private static void testRemoveTexture() throws IOException
+    static void testRemoveTexture() throws IOException
     {
         String name = "TexturedSquare";
         String modifiedName = name + "-removedTexture";
         DefaultGltfModel gltfModel =
             GltfTestModelCreation.createTexturedSquare();
 
-        runTest(gltfModel, name, modifiedName, () ->
+        runTest(gltfModel, name, modifiedName, (m) ->
         {
-            DefaultTextureModel tm = gltfModel.getTextureModel(0);
+            DefaultTextureModel tm = m.getTextureModel(0);
             Set<ModelElement> toRemove = new LinkedHashSet<ModelElement>();
             toRemove.add(tm);
-            GltfModelTransforms.removeAll(gltfModel, toRemove);
+            GltfModelTransforms.removeAll(m, toRemove);
         });
     }
 
@@ -109,13 +132,13 @@ public class GltfModelTransformsTest
         DefaultGltfModel gltfModel =
             GltfTestModelCreation.createTexturedSquare();
 
-        runTest(gltfModel, name, modifiedName, () ->
+        runTest(gltfModel, name, modifiedName, (m) ->
         {
-            ModelElement am2 = gltfModel.getAccessorModel(2);
+            ModelElement am2 = m.getAccessorModel(2);
             Set<ModelElement> toRemove = new LinkedHashSet<ModelElement>();
             toRemove.add(am2);
-            GltfModelTransforms.removeAll(gltfModel, toRemove);
-            GltfModelTransforms.prune(gltfModel);
+            GltfModelTransforms.removeAll(m, toRemove);
+            GltfModelTransforms.prune(m);
         });
     }
 
@@ -131,12 +154,12 @@ public class GltfModelTransformsTest
         DefaultGltfModel gltfModel =
             GltfTestModelCreation.createTexturedSquare();
 
-        runTest(gltfModel, name, modifiedName, () ->
+        runTest(gltfModel, name, modifiedName, (m) ->
         {
-            ModelElement mm0 = gltfModel.getMaterialModel(0);
+            ModelElement mm0 = m.getMaterialModel(0);
             Set<ModelElement> toRemove = new LinkedHashSet<ModelElement>();
             toRemove.add(mm0);
-            GltfModelTransforms.removeAll(gltfModel, toRemove);
+            GltfModelTransforms.removeAll(m, toRemove);
         });
     }
 
@@ -152,16 +175,16 @@ public class GltfModelTransformsTest
         DefaultGltfModel gltfModel =
             GltfTestModelCreation.createSquareWithTexcoords();
 
-        runTest(gltfModel, name, modifiedName, () ->
+        runTest(gltfModel, name, modifiedName, (m) ->
         {
             DefaultPbrMaterialModel materialModel =
                 GltfTestModelCreation.createBaseColorTextureMaterialModel();
-            DefaultMeshModel m0 = gltfModel.getMeshModel(0);
+            DefaultMeshModel m0 = m.getMeshModel(0);
             DefaultMeshPrimitiveModel m0p0 =
                 (DefaultMeshPrimitiveModel) m0.getMeshPrimitiveModels().get(0);
             m0p0.setMaterialModel(materialModel);
 
-            GltfModelTransforms.revalidate(gltfModel);
+            GltfModelTransforms.revalidate(m);
         });
     }
 
@@ -177,12 +200,12 @@ public class GltfModelTransformsTest
         DefaultGltfModel gltfModel =
             GltfTestModelCreation.createTexturedSquareWithClearcoat();
 
-        runTest(gltfModel, name, modifiedName, () ->
+        runTest(gltfModel, name, modifiedName, (m) ->
         {
-            DefaultTextureModel tm = gltfModel.getTextureModel(0);
+            DefaultTextureModel tm = m.getTextureModel(0);
             Set<ModelElement> toRemove = new LinkedHashSet<ModelElement>();
             toRemove.add(tm);
-            GltfModelTransforms.removeAll(gltfModel, toRemove);
+            GltfModelTransforms.removeAll(m, toRemove);
         });
     }
 
@@ -200,16 +223,16 @@ public class GltfModelTransformsTest
         DefaultGltfModel gltfModel =
             GltfTestModelCreation.createTexturedSquareWithClearcoat();
 
-        runTest(gltfModel, name, modifiedName, () ->
+        runTest(gltfModel, name, modifiedName, (m) ->
         {
-            MaterialModel m0 = gltfModel.getMaterialModel(0);
+            MaterialModel m0 = m.getMaterialModel(0);
 
             MaterialsClearcoatModel c = m0.getExtensionModel(
                 "KHR_materials_clearcoat", MaterialsClearcoatModel.class);
             DefaultTextureInfoModel cti =
                 (DefaultTextureInfoModel) c.getClearcoatTextureInfoModel();
             cti.setTextureModel(null);
-            GltfModelTransforms.prune(gltfModel);
+            GltfModelTransforms.prune(m);
         });
     }
 
@@ -226,9 +249,9 @@ public class GltfModelTransformsTest
         DefaultGltfModel gltfModel =
             GltfTestModelCreation.createTexturedSquareWithClearcoat();
 
-        runTest(gltfModel, name, modifiedName, () ->
+        runTest(gltfModel, name, modifiedName, (m) ->
         {
-            MaterialModel m0 = gltfModel.getMaterialModel(0);
+            MaterialModel m0 = m.getMaterialModel(0);
 
             DefaultMaterialsClearcoatModel c =
                 m0.getExtensionModel("KHR_materials_clearcoat",
@@ -252,12 +275,12 @@ public class GltfModelTransformsTest
         DefaultGltfModel gltfModel =
             GltfTestModelCreation.createAnimatedSquare();
 
-        runTest(gltfModel, name, modifiedName, () ->
+        runTest(gltfModel, name, modifiedName, (m) ->
         {
-            ModelElement am3 = gltfModel.getAccessorModel(3);
+            ModelElement am3 = m.getAccessorModel(3);
             Set<ModelElement> toRemove = new LinkedHashSet<ModelElement>();
             toRemove.add(am3);
-            GltfModelTransforms.removeAll(gltfModel, toRemove);
+            GltfModelTransforms.removeAll(m, toRemove);
         });
     }
 
@@ -275,12 +298,12 @@ public class GltfModelTransformsTest
         DefaultGltfModel gltfModel =
             GltfTestModelCreation.createTwoAnimatedSquares();
 
-        runTest(gltfModel, name, modifiedName, () ->
+        runTest(gltfModel, name, modifiedName, (m) ->
         {
-            ModelElement am4 = gltfModel.getAccessorModel(4);
+            ModelElement am4 = m.getAccessorModel(4);
             Set<ModelElement> toRemove = new LinkedHashSet<ModelElement>();
             toRemove.add(am4);
-            GltfModelTransforms.removeAll(gltfModel, toRemove);
+            GltfModelTransforms.removeAll(m, toRemove);
         });
     }
 
@@ -296,21 +319,21 @@ public class GltfModelTransformsTest
         String modifiedName = name + "-removedAnimationTimes";
         DefaultGltfModel gltfModel = GltfTestModelCreation.createSimpleSkin();
 
-        runTest(gltfModel, name, modifiedName, () ->
+        runTest(gltfModel, name, modifiedName, (m) ->
         {
-            ModelElement am4 = gltfModel.getAccessorModel(4);
+            ModelElement am4 = m.getAccessorModel(4);
             Set<ModelElement> toRemove = new LinkedHashSet<ModelElement>();
             toRemove.add(am4);
 
             // Optional: Remove the attributes for the skin (would cause
             // a validation warning otherwise)
-            DefaultMeshModel mm0 = gltfModel.getMeshModel(0);
+            DefaultMeshModel mm0 = m.getMeshModel(0);
             MeshPrimitiveModel mpm0 = mm0.getMeshPrimitiveModels().get(0);
             DefaultMeshPrimitiveModel mpm = (DefaultMeshPrimitiveModel) mpm0;
             mpm.removeAttribute("JOINTS_0");
             mpm.removeAttribute("WEIGHTS_0");
 
-            GltfModelTransforms.removeAll(gltfModel, toRemove);
+            GltfModelTransforms.removeAll(m, toRemove);
         });
     }
 
@@ -325,15 +348,15 @@ public class GltfModelTransformsTest
         String modifiedName = name + "-removedSkinAttributes";
         DefaultGltfModel gltfModel = GltfTestModelCreation.createSimpleSkin();
 
-        runTest(gltfModel, name, modifiedName, () ->
+        runTest(gltfModel, name, modifiedName, (m) ->
         {
-            DefaultMeshModel mm0 = gltfModel.getMeshModel(0);
+            DefaultMeshModel mm0 = m.getMeshModel(0);
             MeshPrimitiveModel mpm0 = mm0.getMeshPrimitiveModels().get(0);
             DefaultMeshPrimitiveModel mpm = (DefaultMeshPrimitiveModel) mpm0;
             mpm.removeAttribute("JOINTS_0");
             mpm.removeAttribute("WEIGHTS_0");
 
-            GltfModelTransforms.prune(gltfModel);
+            GltfModelTransforms.prune(m);
         });
     }
 
@@ -349,13 +372,13 @@ public class GltfModelTransformsTest
         DefaultGltfModel gltfModel =
             GltfTestModelCreation.createTexturedSquare();
 
-        runTest(gltfModel, name, modifiedName, () ->
+        runTest(gltfModel, name, modifiedName, (m) ->
         {
-            NodeModel n0 = gltfModel.getNodeModel(0);
+            NodeModel n0 = m.getNodeModel(0);
             DefaultAnimationModel animationModel =
                 GltfTestModelCreation.createSimpleRotationAnimation(n0);
-            gltfModel.addAnimationModel(animationModel);
-            GltfModelTransforms.revalidate(gltfModel);
+            m.addAnimationModel(animationModel);
+            GltfModelTransforms.revalidate(m);
         });
     }
 
@@ -371,12 +394,67 @@ public class GltfModelTransformsTest
         DefaultGltfModel gltfModel =
             GltfTestModelCreation.createTexturedSquareInstanced();
 
-        runTest(gltfModel, name, modifiedName, () ->
+        runTest(gltfModel, name, modifiedName, (m) ->
         {
-            ModelElement mm0 = gltfModel.getMaterialModel(0);
+            ModelElement mm0 = m.getMaterialModel(0);
             Set<ModelElement> toRemove = new LinkedHashSet<ModelElement>();
             toRemove.add(mm0);
-            GltfModelTransforms.removeAll(gltfModel, toRemove);
+            GltfModelTransforms.removeAll(m, toRemove);
+        });
+    }
+
+    /**
+     * Run a test to add draco to a mesh primitive
+     * 
+     * @throws IOException If an IO error occurs
+     */
+    private static void testAddDraco() throws IOException
+    {
+        String name = "TexturedSquare";
+        String modifiedName = name + "-addedDraco";
+        DefaultGltfModel gltfModel =
+            GltfTestModelCreation.createTexturedSquare();
+
+        runTest(gltfModel, name, modifiedName, (m) ->
+        {
+            DefaultMeshModel mm0 = m.getMeshModel(0);
+            DefaultMeshPrimitiveModel mp0 =
+                (DefaultMeshPrimitiveModel) mm0.getMeshPrimitiveModels().get(0);
+
+            // Assign draco mesh compression to the mesh primitive
+            DefaultDracoMeshCompressionModel dracoMeshCompressionModel =
+                new DefaultDracoMeshCompressionModel();
+            dracoMeshCompressionModel.addAttribute("POSITION");
+            dracoMeshCompressionModel.addAttribute("TEXCOORD_0");
+            mp0.addExtensionModel("KHR_draco_mesh_compression",
+                dracoMeshCompressionModel);
+
+            GltfModelTransforms.revalidate(m);
+        });
+    }
+
+    /**
+     * Run a test to remove draco from a mesh primitive
+     * 
+     * @throws IOException If an IO error occurs
+     */
+    private static void testRemoveDraco() throws IOException
+    {
+        String name = "TexturedSquareInstancedDraco";
+        String modifiedName = name + "-removedDraco";
+        DefaultGltfModel gltfModel =
+            GltfTestModelCreation.createTexturedSquareInstancedDraco();
+
+        runTest(gltfModel, name, modifiedName, (m) ->
+        {
+            DefaultMeshModel mm0 = m.getMeshModel(0);
+            DefaultMeshPrimitiveModel mp0 =
+                (DefaultMeshPrimitiveModel) mm0.getMeshPrimitiveModels().get(0);
+
+            // Remove draco mesh compression from the mesh primitive
+            mp0.removeExtensionModel("KHR_draco_mesh_compression");
+
+            GltfModelTransforms.revalidate(m);
         });
     }
 
@@ -393,15 +471,15 @@ public class GltfModelTransformsTest
         DefaultGltfModel gltfModel =
             GltfTestModelCreation.createMorphedSquare();
 
-        runTest(gltfModel, name, modifiedName, () ->
+        runTest(gltfModel, name, modifiedName, (m) ->
         {
-            ModelElement am4 = gltfModel.getAccessorModel(4);
+            ModelElement am4 = m.getAccessorModel(4);
             Set<ModelElement> toRemove = new LinkedHashSet<ModelElement>();
             toRemove.add(am4);
-            DefaultNodeModel n0 = gltfModel.getNodeModel(0);
+            DefaultNodeModel n0 = m.getNodeModel(0);
             n0.setWeights(new double[]
             { 0.12, 0.34 });
-            GltfModelTransforms.removeAll(gltfModel, toRemove);
+            GltfModelTransforms.removeAll(m, toRemove);
         });
     }
 
@@ -417,12 +495,12 @@ public class GltfModelTransformsTest
         DefaultGltfModel gltfModel =
             GltfTestModelCreation.createMorphedSquare();
 
-        runTest(gltfModel, name, modifiedName, () ->
+        runTest(gltfModel, name, modifiedName, (m) ->
         {
-            ModelElement am2 = gltfModel.getAccessorModel(2);
+            ModelElement am2 = m.getAccessorModel(2);
             Set<ModelElement> toRemove = new LinkedHashSet<ModelElement>();
             toRemove.add(am2);
-            GltfModelTransforms.removeAll(gltfModel, toRemove);
+            GltfModelTransforms.removeAll(m, toRemove);
         });
     }
 
@@ -438,16 +516,16 @@ public class GltfModelTransformsTest
         DefaultGltfModel gltfModel =
             GltfTestModelCreation.createTexturedSquare();
 
-        runTest(gltfModel, name, modifiedName, () ->
+        runTest(gltfModel, name, modifiedName, (m) ->
         {
-            DefaultNodeModel n0 = gltfModel.getNodeModel(0);
+            DefaultNodeModel n0 = m.getNodeModel(0);
 
             // Assign the instancing extension to the node
             DefaultMeshGpuInstancingModel meshGpuInstancing =
                 GltfTestModelCreation.createMeshGpuInstancing();
             n0.addExtensionModel("EXT_mesh_gpu_instancing", meshGpuInstancing);
 
-            GltfModelTransforms.revalidate(gltfModel);
+            GltfModelTransforms.revalidate(m);
         });
     }
 
@@ -465,17 +543,17 @@ public class GltfModelTransformsTest
      * @throws IOException If an IO error occurs
      */
     private static void runTest(DefaultGltfModel gltfModel, String name,
-        String modifiedName, Runnable op) throws IOException
+        String modifiedName, Consumer<DefaultGltfModel> op) throws IOException
     {
         File originalFile = prepareOutput(name, ".glb");
         File modifiedFile = prepareOutput(modifiedName, ".gltf");
 
-        logger.info("Transforming " + name);
-        logger.info("        into " + modifiedName);
+        logger.log(level, "Transforming " + name);
+        logger.log(level, "        into " + modifiedName);
 
         GltfModelWriter w = new GltfModelWriter();
         w.writeBinary(gltfModel, originalFile);
-        op.run();
+        op.accept(gltfModel);
         w.write(gltfModel, modifiedFile);
     }
 
@@ -492,7 +570,7 @@ public class GltfModelTransformsTest
     private static File prepareOutput(String name, String extensionWithDot)
         throws IOException
     {
-        Path dir = BASE_DIR.resolve(name);
+        Path dir = basePath.resolve(name);
         Files.createDirectories(dir);
         String fileName = name + extensionWithDot;
         File file = dir.resolve(fileName).toFile();
