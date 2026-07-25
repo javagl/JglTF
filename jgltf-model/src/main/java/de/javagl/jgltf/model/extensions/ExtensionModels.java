@@ -26,8 +26,10 @@
  */
 package de.javagl.jgltf.model.extensions;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -236,6 +238,57 @@ public class ExtensionModels
     }
 
     /**
+     * Copy all extension model objects that are stored in the given source
+     * model element into the target model element.
+     * 
+     * @param gltfModel The glTF model that contains the source
+     * @param sourceElement The source {@link ModelElement}
+     * @param targetElement The target {@link ModelElement}
+     * @param modelElementMap The mapping from source to target model elements
+     *        that will be passed to {@link ExtensionHandler#copy}
+     */
+    public static void copyExtensionModels(GltfModel gltfModel,
+        ModelElement sourceElement, ModelElement targetElement,
+        Map<ModelElement, ModelElement> modelElementMap)
+    {
+        Class<? extends ModelElement> sourceType = sourceElement.getClass();
+        Set<Class<?>> types = computeModelElementInterfaceTypes(sourceType);
+        for (Class<?> type : types)
+        {
+            logger.finer("Copying extension models based on type " + type);
+            copyExtensionModels(gltfModel, sourceElement, targetElement, type,
+                modelElementMap);
+        }
+    }
+
+    /**
+     * Copy all extension model objects that are stored in the given source
+     * model element into the target model element, based on the given model
+     * class
+     * 
+     * @param gltfModel The glTF model that contains the source
+     * @param sourceElement The source {@link ModelElement}
+     * @param targetElement The target {@link ModelElement}
+     * @param modelClass The model class
+     * @param modelElementMap The mapping from source to target model elements
+     *        that will be passed to {@link ExtensionHandler#copy}
+     */
+    private static void copyExtensionModels(GltfModel gltfModel,
+        ModelElement sourceElement, ModelElement targetElement,
+        Class<?> modelClass, Map<ModelElement, ModelElement> modelElementMap)
+    {
+        if (!(targetElement instanceof AbstractModelElement))
+        {
+            logger.warning("The target element is not an AbstractModelElement");
+            return;
+        }
+        AbstractModelElement targetModelElement =
+            (AbstractModelElement) targetElement;
+        ExtensionModels.copyExtensionModelsInternal(gltfModel, sourceElement,
+            targetModelElement, modelClass, modelElementMap);
+    }
+
+    /**
      * Copy all extension model elements that are contained in the given source
      * element, and add the copies to the given target.<br>
      * <br>
@@ -257,7 +310,7 @@ public class ExtensionModels
      * @param modelElementMap The mapping from source to target model elements
      *        that will be passed to {@link ExtensionHandler#copy}
      */
-    public static void copyExtensionModels(GltfModel gltfModel,
+    private static void copyExtensionModelsInternal(GltfModel gltfModel,
         ModelElement sourceModelElement, ModelElement targetModelElement,
         Class<?> modelClass, Map<ModelElement, ModelElement> modelElementMap)
     {
@@ -297,6 +350,46 @@ public class ExtensionModels
                 sourceExtensionModelObject, modelElementMap);
             abstractTargetModelElement.addExtensionModel(extensionName,
                 targetExtensionModelObject);
+        }
+    }
+
+    /**
+     * Compute the set of all class objects that represent interfaces that are
+     * implemented by the given class or any of its superclasses, and that are
+     * assignable to {@link ModelElement}
+     * 
+     * @param c The class
+     * @return The resulting types
+     */
+    private static Set<Class<?>> computeModelElementInterfaceTypes(Class<?> c)
+    {
+        Set<Class<?>> types = new LinkedHashSet<Class<?>>();
+        computeModelElementInterfaceTypes(c, types);
+        return types;
+    }
+
+    /**
+     * Implementation for {@link #computeModelElementInterfaceTypes(Class)}
+     * 
+     * @param c The class
+     * @param types The resulting types
+     */
+    private static void computeModelElementInterfaceTypes(Class<?> c,
+        Set<Class<?>> types)
+    {
+        if (c.isInterface() && ModelElement.class.isAssignableFrom(c))
+        {
+            types.add(c);
+        }
+        Class<?> superclass = c.getSuperclass();
+        if (superclass != null)
+        {
+            computeModelElementInterfaceTypes(superclass, types);
+        }
+        Class<?>[] interfaces = c.getInterfaces();
+        for (Class<?> i : interfaces)
+        {
+            computeModelElementInterfaceTypes(i, types);
         }
     }
 

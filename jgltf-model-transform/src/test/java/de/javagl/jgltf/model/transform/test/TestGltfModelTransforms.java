@@ -71,6 +71,8 @@ public class TestGltfModelTransforms
         t.testRemoveMorphAnimationTimesAccessor();
         t.testRemoveMorphTargetAccessor();
         t.testAddInstancing();
+        t.testRemoveTextureTransform();
+        t.testAddClearcoatTextureTransform();
     }
 
     @Test
@@ -206,6 +208,20 @@ public class TestGltfModelTransforms
     public void testAddInstancing() throws IOException
     {
         TestCase t = GltfModelTransformsTests.createTestAddInstancing();
+        runTestCase(t);
+    }
+    
+    @Test
+    public void testRemoveTextureTransform() throws IOException
+    {
+        TestCase t = GltfModelTransformsTests.createTestRemoveTextureTransform();
+        runTestCase(t);
+    }
+
+    @Test
+    public void testAddClearcoatTextureTransform() throws IOException
+    {
+        TestCase t = GltfModelTransformsTests.createTestAddClearcoatTextureTransform();
         runTestCase(t);
     }
 

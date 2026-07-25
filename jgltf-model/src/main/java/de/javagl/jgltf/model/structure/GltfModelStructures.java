@@ -29,11 +29,9 @@ package de.javagl.jgltf.model.structure;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.logging.Level;
@@ -63,7 +61,6 @@ import de.javagl.jgltf.model.MeshPrimitiveModel;
 import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.NodeModel;
 import de.javagl.jgltf.model.Optionals;
-import de.javagl.jgltf.model.PbrMaterialModel;
 import de.javagl.jgltf.model.SceneModel;
 import de.javagl.jgltf.model.SkinModel;
 import de.javagl.jgltf.model.TextureModel;
@@ -517,7 +514,8 @@ public class GltfModelStructures
     {
         target.setExtensions(source.getExtensions());
         target.setExtras(source.getExtras());
-        copyExtensionModels(source, target);
+        ExtensionModels.copyExtensionModels(
+            this.source, source, target, this.modelElementMap);
     }
 
     /**
@@ -1129,7 +1127,7 @@ public class GltfModelStructures
      * @param targetMaterial The target {@link DefaultPbrMaterialModel}
      */
     private void initMaterialModel(
-        PbrMaterialModel sourceMaterial, 
+        DefaultPbrMaterialModel sourceMaterial, 
         DefaultPbrMaterialModel targetMaterial)
     {
         targetMaterial.setAlphaMode(sourceMaterial.getAlphaMode());
@@ -1170,6 +1168,8 @@ public class GltfModelStructures
 
         double emissiveFactor[] = sourceMaterial.getEmissiveFactor();
         targetMaterial.setEmissiveFactor(Optionals.clone(emissiveFactor));
+        
+        copyGltfPropertyElements(sourceMaterial, targetMaterial);            
     }
 
     /**
@@ -1483,88 +1483,6 @@ public class GltfModelStructures
             sourceAssetModel, targetAssetModel);
     }
 
-    /**
-     * Compute the set of all class objects that represent interfaces that
-     * are implemented by the given class or any of its superclasses, and
-     * that are assignable to {@link ModelElement}
-     * 
-     * @param c The class
-     * @return The resulting types
-     */
-    private static Set<Class<?>> computeModelElementInterfaceTypes(Class<?> c)
-    {
-        Set<Class<?>> types = new LinkedHashSet<Class<?>>();
-        computeModelElementInterfaceTypes(c, types);
-        return types;
-    }
-    
-    /**
-     * Implementation for {@link #computeModelElementInterfaceTypes(Class)}
-     * 
-     * @param c The class
-     * @param types The resulting types
-     */
-    private static void computeModelElementInterfaceTypes(
-        Class<?> c, Set<Class<?>> types)
-    {
-        if (c.isInterface() && ModelElement.class.isAssignableFrom(c))
-        {
-            types.add(c);
-        }
-        Class<?> superclass = c.getSuperclass();
-        if (superclass != null)
-        {
-            computeModelElementInterfaceTypes(superclass, types);
-        }
-        Class<?>[] interfaces = c.getInterfaces();
-        for (Class<?> i : interfaces)
-        {
-            computeModelElementInterfaceTypes(i, types);
-        }
-    }
-    
-    /**
-     * Copy all extension model objects that are stored in the given source
-     * model element into the target model element.
-     * 
-     * @param sourceElement The source {@link ModelElement}
-     * @param targetElement The target {@link ModelElement}
-     */
-    private void copyExtensionModels(
-        ModelElement sourceElement, ModelElement targetElement)
-    {
-        Class<? extends ModelElement> sourceType = sourceElement.getClass();
-        Set<Class<?>> types = computeModelElementInterfaceTypes(sourceType);
-        for (Class<?> type : types)
-        {
-            logger.finer("Copying extension models based on type " + type);
-            copyExtensionModels(sourceElement, targetElement, type);
-        }
-    }
-    
-    /**
-     * Copy all extension model objects that are stored in the given source
-     * model element into the target model element, based on the given
-     * model class
-     * 
-     * @param sourceElement The source {@link ModelElement}
-     * @param targetElement The target {@link ModelElement}
-     * @param modelClass The model class
-     */
-    private void copyExtensionModels(ModelElement sourceElement,
-        ModelElement targetElement, Class<?> modelClass)
-    {
-        if (!(targetElement instanceof AbstractModelElement))
-        {
-            logger.warning("The target element is not an AbstractModelElement");
-            return;
-        }
-        AbstractModelElement targetModelElement = 
-            (AbstractModelElement) targetElement;
-        ExtensionModels.copyExtensionModels(source, sourceElement,
-            targetModelElement, modelClass, modelElementMap);
-    }
-    
     /**
      * Create a mapping from each source element to a newly created target
      * element, passing the target elements to the given consumer.

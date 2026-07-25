@@ -34,6 +34,7 @@ import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.TextureInfoModel;
 import de.javagl.jgltf.model.extensions.ExtensionHandler;
+import de.javagl.jgltf.model.extensions.ExtensionModels;
 import de.javagl.jgltf.model.v2.ModelElementsV2;
 
 /**
@@ -114,6 +115,9 @@ public class TextureTransformExtensionHandler implements ExtensionHandler
         outputModel.setRotation(inputModel.getRotation());
         outputModel.setScale(Optionals.clone(inputModel.getScale()));
         outputModel.setTexCoord(inputModel.getTexCoord());
+        
+        ExtensionModels.copyExtensionModels(gltfModel, inputModel,
+            outputModel, modelElementMap);
         
         return outputModel;
     }

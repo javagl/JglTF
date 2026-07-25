@@ -41,6 +41,7 @@ import de.javagl.jgltf.model.MeshModel;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
 import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.extensions.ExtensionHandler;
+import de.javagl.jgltf.model.extensions.ExtensionModels;
 import de.javagl.jgltf.model.extensions.ExtensionProcessing;
 import de.javagl.jgltf.model.impl.DefaultAccessorModel;
 import de.javagl.jgltf.model.impl.DefaultBufferViewModel;
@@ -145,6 +146,10 @@ public class DracoMeshCompressionExtensionHandler implements ExtensionHandler
         }
         outputModel
             .setDracoOptions(DracoOptions.copy(inputModel.getDracoOptions()));
+        
+        ExtensionModels.copyExtensionModels(gltfModel, inputModel,
+            outputModel, modelElementMap);
+        
         return outputModel;
     }
 

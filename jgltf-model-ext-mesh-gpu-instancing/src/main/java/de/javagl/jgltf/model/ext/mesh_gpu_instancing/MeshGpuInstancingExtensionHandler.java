@@ -36,6 +36,7 @@ import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.NodeModel;
 import de.javagl.jgltf.model.extensions.ExtensionHandler;
+import de.javagl.jgltf.model.extensions.ExtensionModels;
 import de.javagl.jgltf.model.v2.ModelElementsV2;
 
 /**
@@ -137,6 +138,9 @@ public class MeshGpuInstancingExtensionHandler implements ExtensionHandler
             outputModel.setAttribute(key, outputValue);
         }
 
+        ExtensionModels.copyExtensionModels(gltfModel, inputModel,
+            outputModel, modelElementMap);
+        
         return outputModel;
     }
 }

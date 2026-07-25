@@ -99,17 +99,18 @@ class GltfModelPruner
         // in the top-level glTF model, because they may be only
         // reachable from that
         Map<String, Object> extensionModels = gltfModel.getExtensionModels();
-        for (Entry<String, Object> entry : extensionModels.entrySet())
+        if (extensionModels != null)
         {
-            Object object = entry.getValue();
-            if (object instanceof ModelElement)
+            for (Entry<String, Object> entry : extensionModels.entrySet())
             {
-                ModelElement modelElement = (ModelElement) object;
-                starting.add(modelElement);
+                Object object = entry.getValue();
+                if (object instanceof ModelElement)
+                {
+                    ModelElement modelElement = (ModelElement) object;
+                    starting.add(modelElement);
+                }
             }
-            System.out.println("Reachable from glTF: "+object);
         }
-
         
         // The set of elements that have to be removed in the next iteration
         Set<ModelElement> nextToRemove = new LinkedHashSet<ModelElement>();

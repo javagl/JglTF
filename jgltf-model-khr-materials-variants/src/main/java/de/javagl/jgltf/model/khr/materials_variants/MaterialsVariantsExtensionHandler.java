@@ -34,6 +34,7 @@ import de.javagl.jgltf.impl.v2.khr.materials_variants.GlTFMaterialsVariantsPrope
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.extensions.ExtensionHandler;
+import de.javagl.jgltf.model.extensions.ExtensionModels;
 import de.javagl.jgltf.model.v2.ModelElementsV2;
 
 /**
@@ -122,6 +123,10 @@ public class MaterialsVariantsExtensionHandler implements ExtensionHandler
         {
             outputModel.addName(name);
         }
+        
+        ExtensionModels.copyExtensionModels(gltfModel, inputModel,
+            outputModel, modelElementMap);
+        
         return outputModel;
     }
     

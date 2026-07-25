@@ -49,6 +49,7 @@ import de.javagl.jgltf.model.AnimationModel.Interpolation;
 import de.javagl.jgltf.model.AnimationModel.Sampler;
 import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.NodeModel;
+import de.javagl.jgltf.model.PbrMetallicRoughnessModel;
 import de.javagl.jgltf.model.creation.AccessorModels;
 import de.javagl.jgltf.model.creation.GltfModelBuilder;
 import de.javagl.jgltf.model.ext.mesh_gpu_instancing.DefaultMeshGpuInstancingModel;
@@ -72,6 +73,7 @@ import de.javagl.jgltf.model.khr.draco_mesh_compression.DefaultDracoMeshCompress
 import de.javagl.jgltf.model.khr.materials_clearcoat.DefaultMaterialsClearcoatModel;
 import de.javagl.jgltf.model.khr.materials_variants.DefaultMaterialsVariantsModel;
 import de.javagl.jgltf.model.khr.materials_variants.DefaultMeshPrimitiveMaterialsVariantsModel;
+import de.javagl.jgltf.model.khr.texture_transform.DefaultTextureTransformModel;
 
 /**
  * Utility methods to create test models for this package
@@ -199,7 +201,7 @@ class GltfTestModelCreation
         // Create the mesh primitive model
         DefaultMeshPrimitiveModel meshPrimitiveModel =
             createSquareMeshPrimitiveWithTexcoords();
-        
+
         // Assign draco mesh compression to the mesh primitive
         DefaultDracoMeshCompressionModel dracoMeshCompressionModel =
             new DefaultDracoMeshCompressionModel();
@@ -207,7 +209,7 @@ class GltfTestModelCreation
         dracoMeshCompressionModel.addAttribute("TEXCOORD_0");
         meshPrimitiveModel.addExtensionModel("KHR_draco_mesh_compression",
             dracoMeshCompressionModel);
-        
+
         // Assign a material
         DefaultPbrMaterialModel materialModel =
             createBaseColorTextureMaterialModel("baseColor.png");
@@ -220,7 +222,7 @@ class GltfTestModelCreation
         // Create a node model with the mesh
         DefaultNodeModel nodeModel = new DefaultNodeModel();
         nodeModel.addMeshModel(meshModel);
-        
+
         // Assign the instancing extension to the node
         DefaultMeshGpuInstancingModel meshGpuInstancing =
             createMeshGpuInstancing();
@@ -230,14 +232,14 @@ class GltfTestModelCreation
         // Create a scene model with the node
         DefaultSceneModel sceneModel = new DefaultSceneModel();
         sceneModel.addNode(nodeModel);
-        
+
         // Create the glTF model
         GltfModelBuilder gltfModelBuilder = GltfModelBuilder.create();
         gltfModelBuilder.addSceneModel(sceneModel);
         DefaultGltfModel gltfModel = gltfModelBuilder.build();
         return gltfModel;
     }
-    
+
     /**
      * Create a textured square
      * 
@@ -318,6 +320,49 @@ class GltfTestModelCreation
         meshPrimitiveModel.setMaterialModel(materialModel);
 
         addClearcoatTexture(materialModel);
+
+        DefaultSceneModel sceneModel = createSceneWith(meshPrimitiveModel);
+
+        // Create the glTF model
+        GltfModelBuilder gltfModelBuilder = GltfModelBuilder.create();
+        gltfModelBuilder.addSceneModel(sceneModel);
+        DefaultGltfModel gltfModel = gltfModelBuilder.build();
+        return gltfModel;
+    }
+
+    /**
+     * Create an textured square including a KHR_texture_transform transform
+     * 
+     * @return The model
+     */
+    public static DefaultGltfModel createTexturedSquareWithTextureTransform()
+    {
+        // Create the mesh primitive model
+        DefaultMeshPrimitiveModel meshPrimitiveModel =
+            createSquareMeshPrimitiveWithTexcoords();
+
+        // Assign a material
+        DefaultPbrMaterialModel materialModel =
+            createBaseColorTextureMaterialModel("baseColor.png");
+        meshPrimitiveModel.setMaterialModel(materialModel);
+
+        // Obtain the base color texture info
+        PbrMetallicRoughnessModel pbrMetallicRoughnessModel =
+            materialModel.getPbrMetallicRoughnessModel();
+        DefaultTextureInfoModel baseColorTextureInfoModel =
+            (DefaultTextureInfoModel) pbrMetallicRoughnessModel
+                .getBaseColorTextureInfoModel();
+
+        // Create the texture transform and assign it to the base color
+        DefaultTextureTransformModel baseColorTextureTransform =
+            new DefaultTextureTransformModel();
+        baseColorTextureTransform.setOffset(new double[]
+        { 0.25, 0.25 });
+        baseColorTextureTransform.setScale(new double[]
+        { 0.5, 0.5 });
+        baseColorTextureTransform.setRotation(Math.toRadians(45.0));
+        baseColorTextureInfoModel.addExtensionModel("KHR_texture_transform",
+            baseColorTextureTransform);
 
         DefaultSceneModel sceneModel = createSceneWith(meshPrimitiveModel);
 
@@ -747,7 +792,8 @@ class GltfTestModelCreation
      * @param uri The URI
      * @return The material model
      */
-    static DefaultPbrMaterialModel createBaseColorTextureMaterialModel(String uri)
+    static DefaultPbrMaterialModel
+        createBaseColorTextureMaterialModel(String uri)
     {
         DefaultPbrMaterialModel materialModel = new DefaultPbrMaterialModel();
 
@@ -757,8 +803,7 @@ class GltfTestModelCreation
         DefaultTextureInfoModel baseColorTextureInfoModel =
             new DefaultTextureInfoModel();
 
-        DefaultTextureModel textureModel =
-            createSimpleTextureModel(uri);
+        DefaultTextureModel textureModel = createSimpleTextureModel(uri);
         baseColorTextureInfoModel.setTextureModel(textureModel);
         pbrMetallicRoughnessModel
             .setBaseColorTextureInfoModel(baseColorTextureInfoModel);
@@ -1107,7 +1152,7 @@ class GltfTestModelCreation
         DefaultGltfModel gltfModel = gltfModelBuilder.build();
         return gltfModel;
     }
-    
+
     /**
      * Create a glTF model with material variants
      * 
@@ -1154,7 +1199,7 @@ class GltfTestModelCreation
         materialVariantsModel.addName("variantC");
         gltfModel.addExtensionModel("KHR_materials_variants",
             materialVariantsModel);
-        
+
         return gltfModel;
     }
 

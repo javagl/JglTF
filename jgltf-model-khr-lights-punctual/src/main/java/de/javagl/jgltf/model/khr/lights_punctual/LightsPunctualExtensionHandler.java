@@ -183,7 +183,15 @@ public class LightsPunctualExtensionHandler implements ExtensionHandler
                 outputLightModel.setSpot(outputLightSpotModel);
             }
             outputModel.addLightModel(outputLightModel);
+            
+            ExtensionModels.copyExtensionModels(gltfModel, inputLightModel,
+                outputLightModel, modelElementMap);
+            
         }
+        
+        ExtensionModels.copyExtensionModels(gltfModel, inputModel,
+            outputModel, modelElementMap);
+        
         return outputModel;
     }
 

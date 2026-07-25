@@ -32,11 +32,13 @@ import java.util.Map;
 import de.javagl.jgltf.impl.v2.MaterialNormalTextureInfo;
 import de.javagl.jgltf.impl.v2.MaterialOcclusionTextureInfo;
 import de.javagl.jgltf.impl.v2.TextureInfo;
+import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.NormalTextureInfoModel;
 import de.javagl.jgltf.model.OcclusionTextureInfoModel;
 import de.javagl.jgltf.model.TextureInfoModel;
 import de.javagl.jgltf.model.TextureModel;
+import de.javagl.jgltf.model.extensions.ExtensionModels;
 import de.javagl.jgltf.model.v2.ModelElementsV2;
 
 /**
@@ -147,12 +149,13 @@ public class TextureInfoModels
      * 
      * The copy that is returned will also be placed into this map.
      * 
+     * @param gltfModel The glTF model that contains the input
      * @param input The input
      * @param modelElementMap The model element map 
      * @return The copy
      */
     public static DefaultTextureInfoModel copy(
-        TextureInfoModel input, 
+        GltfModel gltfModel, TextureInfoModel input, 
         Map<ModelElement, ModelElement> modelElementMap)
     {
         if (input == null)
@@ -169,6 +172,10 @@ public class TextureInfoModels
             (TextureModel) modelElementMap.get(inputTextureModel);
         output.setTextureModel(outputTextureModel);
         output.setTexCoord(input.getTexCoord());
+        
+        ExtensionModels.copyExtensionModels(gltfModel, input,
+            output, modelElementMap);
+        
         return output;
     }
 
@@ -182,11 +189,13 @@ public class TextureInfoModels
      * 
      * The copy that is returned will also be placed into this map.
      * 
+     * @param gltfModel The glTF model that contains the input
      * @param input The input
      * @param modelElementMap The model element map 
      * @return The copy
      */
     public static DefaultNormalTextureInfoModel copy(
+        GltfModel gltfModel,
         NormalTextureInfoModel input, 
         Map<ModelElement, ModelElement> modelElementMap)
     {
@@ -205,6 +214,10 @@ public class TextureInfoModels
         output.setTextureModel(outputTextureModel);
         output.setTexCoord(input.getTexCoord());
         output.setScale(input.getScale());
+        
+        ExtensionModels.copyExtensionModels(gltfModel, input,
+            output, modelElementMap);
+        
         return output;
     }
     
@@ -219,11 +232,13 @@ public class TextureInfoModels
      * 
      * The copy that is returned will also be placed into this map.
      * 
+     * @param gltfModel The glTF model that contains the input
      * @param input The input
      * @param modelElementMap The model element map 
      * @return The copy
      */
     public static DefaultOcclusionTextureInfoModel copy(
+        GltfModel gltfModel,
         OcclusionTextureInfoModel input, 
         Map<ModelElement, ModelElement> modelElementMap)
     {
@@ -242,6 +257,10 @@ public class TextureInfoModels
         output.setTextureModel(outputTextureModel);
         output.setTexCoord(input.getTexCoord());
         output.setStrength(input.getStrength());
+        
+        ExtensionModels.copyExtensionModels(gltfModel, input,
+            output, modelElementMap);
+        
         return output;
     }
     

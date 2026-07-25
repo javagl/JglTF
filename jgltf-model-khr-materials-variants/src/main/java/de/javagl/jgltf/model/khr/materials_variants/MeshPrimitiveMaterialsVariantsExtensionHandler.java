@@ -41,6 +41,7 @@ import de.javagl.jgltf.model.MaterialModel;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
 import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.extensions.ExtensionHandler;
+import de.javagl.jgltf.model.extensions.ExtensionModels;
 import de.javagl.jgltf.model.v2.ModelElementsV2;
 
 /**
@@ -222,6 +223,10 @@ public class MeshPrimitiveMaterialsVariantsExtensionHandler
             outputModel.setMaterialForVariant(variantName, outputMaterialModel,
                 mappingName);
         }
+        
+        ExtensionModels.copyExtensionModels(gltfModel, inputModel,
+            outputModel, modelElementMap);
+        
         return outputModel;
     }
     

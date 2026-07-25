@@ -25,6 +25,8 @@ import de.javagl.jgltf.model.MeshModel;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
 import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.NodeModel;
+import de.javagl.jgltf.model.PbrMaterialModel;
+import de.javagl.jgltf.model.PbrMetallicRoughnessModel;
 import de.javagl.jgltf.model.TextureInfoModel;
 import de.javagl.jgltf.model.ext.mesh_gpu_instancing.DefaultMeshGpuInstancingModel;
 import de.javagl.jgltf.model.impl.DefaultAnimationModel;
@@ -37,6 +39,7 @@ import de.javagl.jgltf.model.io.GltfModelWriter;
 import de.javagl.jgltf.model.khr.draco_mesh_compression.DefaultDracoMeshCompressionModel;
 import de.javagl.jgltf.model.khr.materials_clearcoat.DefaultMaterialsClearcoatModel;
 import de.javagl.jgltf.model.khr.materials_clearcoat.MaterialsClearcoatModel;
+import de.javagl.jgltf.model.khr.texture_transform.DefaultTextureTransformModel;
 import de.javagl.jgltf.model.transform.GltfModelTransforms;
 
 /**
@@ -91,7 +94,8 @@ public class GltfModelTransformsTests
         runTest(createTestRemoveDraco());
         runTest(createTestRemoveMaterialVariants());
         runTest(createTestRemoveSingleVariantMaterial());
-        
+        runTest(createTestRemoveTextureTransform());
+        runTest(createTestAddClearcoatTextureTransform());
     }
 
     /**
@@ -193,9 +197,8 @@ public class GltfModelTransformsTests
             GltfTestModelCreation.createSquareWithTexcoords();
         Consumer<DefaultGltfModel> op = (m) ->
         {
-            DefaultPbrMaterialModel materialModel =
-                GltfTestModelCreation.createBaseColorTextureMaterialModel(
-                    "baseColor.png");
+            DefaultPbrMaterialModel materialModel = GltfTestModelCreation
+                .createBaseColorTextureMaterialModel("baseColor.png");
 
             MeshModel mesh0 = m.getMeshModel(0);
             MeshPrimitiveModel primitive0 =
@@ -589,7 +592,7 @@ public class GltfModelTransformsTests
         };
         return TestCase.create(name, modifiedName, gltfModel, op);
     }
-    
+
     /**
      * Create a test to remove material variants
      * 
@@ -607,20 +610,20 @@ public class GltfModelTransformsTests
             MeshModel mesh0 = m.getMeshModel(0);
             MeshPrimitiveModel primitive0 =
                 mesh0.getMeshPrimitiveModels().get(0);
-            DefaultMeshPrimitiveModel defaultPrimitive0 = 
+            DefaultMeshPrimitiveModel defaultPrimitive0 =
                 (DefaultMeshPrimitiveModel) primitive0;
             defaultPrimitive0.removeExtensionModel("KHR_materials_variants");
 
             // Remove the material variants from the glTF model
             m.removeExtensionModel("KHR_materials_variants");
-            
+
             GltfModelTransforms.prune(m);
         };
         return TestCase.create(name, modifiedName, gltfModel, op);
     }
-    
+
     /**
-     * Create a test to remove a single material that is used in material 
+     * Create a test to remove a single material that is used in material
      * variants
      * 
      * @return The test
@@ -634,7 +637,7 @@ public class GltfModelTransformsTests
         Consumer<DefaultGltfModel> op = (m) ->
         {
             MaterialModel material1 = m.getMaterialModel(1);
-            
+
             Set<ModelElement> toRemove = new LinkedHashSet<ModelElement>();
             toRemove.add(material1);
 
@@ -642,7 +645,63 @@ public class GltfModelTransformsTests
         };
         return TestCase.create(name, modifiedName, gltfModel, op);
     }
+
+    /**
+     * Create a test to remove texture transform from a texture
+     * 
+     * @return The test
+     */
+    static TestCase createTestRemoveTextureTransform()
+    {
+        String name = "TexturedSquareWithTextureTransform";
+        String modifiedName = name + "-removedTextureTransform";
+        DefaultGltfModel gltfModel =
+            GltfTestModelCreation.createTexturedSquareWithTextureTransform();
+        Consumer<DefaultGltfModel> op = (m) ->
+        {
+            PbrMaterialModel material0 =
+                (PbrMaterialModel) m.getMaterialModel(0);
+            PbrMetallicRoughnessModel pbr =
+                material0.getPbrMetallicRoughnessModel();
+            DefaultTextureInfoModel textureInfo =
+                (DefaultTextureInfoModel) pbr.getBaseColorTextureInfoModel();
+            textureInfo.removeExtensionModel("KHR_texture_transform");
+        };
+        return TestCase.create(name, modifiedName, gltfModel, op);
+    }
     
+    /**
+     * Create a test to add a texture transform to a clearcoat texture
+     * 
+     * @return The test
+     */
+    static TestCase createTestAddClearcoatTextureTransform()
+    {
+        String name = "TexturedSquareWithClearcoat";
+        String modifiedName = name + "-addedClearcoatTextureTransform";
+        DefaultGltfModel gltfModel =
+            GltfTestModelCreation.createTexturedSquareWithClearcoat();
+        Consumer<DefaultGltfModel> op = (m) ->
+        {
+            PbrMaterialModel material0 =
+                (PbrMaterialModel) m.getMaterialModel(0);
+            MaterialsClearcoatModel clearcoat = material0.getExtensionModel(
+                "KHR_materials_clearcoat", MaterialsClearcoatModel.class);
+            DefaultTextureInfoModel textureInfo = (DefaultTextureInfoModel)clearcoat.getClearcoatTextureInfoModel();
+            DefaultTextureTransformModel textureTransform =
+                new DefaultTextureTransformModel();
+            textureTransform.setOffset(new double[]
+            { 0.25, 0.25 });
+            textureTransform.setScale(new double[]
+            { 0.5, 0.5 });
+            textureTransform.setRotation(Math.toRadians(45.0));
+            textureInfo.addExtensionModel("KHR_texture_transform",
+                textureTransform);
+
+            GltfModelTransforms.revalidate(gltfModel);
+        };
+        return TestCase.create(name, modifiedName, gltfModel, op);
+    }
     
 
     // =========================================================================
