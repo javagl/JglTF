@@ -95,7 +95,7 @@ public class MaterialsVariantsExtensionHandler implements ExtensionHandler
         ModelElementsV2.transferGltfPropertyElementsFromModel(
             model, impl);
         
-        List<String> names = model.getNames();
+        List<String> names = model.getVariantNames();
         for (String name : names)
         {
             GlTFMaterialsVariantsPropertiesVariantsItems element = 
@@ -117,7 +117,7 @@ public class MaterialsVariantsExtensionHandler implements ExtensionHandler
         ModelElementsV2.transferGltfPropertyElements(inputModel, outputModel);
         modelElementMap.put(inputModel, outputModel);
         
-        List<String> names = inputModel.getNames();
+        List<String> names = inputModel.getVariantNames();
         for (String name : names)
         {
             outputModel.addName(name);

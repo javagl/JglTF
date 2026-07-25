@@ -89,6 +89,9 @@ public class GltfModelTransformsTests
         runTest(createTestAddInstancing());
         runTest(createTestAddDraco());
         runTest(createTestRemoveDraco());
+        runTest(createTestRemoveMaterialVariants());
+        runTest(createTestRemoveSingleVariantMaterial());
+        
     }
 
     /**
@@ -191,7 +194,8 @@ public class GltfModelTransformsTests
         Consumer<DefaultGltfModel> op = (m) ->
         {
             DefaultPbrMaterialModel materialModel =
-                GltfTestModelCreation.createBaseColorTextureMaterialModel();
+                GltfTestModelCreation.createBaseColorTextureMaterialModel(
+                    "baseColor.png");
 
             MeshModel mesh0 = m.getMeshModel(0);
             MeshPrimitiveModel primitive0 =
@@ -585,6 +589,61 @@ public class GltfModelTransformsTests
         };
         return TestCase.create(name, modifiedName, gltfModel, op);
     }
+    
+    /**
+     * Create a test to remove material variants
+     * 
+     * @return The test
+     */
+    static TestCase createTestRemoveMaterialVariants()
+    {
+        String name = "MaterialVariants";
+        String modifiedName = name + "-removedVariants";
+        DefaultGltfModel gltfModel =
+            GltfTestModelCreation.createMaterialVariants();
+        Consumer<DefaultGltfModel> op = (m) ->
+        {
+            // Remove the material variants from the primitive model
+            MeshModel mesh0 = m.getMeshModel(0);
+            MeshPrimitiveModel primitive0 =
+                mesh0.getMeshPrimitiveModels().get(0);
+            DefaultMeshPrimitiveModel defaultPrimitive0 = 
+                (DefaultMeshPrimitiveModel) primitive0;
+            defaultPrimitive0.removeExtensionModel("KHR_materials_variants");
+
+            // Remove the material variants from the glTF model
+            m.removeExtensionModel("KHR_materials_variants");
+            
+            GltfModelTransforms.prune(m);
+        };
+        return TestCase.create(name, modifiedName, gltfModel, op);
+    }
+    
+    /**
+     * Create a test to remove a single material that is used in material 
+     * variants
+     * 
+     * @return The test
+     */
+    static TestCase createTestRemoveSingleVariantMaterial()
+    {
+        String name = "MaterialVariants";
+        String modifiedName = name + "-removedSingleVariantMaterial";
+        DefaultGltfModel gltfModel =
+            GltfTestModelCreation.createMaterialVariants();
+        Consumer<DefaultGltfModel> op = (m) ->
+        {
+            MaterialModel material1 = m.getMaterialModel(1);
+            
+            Set<ModelElement> toRemove = new LinkedHashSet<ModelElement>();
+            toRemove.add(material1);
+
+            GltfModelTransforms.removeAll(m, toRemove);
+        };
+        return TestCase.create(name, modifiedName, gltfModel, op);
+    }
+    
+    
 
     // =========================================================================
     // Utility functions for the tests

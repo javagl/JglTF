@@ -100,7 +100,7 @@ public class MeshPrimitiveMaterialsVariantsExtensionHandler
                 + "extension object");
             return Collections.emptyList();
         }
-        List<String> variantNames = materialVariantsModel.getNames();
+        List<String> variantNames = materialVariantsModel.getVariantNames();
         return variantNames;
     }
 
@@ -163,7 +163,10 @@ public class MeshPrimitiveMaterialsVariantsExtensionHandler
         {
             String variantName = variantNames.get(variantIndex);
             MaterialModel materialModel = model.getMaterialModel(variantName);
-
+            if (materialModel == null)
+            {
+                continue;
+            }
             List<Integer> variantIndices = 
                 variantIndicesPerMaterial.get(materialModel);
             if (variantIndices == null)

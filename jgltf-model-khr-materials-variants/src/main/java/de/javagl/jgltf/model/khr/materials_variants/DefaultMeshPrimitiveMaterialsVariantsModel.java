@@ -131,6 +131,7 @@ public class DefaultMeshPrimitiveMaterialsVariantsModel
         for (String keyToRemove : keysToRemove)
         {
             materials.remove(keyToRemove);
+            names.remove(keyToRemove);
         }
         return materials.isEmpty();
     }

@@ -346,6 +346,10 @@ public class GltfCreatorV2
         Asset asset = createAsset(gltfModel.getAssetModel());
         gltf.setAsset(asset);
         
+        ExtensionModels.createExtensionImpls(
+            gltfModel, gltfModel, 
+            GltfModel.class, gltf);
+        
         return gltf;
     }
     

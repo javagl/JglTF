@@ -467,6 +467,7 @@ public class GltfModelStructures
         target.addBufferViewModels(bbs.getBufferViewModels());
         target.addBufferModels(bbs.getBufferModels());
         
+        // Add information about the used and required extensions
         DefaultExtensionsModel extensionsModel = target.getExtensionsModel();
         for (ModelElement modelElement : modelElementMap.values())
         {
@@ -481,7 +482,7 @@ public class GltfModelStructures
                 }
             }
         }
-        
+
         DefaultGltfModel result = target;
         this.source = null;
         target = null;
@@ -662,10 +663,13 @@ public class GltfModelStructures
             for (MeshPrimitiveModel sourceMeshPrimitiveModel : 
                 sourceMeshPrimitiveModels)
             {
+                DefaultMeshPrimitiveModel defaultSourceMeshPrimitiveModel =
+                    (DefaultMeshPrimitiveModel) sourceMeshPrimitiveModel;
                 DefaultMeshPrimitiveModel targetMeshPrimitiveModel = 
-                    copyMeshPrimitiveModel(
-                        (DefaultMeshPrimitiveModel) sourceMeshPrimitiveModel);
+                    copyMeshPrimitiveModel(defaultSourceMeshPrimitiveModel);
                 targetMeshModel.addMeshPrimitiveModel(targetMeshPrimitiveModel);
+                copyGltfPropertyElements(
+                    defaultSourceMeshPrimitiveModel, targetMeshPrimitiveModel);
             }
             double[] weights = sourceMeshModel.getWeights();
             targetMeshModel.setWeights(Optionals.clone(weights));

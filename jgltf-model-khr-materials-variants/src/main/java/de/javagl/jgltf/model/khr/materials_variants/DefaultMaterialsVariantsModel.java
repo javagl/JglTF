@@ -56,7 +56,7 @@ public class DefaultMaterialsVariantsModel
     }
 
     @Override
-    public List<String> getNames()
+    public List<String> getVariantNames()
     {
         return Collections.unmodifiableList(names);
     }

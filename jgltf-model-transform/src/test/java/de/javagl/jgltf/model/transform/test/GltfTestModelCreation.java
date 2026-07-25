@@ -70,6 +70,8 @@ import de.javagl.jgltf.model.impl.DefaultTextureModel;
 import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.model.khr.draco_mesh_compression.DefaultDracoMeshCompressionModel;
 import de.javagl.jgltf.model.khr.materials_clearcoat.DefaultMaterialsClearcoatModel;
+import de.javagl.jgltf.model.khr.materials_variants.DefaultMaterialsVariantsModel;
+import de.javagl.jgltf.model.khr.materials_variants.DefaultMeshPrimitiveMaterialsVariantsModel;
 
 /**
  * Utility methods to create test models for this package
@@ -175,7 +177,7 @@ class GltfTestModelCreation
 
         // Assign a material
         DefaultPbrMaterialModel materialModel =
-            createBaseColorTextureMaterialModel();
+            createBaseColorTextureMaterialModel("baseColor.png");
         meshPrimitiveModel.setMaterialModel(materialModel);
 
         DefaultSceneModel sceneModel = createSceneWith(meshPrimitiveModel);
@@ -208,7 +210,7 @@ class GltfTestModelCreation
         
         // Assign a material
         DefaultPbrMaterialModel materialModel =
-            createBaseColorTextureMaterialModel();
+            createBaseColorTextureMaterialModel("baseColor.png");
         meshPrimitiveModel.setMaterialModel(materialModel);
 
         // Create a mesh model with the mesh primitive
@@ -312,7 +314,7 @@ class GltfTestModelCreation
 
         // Assign a material
         DefaultPbrMaterialModel materialModel =
-            createBaseColorTextureMaterialModel();
+            createBaseColorTextureMaterialModel("baseColor.png");
         meshPrimitiveModel.setMaterialModel(materialModel);
 
         addClearcoatTexture(materialModel);
@@ -339,7 +341,7 @@ class GltfTestModelCreation
 
         // Assign a material
         DefaultPbrMaterialModel materialModel =
-            createBaseColorTextureMaterialModel();
+            createBaseColorTextureMaterialModel("baseColor.png");
         meshPrimitiveModel.setMaterialModel(materialModel);
 
         // Create a mesh with the primitive
@@ -428,7 +430,7 @@ class GltfTestModelCreation
 
         // Assign a material
         DefaultPbrMaterialModel materialModel =
-            createBaseColorTextureMaterialModel();
+            createBaseColorTextureMaterialModel("baseColor.png");
         meshPrimitiveModel.setMaterialModel(materialModel);
 
         // Create a mesh model with the mesh primitive
@@ -742,9 +744,10 @@ class GltfTestModelCreation
     /**
      * Create a simple material model with a base color texture for tests
      * 
+     * @param uri The URI
      * @return The material model
      */
-    static DefaultPbrMaterialModel createBaseColorTextureMaterialModel()
+    static DefaultPbrMaterialModel createBaseColorTextureMaterialModel(String uri)
     {
         DefaultPbrMaterialModel materialModel = new DefaultPbrMaterialModel();
 
@@ -755,7 +758,7 @@ class GltfTestModelCreation
             new DefaultTextureInfoModel();
 
         DefaultTextureModel textureModel =
-            createSimpleTextureModel("baseColor.png");
+            createSimpleTextureModel(uri);
         baseColorTextureInfoModel.setTextureModel(textureModel);
         pbrMetallicRoughnessModel
             .setBaseColorTextureInfoModel(baseColorTextureInfoModel);
@@ -1103,7 +1106,56 @@ class GltfTestModelCreation
         gltfModelBuilder.addAnimationModel(animationModel);
         DefaultGltfModel gltfModel = gltfModelBuilder.build();
         return gltfModel;
+    }
+    
+    /**
+     * Create a glTF model with material variants
+     * 
+     * @return The model
+     */
+    static DefaultGltfModel createMaterialVariants()
+    {
+        // Create the mesh primitive model
+        DefaultMeshPrimitiveModel meshPrimitiveModel =
+            createSquareMeshPrimitiveWithTexcoords();
 
+        // Create the material variants
+        DefaultPbrMaterialModel materialModelA =
+            createBaseColorTextureMaterialModel("variantA.png");
+        DefaultPbrMaterialModel materialModelB =
+            createBaseColorTextureMaterialModel("variantB.png");
+        DefaultPbrMaterialModel materialModelC =
+            createBaseColorTextureMaterialModel("variantC.png");
+
+        // Create the material variants of the mesh primitive
+        DefaultMeshPrimitiveMaterialsVariantsModel meshPrimitiveMaterialsVariantsModel =
+            new DefaultMeshPrimitiveMaterialsVariantsModel();
+        meshPrimitiveMaterialsVariantsModel.setMaterialForVariant("variantA",
+            materialModelA, null);
+        meshPrimitiveMaterialsVariantsModel.setMaterialForVariant("variantB",
+            materialModelB, null);
+        meshPrimitiveMaterialsVariantsModel.setMaterialForVariant("variantC",
+            materialModelC, null);
+        meshPrimitiveModel.addExtensionModel("KHR_materials_variants",
+            meshPrimitiveMaterialsVariantsModel);
+
+        DefaultSceneModel sceneModel = createSceneWith(meshPrimitiveModel);
+
+        // Create the glTF model
+        GltfModelBuilder gltfModelBuilder = GltfModelBuilder.create();
+        gltfModelBuilder.addSceneModel(sceneModel);
+        DefaultGltfModel gltfModel = gltfModelBuilder.build();
+
+        // Add the top-level variants model
+        DefaultMaterialsVariantsModel materialVariantsModel =
+            new DefaultMaterialsVariantsModel();
+        materialVariantsModel.addName("variantA");
+        materialVariantsModel.addName("variantB");
+        materialVariantsModel.addName("variantC");
+        gltfModel.addExtensionModel("KHR_materials_variants",
+            materialVariantsModel);
+        
+        return gltfModel;
     }
 
     /**

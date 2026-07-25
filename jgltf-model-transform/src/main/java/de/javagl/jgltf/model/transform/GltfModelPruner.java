@@ -28,6 +28,8 @@ package de.javagl.jgltf.model.transform;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -86,13 +88,29 @@ class GltfModelPruner
         Set<ModelElement> ignored = new LinkedHashSet<ModelElement>();
         ignored.add(gltfModel);
         ignored.add(gltfModel.getAssetModel());
-
+        
         // Start the traversal for the reachability computations at the scene-
         // and animation models
         Set<ModelElement> starting = new LinkedHashSet<ModelElement>();
         starting.addAll(gltfModel.getSceneModels());
         starting.addAll(gltfModel.getAnimationModels());
 
+        // Also consider the extension models that are contained
+        // in the top-level glTF model, because they may be only
+        // reachable from that
+        Map<String, Object> extensionModels = gltfModel.getExtensionModels();
+        for (Entry<String, Object> entry : extensionModels.entrySet())
+        {
+            Object object = entry.getValue();
+            if (object instanceof ModelElement)
+            {
+                ModelElement modelElement = (ModelElement) object;
+                starting.add(modelElement);
+            }
+            System.out.println("Reachable from glTF: "+object);
+        }
+
+        
         // The set of elements that have to be removed in the next iteration
         Set<ModelElement> nextToRemove = new LinkedHashSet<ModelElement>();
         if (toRemove != null)

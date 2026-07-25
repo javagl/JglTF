@@ -42,5 +42,5 @@ public interface MaterialsVariantsModel extends ModelElement, ExtensionModel
      * 
      * @return The material variant names
      */
-    List<String> getNames();
+    List<String> getVariantNames();
 }
