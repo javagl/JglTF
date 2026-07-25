@@ -407,6 +407,19 @@ public class GltfModelStructures
         
         return create(config);
     }
+
+    /**
+     * Create a restructured version of the glTF model that was last given
+     * to {@link #prepare(GltfModel)}.
+     * 
+     * @return The restructured model
+     */
+    public DefaultGltfModel createGlbWithExternalImages()
+    {
+        BufferBuilderConfig config = 
+            new BufferBuilderConfig();
+        return create(config);
+    }
     
     
 
