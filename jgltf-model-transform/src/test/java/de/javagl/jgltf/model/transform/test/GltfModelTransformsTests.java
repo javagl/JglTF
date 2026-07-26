@@ -97,6 +97,7 @@ public class GltfModelTransformsTests
         runTest(createTestRemoveTextureTransform());
         runTest(createTestAddClearcoatTextureTransform());
         runTest(createTestRemoveAnisotropy());
+        runTest(createTestRemoveVolume());
     }
 
     /**
@@ -726,6 +727,29 @@ public class GltfModelTransformsTests
         return TestCase.create(name, modifiedName, gltfModel, op);
     }
     
+    
+    /**
+     * Create a test to remove volume
+     * 
+     * @return The test
+     */
+    static TestCase createTestRemoveVolume()
+    {
+        String name = "TexturedSquareWithVolume";
+        String modifiedName = name + "-removedVolume";
+        DefaultGltfModel gltfModel =
+            GltfTestModelCreation.createTexturedSquareWithVolume();
+        Consumer<DefaultGltfModel> op = (m) ->
+        {
+            DefaultPbrMaterialModel material1 =
+                (DefaultPbrMaterialModel) m.getMaterialModel(1);
+            material1.removeExtensionModel("KHR_materials_volume");
+            material1.removeExtensionModel("KHR_materials_dispersion");
+            GltfModelTransforms.revalidate(gltfModel);
+        };
+        return TestCase.create(name, modifiedName, gltfModel, op);
+    }
+        
     
     // =========================================================================
     // Utility functions for the tests

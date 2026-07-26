@@ -72,8 +72,11 @@ import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.model.khr.draco_mesh_compression.DefaultDracoMeshCompressionModel;
 import de.javagl.jgltf.model.khr.materials_anisotropy.DefaultMaterialsAnisotropyModel;
 import de.javagl.jgltf.model.khr.materials_clearcoat.DefaultMaterialsClearcoatModel;
+import de.javagl.jgltf.model.khr.materials_dispersion.DefaultMaterialsDispersionModel;
+import de.javagl.jgltf.model.khr.materials_transmission.DefaultMaterialsTransmissionModel;
 import de.javagl.jgltf.model.khr.materials_variants.DefaultMaterialsVariantsModel;
 import de.javagl.jgltf.model.khr.materials_variants.DefaultMeshPrimitiveMaterialsVariantsModel;
+import de.javagl.jgltf.model.khr.materials_volume.DefaultMaterialsVolumeModel;
 import de.javagl.jgltf.model.khr.texture_transform.DefaultTextureTransformModel;
 
 /**
@@ -345,13 +348,13 @@ class GltfTestModelCreation
         // Assign a material
         DefaultPbrMaterialModel materialModel =
             createBaseColorTextureMaterialModel("baseColor.png");
-        
+
         // Note: For the anisotropy to be visible, the roughness
         // of the material may not be 1.0 (the lower it is, the
-        // more visible the effect is). 
-        PbrMetallicRoughnessModel pbr = 
+        // more visible the effect is).
+        PbrMetallicRoughnessModel pbr =
             materialModel.getPbrMetallicRoughnessModel();
-        DefaultPbrMetallicRoughnessModel defaultPbr = 
+        DefaultPbrMetallicRoughnessModel defaultPbr =
             (DefaultPbrMetallicRoughnessModel) pbr;
         defaultPbr.setRoughnessFactor(0.1);
         meshPrimitiveModel.setMaterialModel(materialModel);
@@ -372,7 +375,90 @@ class GltfTestModelCreation
         DefaultGltfModel gltfModel = gltfModelBuilder.build();
         return gltfModel;
     }
-    
+
+    /**
+     * Create an textured square including a KHR_materials_volume and
+     * KHR_materials_dispersion and KRH_materials_transmission
+     * 
+     * @return The model
+     */
+    public static DefaultGltfModel createTexturedSquareWithVolume()
+    {
+        // Create a mesh primitive model for the background
+        DefaultMeshPrimitiveModel backgroundMeshPrimitiveModel =
+            createSquareMeshPrimitiveWithTexcoords();
+        DefaultPbrMaterialModel backgroundMaterialModel =
+            createBaseColorTextureMaterialModel("background.png");
+        backgroundMeshPrimitiveModel.setMaterialModel(backgroundMaterialModel);
+        DefaultMeshModel backgroundMeshModel = new DefaultMeshModel();
+        backgroundMeshModel.addMeshPrimitiveModel(backgroundMeshPrimitiveModel);
+
+        // Create the mesh primitive model
+        DefaultMeshPrimitiveModel meshPrimitiveModel =
+            createSquareMeshPrimitiveWithTexcoords();
+
+        // Assign a material
+        DefaultPbrMaterialModel materialModel = new DefaultPbrMaterialModel();
+        DefaultPbrMetallicRoughnessModel pbrMetallicRoughnessModel =
+            new DefaultPbrMetallicRoughnessModel();
+        pbrMetallicRoughnessModel.setMetallicFactor(0.0);
+        pbrMetallicRoughnessModel.setRoughnessFactor(0.1);
+        pbrMetallicRoughnessModel.setBaseColorFactor(new double[]
+        { 0.9, 0.1, 0.1, 0.1 });
+        materialModel.setPbrMetallicRoughnessModel(pbrMetallicRoughnessModel);
+        meshPrimitiveModel.setMaterialModel(materialModel);
+
+        // Assign the volume extension
+        DefaultMaterialsVolumeModel volumeModel =
+            new DefaultMaterialsVolumeModel();
+        volumeModel.setThicknessFactor(0.001);
+        volumeModel.setAttenuationDistance(0.0009);
+        volumeModel.setAttenuationColor(new double[]
+        { 0.1, 0.9, 0.1 });
+        materialModel.addExtensionModel("KHR_materials_volume", volumeModel);
+
+        // Assign the transmission extension
+        DefaultMaterialsTransmissionModel transmissionModel =
+            new DefaultMaterialsTransmissionModel();
+        transmissionModel.setTransmissionFactor(0.9);
+        materialModel.addExtensionModel("KHR_materials_transmission",
+            transmissionModel);
+
+        // Assign the dispersion extension
+        DefaultMaterialsDispersionModel dispersionModel =
+            new DefaultMaterialsDispersionModel();
+        dispersionModel.setDispersion(0.1);
+        materialModel.addExtensionModel("KHR_materials_dispersion",
+            dispersionModel);
+
+        DefaultNodeModel backgroundNode = new DefaultNodeModel();
+        backgroundNode.addMeshModel(backgroundMeshModel);
+        backgroundNode.setScale(new double[]
+        { 2.0, 2.0, 2.0 });
+        backgroundNode.setTranslation(new double[]
+        { -0.5, -0.5, -1.0 });
+
+        DefaultNodeModel node = new DefaultNodeModel();
+//        node.setRotation(new double[]
+//        { 0.0, 1.0, 0.0, 0.0 });
+        DefaultMeshModel meshModel = new DefaultMeshModel();
+        meshModel.addMeshPrimitiveModel(meshPrimitiveModel);
+        node.addMeshModel(meshModel);
+
+        DefaultNodeModel root = new DefaultNodeModel();
+        root.addChild(backgroundNode);
+        root.addChild(node);
+
+        DefaultSceneModel sceneModel = new DefaultSceneModel();
+        sceneModel.addNode(root);
+
+        // Create the glTF model
+        GltfModelBuilder gltfModelBuilder = GltfModelBuilder.create();
+        gltfModelBuilder.addSceneModel(sceneModel);
+        DefaultGltfModel gltfModel = gltfModelBuilder.build();
+        return gltfModel;
+    }
+
     /**
      * Create an textured square including a KHR_texture_transform transform
      * 
@@ -850,6 +936,31 @@ class GltfTestModelCreation
         baseColorTextureInfoModel.setTextureModel(textureModel);
         pbrMetallicRoughnessModel
             .setBaseColorTextureInfoModel(baseColorTextureInfoModel);
+
+        materialModel.setPbrMetallicRoughnessModel(pbrMetallicRoughnessModel);
+        materialModel.setDoubleSided(true);
+        return materialModel;
+    }
+
+    /**
+     * Create a simple material model with a base color for tests
+     * 
+     * @param r The red component
+     * @param g The green component
+     * @param b The blue component
+     * @param a The alpha component
+     * @return The material model
+     */
+    static DefaultPbrMaterialModel createBaseColorMaterialModel(double r,
+        double g, double b, double a)
+    {
+        DefaultPbrMaterialModel materialModel = new DefaultPbrMaterialModel();
+
+        DefaultPbrMetallicRoughnessModel pbrMetallicRoughnessModel =
+            new DefaultPbrMetallicRoughnessModel();
+        pbrMetallicRoughnessModel.setMetallicFactor(0.0);
+        pbrMetallicRoughnessModel.setBaseColorFactor(new double[]
+        { r, g, b, a });
 
         materialModel.setPbrMetallicRoughnessModel(pbrMetallicRoughnessModel);
         materialModel.setDoubleSided(true);

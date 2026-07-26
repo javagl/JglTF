@@ -43,6 +43,21 @@
     </dependency>
     <dependency>
       <groupId>de.javagl</groupId>
+      <artifactId>jgltf-model-khr-materials-volume</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>de.javagl</groupId>
+      <artifactId>jgltf-model-khr-materials-transmission</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>de.javagl</groupId>
+      <artifactId>jgltf-model-khr-materials-dispersion</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>de.javagl</groupId>
       <artifactId>jgltf-model-khr-materials-variants</artifactId>
       <version>${project.version}</version>
     </dependency>
