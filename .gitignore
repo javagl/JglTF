@@ -27,6 +27,10 @@
 /jgltf-model-ext-meshopt-compression
 # ---
 
+# Temporarily ignored until the unit tests are settled
+/jgltf-model-transform/src/test/resources/testModels
+
+
 /jgltf-model-transform/.classpath
 /jgltf-model-transform/.settings
 /jgltf-model-transform/.project
@@ -63,6 +67,11 @@
 /jgltf-impl-v2-khr-materials-clearcoat/.project
 /jgltf-impl-v2-khr-materials-clearcoat/target
 
+/jgltf-impl-v2-khr-materials-anisotropy/.classpath
+/jgltf-impl-v2-khr-materials-anisotropy/.settings
+/jgltf-impl-v2-khr-materials-anisotropy/.project
+/jgltf-impl-v2-khr-materials-anisotropy/target
+
 /jgltf-impl-v2-khr-texture-transform/.classpath
 /jgltf-impl-v2-khr-texture-transform/.settings
 /jgltf-impl-v2-khr-texture-transform/.project
@@ -87,6 +96,11 @@
 /jgltf-model-khr-materials-clearcoat/.settings
 /jgltf-model-khr-materials-clearcoat/.project
 /jgltf-model-khr-materials-clearcoat/target
+
+/jgltf-model-khr-materials-anisotropy/.classpath
+/jgltf-model-khr-materials-anisotropy/.settings
+/jgltf-model-khr-materials-anisotropy/.project
+/jgltf-model-khr-materials-anisotropy/target
 
 /jgltf-model-khr-texture-transform/.classpath
 /jgltf-model-khr-texture-transform/.settings

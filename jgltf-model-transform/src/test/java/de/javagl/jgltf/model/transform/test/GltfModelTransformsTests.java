@@ -96,6 +96,7 @@ public class GltfModelTransformsTests
         runTest(createTestRemoveSingleVariantMaterial());
         runTest(createTestRemoveTextureTransform());
         runTest(createTestAddClearcoatTextureTransform());
+        runTest(createTestRemoveAnisotropy());
     }
 
     /**
@@ -704,6 +705,28 @@ public class GltfModelTransformsTests
     }
     
 
+    /**
+     * Create a test to remove anisotropy
+     * 
+     * @return The test
+     */
+    static TestCase createTestRemoveAnisotropy()
+    {
+        String name = "TexturedSquareWithAnisotropy";
+        String modifiedName = name + "-removedAnisotropy";
+        DefaultGltfModel gltfModel =
+            GltfTestModelCreation.createTexturedSquareWithAnisotropy();
+        Consumer<DefaultGltfModel> op = (m) ->
+        {
+            DefaultPbrMaterialModel material0 =
+                (DefaultPbrMaterialModel) m.getMaterialModel(0);
+            material0.removeExtensionModel("KHR_materials_anisotropy");
+            GltfModelTransforms.revalidate(gltfModel);
+        };
+        return TestCase.create(name, modifiedName, gltfModel, op);
+    }
+    
+    
     // =========================================================================
     // Utility functions for the tests
 

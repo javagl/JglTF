@@ -70,6 +70,7 @@ import de.javagl.jgltf.model.impl.DefaultTextureInfoModel;
 import de.javagl.jgltf.model.impl.DefaultTextureModel;
 import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.model.khr.draco_mesh_compression.DefaultDracoMeshCompressionModel;
+import de.javagl.jgltf.model.khr.materials_anisotropy.DefaultMaterialsAnisotropyModel;
 import de.javagl.jgltf.model.khr.materials_clearcoat.DefaultMaterialsClearcoatModel;
 import de.javagl.jgltf.model.khr.materials_variants.DefaultMaterialsVariantsModel;
 import de.javagl.jgltf.model.khr.materials_variants.DefaultMeshPrimitiveMaterialsVariantsModel;
@@ -330,6 +331,48 @@ class GltfTestModelCreation
         return gltfModel;
     }
 
+    /**
+     * Create an textured square including a KHR_materials_anisotropy
+     * 
+     * @return The model
+     */
+    public static DefaultGltfModel createTexturedSquareWithAnisotropy()
+    {
+        // Create the mesh primitive model
+        DefaultMeshPrimitiveModel meshPrimitiveModel =
+            createSquareMeshPrimitiveWithTexcoords();
+
+        // Assign a material
+        DefaultPbrMaterialModel materialModel =
+            createBaseColorTextureMaterialModel("baseColor.png");
+        
+        // Note: For the anisotropy to be visible, the roughness
+        // of the material may not be 1.0 (the lower it is, the
+        // more visible the effect is). 
+        PbrMetallicRoughnessModel pbr = 
+            materialModel.getPbrMetallicRoughnessModel();
+        DefaultPbrMetallicRoughnessModel defaultPbr = 
+            (DefaultPbrMetallicRoughnessModel) pbr;
+        defaultPbr.setRoughnessFactor(0.1);
+        meshPrimitiveModel.setMaterialModel(materialModel);
+
+        // Assign the anisotropy extension
+        DefaultMaterialsAnisotropyModel anisotropyModel =
+            new DefaultMaterialsAnisotropyModel();
+        anisotropyModel.setAnisotropyStrength(0.25);
+        anisotropyModel.setAnisotropyRotation(Math.toRadians(45.0));
+        materialModel.addExtensionModel("KHR_materials_anisotropy",
+            anisotropyModel);
+
+        DefaultSceneModel sceneModel = createSceneWith(meshPrimitiveModel);
+
+        // Create the glTF model
+        GltfModelBuilder gltfModelBuilder = GltfModelBuilder.create();
+        gltfModelBuilder.addSceneModel(sceneModel);
+        DefaultGltfModel gltfModel = gltfModelBuilder.build();
+        return gltfModel;
+    }
+    
     /**
      * Create an textured square including a KHR_texture_transform transform
      * 
