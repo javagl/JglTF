@@ -98,6 +98,7 @@ public class GltfModelTransformsTests
         runTest(createTestAddClearcoatTextureTransform());
         runTest(createTestRemoveAnisotropy());
         runTest(createTestRemoveVolume());
+        runTest(createTestRemoveSheen());
     }
 
     /**
@@ -671,7 +672,7 @@ public class GltfModelTransformsTests
         };
         return TestCase.create(name, modifiedName, gltfModel, op);
     }
-    
+
     /**
      * Create a test to add a texture transform to a clearcoat texture
      * 
@@ -689,7 +690,9 @@ public class GltfModelTransformsTests
                 (PbrMaterialModel) m.getMaterialModel(0);
             MaterialsClearcoatModel clearcoat = material0.getExtensionModel(
                 "KHR_materials_clearcoat", MaterialsClearcoatModel.class);
-            DefaultTextureInfoModel textureInfo = (DefaultTextureInfoModel)clearcoat.getClearcoatTextureInfoModel();
+            DefaultTextureInfoModel textureInfo =
+                (DefaultTextureInfoModel) clearcoat
+                    .getClearcoatTextureInfoModel();
             DefaultTextureTransformModel textureTransform =
                 new DefaultTextureTransformModel();
             textureTransform.setOffset(new double[]
@@ -704,7 +707,6 @@ public class GltfModelTransformsTests
         };
         return TestCase.create(name, modifiedName, gltfModel, op);
     }
-    
 
     /**
      * Create a test to remove anisotropy
@@ -726,8 +728,7 @@ public class GltfModelTransformsTests
         };
         return TestCase.create(name, modifiedName, gltfModel, op);
     }
-    
-    
+
     /**
      * Create a test to remove volume
      * 
@@ -735,22 +736,39 @@ public class GltfModelTransformsTests
      */
     static TestCase createTestRemoveVolume()
     {
-        String name = "TexturedSquareWithVolume";
+        String name = "Lens";
         String modifiedName = name + "-removedVolume";
-        DefaultGltfModel gltfModel =
-            GltfTestModelCreation.createTexturedSquareWithVolume();
+        DefaultGltfModel gltfModel = GltfTestModelCreation.createLens();
         Consumer<DefaultGltfModel> op = (m) ->
         {
             DefaultPbrMaterialModel material1 =
                 (DefaultPbrMaterialModel) m.getMaterialModel(1);
             material1.removeExtensionModel("KHR_materials_volume");
-            material1.removeExtensionModel("KHR_materials_dispersion");
             GltfModelTransforms.revalidate(gltfModel);
         };
         return TestCase.create(name, modifiedName, gltfModel, op);
     }
-        
-    
+
+    /**
+     * Create a test to remove sheen
+     * 
+     * @return The test
+     */
+    static TestCase createTestRemoveSheen()
+    {
+        String name = "Lens";
+        String modifiedName = name + "-removedSheen";
+        DefaultGltfModel gltfModel = GltfTestModelCreation.createLens();
+        Consumer<DefaultGltfModel> op = (m) ->
+        {
+            DefaultPbrMaterialModel material1 =
+                (DefaultPbrMaterialModel) m.getMaterialModel(1);
+            material1.removeExtensionModel("KHR_materials_sheen");
+            GltfModelTransforms.revalidate(gltfModel);
+        };
+        return TestCase.create(name, modifiedName, gltfModel, op);
+    }
+
     // =========================================================================
     // Utility functions for the tests
 

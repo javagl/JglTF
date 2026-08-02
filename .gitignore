@@ -82,6 +82,16 @@
 /jgltf-impl-v2-khr-materials-dispersion/.project
 /jgltf-impl-v2-khr-materials-dispersion/target
 
+/jgltf-impl-v2-khr-materials-ior/.classpath
+/jgltf-impl-v2-khr-materials-ior/.settings
+/jgltf-impl-v2-khr-materials-ior/.project
+/jgltf-impl-v2-khr-materials-ior/target
+
+/jgltf-impl-v2-khr-materials-sheen/.classpath
+/jgltf-impl-v2-khr-materials-sheen/.settings
+/jgltf-impl-v2-khr-materials-sheen/.project
+/jgltf-impl-v2-khr-materials-sheen/target
+
 /jgltf-impl-v2-khr-materials-anisotropy/.classpath
 /jgltf-impl-v2-khr-materials-anisotropy/.settings
 /jgltf-impl-v2-khr-materials-anisotropy/.project
@@ -126,6 +136,16 @@
 /jgltf-model-khr-materials-dispersion/.settings
 /jgltf-model-khr-materials-dispersion/.project
 /jgltf-model-khr-materials-dispersion/target
+
+/jgltf-model-khr-materials-ior/.classpath
+/jgltf-model-khr-materials-ior/.settings
+/jgltf-model-khr-materials-ior/.project
+/jgltf-model-khr-materials-ior/target
+
+/jgltf-model-khr-materials-sheen/.classpath
+/jgltf-model-khr-materials-sheen/.settings
+/jgltf-model-khr-materials-sheen/.project
+/jgltf-model-khr-materials-sheen/target
 
 /jgltf-model-khr-materials-anisotropy/.classpath
 /jgltf-model-khr-materials-anisotropy/.settings
