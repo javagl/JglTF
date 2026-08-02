@@ -380,7 +380,7 @@ class GltfTestModelCreation
 
     /**
      * Create a "lens" including a KHR_materials_volume and
-     * KHR_materials_dispersion and KRH_materials_transmission and
+     * KHR_materials_dispersion and KHR_materials_transmission and
      * KHR_materials_ior and KHR_materials_sheen, just to have all of them in
      * one place...
      * 
