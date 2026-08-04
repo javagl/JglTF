@@ -37,35 +37,43 @@ import de.javagl.jgltf.model.extensions.ExtensionModel;
 public interface MaterialsAnisotropyModel extends ModelElement, ExtensionModel
 {
     /**
-     * The anisotropy strength
+     * The anisotropy strength. (optional)<br> 
+     * Default: 0.0<br> 
+     * Minimum: 0.0 (inclusive)<br> 
+     * Maximum: 1.0 (inclusive) 
      * 
      * @param anisotropyStrength The anisotropy strength to set
      */
     void setAnisotropyStrength(Double anisotropyStrength);
 
     /**
-     * The anisotropy strength
+     * The anisotropy strength. (optional)<br> 
+     * Default: 0.0<br> 
+     * Minimum: 0.0 (inclusive)<br> 
+     * Maximum: 1.0 (inclusive) 
      * 
      * @return The anisotropy strength
      */
     Double getAnisotropyStrength();
 
     /**
-     * The anisotropy rotation
+     * The rotation of the anisotropy. (optional)<br> 
+     * Default: 0.0 
      * 
      * @param anisotropyRotation The anisotropy rotation to set
      */
     void setAnisotropyRotation(Double anisotropyRotation);
 
     /**
-     * The anisotropy rotation
+     * The rotation of the anisotropy. (optional)<br> 
+     * Default: 0.0 
      * 
      * @return The anisotropy rotation
      */
     Double getAnisotropyRotation();
 
     /**
-     * The anisotropy texture info model
+     * The anisotropy texture. (optional) 
      * 
      * @param anisotropyTextureInfoModel The The anisotropy texture info model
      */
@@ -73,7 +81,7 @@ public interface MaterialsAnisotropyModel extends ModelElement, ExtensionModel
         TextureInfoModel anisotropyTextureInfoModel);
 
     /**
-     * The anisotropy texture info model
+     * The anisotropy texture. (optional) 
      * 
      * @return The anisotropy texture info model
      */

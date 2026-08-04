@@ -38,6 +38,8 @@ public interface MaterialsDispersionModel extends ModelElement, ExtensionModel
     /**
      * This parameter defines dispersion in terms of the 20/Abbe number
      * formulation. (optional)<br>
+     * Default: 0.0<br> 
+     * Minimum: 0.0 (inclusive) 
      * 
      * @param dispersion The dispersion to set
      */
@@ -46,6 +48,8 @@ public interface MaterialsDispersionModel extends ModelElement, ExtensionModel
     /**
      * This parameter defines dispersion in terms of the 20/Abbe number
      * formulation. (optional)<br>
+     * Default: 0.0<br> 
+     * Minimum: 0.0 (inclusive) 
      * 
      * @return The clearcoatFactor
      */

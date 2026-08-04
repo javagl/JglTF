@@ -38,21 +38,27 @@ import de.javagl.jgltf.model.extensions.ExtensionModel;
 public interface MaterialsClearcoatModel extends ModelElement, ExtensionModel
 {
     /**
-     * The clearcoat layer intensity.
+     * The clearcoat layer intensity. (optional)<br> 
+     * Default: 0.0<br> 
+     * Minimum: 0.0 (inclusive)<br> 
+     * Maximum: 1.0 (inclusive) 
      * 
      * @param clearcoatFactor The clearcoatFactor to set
      */
     void setClearcoatFactor(Double clearcoatFactor);
 
     /**
-     * The clearcoat layer intensity.
+     * The clearcoat layer intensity. (optional)<br> 
+     * Default: 0.0<br> 
+     * Minimum: 0.0 (inclusive)<br> 
+     * Maximum: 1.0 (inclusive) 
      * 
      * @return The clearcoatFactor
      */
     Double getClearcoatFactor();
 
     /**
-     * The clearcoat layer intensity texture info.
+     * The clearcoat layer intensity texture. (optional) 
      * 
      * @param clearcoatTextureInfoModel The texture info
      */
@@ -60,28 +66,34 @@ public interface MaterialsClearcoatModel extends ModelElement, ExtensionModel
         TextureInfoModel clearcoatTextureInfoModel);
 
     /**
-     * The clearcoat layer intensity texture info
+     * The clearcoat layer intensity texture. (optional) 
      * 
      * @return The texture info
      */
     TextureInfoModel getClearcoatTextureInfoModel();
 
     /**
-     * The clearcoat layer roughness.
+     * The clearcoat layer roughness. (optional)<br> 
+     * Default: 0.0<br> 
+     * Minimum: 0.0 (inclusive)<br> 
+     * Maximum: 1.0 (inclusive) 
      * 
      * @param clearcoatRoughnessFactor The clearcoatRoughnessFactor to set
      */
     void setClearcoatRoughnessFactor(Double clearcoatRoughnessFactor);
 
     /**
-     * The clearcoat layer roughness.
+     * The clearcoat layer roughness. (optional)<br> 
+     * Default: 0.0<br> 
+     * Minimum: 0.0 (inclusive)<br> 
+     * Maximum: 1.0 (inclusive) 
      * 
      * @return The clearcoatRoughnessFactor
      */
     Double getClearcoatRoughnessFactor();
 
     /**
-     * The clearcoat layer roughness texture info
+     * The clearcoat layer roughness texture. (optional) 
      * 
      * @param clearcoatRoughnessTextureInfoModel The texture info
      */
@@ -89,14 +101,14 @@ public interface MaterialsClearcoatModel extends ModelElement, ExtensionModel
         TextureInfoModel clearcoatRoughnessTextureInfoModel);
 
     /**
-     * The clearcoat layer roughness texture info.
+     * The clearcoat layer roughness texture. (optional) 
      * 
      * @return The clearcoatRoughnessTexture info
      */
     TextureInfoModel getClearcoatRoughnessTextureInfoModel();
 
     /**
-     * The clearcoat normal map texture info. (optional)
+     * The clearcoat normal map texture. (optional) 
      * 
      * @param clearcoatNormalTextureInfoModel The texture info
      */
@@ -104,10 +116,9 @@ public interface MaterialsClearcoatModel extends ModelElement, ExtensionModel
         NormalTextureInfoModel clearcoatNormalTextureInfoModel);
 
     /**
-     * The clearcoat normal map texture info. (optional)
+     * The clearcoat normal map texture. (optional) 
      * 
      * @return The texture info
-     * 
      */
     NormalTextureInfoModel getClearcoatNormalTextureInfoModel();
 }

@@ -37,14 +37,26 @@ import de.javagl.jgltf.model.extensions.ExtensionModel;
 public interface MaterialsSheenModel extends ModelElement, ExtensionModel
 {
     /**
-     * Color of the sheen layer (in linear space). (optional)<br>
+     * Color of the sheen layer (in linear space). (optional)<br> 
+     * Default: [0,0,0]<br> 
+     * Number of items: 3<br> 
+     * Array elements:<br> 
+     * &nbsp;&nbsp;The elements of this array (optional)<br> 
+     * &nbsp;&nbsp;Minimum: 0.0 (inclusive)<br> 
+     * &nbsp;&nbsp;Maximum: 1.0 (inclusive) 
      * 
      * @param sheenColorFactor The sheenColorFactor to set
      */
     void setSheenColorFactor(double[] sheenColorFactor);
 
     /**
-     * Color of the sheen layer (in linear space). (optional)<br>
+     * Color of the sheen layer (in linear space). (optional)<br> 
+     * Default: [0,0,0]<br> 
+     * Number of items: 3<br> 
+     * Array elements:<br> 
+     * &nbsp;&nbsp;The elements of this array (optional)<br> 
+     * &nbsp;&nbsp;Minimum: 0.0 (inclusive)<br> 
+     * &nbsp;&nbsp;Maximum: 1.0 (inclusive) 
      * 
      * @return The sheenColorFactor
      */
@@ -67,14 +79,20 @@ public interface MaterialsSheenModel extends ModelElement, ExtensionModel
     TextureInfoModel getSheenColorTextureInfoModel();
 
     /**
-     * The sheen layer roughness. (optional)<br>
+     * The sheen layer roughness. (optional)<br> 
+     * Default: 0.0<br> 
+     * Minimum: 0.0 (inclusive)<br> 
+     * Maximum: 1.0 (inclusive) 
      * 
      * @param sheenRoughnessFactor The sheenRoughnessFactor to set
      */
     void setSheenRoughnessFactor(Double sheenRoughnessFactor);
 
     /**
-     * The sheen layer roughness. (optional)<br>
+     * The sheen layer roughness. (optional)<br> 
+     * Default: 0.0<br> 
+     * Minimum: 0.0 (inclusive)<br> 
+     * Maximum: 1.0 (inclusive) 
      * 
      * @return The sheenRoughnessFactor
      */

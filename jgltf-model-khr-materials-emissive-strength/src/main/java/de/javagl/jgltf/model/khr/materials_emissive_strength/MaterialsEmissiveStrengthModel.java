@@ -39,6 +39,8 @@ public interface MaterialsEmissiveStrengthModel
     /**
      * The strength adjustment to be multiplied with the material's emissive
      * value. (optional)<br>
+     * Default: 1.0<br> 
+     * Minimum: 0.0 (inclusive) 
      * 
      * @param emissiveStrength The emissiveStrength to set
      */
@@ -47,6 +49,8 @@ public interface MaterialsEmissiveStrengthModel
     /**
      * The strength adjustment to be multiplied with the material's emissive
      * value. (optional)<br>
+     * Default: 1.0<br> 
+     * Minimum: 0.0 (inclusive) 
      * 
      * @return The emissiveStrength
      */
