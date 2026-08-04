@@ -73,6 +73,7 @@ import de.javagl.jgltf.model.khr.draco_mesh_compression.DefaultDracoMeshCompress
 import de.javagl.jgltf.model.khr.materials_anisotropy.DefaultMaterialsAnisotropyModel;
 import de.javagl.jgltf.model.khr.materials_clearcoat.DefaultMaterialsClearcoatModel;
 import de.javagl.jgltf.model.khr.materials_dispersion.DefaultMaterialsDispersionModel;
+import de.javagl.jgltf.model.khr.materials_emissive_strength.DefaultMaterialsEmissiveStrengthModel;
 import de.javagl.jgltf.model.khr.materials_ior.DefaultMaterialsIorModel;
 import de.javagl.jgltf.model.khr.materials_sheen.DefaultMaterialsSheenModel;
 import de.javagl.jgltf.model.khr.materials_transmission.DefaultMaterialsTransmissionModel;
@@ -581,6 +582,63 @@ class GltfTestModelCreation
             AccessorModels.createFloat3D(FloatBuffer.wrap(translations));
         meshGpuInstancing.setAttribute("TRANSLATION", translationAccessorModel);
         return meshGpuInstancing;
+    }
+
+    /**
+     * Create a textured square including a KHR_materials_emissive_strength
+     * 
+     * @return The model
+     */
+    public static DefaultGltfModel createTexturedSquareWithEmissive()
+    {
+        // Create the mesh primitive model
+        DefaultMeshPrimitiveModel meshPrimitiveModel =
+            createSquareMeshPrimitiveWithTexcoords();
+
+        // Create a material with an emissive texture
+        DefaultPbrMaterialModel materialModel = new DefaultPbrMaterialModel();
+        materialModel.setDoubleSided(true);
+
+        // Assign the base color texture to the material
+        DefaultPbrMetallicRoughnessModel pbrMetallicRoughnessModel =
+            new DefaultPbrMetallicRoughnessModel();
+        pbrMetallicRoughnessModel.setMetallicFactor(0.0);
+        pbrMetallicRoughnessModel.setRoughnessFactor(1.0);
+        DefaultTextureModel baseColorTextureModel =
+            createSimpleTextureModel("baseColor.png");
+        DefaultTextureInfoModel baseColorTextureInfoModel =
+            new DefaultTextureInfoModel();
+        baseColorTextureInfoModel.setTextureModel(baseColorTextureModel);
+        pbrMetallicRoughnessModel
+            .setBaseColorTextureInfoModel(baseColorTextureInfoModel);
+        materialModel.setPbrMetallicRoughnessModel(pbrMetallicRoughnessModel);
+
+        // Assign the emissive texture to the material
+        DefaultTextureInfoModel emissiveTextureInfoModel =
+            new DefaultTextureInfoModel();
+        DefaultTextureModel emissiveTextureModel =
+            createSimpleTextureModel("emissive.png", Color.WHITE, Color.BLACK);
+        emissiveTextureInfoModel.setTextureModel(emissiveTextureModel);
+        materialModel.setEmissiveTextureInfoModel(emissiveTextureInfoModel);
+
+        meshPrimitiveModel.setMaterialModel(materialModel);
+
+        // Assign the emissive strength extension to the material
+        DefaultMaterialsEmissiveStrengthModel emissiveStrengthModel =
+            new DefaultMaterialsEmissiveStrengthModel();
+        emissiveStrengthModel.setEmissiveStrength(10.0);
+        materialModel.setEmissiveFactor(new double[]
+        { 1.0, 1.0, 1.0 });
+        materialModel.addExtensionModel("KHR_materials_emissive_strength",
+            emissiveStrengthModel);
+
+        DefaultSceneModel sceneModel = createSceneWith(meshPrimitiveModel);
+
+        // Create the glTF model
+        GltfModelBuilder gltfModelBuilder = GltfModelBuilder.create();
+        gltfModelBuilder.addSceneModel(sceneModel);
+        DefaultGltfModel gltfModel = gltfModelBuilder.build();
+        return gltfModel;
     }
 
     /**
@@ -2392,9 +2450,9 @@ class GltfTestModelCreation
         DefaultPbrMetallicRoughnessModel pbrMetallicRoughnessModel =
             new DefaultPbrMetallicRoughnessModel();
         pbrMetallicRoughnessModel.setMetallicFactor(0.0);
+
         DefaultTextureInfoModel baseColorTextureInfoModel =
             new DefaultTextureInfoModel();
-
         DefaultTextureModel textureModel = createSimpleTextureModel(uri);
         baseColorTextureInfoModel.setTextureModel(textureModel);
         pbrMetallicRoughnessModel
@@ -2462,11 +2520,25 @@ class GltfTestModelCreation
      */
     private static DefaultTextureModel createSimpleTextureModel(String uri)
     {
+        Color foreground = new Color(255, 0, 0);
+        Color background = new Color(0, 0, 255);
+        return createSimpleTextureModel(uri, foreground, background);
+    }
+
+    /**
+     * Create a simple texture model for tests
+     * 
+     * @param uri The URI for the image
+     * @param foreground The foreground color
+     * @param background The background color
+     * @return The texture model
+     */
+    private static DefaultTextureModel createSimpleTextureModel(String uri,
+        Color foreground, Color background)
+    {
         DefaultTextureModel textureModel = new DefaultTextureModel();
         String imageText = createImageText(uri);
         int fontSize = 12;
-        Color foreground = new Color(255, 0, 0);
-        Color background = new Color(0, 0, 255);
         DefaultImageModel imageModel =
             createImageModel(uri, imageText, fontSize, foreground, background);
         textureModel.setImageModel(imageModel);

@@ -82,6 +82,11 @@
 /jgltf-impl-v2-khr-materials-dispersion/.project
 /jgltf-impl-v2-khr-materials-dispersion/target
 
+/jgltf-impl-v2-khr-materials-emissive-strength/.classpath
+/jgltf-impl-v2-khr-materials-emissive-strength/.settings
+/jgltf-impl-v2-khr-materials-emissive-strength/.project
+/jgltf-impl-v2-khr-materials-emissive-strength/target
+
 /jgltf-impl-v2-khr-materials-ior/.classpath
 /jgltf-impl-v2-khr-materials-ior/.settings
 /jgltf-impl-v2-khr-materials-ior/.project
@@ -136,6 +141,11 @@
 /jgltf-model-khr-materials-dispersion/.settings
 /jgltf-model-khr-materials-dispersion/.project
 /jgltf-model-khr-materials-dispersion/target
+
+/jgltf-model-khr-materials-emissive-strength/.classpath
+/jgltf-model-khr-materials-emissive-strength/.settings
+/jgltf-model-khr-materials-emissive-strength/.project
+/jgltf-model-khr-materials-emissive-strength/target
 
 /jgltf-model-khr-materials-ior/.classpath
 /jgltf-model-khr-materials-ior/.settings

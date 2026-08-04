@@ -99,6 +99,7 @@ public class GltfModelTransformsTests
         runTest(createTestRemoveAnisotropy());
         runTest(createTestRemoveVolume());
         runTest(createTestRemoveSheen());
+        runTest(createTestRemoveEmissiveStrength());
     }
 
     /**
@@ -764,6 +765,26 @@ public class GltfModelTransformsTests
             DefaultPbrMaterialModel material1 =
                 (DefaultPbrMaterialModel) m.getMaterialModel(1);
             material1.removeExtensionModel("KHR_materials_sheen");
+            GltfModelTransforms.revalidate(gltfModel);
+        };
+        return TestCase.create(name, modifiedName, gltfModel, op);
+    }
+
+    /**
+     * Create a test to remove emissive strength
+     * 
+     * @return The test
+     */
+    static TestCase createTestRemoveEmissiveStrength()
+    {
+        String name = "TexturedSquareWithEmissive";
+        String modifiedName = name + "-removedEmissiveStrength";
+        DefaultGltfModel gltfModel = GltfTestModelCreation.createTexturedSquareWithEmissive();
+        Consumer<DefaultGltfModel> op = (m) ->
+        {
+            DefaultPbrMaterialModel material0 =
+                (DefaultPbrMaterialModel) m.getMaterialModel(0);
+            material0.removeExtensionModel("KHR_materials_emissive_strength");
             GltfModelTransforms.revalidate(gltfModel);
         };
         return TestCase.create(name, modifiedName, gltfModel, op);
