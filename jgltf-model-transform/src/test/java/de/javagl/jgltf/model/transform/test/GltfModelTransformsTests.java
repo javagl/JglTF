@@ -99,6 +99,7 @@ public class GltfModelTransformsTests
         runTest(createTestRemoveAnisotropy());
         runTest(createTestRemoveVolume());
         runTest(createTestRemoveSheen());
+        runTest(createTestRemoveIridescence());
         runTest(createTestRemoveEmissiveStrength());
     }
 
@@ -771,6 +772,27 @@ public class GltfModelTransformsTests
     }
 
     /**
+     * Create a test to remove iridescence
+     * 
+     * @return The test
+     */
+    static TestCase createTestRemoveIridescence()
+    {
+        String name = "TexturedSquareWithIridescence";
+        String modifiedName = name + "-removedIridescence";
+        DefaultGltfModel gltfModel =
+            GltfTestModelCreation.createTexturedSquareWithIridescence();
+        Consumer<DefaultGltfModel> op = (m) ->
+        {
+            DefaultPbrMaterialModel material0 =
+                (DefaultPbrMaterialModel) m.getMaterialModel(0);
+            material0.removeExtensionModel("KHR_materials_iridescence");
+            GltfModelTransforms.revalidate(gltfModel);
+        };
+        return TestCase.create(name, modifiedName, gltfModel, op);
+    }
+
+    /**
      * Create a test to remove emissive strength
      * 
      * @return The test
@@ -779,7 +801,8 @@ public class GltfModelTransformsTests
     {
         String name = "TexturedSquareWithEmissive";
         String modifiedName = name + "-removedEmissiveStrength";
-        DefaultGltfModel gltfModel = GltfTestModelCreation.createTexturedSquareWithEmissive();
+        DefaultGltfModel gltfModel =
+            GltfTestModelCreation.createTexturedSquareWithEmissive();
         Consumer<DefaultGltfModel> op = (m) ->
         {
             DefaultPbrMaterialModel material0 =

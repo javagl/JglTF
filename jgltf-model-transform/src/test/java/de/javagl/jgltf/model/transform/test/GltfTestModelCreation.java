@@ -75,6 +75,7 @@ import de.javagl.jgltf.model.khr.materials_clearcoat.DefaultMaterialsClearcoatMo
 import de.javagl.jgltf.model.khr.materials_dispersion.DefaultMaterialsDispersionModel;
 import de.javagl.jgltf.model.khr.materials_emissive_strength.DefaultMaterialsEmissiveStrengthModel;
 import de.javagl.jgltf.model.khr.materials_ior.DefaultMaterialsIorModel;
+import de.javagl.jgltf.model.khr.materials_iridescence.DefaultMaterialsIridescenceModel;
 import de.javagl.jgltf.model.khr.materials_sheen.DefaultMaterialsSheenModel;
 import de.javagl.jgltf.model.khr.materials_transmission.DefaultMaterialsTransmissionModel;
 import de.javagl.jgltf.model.khr.materials_variants.DefaultMaterialsVariantsModel;
@@ -468,6 +469,54 @@ class GltfTestModelCreation
         root.addChild(node);
         DefaultSceneModel sceneModel = new DefaultSceneModel();
         sceneModel.addNode(root);
+
+        // Create the glTF model
+        GltfModelBuilder gltfModelBuilder = GltfModelBuilder.create();
+        gltfModelBuilder.addSceneModel(sceneModel);
+        DefaultGltfModel gltfModel = gltfModelBuilder.build();
+        return gltfModel;
+    }
+
+    /**
+     * Create a textured square including a KHR_materials_iridescence
+     * 
+     * @return The model
+     */
+    public static DefaultGltfModel createTexturedSquareWithIridescence()
+    {
+        // Create the mesh primitive model
+        DefaultMeshPrimitiveModel meshPrimitiveModel =
+            createSquareMeshPrimitiveWithTexcoords();
+
+        // Create a material
+        DefaultPbrMaterialModel materialModel = new DefaultPbrMaterialModel();
+        materialModel.setDoubleSided(true);
+        DefaultPbrMetallicRoughnessModel pbrMetallicRoughnessModel =
+            new DefaultPbrMetallicRoughnessModel();
+        pbrMetallicRoughnessModel.setBaseColorFactor(new double[]
+        { 0.0, 0.0, 0.0, 0.0 });
+        pbrMetallicRoughnessModel.setMetallicFactor(0.0);
+        pbrMetallicRoughnessModel.setRoughnessFactor(1.0);
+        materialModel.setPbrMetallicRoughnessModel(pbrMetallicRoughnessModel);
+
+        // Assign the iridescence extension
+        DefaultMaterialsIridescenceModel iridescenceModel =
+            new DefaultMaterialsIridescenceModel();
+        iridescenceModel.setIridescenceFactor(1.0);
+        iridescenceModel.setIridescenceIor(1.5);
+        DefaultTextureInfoModel iridescenceTextureInfoModel =
+            new DefaultTextureInfoModel();
+        DefaultTextureModel textureModel =
+            createSimpleTextureModel("iridescence.png", Color.BLACK, Color.RED);
+        iridescenceTextureInfoModel.setTextureModel(textureModel);
+        iridescenceModel.setIridescenceTexture(iridescenceTextureInfoModel);
+
+        materialModel.addExtensionModel("KHR_materials_iridescence",
+            iridescenceModel);
+
+        meshPrimitiveModel.setMaterialModel(materialModel);
+
+        DefaultSceneModel sceneModel = createSceneWith(meshPrimitiveModel);
 
         // Create the glTF model
         GltfModelBuilder gltfModelBuilder = GltfModelBuilder.create();
