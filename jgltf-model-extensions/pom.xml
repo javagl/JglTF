@@ -73,6 +73,11 @@
     </dependency>
     <dependency>
       <groupId>de.javagl</groupId>
+      <artifactId>jgltf-model-khr-materials-iridescence</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>de.javagl</groupId>
       <artifactId>jgltf-model-khr-materials-variants</artifactId>
       <version>${project.version}</version>
     </dependency>

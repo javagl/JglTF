@@ -87,6 +87,11 @@
 /jgltf-impl-v2-khr-materials-emissive-strength/.project
 /jgltf-impl-v2-khr-materials-emissive-strength/target
 
+/jgltf-impl-v2-khr-materials-iridescence/.classpath
+/jgltf-impl-v2-khr-materials-iridescence/.settings
+/jgltf-impl-v2-khr-materials-iridescence/.project
+/jgltf-impl-v2-khr-materials-iridescence/target
+
 /jgltf-impl-v2-khr-materials-ior/.classpath
 /jgltf-impl-v2-khr-materials-ior/.settings
 /jgltf-impl-v2-khr-materials-ior/.project
@@ -146,6 +151,11 @@
 /jgltf-model-khr-materials-emissive-strength/.settings
 /jgltf-model-khr-materials-emissive-strength/.project
 /jgltf-model-khr-materials-emissive-strength/target
+
+/jgltf-model-khr-materials-iridescence/.classpath
+/jgltf-model-khr-materials-iridescence/.settings
+/jgltf-model-khr-materials-iridescence/.project
+/jgltf-model-khr-materials-iridescence/target
 
 /jgltf-model-khr-materials-ior/.classpath
 /jgltf-model-khr-materials-ior/.settings
