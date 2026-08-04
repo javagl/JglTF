@@ -50,17 +50,17 @@ public final class DefaultPbrMaterialModel extends AbstractNamedModelElement
     /**
      * THe {@link NormalTextureInfoModel}
      */
-    private NormalTextureInfoModel normalTextureInfoModel;
+    private NormalTextureInfoModel normalTexture;
     
     /**
      * The {@link OcclusionTextureInfoModel}
      */
-    private OcclusionTextureInfoModel occlusionTextureInfoModel;
+    private OcclusionTextureInfoModel occlusionTexture;
     
     /**
      * The emissive {@link TextureInfoModel}
      */
-    private TextureInfoModel emissiveTextureInfoModel;
+    private TextureInfoModel emissiveTexture;
     
     /**
      * The emissive factor
@@ -88,9 +88,9 @@ public final class DefaultPbrMaterialModel extends AbstractNamedModelElement
     public DefaultPbrMaterialModel()
     {
         pbrMetallicRoughnessModel = null;
-        normalTextureInfoModel = null;
-        occlusionTextureInfoModel = null;
-        emissiveTextureInfoModel = null;
+        normalTexture = null;
+        occlusionTexture = null;
+        emissiveTexture = null;
         emissiveFactor = null;
         alphaMode = null;
         alphaCutoff = null;
@@ -115,53 +115,42 @@ public final class DefaultPbrMaterialModel extends AbstractNamedModelElement
     }
 
     @Override
-    public NormalTextureInfoModel getNormalTextureInfoModel()
+    public NormalTextureInfoModel getNormalTexture()
     {
-        return normalTextureInfoModel;
+        return normalTexture;
     }
     
-    /**
-     * Set the {@link NormalTextureInfoModel}
-     * @param normalTextureInfoModel The {@link NormalTextureInfoModel}
-     */
+    @Override
     public void
-        setNormalTextureInfoModel(NormalTextureInfoModel normalTextureInfoModel)
+        setNormalTexture(NormalTextureInfoModel normalTexture)
     {
-        this.normalTextureInfoModel = normalTextureInfoModel;
+        this.normalTexture = normalTexture;
     }
 
     @Override
-    public OcclusionTextureInfoModel getOcclusionTextureInfoModel()
+    public OcclusionTextureInfoModel getOcclusionTexture()
     {
-        return occlusionTextureInfoModel;
+        return occlusionTexture;
     }
     
-    /**
-     * Set the {@link OcclusionTextureInfoModel}
-     * 
-     * @param occlusionTextureInfoModel The {@link OcclusionTextureInfoModel}
-     */
-    public void setOcclusionTextureInfoModel(
-        OcclusionTextureInfoModel occlusionTextureInfoModel)
+    @Override
+    public void setOcclusionTexture(
+        OcclusionTextureInfoModel occlusionTexture)
     {
-        this.occlusionTextureInfoModel = occlusionTextureInfoModel;
+        this.occlusionTexture = occlusionTexture;
     }
 
     @Override
-    public TextureInfoModel getEmissiveTextureInfoModel()
+    public TextureInfoModel getEmissiveTexture()
     {
-        return emissiveTextureInfoModel;
+        return emissiveTexture;
     }
     
-    /**
-     * Set the emissive {@link TextureInfoModel}
-     * 
-     * @param emissiveTextureInfoModel The {@link TextureInfoModel}
-     */
+    @Override
     public void
-        setEmissiveTextureInfoModel(TextureInfoModel emissiveTextureInfoModel)
+        setEmissiveTexture(TextureInfoModel emissiveTexture)
     {
-        this.emissiveTextureInfoModel = emissiveTextureInfoModel;
+        this.emissiveTexture = emissiveTexture;
     }
 
     @Override
@@ -170,11 +159,7 @@ public final class DefaultPbrMaterialModel extends AbstractNamedModelElement
         return emissiveFactor;
     }
 
-    /**
-     * Set the emissive factor
-     *
-     * @param emissiveFactor The emissive factor
-     */
+    @Override
     public void setEmissiveFactor(double[] emissiveFactor)
     {
         this.emissiveFactor = emissiveFactor;
@@ -186,11 +171,7 @@ public final class DefaultPbrMaterialModel extends AbstractNamedModelElement
         return alphaMode;
     }
 
-    /**
-     * Set the alpha mode
-     *
-     * @param alphaMode The alpha mode
-     */
+    @Override
     public void setAlphaMode(AlphaMode alphaMode)
     {
         this.alphaMode = alphaMode;
@@ -202,11 +183,7 @@ public final class DefaultPbrMaterialModel extends AbstractNamedModelElement
         return alphaCutoff;
     }
 
-    /**
-     * Set the alpha cutoff
-     *
-     * @param alphaCutoff The alpha cutoff
-     */
+    @Override
     public void setAlphaCutoff(Double alphaCutoff)
     {
         this.alphaCutoff = alphaCutoff;
@@ -218,11 +195,7 @@ public final class DefaultPbrMaterialModel extends AbstractNamedModelElement
         return doubleSided;
     }
 
-    /**
-     * Set whether the material is double sided
-     *
-     * @param doubleSided Whether the material is double sided
-     */
+    @Override
     public void setDoubleSided(Boolean doubleSided)
     {
         this.doubleSided = doubleSided;
@@ -237,17 +210,17 @@ public final class DefaultPbrMaterialModel extends AbstractNamedModelElement
         {
             modelElements.add(pbrMetallicRoughnessModel);
         }
-        if (normalTextureInfoModel != null)
+        if (normalTexture != null)
         {
-            modelElements.add(normalTextureInfoModel);
+            modelElements.add(normalTexture);
         }
-        if (occlusionTextureInfoModel != null)
+        if (occlusionTexture != null)
         {
-            modelElements.add(occlusionTextureInfoModel);
+            modelElements.add(occlusionTexture);
         }
-        if (emissiveTextureInfoModel != null)
+        if (emissiveTexture != null)
         {
-            modelElements.add(emissiveTextureInfoModel);
+            modelElements.add(emissiveTexture);
         }
         return modelElements;
     }
@@ -261,15 +234,15 @@ public final class DefaultPbrMaterialModel extends AbstractNamedModelElement
         {
             setPbrMetallicRoughnessModel(null);
         }
-        if (modelElementsToRemove.contains(normalTextureInfoModel)) 
+        if (modelElementsToRemove.contains(normalTexture)) 
         {
-            setNormalTextureInfoModel(null);
+            setNormalTexture(null);
         }
-        if (modelElementsToRemove.contains(occlusionTextureInfoModel)) 
+        if (modelElementsToRemove.contains(occlusionTexture)) 
         {
-            setOcclusionTextureInfoModel(null);
+            setOcclusionTexture(null);
         }
-        if (modelElementsToRemove.contains(emissiveTextureInfoModel)) 
+        if (modelElementsToRemove.contains(emissiveTexture)) 
         {
             setEmissiveFactor(null);
         }

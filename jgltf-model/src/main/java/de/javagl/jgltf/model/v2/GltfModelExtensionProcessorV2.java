@@ -243,7 +243,7 @@ class GltfModelExtensionProcessorV2
                 PbrMetallicRoughnessModel.class);
             
             TextureInfoModel baseColorTextureInfoModel = 
-                pbrMetallicRoughnessModel.getBaseColorTextureInfoModel();
+                pbrMetallicRoughnessModel.getBaseColorTexture();
             if (baseColorTextureInfoModel != null)
             {
                 ExtensionModels.createExtensionModels(gltfModel, 
@@ -252,7 +252,7 @@ class GltfModelExtensionProcessorV2
             }
             
             TextureInfoModel metallicRoughnessTextureInfoModel =
-                pbrMetallicRoughnessModel.getMetallicRoughnessTextureInfoModel();
+                pbrMetallicRoughnessModel.getMetallicRoughnessTexture();
             if (metallicRoughnessTextureInfoModel != null)
             {
                 ExtensionModels.createExtensionModels(gltfModel, 
@@ -262,7 +262,7 @@ class GltfModelExtensionProcessorV2
         }
         
         NormalTextureInfoModel normalTextureInfoModel = 
-            pbrMaterialModel.getNormalTextureInfoModel();
+            pbrMaterialModel.getNormalTexture();
         if (normalTextureInfoModel != null)
         {
             ExtensionModels.createExtensionModels(gltfModel, 
@@ -270,7 +270,7 @@ class GltfModelExtensionProcessorV2
                 TextureInfoModel.class);
         }
         OcclusionTextureInfoModel occlusionTextureInfoModel = 
-            pbrMaterialModel.getOcclusionTextureInfoModel();
+            pbrMaterialModel.getOcclusionTexture();
         if (occlusionTextureInfoModel != null)
         {
             ExtensionModels.createExtensionModels(gltfModel, 
@@ -278,7 +278,7 @@ class GltfModelExtensionProcessorV2
                 TextureInfoModel.class);
         }
         TextureInfoModel emissiveTextureInfoModel = 
-            pbrMaterialModel.getEmissiveTextureInfoModel();
+            pbrMaterialModel.getEmissiveTexture();
         if (emissiveTextureInfoModel != null)
         {
             ExtensionModels.createExtensionModels(gltfModel, 

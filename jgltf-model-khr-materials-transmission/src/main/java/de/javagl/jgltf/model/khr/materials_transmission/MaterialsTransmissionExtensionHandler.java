@@ -91,7 +91,7 @@ public class MaterialsTransmissionExtensionHandler implements ExtensionHandler
         {
             DefaultTextureInfoModel transmissionTextureInfoModel =
                 TextureInfoModels.from(textureModels, transmissionTextureInfo);
-            model.setTransmissionTextureInfoModel(transmissionTextureInfoModel);
+            model.setTransmissionTexture(transmissionTextureInfoModel);
             ExtensionModels.createExtensionModels(gltfModel,
                 transmissionTextureInfoModel, TextureInfoModel.class);
         }
@@ -110,7 +110,7 @@ public class MaterialsTransmissionExtensionHandler implements ExtensionHandler
         impl.setTransmissionFactor(model.getTransmissionFactor());
 
         TextureInfoModel transmissionTextureInfoModel =
-            model.getTransmissionTextureInfoModel();
+            model.getTransmissionTexture();
         TextureInfo transmissionTextureInfo =
             TextureInfos.from(gltfModel, transmissionTextureInfoModel);
         impl.setTransmissionTexture(transmissionTextureInfo);
@@ -131,12 +131,11 @@ public class MaterialsTransmissionExtensionHandler implements ExtensionHandler
         outputModel.setTransmissionFactor(inputModel.getTransmissionFactor());
 
         TextureInfoModel inputTransmissionTextureInfoModel =
-            inputModel.getTransmissionTextureInfoModel();
+            inputModel.getTransmissionTexture();
         TextureInfoModel outputTransmissionTextureInfoModel =
             TextureInfoModels.copy(gltfModel, inputTransmissionTextureInfoModel,
                 modelElementMap);
-        outputModel.setTransmissionTextureInfoModel(
-            outputTransmissionTextureInfoModel);
+        outputModel.setTransmissionTexture(outputTransmissionTextureInfoModel);
 
         ExtensionModels.copyExtensionModels(gltfModel, inputModel, outputModel,
             modelElementMap);

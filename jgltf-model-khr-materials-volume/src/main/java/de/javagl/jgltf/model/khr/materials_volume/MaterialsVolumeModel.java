@@ -37,18 +37,18 @@ import de.javagl.jgltf.model.extensions.ExtensionModel;
 public interface MaterialsVolumeModel extends ModelElement, ExtensionModel
 {
     /**
-     * Thickness of the volume. (optional)<br> 
-     * Default: 0.0<br> 
-     * Minimum: 0.0 (inclusive) 
+     * Thickness of the volume. (optional)<br>
+     * Default: 0.0<br>
+     * Minimum: 0.0 (inclusive)
      * 
      * @param thicknessFactor The thicknessFactor to set
      */
     void setThicknessFactor(Double thicknessFactor);
 
     /**
-     * Thickness of the volume. (optional)<br> 
-     * Default: 0.0<br> 
-     * Minimum: 0.0 (inclusive) 
+     * Thickness of the volume. (optional)<br>
+     * Default: 0.0<br>
+     * Minimum: 0.0 (inclusive)
      * 
      * @return The thicknessFactor
      */
@@ -58,11 +58,10 @@ public interface MaterialsVolumeModel extends ModelElement, ExtensionModel
      * Texture that defines the thickness of the volume, stored in the G
      * channel. (optional)
      * 
-     * @param thicknessTextureInfoModel The thicknessTexture to set
+     * @param thicknessTexture The thicknessTexture to set
      * 
      */
-    void setThicknessTextureInfoModel(
-        TextureInfoModel thicknessTextureInfoModel);
+    void setThicknessTexture(TextureInfoModel thicknessTexture);
 
     /**
      * Texture that defines the thickness of the volume, stored in the G
@@ -71,7 +70,7 @@ public interface MaterialsVolumeModel extends ModelElement, ExtensionModel
      * @return The thicknessTexture
      * 
      */
-    TextureInfoModel getThicknessTextureInfoModel();
+    TextureInfoModel getThicknessTexture();
 
     /**
      * Average distance that light travels in the medium before interacting with
@@ -92,28 +91,28 @@ public interface MaterialsVolumeModel extends ModelElement, ExtensionModel
     Double getAttenuationDistance();
 
     /**
-     * Color that white light turns into due to absorption when reaching the 
-     * attenuation distance. (optional)<br> 
-     * Default: [1.0,1.0,1.0]<br> 
-     * Number of items: 3<br> 
-     * Array elements:<br> 
-     * &nbsp;&nbsp;The elements of this array (optional)<br> 
-     * &nbsp;&nbsp;Minimum: 0.0 (inclusive)<br> 
-     * &nbsp;&nbsp;Maximum: 1.0 (inclusive) 
+     * Color that white light turns into due to absorption when reaching the
+     * attenuation distance. (optional)<br>
+     * Default: [1.0,1.0,1.0]<br>
+     * Number of items: 3<br>
+     * Array elements:<br>
+     * &nbsp;&nbsp;The elements of this array (optional)<br>
+     * &nbsp;&nbsp;Minimum: 0.0 (inclusive)<br>
+     * &nbsp;&nbsp;Maximum: 1.0 (inclusive)
      * 
      * @param attenuationColor The attenuationColor to set
      */
     void setAttenuationColor(double[] attenuationColor);
 
     /**
-     * Color that white light turns into due to absorption when reaching the 
-     * attenuation distance. (optional)<br> 
-     * Default: [1.0,1.0,1.0]<br> 
-     * Number of items: 3<br> 
-     * Array elements:<br> 
-     * &nbsp;&nbsp;The elements of this array (optional)<br> 
-     * &nbsp;&nbsp;Minimum: 0.0 (inclusive)<br> 
-     * &nbsp;&nbsp;Maximum: 1.0 (inclusive) 
+     * Color that white light turns into due to absorption when reaching the
+     * attenuation distance. (optional)<br>
+     * Default: [1.0,1.0,1.0]<br>
+     * Number of items: 3<br>
+     * Array elements:<br>
+     * &nbsp;&nbsp;The elements of this array (optional)<br>
+     * &nbsp;&nbsp;Minimum: 0.0 (inclusive)<br>
+     * &nbsp;&nbsp;Maximum: 1.0 (inclusive)
      * 
      * @return The attenuationColor
      */

@@ -37,54 +37,53 @@ import de.javagl.jgltf.model.extensions.ExtensionModel;
 public interface MaterialsAnisotropyModel extends ModelElement, ExtensionModel
 {
     /**
-     * The anisotropy strength. (optional)<br> 
-     * Default: 0.0<br> 
-     * Minimum: 0.0 (inclusive)<br> 
-     * Maximum: 1.0 (inclusive) 
+     * The anisotropy strength. (optional)<br>
+     * Default: 0.0<br>
+     * Minimum: 0.0 (inclusive)<br>
+     * Maximum: 1.0 (inclusive)
      * 
      * @param anisotropyStrength The anisotropy strength to set
      */
     void setAnisotropyStrength(Double anisotropyStrength);
 
     /**
-     * The anisotropy strength. (optional)<br> 
-     * Default: 0.0<br> 
-     * Minimum: 0.0 (inclusive)<br> 
-     * Maximum: 1.0 (inclusive) 
+     * The anisotropy strength. (optional)<br>
+     * Default: 0.0<br>
+     * Minimum: 0.0 (inclusive)<br>
+     * Maximum: 1.0 (inclusive)
      * 
      * @return The anisotropy strength
      */
     Double getAnisotropyStrength();
 
     /**
-     * The rotation of the anisotropy. (optional)<br> 
-     * Default: 0.0 
+     * The rotation of the anisotropy. (optional)<br>
+     * Default: 0.0
      * 
      * @param anisotropyRotation The anisotropy rotation to set
      */
     void setAnisotropyRotation(Double anisotropyRotation);
 
     /**
-     * The rotation of the anisotropy. (optional)<br> 
-     * Default: 0.0 
+     * The rotation of the anisotropy. (optional)<br>
+     * Default: 0.0
      * 
      * @return The anisotropy rotation
      */
     Double getAnisotropyRotation();
 
     /**
-     * The anisotropy texture. (optional) 
+     * The anisotropy texture. (optional)
      * 
-     * @param anisotropyTextureInfoModel The The anisotropy texture info model
+     * @param anisotropyTexture The The anisotropy texture info model
      */
-    void setAnisotropyTextureInfoModel(
-        TextureInfoModel anisotropyTextureInfoModel);
+    void setAnisotropyTexture(TextureInfoModel anisotropyTexture);
 
     /**
-     * The anisotropy texture. (optional) 
+     * The anisotropy texture. (optional)
      * 
      * @return The anisotropy texture info model
      */
-    TextureInfoModel getAnisotropyTextureInfoModel();
+    TextureInfoModel getAnisotropyTexture();
 
 }

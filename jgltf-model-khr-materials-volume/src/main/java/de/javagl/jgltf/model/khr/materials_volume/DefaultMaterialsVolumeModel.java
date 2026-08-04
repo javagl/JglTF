@@ -48,7 +48,7 @@ public class DefaultMaterialsVolumeModel extends AbstractModelElement
      * Texture that defines the thickness of the volume, stored in the G
      * channel. (optional)
      */
-    private TextureInfoModel thicknessTextureInfoModel;
+    private TextureInfoModel thicknessTexture;
 
     /**
      * Average distance that light travels in the medium before interacting with
@@ -75,16 +75,15 @@ public class DefaultMaterialsVolumeModel extends AbstractModelElement
     }
 
     @Override
-    public void
-        setThicknessTextureInfoModel(TextureInfoModel thicknessTextureInfoModel)
+    public void setThicknessTexture(TextureInfoModel thicknessTexture)
     {
-        this.thicknessTextureInfoModel = thicknessTextureInfoModel;
+        this.thicknessTexture = thicknessTexture;
     }
 
     @Override
-    public TextureInfoModel getThicknessTextureInfoModel()
+    public TextureInfoModel getThicknessTexture()
     {
-        return this.thicknessTextureInfoModel;
+        return this.thicknessTexture;
     }
 
     @Override
@@ -115,9 +114,9 @@ public class DefaultMaterialsVolumeModel extends AbstractModelElement
     public Set<ModelElement> getReferencedModelElements()
     {
         Set<ModelElement> modelElements = getReferencedExtensionModelElements();
-        if (thicknessTextureInfoModel != null)
+        if (thicknessTexture != null)
         {
-            modelElements.add(thicknessTextureInfoModel);
+            modelElements.add(thicknessTexture);
         }
         return modelElements;
     }
@@ -127,9 +126,9 @@ public class DefaultMaterialsVolumeModel extends AbstractModelElement
         Collection<? extends ModelElement> modelElementsToRemove)
     {
         removeExtensionModelElements(modelElementsToRemove);
-        if (modelElementsToRemove.contains(thicknessTextureInfoModel))
+        if (modelElementsToRemove.contains(thicknessTexture))
         {
-            setThicknessTextureInfoModel(null);
+            setThicknessTexture(null);
         }
         return false;
     }

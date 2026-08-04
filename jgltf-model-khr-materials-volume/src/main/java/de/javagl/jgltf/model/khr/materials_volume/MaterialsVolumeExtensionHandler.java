@@ -92,7 +92,7 @@ public class MaterialsVolumeExtensionHandler implements ExtensionHandler
         {
             DefaultTextureInfoModel thicknessTextureInfoModel =
                 TextureInfoModels.from(textureModels, thicknessTextureInfo);
-            model.setThicknessTextureInfoModel(thicknessTextureInfoModel);
+            model.setThicknessTexture(thicknessTextureInfoModel);
             ExtensionModels.createExtensionModels(gltfModel,
                 thicknessTextureInfoModel, TextureInfoModel.class);
         }
@@ -113,7 +113,7 @@ public class MaterialsVolumeExtensionHandler implements ExtensionHandler
         impl.setAttenuationColor(Optionals.clone(model.getAttenuationColor()));
 
         TextureInfoModel thicknessTextureInfoModel =
-            model.getThicknessTextureInfoModel();
+            model.getThicknessTexture();
         TextureInfo thicknessTextureInfo =
             TextureInfos.from(gltfModel, thicknessTextureInfoModel);
         impl.setThicknessTexture(thicknessTextureInfo);
@@ -136,11 +136,10 @@ public class MaterialsVolumeExtensionHandler implements ExtensionHandler
             Optionals.clone(inputModel.getAttenuationColor()));
 
         TextureInfoModel inputThicknessTextureInfoModel =
-            inputModel.getThicknessTextureInfoModel();
+            inputModel.getThicknessTexture();
         TextureInfoModel outputThicknessTextureInfoModel = TextureInfoModels
             .copy(gltfModel, inputThicknessTextureInfoModel, modelElementMap);
-        outputModel
-            .setThicknessTextureInfoModel(outputThicknessTextureInfoModel);
+        outputModel.setThicknessTexture(outputThicknessTextureInfoModel);
 
         ExtensionModels.copyExtensionModels(gltfModel, inputModel, outputModel,
             modelElementMap);

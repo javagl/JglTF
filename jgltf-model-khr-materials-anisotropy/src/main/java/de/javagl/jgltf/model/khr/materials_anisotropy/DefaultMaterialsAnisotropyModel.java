@@ -36,96 +36,98 @@ import de.javagl.jgltf.model.impl.AbstractModelElement;
 /**
  * Default implementation of a {@link MaterialsAnisotropyModel}
  */
-public class DefaultMaterialsAnisotropyModel 
-    extends AbstractModelElement 
+public class DefaultMaterialsAnisotropyModel extends AbstractModelElement
     implements MaterialsAnisotropyModel
 {
     /**
-     * The anisotropy strength. (optional)<br> 
-     * Default: 0.0<br> 
-     * Minimum: 0.0 (inclusive)<br> 
-     * Maximum: 1.0 (inclusive) 
+     * The anisotropy strength. (optional)<br>
+     * Default: 0.0<br>
+     * Minimum: 0.0 (inclusive)<br>
+     * Maximum: 1.0 (inclusive)
      * 
      */
     private Double anisotropyStrength;
     /**
-     * The rotation of the anisotropy. (optional)<br> 
-     * Default: 0.0 
+     * The rotation of the anisotropy. (optional)<br>
+     * Default: 0.0
      * 
      */
     private Double anisotropyRotation;
     /**
-     * The anisotropy texture. (optional) 
+     * The anisotropy texture. (optional)
      * 
      */
-    private TextureInfoModel anisotropyTextureInfoModel;
+    private TextureInfoModel anisotropyTexture;
 
     @Override
-    public void setAnisotropyStrength(Double anisotropyStrength) {
+    public void setAnisotropyStrength(Double anisotropyStrength)
+    {
         this.anisotropyStrength = anisotropyStrength;
     }
 
     @Override
-    public Double getAnisotropyStrength() {
+    public Double getAnisotropyStrength()
+    {
         return this.anisotropyStrength;
     }
 
     @Override
-    public void setAnisotropyRotation(Double anisotropyRotation) {
+    public void setAnisotropyRotation(Double anisotropyRotation)
+    {
         this.anisotropyRotation = anisotropyRotation;
     }
 
     @Override
-    public Double getAnisotropyRotation() {
+    public Double getAnisotropyRotation()
+    {
         return this.anisotropyRotation;
     }
 
-
     @Override
-    public void setAnisotropyTextureInfoModel(TextureInfoModel anisotropyTextureInfoModel) {
-        this.anisotropyTextureInfoModel = anisotropyTextureInfoModel;
+    public void setAnisotropyTexture(TextureInfoModel anisotropyTexture)
+    {
+        this.anisotropyTexture = anisotropyTexture;
     }
 
     @Override
-    public TextureInfoModel getAnisotropyTextureInfoModel() {
-        return this.anisotropyTextureInfoModel;
+    public TextureInfoModel getAnisotropyTexture()
+    {
+        return this.anisotropyTexture;
     }
 
-    
     @Override
     public Set<ModelElement> getReferencedModelElements()
     {
-        Set<ModelElement> modelElements = 
-            getReferencedExtensionModelElements();
-        if (anisotropyTextureInfoModel != null)
+        Set<ModelElement> modelElements = getReferencedExtensionModelElements();
+        if (anisotropyTexture != null)
         {
-            modelElements.add(anisotropyTextureInfoModel);
+            modelElements.add(anisotropyTexture);
         }
         return modelElements;
     }
-    
+
     @Override
     public boolean removeModelElements(
-        Collection<? extends ModelElement> modelElementsToRemove) 
+        Collection<? extends ModelElement> modelElementsToRemove)
     {
         removeExtensionModelElements(modelElementsToRemove);
-        if (modelElementsToRemove.contains(anisotropyTextureInfoModel)) 
+        if (modelElementsToRemove.contains(anisotropyTexture))
         {
-            setAnisotropyTextureInfoModel(null);
+            setAnisotropyTexture(null);
         }
         return false;
     }
-    
+
     @Override
     public String getExtensionName()
     {
         return "KHR_materials_anisotropy";
     }
-    
+
     @Override
     public boolean isRequired()
     {
         return false;
     }
-    
+
 }
