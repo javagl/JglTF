@@ -102,6 +102,16 @@
 /jgltf-impl-v2-khr-materials-sheen/.project
 /jgltf-impl-v2-khr-materials-sheen/target
 
+/jgltf-impl-v2-khr-materials-specular/.classpath
+/jgltf-impl-v2-khr-materials-specular/.settings
+/jgltf-impl-v2-khr-materials-specular/.project
+/jgltf-impl-v2-khr-materials-specular/target
+
+/jgltf-impl-v2-khr-materials-unlit/.classpath
+/jgltf-impl-v2-khr-materials-unlit/.settings
+/jgltf-impl-v2-khr-materials-unlit/.project
+/jgltf-impl-v2-khr-materials-unlit/target
+
 /jgltf-impl-v2-khr-materials-anisotropy/.classpath
 /jgltf-impl-v2-khr-materials-anisotropy/.settings
 /jgltf-impl-v2-khr-materials-anisotropy/.project
@@ -166,6 +176,16 @@
 /jgltf-model-khr-materials-sheen/.settings
 /jgltf-model-khr-materials-sheen/.project
 /jgltf-model-khr-materials-sheen/target
+
+/jgltf-model-khr-materials-specular/.classpath
+/jgltf-model-khr-materials-specular/.settings
+/jgltf-model-khr-materials-specular/.project
+/jgltf-model-khr-materials-specular/target
+
+/jgltf-model-khr-materials-unlit/.classpath
+/jgltf-model-khr-materials-unlit/.settings
+/jgltf-model-khr-materials-unlit/.project
+/jgltf-model-khr-materials-unlit/target
 
 /jgltf-model-khr-materials-anisotropy/.classpath
 /jgltf-model-khr-materials-anisotropy/.settings

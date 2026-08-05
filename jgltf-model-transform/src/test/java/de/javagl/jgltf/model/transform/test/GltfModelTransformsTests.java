@@ -39,6 +39,7 @@ import de.javagl.jgltf.model.io.GltfModelWriter;
 import de.javagl.jgltf.model.khr.draco_mesh_compression.DefaultDracoMeshCompressionModel;
 import de.javagl.jgltf.model.khr.materials_clearcoat.DefaultMaterialsClearcoatModel;
 import de.javagl.jgltf.model.khr.materials_clearcoat.MaterialsClearcoatModel;
+import de.javagl.jgltf.model.khr.materials_unlit.DefaultMaterialsUnlitModel;
 import de.javagl.jgltf.model.khr.texture_transform.DefaultTextureTransformModel;
 import de.javagl.jgltf.model.transform.GltfModelTransforms;
 
@@ -100,6 +101,8 @@ public class GltfModelTransformsTests
         runTest(createTestRemoveVolume());
         runTest(createTestRemoveSheen());
         runTest(createTestRemoveIridescence());
+        runTest(createTestRemoveSpecular());
+        runTest(createTestAddUnlit());
         runTest(createTestRemoveEmissiveStrength());
     }
 
@@ -771,6 +774,47 @@ public class GltfModelTransformsTests
         return TestCase.create(name, modifiedName, gltfModel, op);
     }
 
+    /**
+     * Create a test to remove specular
+     * 
+     * @return The test
+     */
+    static TestCase createTestRemoveSpecular()
+    {
+        String name = "Lens";
+        String modifiedName = name + "-removedSpecular";
+        DefaultGltfModel gltfModel = GltfTestModelCreation.createLens();
+        Consumer<DefaultGltfModel> op = (m) ->
+        {
+            DefaultPbrMaterialModel material1 =
+                (DefaultPbrMaterialModel) m.getMaterialModel(1);
+            material1.removeExtensionModel("KHR_materials_specular");
+            GltfModelTransforms.revalidate(gltfModel);
+        };
+        return TestCase.create(name, modifiedName, gltfModel, op);
+    }
+    
+    /**
+     * Create a test to add unlit
+     * 
+     * @return The test
+     */
+    static TestCase createTestAddUnlit()
+    {
+        String name = "Lens";
+        String modifiedName = name + "-addedUnlit";
+        DefaultGltfModel gltfModel = GltfTestModelCreation.createLens();
+        Consumer<DefaultGltfModel> op = (m) ->
+        {
+            DefaultPbrMaterialModel material1 =
+                (DefaultPbrMaterialModel) m.getMaterialModel(1);
+            DefaultMaterialsUnlitModel e = new DefaultMaterialsUnlitModel();
+            material1.addExtensionModel("KHR_materials_unlit", e);
+            GltfModelTransforms.revalidate(gltfModel);
+        };
+        return TestCase.create(name, modifiedName, gltfModel, op);
+    }
+    
     /**
      * Create a test to remove iridescence
      * 

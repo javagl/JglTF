@@ -77,6 +77,7 @@ import de.javagl.jgltf.model.khr.materials_emissive_strength.DefaultMaterialsEmi
 import de.javagl.jgltf.model.khr.materials_ior.DefaultMaterialsIorModel;
 import de.javagl.jgltf.model.khr.materials_iridescence.DefaultMaterialsIridescenceModel;
 import de.javagl.jgltf.model.khr.materials_sheen.DefaultMaterialsSheenModel;
+import de.javagl.jgltf.model.khr.materials_specular.DefaultMaterialsSpecularModel;
 import de.javagl.jgltf.model.khr.materials_transmission.DefaultMaterialsTransmissionModel;
 import de.javagl.jgltf.model.khr.materials_variants.DefaultMaterialsVariantsModel;
 import de.javagl.jgltf.model.khr.materials_variants.DefaultMeshPrimitiveMaterialsVariantsModel;
@@ -383,8 +384,8 @@ class GltfTestModelCreation
     /**
      * Create a "lens" including a KHR_materials_volume and
      * KHR_materials_dispersion and KHR_materials_transmission and
-     * KHR_materials_ior and KHR_materials_sheen, just to have all of them in
-     * one place...
+     * KHR_materials_ior and KHR_materials_sheen, and KHR_materials_specular,
+     * just to have all of them in one place...
      * 
      * @return The model
      */
@@ -448,6 +449,14 @@ class GltfTestModelCreation
         { 1.0, 1.0, 0.0 });
         sheenModel.setSheenRoughnessFactor(0.9);
         materialModel.addExtensionModel("KHR_materials_sheen", sheenModel);
+
+        // Assign the specular extension
+        DefaultMaterialsSpecularModel specularModel =
+            new DefaultMaterialsSpecularModel();
+        specularModel.setSpecularColorFactor(new double[]
+        { 0.0, 0.0, 1.0 });
+        materialModel.addExtensionModel("KHR_materials_specular",
+            specularModel);
 
         // Arrange the background behind the main model
         DefaultNodeModel backgroundNode = new DefaultNodeModel();
