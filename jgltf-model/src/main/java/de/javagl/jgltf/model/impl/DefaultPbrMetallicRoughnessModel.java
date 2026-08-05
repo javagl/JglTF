@@ -47,7 +47,7 @@ public class DefaultPbrMetallicRoughnessModel extends AbstractModelElement
     /**
      * The base color texture info
      */
-    private TextureInfoModel baseColorTextureInfoModel;
+    private TextureInfoModel baseColorTexture;
 
     /**
      * The metallic factor
@@ -62,7 +62,7 @@ public class DefaultPbrMetallicRoughnessModel extends AbstractModelElement
     /**
      * The metallic-roughness texture info
      */
-    private TextureInfoModel metallicRoughnessTextureInfoModel;
+    private TextureInfoModel metallicRoughnessTexture;
 
     /**
      * Creates a new instance
@@ -70,10 +70,10 @@ public class DefaultPbrMetallicRoughnessModel extends AbstractModelElement
     public DefaultPbrMetallicRoughnessModel()
     {
         baseColorFactor = null;
-        baseColorTextureInfoModel = null;
+        baseColorTexture = null;
         metallicFactor = null;
         roughnessFactor = null;
-        metallicRoughnessTextureInfoModel = null;
+        metallicRoughnessTexture = null;
     }
 
     @Override
@@ -82,31 +82,22 @@ public class DefaultPbrMetallicRoughnessModel extends AbstractModelElement
         return baseColorFactor;
     }
 
-    /**
-     * Set the base color factor
-     *
-     * @param baseColorFactor The base color factor
-     */
+    @Override
     public void setBaseColorFactor(double[] baseColorFactor)
     {
         this.baseColorFactor = baseColorFactor;
     }
 
     @Override
-    public TextureInfoModel getBaseColorTextureInfoModel()
+    public TextureInfoModel getBaseColorTexture()
     {
-        return baseColorTextureInfoModel;
+        return baseColorTexture;
     }
 
-    /**
-     * Set the base color texture info model
-     *
-     * @param baseColorTextureInfoModel The base color texture info model
-     */
-    public void setBaseColorTextureInfoModel(
-        TextureInfoModel baseColorTextureInfoModel)
+    @Override
+    public void setBaseColorTexture(TextureInfoModel baseColorTexture)
     {
-        this.baseColorTextureInfoModel = baseColorTextureInfoModel;
+        this.baseColorTexture = baseColorTexture;
     }
 
     @Override
@@ -115,11 +106,7 @@ public class DefaultPbrMetallicRoughnessModel extends AbstractModelElement
         return metallicFactor;
     }
 
-    /**
-     * Set the metallic factor
-     *
-     * @param metallicFactor The metallic factor
-     */
+    @Override
     public void setMetallicFactor(Double metallicFactor)
     {
         this.metallicFactor = metallicFactor;
@@ -131,66 +118,54 @@ public class DefaultPbrMetallicRoughnessModel extends AbstractModelElement
         return roughnessFactor;
     }
 
-    /**
-     * Set the roughness factor
-     *
-     * @param roughnessFactor The roughness factor
-     */
+    @Override
     public void setRoughnessFactor(Double roughnessFactor)
     {
         this.roughnessFactor = roughnessFactor;
     }
 
     @Override
-    public TextureInfoModel getMetallicRoughnessTextureInfoModel()
+    public TextureInfoModel getMetallicRoughnessTexture()
     {
-        return metallicRoughnessTextureInfoModel;
+        return metallicRoughnessTexture;
     }
 
-    /**
-     * Set the metallic-roughness-texture info model
-     *
-     * @param metallicRoughnessTextureInfoModel The metallic-roughness-texture
-     *        info model
-     */
-    public void setMetallicRoughnessTextureInfoModel(
-        TextureInfoModel metallicRoughnessTextureInfoModel)
+    @Override
+    public void
+        setMetallicRoughnessTexture(TextureInfoModel metallicRoughnessTexture)
     {
-        this.metallicRoughnessTextureInfoModel =
-            metallicRoughnessTextureInfoModel;
+        this.metallicRoughnessTexture = metallicRoughnessTexture;
     }
 
     @Override
     public Set<ModelElement> getReferencedModelElements()
     {
-        Set<ModelElement> modelElements = 
-            getReferencedExtensionModelElements();
-        if (baseColorTextureInfoModel != null)
+        Set<ModelElement> modelElements = getReferencedExtensionModelElements();
+        if (baseColorTexture != null)
         {
-            modelElements.add(baseColorTextureInfoModel);
+            modelElements.add(baseColorTexture);
         }
-        if (metallicRoughnessTextureInfoModel != null)
+        if (metallicRoughnessTexture != null)
         {
-            modelElements.add(metallicRoughnessTextureInfoModel);
+            modelElements.add(metallicRoughnessTexture);
         }
         return modelElements;
     }
-    
+
     @Override
     public boolean removeModelElements(
         Collection<? extends ModelElement> modelElementsToRemove)
     {
         removeExtensionModelElements(modelElementsToRemove);
-        if (modelElementsToRemove.contains(baseColorTextureInfoModel)) 
+        if (modelElementsToRemove.contains(baseColorTexture))
         {
-            setBaseColorTextureInfoModel(null);
+            setBaseColorTexture(null);
         }
-        if (modelElementsToRemove.contains(metallicRoughnessTextureInfoModel)) 
+        if (modelElementsToRemove.contains(metallicRoughnessTexture))
         {
-            setBaseColorTextureInfoModel(null);
+            setBaseColorTexture(null);
         }
         return false;
     }
-    
-    
+
 }

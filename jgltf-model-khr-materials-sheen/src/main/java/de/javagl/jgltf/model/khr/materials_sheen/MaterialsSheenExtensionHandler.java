@@ -90,7 +90,7 @@ public class MaterialsSheenExtensionHandler implements ExtensionHandler
         {
             DefaultTextureInfoModel sheenColorTextureInfoModel =
                 TextureInfoModels.from(textureModels, sheenColorTextureInfo);
-            model.setSheenColorTextureInfoModel(sheenColorTextureInfoModel);
+            model.setSheenColorTexture(sheenColorTextureInfoModel);
             ExtensionModels.createExtensionModels(gltfModel,
                 sheenColorTextureInfoModel, TextureInfoModel.class);
         }
@@ -102,8 +102,7 @@ public class MaterialsSheenExtensionHandler implements ExtensionHandler
             DefaultTextureInfoModel sheenRoughnessTextureInfoModel =
                 TextureInfoModels.from(textureModels,
                     sheenRoughnessTextureInfo);
-            model.setSheenRoughnessTextureInfoModel(
-                sheenRoughnessTextureInfoModel);
+            model.setSheenRoughnessTexture(sheenRoughnessTextureInfoModel);
             ExtensionModels.createExtensionModels(gltfModel,
                 sheenRoughnessTextureInfoModel, TextureInfoModel.class);
         }
@@ -122,13 +121,13 @@ public class MaterialsSheenExtensionHandler implements ExtensionHandler
         impl.setSheenRoughnessFactor(model.getSheenRoughnessFactor());
 
         TextureInfoModel sheenColorTextureInfoModel =
-            model.getSheenColorTextureInfoModel();
+            model.getSheenColorTexture();
         TextureInfo sheenColorTextureInfo =
             TextureInfos.from(gltfModel, sheenColorTextureInfoModel);
         impl.setSheenColorTexture(sheenColorTextureInfo);
 
         TextureInfoModel sheenRoughnessTextureInfoModel =
-            model.getSheenRoughnessTextureInfoModel();
+            model.getSheenRoughnessTexture();
         TextureInfo sheenRoughnessTextureInfo =
             TextureInfos.from(gltfModel, sheenRoughnessTextureInfoModel);
         impl.setSheenRoughnessTexture(sheenRoughnessTextureInfo);
@@ -151,19 +150,18 @@ public class MaterialsSheenExtensionHandler implements ExtensionHandler
             .setSheenRoughnessFactor(inputModel.getSheenRoughnessFactor());
 
         TextureInfoModel inputSheenColorTextureInfoModel =
-            inputModel.getSheenColorTextureInfoModel();
+            inputModel.getSheenColorTexture();
         TextureInfoModel outputSheenColorTextureInfoModel = TextureInfoModels
             .copy(gltfModel, inputSheenColorTextureInfoModel, modelElementMap);
-        outputModel
-            .setSheenColorTextureInfoModel(outputSheenColorTextureInfoModel);
+        outputModel.setSheenColorTexture(outputSheenColorTextureInfoModel);
 
         TextureInfoModel inputSheenRoughnessTextureInfoModel =
-            inputModel.getSheenRoughnessTextureInfoModel();
+            inputModel.getSheenRoughnessTexture();
         TextureInfoModel outputSheenRoughnessTextureInfoModel =
             TextureInfoModels.copy(gltfModel,
                 inputSheenRoughnessTextureInfoModel, modelElementMap);
-        outputModel.setSheenRoughnessTextureInfoModel(
-            outputSheenRoughnessTextureInfoModel);
+        outputModel
+            .setSheenRoughnessTexture(outputSheenRoughnessTextureInfoModel);
 
         ExtensionModels.copyExtensionModels(gltfModel, inputModel, outputModel,
             modelElementMap);

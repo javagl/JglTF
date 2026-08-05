@@ -80,24 +80,23 @@ public class MaterialsAnisotropyExtensionHandler implements ExtensionHandler
         DefaultMaterialsAnisotropyModel model =
             new DefaultMaterialsAnisotropyModel();
         MaterialMaterialsAnisotropy impl = (MaterialMaterialsAnisotropy) object;
-        ModelElementsV2.transferGltfPropertyElementsToModel(
-            impl, model);
+        ModelElementsV2.transferGltfPropertyElementsToModel(impl, model);
 
         List<TextureModel> textureModels = gltfModel.getTextureModels();
 
         model.setAnisotropyStrength(impl.getAnisotropyStrength());
         model.setAnisotropyRotation(impl.getAnisotropyRotation());
-        
+
         TextureInfo anisotropyTextureInfo = impl.getAnisotropyTexture();
         if (anisotropyTextureInfo != null)
         {
-            DefaultTextureInfoModel anisotropyTextureInfoModel = 
+            DefaultTextureInfoModel anisotropyTextureInfoModel =
                 TextureInfoModels.from(textureModels, anisotropyTextureInfo);
-            model.setAnisotropyTextureInfoModel(anisotropyTextureInfoModel);
-            ExtensionModels.createExtensionModels(gltfModel, 
+            model.setAnisotropyTexture(anisotropyTextureInfoModel);
+            ExtensionModels.createExtensionModels(gltfModel,
                 anisotropyTextureInfoModel, TextureInfoModel.class);
         }
-        
+
         return model;
     }
 
@@ -105,50 +104,45 @@ public class MaterialsAnisotropyExtensionHandler implements ExtensionHandler
     public Object convertToImpl(GltfModel gltfModel, Object modelObject)
     {
         DefaultMaterialsAnisotropyModel model =
-            (DefaultMaterialsAnisotropyModel)modelObject;
+            (DefaultMaterialsAnisotropyModel) modelObject;
         MaterialMaterialsAnisotropy impl = new MaterialMaterialsAnisotropy();
-        ModelElementsV2.transferGltfPropertyElementsFromModel(
-            model, impl);
+        ModelElementsV2.transferGltfPropertyElementsFromModel(model, impl);
 
         impl.setAnisotropyStrength(model.getAnisotropyStrength());
         impl.setAnisotropyRotation(model.getAnisotropyRotation());
 
-        TextureInfoModel anisotropyTextureInfoModel = 
-            model.getAnisotropyTextureInfoModel();
-        TextureInfo anisotropyTextureInfo = 
+        TextureInfoModel anisotropyTextureInfoModel =
+            model.getAnisotropyTexture();
+        TextureInfo anisotropyTextureInfo =
             TextureInfos.from(gltfModel, anisotropyTextureInfoModel);
         impl.setAnisotropyTexture(anisotropyTextureInfo);
 
         return impl;
     }
-    
+
     @Override
     public Object copy(GltfModel gltfModel, Object modelObject,
         Map<ModelElement, ModelElement> modelElementMap)
     {
         MaterialsAnisotropyModel inputModel =
-            (MaterialsAnisotropyModel)modelObject;
-        DefaultMaterialsAnisotropyModel outputModel = 
+            (MaterialsAnisotropyModel) modelObject;
+        DefaultMaterialsAnisotropyModel outputModel =
             new DefaultMaterialsAnisotropyModel();
         modelElementMap.put(inputModel, outputModel);
-        
+
         outputModel.setAnisotropyStrength(inputModel.getAnisotropyStrength());
         outputModel.setAnisotropyRotation(inputModel.getAnisotropyRotation());
 
-        TextureInfoModel inputAnisotropyTextureInfoModel = 
-            inputModel.getAnisotropyTextureInfoModel();
-        TextureInfoModel outputAnisotropyTextureInfoModel =
-            TextureInfoModels.copy(gltfModel, 
-                inputAnisotropyTextureInfoModel, modelElementMap);
-        outputModel.setAnisotropyTextureInfoModel(
-            outputAnisotropyTextureInfoModel);
+        TextureInfoModel inputAnisotropyTextureInfoModel =
+            inputModel.getAnisotropyTexture();
+        TextureInfoModel outputAnisotropyTextureInfoModel = TextureInfoModels
+            .copy(gltfModel, inputAnisotropyTextureInfoModel, modelElementMap);
+        outputModel.setAnisotropyTexture(outputAnisotropyTextureInfoModel);
 
-        ExtensionModels.copyExtensionModels(gltfModel, inputModel,
-            outputModel, modelElementMap);
-        
+        ExtensionModels.copyExtensionModels(gltfModel, inputModel, outputModel,
+            modelElementMap);
+
         return outputModel;
     }
-    
-    
 
 }

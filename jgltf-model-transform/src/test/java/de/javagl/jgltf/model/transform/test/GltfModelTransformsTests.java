@@ -259,7 +259,7 @@ public class GltfModelTransformsTests
             MaterialsClearcoatModel clearcoat0 = material0.getExtensionModel(
                 "KHR_materials_clearcoat", MaterialsClearcoatModel.class);
             TextureInfoModel textureInfo0 =
-                clearcoat0.getClearcoatTextureInfoModel();
+                clearcoat0.getClearcoatTexture();
             DefaultTextureInfoModel defaultTextureInfo0 =
                 (DefaultTextureInfoModel) textureInfo0;
             defaultTextureInfo0.setTextureModel(null);
@@ -288,7 +288,7 @@ public class GltfModelTransformsTests
             DefaultMaterialsClearcoatModel defaultClearcoat0 =
                 material0.getExtensionModel("KHR_materials_clearcoat",
                     DefaultMaterialsClearcoatModel.class);
-            defaultClearcoat0.setClearcoatTextureInfoModel(null);
+            defaultClearcoat0.setClearcoatTexture(null);
 
             GltfModelTransforms.prune(gltfModel);
 
@@ -669,7 +669,7 @@ public class GltfModelTransformsTests
             PbrMetallicRoughnessModel pbr =
                 material0.getPbrMetallicRoughnessModel();
             DefaultTextureInfoModel textureInfo =
-                (DefaultTextureInfoModel) pbr.getBaseColorTextureInfoModel();
+                (DefaultTextureInfoModel) pbr.getBaseColorTexture();
             textureInfo.removeExtensionModel("KHR_texture_transform");
         };
         return TestCase.create(name, modifiedName, gltfModel, op);
@@ -694,7 +694,7 @@ public class GltfModelTransformsTests
                 "KHR_materials_clearcoat", MaterialsClearcoatModel.class);
             DefaultTextureInfoModel textureInfo =
                 (DefaultTextureInfoModel) clearcoat
-                    .getClearcoatTextureInfoModel();
+                    .getClearcoatTexture();
             DefaultTextureTransformModel textureTransform =
                 new DefaultTextureTransformModel();
             textureTransform.setOffset(new double[]

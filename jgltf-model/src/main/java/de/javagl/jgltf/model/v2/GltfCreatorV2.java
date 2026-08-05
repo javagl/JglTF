@@ -746,7 +746,7 @@ public class GltfCreatorV2
         }
             
         NormalTextureInfoModel normalTextureInfoModel = 
-            materialModel.getNormalTextureInfoModel();
+            materialModel.getNormalTexture();
         if (normalTextureInfoModel != null)
         {
             MaterialNormalTextureInfo normalTextureInfo = 
@@ -755,7 +755,7 @@ public class GltfCreatorV2
         }
 
         OcclusionTextureInfoModel occlusionTextureInfoModel = 
-            materialModel.getOcclusionTextureInfoModel();
+            materialModel.getOcclusionTexture();
         if (occlusionTextureInfoModel != null)
         {
             
@@ -765,7 +765,7 @@ public class GltfCreatorV2
         }
         
         TextureInfoModel emissiveTextureInfoModel = 
-            materialModel.getEmissiveTextureInfoModel();
+            materialModel.getEmissiveTexture();
         if (emissiveTextureInfoModel != null)
         {
             TextureInfo emissiveTextureInfo = 
@@ -798,7 +798,7 @@ public class GltfCreatorV2
             pbrMetallicRoughnessModel.getBaseColorFactor());
 
         TextureInfoModel baseColorTextureInfoModel =
-            pbrMetallicRoughnessModel.getBaseColorTextureInfoModel();
+            pbrMetallicRoughnessModel.getBaseColorTexture();
         if (baseColorTextureInfoModel != null)
         {
             TextureInfo baseColorTextureInfo = 
@@ -813,7 +813,7 @@ public class GltfCreatorV2
         
         TextureInfoModel metallicRoughnessTextureInfoModel =
             pbrMetallicRoughnessModel
-                .getMetallicRoughnessTextureInfoModel();
+                .getMetallicRoughnessTexture();
         if (metallicRoughnessTextureInfoModel != null)
         {
             TextureInfo metallicRoughnessTextureInfo = 

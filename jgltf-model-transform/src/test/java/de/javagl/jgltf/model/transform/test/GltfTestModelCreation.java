@@ -546,7 +546,7 @@ class GltfTestModelCreation
             materialModel.getPbrMetallicRoughnessModel();
         DefaultTextureInfoModel baseColorTextureInfoModel =
             (DefaultTextureInfoModel) pbrMetallicRoughnessModel
-                .getBaseColorTextureInfoModel();
+                .getBaseColorTexture();
 
         // Create the texture transform and assign it to the base color
         DefaultTextureTransformModel baseColorTextureTransform =
@@ -659,7 +659,7 @@ class GltfTestModelCreation
             new DefaultTextureInfoModel();
         baseColorTextureInfoModel.setTextureModel(baseColorTextureModel);
         pbrMetallicRoughnessModel
-            .setBaseColorTextureInfoModel(baseColorTextureInfoModel);
+            .setBaseColorTexture(baseColorTextureInfoModel);
         materialModel.setPbrMetallicRoughnessModel(pbrMetallicRoughnessModel);
 
         // Assign the emissive texture to the material
@@ -668,7 +668,7 @@ class GltfTestModelCreation
         DefaultTextureModel emissiveTextureModel =
             createSimpleTextureModel("emissive.png", Color.WHITE, Color.BLACK);
         emissiveTextureInfoModel.setTextureModel(emissiveTextureModel);
-        materialModel.setEmissiveTextureInfoModel(emissiveTextureInfoModel);
+        materialModel.setEmissiveTexture(emissiveTextureInfoModel);
 
         meshPrimitiveModel.setMaterialModel(materialModel);
 
@@ -2505,7 +2505,7 @@ class GltfTestModelCreation
         DefaultTextureModel textureModel = createSimpleTextureModel(uri);
         baseColorTextureInfoModel.setTextureModel(textureModel);
         pbrMetallicRoughnessModel
-            .setBaseColorTextureInfoModel(baseColorTextureInfoModel);
+            .setBaseColorTexture(baseColorTextureInfoModel);
 
         materialModel.setPbrMetallicRoughnessModel(pbrMetallicRoughnessModel);
         materialModel.setDoubleSided(true);
@@ -2554,7 +2554,7 @@ class GltfTestModelCreation
         DefaultTextureInfoModel clearcoatTextureInfoModel =
             new DefaultTextureInfoModel();
         clearcoatTextureInfoModel.setTextureModel(textureModel);
-        clearcoatModel.setClearcoatTextureInfoModel(clearcoatTextureInfoModel);
+        clearcoatModel.setClearcoatTexture(clearcoatTextureInfoModel);
         clearcoatModel.setClearcoatFactor(1.0);
 
         materialModel.addExtensionModel("KHR_materials_clearcoat",

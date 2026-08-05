@@ -50,7 +50,7 @@ public class DefaultMaterialsTransmissionModel extends AbstractModelElement
      * sampled from the R channel. These values are linear, and will be
      * multiplied by transmissionFactor. (optional)
      */
-    private TextureInfoModel transmissionTextureInfoModel;
+    private TextureInfoModel transmissionTexture;
 
     @Override
     public void setTransmissionFactor(Double transmissionFactor)
@@ -65,25 +65,24 @@ public class DefaultMaterialsTransmissionModel extends AbstractModelElement
     }
 
     @Override
-    public void setTransmissionTextureInfoModel(
-        TextureInfoModel transmissionTextureInfoModel)
+    public void setTransmissionTexture(TextureInfoModel transmissionTexture)
     {
-        this.transmissionTextureInfoModel = transmissionTextureInfoModel;
+        this.transmissionTexture = transmissionTexture;
     }
 
     @Override
-    public TextureInfoModel getTransmissionTextureInfoModel()
+    public TextureInfoModel getTransmissionTexture()
     {
-        return this.transmissionTextureInfoModel;
+        return this.transmissionTexture;
     }
 
     @Override
     public Set<ModelElement> getReferencedModelElements()
     {
         Set<ModelElement> modelElements = getReferencedExtensionModelElements();
-        if (transmissionTextureInfoModel != null)
+        if (transmissionTexture != null)
         {
-            modelElements.add(transmissionTextureInfoModel);
+            modelElements.add(transmissionTexture);
         }
         return modelElements;
     }
@@ -93,9 +92,9 @@ public class DefaultMaterialsTransmissionModel extends AbstractModelElement
         Collection<? extends ModelElement> modelElementsToRemove)
     {
         removeExtensionModelElements(modelElementsToRemove);
-        if (modelElementsToRemove.contains(transmissionTextureInfoModel))
+        if (modelElementsToRemove.contains(transmissionTexture))
         {
-            setTransmissionTextureInfoModel(null);
+            setTransmissionTexture(null);
         }
         return false;
     }

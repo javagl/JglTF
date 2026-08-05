@@ -37,22 +37,22 @@ import de.javagl.jgltf.model.extensions.ExtensionModel;
 public interface MaterialsTransmissionModel extends ModelElement, ExtensionModel
 {
     /**
-     * The base percentage of light transmitted through the surface. 
-     * (optional)<br> 
-     * Default: 0.0<br> 
-     * Minimum: 0.0 (inclusive)<br> 
-     * Maximum: 1.0 (inclusive) 
+     * The base percentage of light transmitted through the surface.
+     * (optional)<br>
+     * Default: 0.0<br>
+     * Minimum: 0.0 (inclusive)<br>
+     * Maximum: 1.0 (inclusive)
      * 
      * @param transmissionFactor The transmissionFactor to set
      */
     void setTransmissionFactor(Double transmissionFactor);
 
     /**
-     * The base percentage of light transmitted through the surface. 
-     * (optional)<br> 
-     * Default: 0.0<br> 
-     * Minimum: 0.0 (inclusive)<br> 
-     * Maximum: 1.0 (inclusive) 
+     * The base percentage of light transmitted through the surface.
+     * (optional)<br>
+     * Default: 0.0<br>
+     * Minimum: 0.0 (inclusive)<br>
+     * Maximum: 1.0 (inclusive)
      * 
      * @return The transmissionFactor
      */
@@ -63,10 +63,9 @@ public interface MaterialsTransmissionModel extends ModelElement, ExtensionModel
      * sampled from the R channel. These values are linear, and will be
      * multiplied by transmissionFactor. (optional)
      * 
-     * @param transmissionTextureInfoModel The transmissionTexture to set
+     * @param transmissionTexture The transmissionTexture to set
      */
-    void setTransmissionTextureInfoModel(
-        TextureInfoModel transmissionTextureInfoModel);
+    void setTransmissionTexture(TextureInfoModel transmissionTexture);
 
     /**
      * A texture that defines the transmission percentage of the surface,
@@ -75,5 +74,5 @@ public interface MaterialsTransmissionModel extends ModelElement, ExtensionModel
      * 
      * @return The transmissionTexture
      */
-    TextureInfoModel getTransmissionTextureInfoModel();
+    TextureInfoModel getTransmissionTexture();
 }

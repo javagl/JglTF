@@ -130,7 +130,7 @@ class MtlMaterialHandlerV2 implements MtlMaterialHandler
         
         DefaultTextureInfoModel textureInfo = new DefaultTextureInfoModel();
         textureInfo.setTextureModel(textureModel);
-        metallicRoughness.setBaseColorTextureInfoModel(textureInfo);
+        metallicRoughness.setBaseColorTexture(textureInfo);
 
         metallicRoughness.setMetallicFactor(0.0);
         metallicRoughness.setRoughnessFactor(1.0);

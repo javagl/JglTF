@@ -47,7 +47,7 @@ public class DefaultMaterialsSheenModel extends AbstractModelElement
     /**
      * The sheen color (RGB) texture. (optional)
      */
-    private TextureInfoModel sheenColorTextureInfoModel;
+    private TextureInfoModel sheenColorTexture;
 
     /**
      * The sheen layer roughness. (optional)<br>
@@ -57,7 +57,7 @@ public class DefaultMaterialsSheenModel extends AbstractModelElement
     /**
      * The sheen roughness (Alpha) texture. (optional)
      */
-    private TextureInfoModel sheenRoughnessTextureInfoModel;
+    private TextureInfoModel sheenRoughnessTexture;
 
     @Override
     public void setSheenColorFactor(double[] sheenColorFactor)
@@ -72,16 +72,15 @@ public class DefaultMaterialsSheenModel extends AbstractModelElement
     }
 
     @Override
-    public void setSheenColorTextureInfoModel(
-        TextureInfoModel sheenColorTextureInfoModel)
+    public void setSheenColorTexture(TextureInfoModel sheenColorTexture)
     {
-        this.sheenColorTextureInfoModel = sheenColorTextureInfoModel;
+        this.sheenColorTexture = sheenColorTexture;
     }
 
     @Override
-    public TextureInfoModel getSheenColorTextureInfoModel()
+    public TextureInfoModel getSheenColorTexture()
     {
-        return this.sheenColorTextureInfoModel;
+        return this.sheenColorTexture;
     }
 
     @Override
@@ -97,29 +96,28 @@ public class DefaultMaterialsSheenModel extends AbstractModelElement
     }
 
     @Override
-    public void setSheenRoughnessTextureInfoModel(
-        TextureInfoModel sheenRoughnessTextureInfoModel)
+    public void setSheenRoughnessTexture(TextureInfoModel sheenRoughnessTexture)
     {
-        this.sheenRoughnessTextureInfoModel = sheenRoughnessTextureInfoModel;
+        this.sheenRoughnessTexture = sheenRoughnessTexture;
     }
 
     @Override
-    public TextureInfoModel getSheenRoughnessTextureInfoModel()
+    public TextureInfoModel getSheenRoughnessTexture()
     {
-        return this.sheenRoughnessTextureInfoModel;
+        return this.sheenRoughnessTexture;
     }
 
     @Override
     public Set<ModelElement> getReferencedModelElements()
     {
         Set<ModelElement> modelElements = getReferencedExtensionModelElements();
-        if (sheenColorTextureInfoModel != null)
+        if (sheenColorTexture != null)
         {
-            modelElements.add(sheenColorTextureInfoModel);
+            modelElements.add(sheenColorTexture);
         }
-        if (sheenRoughnessTextureInfoModel != null)
+        if (sheenRoughnessTexture != null)
         {
-            modelElements.add(sheenRoughnessTextureInfoModel);
+            modelElements.add(sheenRoughnessTexture);
         }
         return modelElements;
     }
@@ -129,13 +127,13 @@ public class DefaultMaterialsSheenModel extends AbstractModelElement
         Collection<? extends ModelElement> modelElementsToRemove)
     {
         removeExtensionModelElements(modelElementsToRemove);
-        if (modelElementsToRemove.contains(sheenColorTextureInfoModel))
+        if (modelElementsToRemove.contains(sheenColorTexture))
         {
-            setSheenColorTextureInfoModel(null);
+            setSheenColorTexture(null);
         }
-        if (modelElementsToRemove.contains(sheenRoughnessTextureInfoModel))
+        if (modelElementsToRemove.contains(sheenRoughnessTexture))
         {
-            setSheenRoughnessTextureInfoModel(null);
+            setSheenRoughnessTexture(null);
         }
         return false;
     }

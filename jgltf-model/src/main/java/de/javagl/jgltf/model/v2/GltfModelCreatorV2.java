@@ -1280,20 +1280,20 @@ public class GltfModelCreatorV2
             material.getNormalTexture();
         DefaultNormalTextureInfoModel normalTextureInfoModel = 
             TextureInfoModels.from(textureModels, normalTextureInfo);
-        materialModel.setNormalTextureInfoModel(normalTextureInfoModel);
+        materialModel.setNormalTexture(normalTextureInfoModel);
 
         MaterialOcclusionTextureInfo occlusionTextureInfo = 
             material.getOcclusionTexture();
         DefaultOcclusionTextureInfoModel occlusionTextureInfoModel =
             TextureInfoModels.from(textureModels, occlusionTextureInfo);
-        materialModel.setOcclusionTextureInfoModel(
+        materialModel.setOcclusionTexture(
             occlusionTextureInfoModel);
 
         TextureInfo emissiveTextureInfo = 
             material.getEmissiveTexture();
         DefaultTextureInfoModel emissiveTextureInfoModel = 
             TextureInfoModels.from(textureModels, emissiveTextureInfo);
-        materialModel.setEmissiveTextureInfoModel(emissiveTextureInfoModel);
+        materialModel.setEmissiveTexture(emissiveTextureInfoModel);
         
         materialModel.setEmissiveFactor(
             Optionals.clone(material.getEmissiveFactor()));
@@ -1320,7 +1320,7 @@ public class GltfModelCreatorV2
             // Create the TextureInfoModel and assign it to the material model
             DefaultTextureInfoModel baseColorTextureInfoModel = 
                 new DefaultTextureInfoModel();
-            pbrMetallicRoughnessModel.setBaseColorTextureInfoModel(
+            pbrMetallicRoughnessModel.setBaseColorTexture(
                 baseColorTextureInfoModel);
 
             // Initialize the TextureInfoModel
@@ -1336,7 +1336,7 @@ public class GltfModelCreatorV2
             // Create the TextureInfoModel and assign it to the material model
             DefaultTextureInfoModel metallicRoughnessTextureInfoModel = 
                 new DefaultTextureInfoModel();
-            pbrMetallicRoughnessModel.setMetallicRoughnessTextureInfoModel(
+            pbrMetallicRoughnessModel.setMetallicRoughnessTexture(
                 metallicRoughnessTextureInfoModel);
 
             // Initialize the TextureInfoModel
