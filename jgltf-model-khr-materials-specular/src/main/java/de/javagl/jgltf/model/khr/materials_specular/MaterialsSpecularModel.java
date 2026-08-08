@@ -44,7 +44,7 @@ public interface MaterialsSpecularModel extends ModelElement, ExtensionModel
      * 
      * @param specularFactor The specularFactor to set
      */
-    public void setSpecularFactor(Double specularFactor);
+    void setSpecularFactor(Double specularFactor);
 
     /**
      * The strength of the specular reflection. (optional)<br>
@@ -54,7 +54,7 @@ public interface MaterialsSpecularModel extends ModelElement, ExtensionModel
      * 
      * @return The specularFactor
      */
-    public Double getSpecularFactor();
+    Double getSpecularFactor();
 
     /**
      * A texture that defines the specular factor in the alpha channel.
@@ -62,7 +62,7 @@ public interface MaterialsSpecularModel extends ModelElement, ExtensionModel
      * 
      * @param specularTexture The specularTexture to set
      */
-    public void setSpecularTexture(TextureInfoModel specularTexture);
+    void setSpecularTexture(TextureInfoModel specularTexture);
 
     /**
      * A texture that defines the specular factor in the alpha channel.
@@ -70,7 +70,7 @@ public interface MaterialsSpecularModel extends ModelElement, ExtensionModel
      * 
      * @return The specularTexture
      */
-    public TextureInfoModel getSpecularTexture();
+    TextureInfoModel getSpecularTexture();
 
     /**
      * The F0 RGB color of the specular reflection. (optional)<br>
@@ -82,7 +82,7 @@ public interface MaterialsSpecularModel extends ModelElement, ExtensionModel
      * 
      * @param specularColorFactor The specularColorFactor to set
      */
-    public void setSpecularColorFactor(double[] specularColorFactor);
+    void setSpecularColorFactor(double[] specularColorFactor);
 
     /**
      * The F0 RGB color of the specular reflection. (optional)<br>
@@ -94,7 +94,7 @@ public interface MaterialsSpecularModel extends ModelElement, ExtensionModel
      * 
      * @return The specularColorFactor
      */
-    public double[] getSpecularColorFactor();
+    double[] getSpecularColorFactor();
 
     /**
      * A texture that defines the F0 color of the specular reflection.
@@ -102,7 +102,7 @@ public interface MaterialsSpecularModel extends ModelElement, ExtensionModel
      * 
      * @param specularColorTexture The specularColorTexture to set
      */
-    public void setSpecularColorTexture(TextureInfoModel specularColorTexture);
+    void setSpecularColorTexture(TextureInfoModel specularColorTexture);
 
     /**
      * A texture that defines the F0 color of the specular reflection.
@@ -110,5 +110,5 @@ public interface MaterialsSpecularModel extends ModelElement, ExtensionModel
      * 
      * @return The specularColorTexture
      */
-    public TextureInfoModel getSpecularColorTexture();
+    TextureInfoModel getSpecularColorTexture();
 }
