@@ -49,7 +49,7 @@ public class DefaultMaterialsClearcoatModel
     /**
      * The clearcoat texture info model
      */
-    private TextureInfoModel clearcoatTextureInfoModel;
+    private TextureInfoModel clearcoatTexture;
     
     /**
      * The clearcoat layer roughness.
@@ -59,12 +59,12 @@ public class DefaultMaterialsClearcoatModel
     /**
      * The clearcoat layer roughness texture info
      */
-    private TextureInfoModel clearcoatRoughnessTextureInfoModel;
+    private TextureInfoModel clearcoatRoughnessTexture;
 
     /**
      * The clearcoat normal map texture info
      */
-    private NormalTextureInfoModel clearcoatNormalTextureInfoModel;
+    private NormalTextureInfoModel clearcoatNormalTexture;
 
     @Override
     public void setClearcoatFactor(Double clearcoatFactor)
@@ -79,16 +79,16 @@ public class DefaultMaterialsClearcoatModel
     }
 
     @Override
-    public void setClearcoatTextureInfoModel(
-        TextureInfoModel clearcoatTextureInfoModel)
+    public void setClearcoatTexture(
+        TextureInfoModel clearcoatTexture)
     {
-        this.clearcoatTextureInfoModel = clearcoatTextureInfoModel;
+        this.clearcoatTexture = clearcoatTexture;
     }
 
     @Override
-    public TextureInfoModel getClearcoatTextureInfoModel()
+    public TextureInfoModel getClearcoatTexture()
     {
-        return this.clearcoatTextureInfoModel;
+        return this.clearcoatTexture;
     }
 
     @Override
@@ -104,30 +104,30 @@ public class DefaultMaterialsClearcoatModel
     }
 
     @Override
-    public void setClearcoatRoughnessTextureInfoModel(
-        TextureInfoModel clearcoatRoughnessTextureInfoModel)
+    public void setClearcoatRoughnessTexture(
+        TextureInfoModel clearcoatRoughnessTexture)
     {
-        this.clearcoatRoughnessTextureInfoModel = 
-            clearcoatRoughnessTextureInfoModel;
+        this.clearcoatRoughnessTexture = 
+            clearcoatRoughnessTexture;
     }
 
     @Override
-    public TextureInfoModel getClearcoatRoughnessTextureInfoModel()
+    public TextureInfoModel getClearcoatRoughnessTexture()
     {
-        return this.clearcoatRoughnessTextureInfoModel;
+        return this.clearcoatRoughnessTexture;
     }
 
     @Override
-    public void setClearcoatNormalTextureInfoModel(
-        NormalTextureInfoModel clearcoatNormalTextureInfoModel)
+    public void setClearcoatNormalTexture(
+        NormalTextureInfoModel clearcoatNormalTexture)
     {
-        this.clearcoatNormalTextureInfoModel = clearcoatNormalTextureInfoModel;
+        this.clearcoatNormalTexture = clearcoatNormalTexture;
     }
 
     @Override
-    public NormalTextureInfoModel getClearcoatNormalTextureInfoModel()
+    public NormalTextureInfoModel getClearcoatNormalTexture()
     {
-        return this.clearcoatNormalTextureInfoModel;
+        return this.clearcoatNormalTexture;
     }
     
     @Override
@@ -135,17 +135,17 @@ public class DefaultMaterialsClearcoatModel
     {
         Set<ModelElement> modelElements = 
             getReferencedExtensionModelElements();
-        if (clearcoatTextureInfoModel != null)
+        if (clearcoatTexture != null)
         {
-            modelElements.add(clearcoatTextureInfoModel);
+            modelElements.add(clearcoatTexture);
         }
-        if (clearcoatRoughnessTextureInfoModel != null)
+        if (clearcoatRoughnessTexture != null)
         {
-            modelElements.add(clearcoatRoughnessTextureInfoModel);
+            modelElements.add(clearcoatRoughnessTexture);
         }
-        if (clearcoatNormalTextureInfoModel != null)
+        if (clearcoatNormalTexture != null)
         {
-            modelElements.add(clearcoatNormalTextureInfoModel);
+            modelElements.add(clearcoatNormalTexture);
         }
         return modelElements;
     }
@@ -155,17 +155,17 @@ public class DefaultMaterialsClearcoatModel
         Collection<? extends ModelElement> modelElementsToRemove) 
     {
         removeExtensionModelElements(modelElementsToRemove);
-        if (modelElementsToRemove.contains(clearcoatTextureInfoModel)) 
+        if (modelElementsToRemove.contains(clearcoatTexture)) 
         {
-            setClearcoatTextureInfoModel(null);
+            setClearcoatTexture(null);
         }
-        if (modelElementsToRemove.contains(clearcoatRoughnessTextureInfoModel)) 
+        if (modelElementsToRemove.contains(clearcoatRoughnessTexture)) 
         {
-            setClearcoatRoughnessTextureInfoModel(null);
+            setClearcoatRoughnessTexture(null);
         }
-        if (modelElementsToRemove.contains(clearcoatNormalTextureInfoModel)) 
+        if (modelElementsToRemove.contains(clearcoatNormalTexture)) 
         {
-            setClearcoatNormalTextureInfoModel(null);
+            setClearcoatNormalTexture(null);
         }
         return false;
     }

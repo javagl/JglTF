@@ -61,11 +61,11 @@ public interface PbrMaterialModel extends MaterialModel
     PbrMetallicRoughnessModel getPbrMetallicRoughnessModel();
 
     /**
-     * Returns the base color {@link TextureModel}
+     * Returns the base color {@link TextureModel} (optional)
      * 
      * @return The {@link TextureModel}
      */
-    default TextureModel getBaseColorTexture()
+    default TextureModel getBaseColorTextureModel()
     {
         PbrMetallicRoughnessModel pbrMetallicRoughnessModel =
             getPbrMetallicRoughnessModel();
@@ -74,7 +74,7 @@ public interface PbrMaterialModel extends MaterialModel
             return null;
         }
         TextureInfoModel textureInfo =
-            pbrMetallicRoughnessModel.getBaseColorTextureInfoModel();
+            pbrMetallicRoughnessModel.getBaseColorTexture();
         if (textureInfo == null)
         {
             return null;
@@ -83,7 +83,7 @@ public interface PbrMaterialModel extends MaterialModel
     }
 
     /**
-     * Returns the base color texture coordinate index
+     * Returns the base color texture coordinate index (optional)
      * 
      * @return The index
      */
@@ -96,7 +96,7 @@ public interface PbrMaterialModel extends MaterialModel
             return null;
         }
         TextureInfoModel textureInfo =
-            pbrMetallicRoughnessModel.getBaseColorTextureInfoModel();
+            pbrMetallicRoughnessModel.getBaseColorTexture();
         if (textureInfo == null)
         {
             return null;
@@ -105,11 +105,11 @@ public interface PbrMaterialModel extends MaterialModel
     }
 
     /**
-     * Returns the metallic-roughness {@link TextureModel}
+     * Returns the metallic-roughness {@link TextureModel} (optional)
      * 
      * @return The {@link TextureModel}
      */
-    default TextureModel getMetallicRoughnessTexture()
+    default TextureModel getMetallicRoughnessTextureModel()
     {
         PbrMetallicRoughnessModel pbrMetallicRoughnessModel =
             getPbrMetallicRoughnessModel();
@@ -118,7 +118,7 @@ public interface PbrMaterialModel extends MaterialModel
             return null;
         }
         TextureInfoModel textureInfo =
-            pbrMetallicRoughnessModel.getMetallicRoughnessTextureInfoModel();
+            pbrMetallicRoughnessModel.getMetallicRoughnessTexture();
         if (textureInfo == null)
         {
             return null;
@@ -127,7 +127,7 @@ public interface PbrMaterialModel extends MaterialModel
     }
     
     /**
-     * Returns the metallic-roughness texture coordinate index
+     * Returns the metallic-roughness texture coordinate index (optional)
      * 
      * @return The index
      */
@@ -140,7 +140,7 @@ public interface PbrMaterialModel extends MaterialModel
             return null;
         }
         TextureInfoModel textureInfo =
-            pbrMetallicRoughnessModel.getMetallicRoughnessTextureInfoModel();
+            pbrMetallicRoughnessModel.getMetallicRoughnessTexture();
         if (textureInfo == null)
         {
             return null;
@@ -149,20 +149,27 @@ public interface PbrMaterialModel extends MaterialModel
     }
     
     /**
-     * Returns the {@link NormalTextureInfoModel} of this material
+     * Returns the {@link NormalTextureInfoModel} of this material (optional)
      * 
      * @return The {@link NormalTextureInfoModel}
      */
-    NormalTextureInfoModel getNormalTextureInfoModel();
+    NormalTextureInfoModel getNormalTexture();
+    
+    /**
+     * Set the {@link NormalTextureInfoModel} of this material (optional)
+     * 
+     * @param normalTexture The {@link NormalTextureInfoModel}
+     */
+    void setNormalTexture(NormalTextureInfoModel normalTexture);
 
     /**
-     * Returns the normal {@link TextureModel}
+     * Returns the normal {@link TextureModel} (optional)
      * 
      * @return The {@link TextureModel}
      */
-    default TextureModel getNormalTexture()
+    default TextureModel getNormalTextureModel()
     {
-        TextureInfoModel textureInfo = getNormalTextureInfoModel();
+        TextureInfoModel textureInfo = getNormalTexture();
         if (textureInfo == null)
         {
             return null;
@@ -171,13 +178,13 @@ public interface PbrMaterialModel extends MaterialModel
     }
     
     /**
-     * Returns the normal texture coordinate index
+     * Returns the normal texture coordinate index (optional)
      * 
      * @return The index
      */
     default Integer getNormalTexcoord()
     {
-        TextureInfoModel textureInfo = getNormalTextureInfoModel();
+        TextureInfoModel textureInfo = getNormalTexture();
         if (textureInfo == null)
         {
             return null;
@@ -186,13 +193,15 @@ public interface PbrMaterialModel extends MaterialModel
     }
     
     /**
-     * Returns the normal scale
+     * The scalar parameter applied to each normal vector of the normal 
+     * texture. (optional)<br> 
+     * Default: 1.0 
      * 
      * @return The normal scale
      */
     default Double getNormalScale()
     {
-        NormalTextureInfoModel textureInfo = getNormalTextureInfoModel();
+        NormalTextureInfoModel textureInfo = getNormalTexture();
         if (textureInfo == null)
         {
             return null;
@@ -201,20 +210,27 @@ public interface PbrMaterialModel extends MaterialModel
     }
     
     /**
-     * Returns the {@link OcclusionTextureInfoModel} of this material
+     * Returns the {@link OcclusionTextureInfoModel} of this material (optional)
      * 
      * @return The {@link OcclusionTextureInfoModel}
      */
-    OcclusionTextureInfoModel getOcclusionTextureInfoModel();
+    OcclusionTextureInfoModel getOcclusionTexture();
 
     /**
-     * Returns the occlusion {@link TextureModel}
+     * Set the {@link OcclusionTextureInfoModel} of this material (optional)
+     * 
+     * @param occlusionTexture The {@link OcclusionTextureInfoModel}
+     */
+    void setOcclusionTexture(OcclusionTextureInfoModel occlusionTexture);
+    
+    /**
+     * Returns the occlusion {@link TextureModel} (optional)
      * 
      * @return The {@link TextureModel}
      */
-    default TextureModel getOcclusionTexture()
+    default TextureModel getOcclusionTextureModel()
     {
-        TextureInfoModel textureInfo = getOcclusionTextureInfoModel();
+        TextureInfoModel textureInfo = getOcclusionTexture();
         if (textureInfo == null)
         {
             return null;
@@ -223,13 +239,13 @@ public interface PbrMaterialModel extends MaterialModel
     }
     
     /**
-     * Returns the occlusion texture coordinate index
+     * Returns the occlusion texture coordinate index (optional)
      * 
      * @return The index
      */
     default Integer getOcclusionTexcoord()
     {
-        TextureInfoModel textureInfo = getOcclusionTextureInfoModel();
+        TextureInfoModel textureInfo = getOcclusionTexture();
         if (textureInfo == null)
         {
             return null;
@@ -238,13 +254,17 @@ public interface PbrMaterialModel extends MaterialModel
     }
     
     /**
-     * Returns the occlusion strength
+     * A scalar multiplier controlling the amount of occlusion applied. 
+     * (optional)<br> 
+     * Default: 1.0<br> 
+     * Minimum: 0.0 (inclusive)<br> 
+     * Maximum: 1.0 (inclusive) 
      * 
      * @return The occlusion strength
      */
     default Double getOcclusionStrength()
     {
-        OcclusionTextureInfoModel textureInfo = getOcclusionTextureInfoModel();
+        OcclusionTextureInfoModel textureInfo = getOcclusionTexture();
         if (textureInfo == null)
         {
             return null;
@@ -253,20 +273,27 @@ public interface PbrMaterialModel extends MaterialModel
     }
     
     /**
-     * Returns the {@link TextureInfoModel} for the emissive texture
+     * Returns the {@link TextureInfoModel} for the emissive texture (optional)
      * 
      * @return The {@link TextureInfoModel}
      */
-    TextureInfoModel getEmissiveTextureInfoModel();
+    TextureInfoModel getEmissiveTexture();
 
     /**
-     * Returns the emissive {@link TextureModel}
+     * Set the {@link TextureInfoModel} for the emissive texture (optional)
+     * 
+     * @param emissiveTexture The {@link TextureInfoModel}
+     */
+    void setEmissiveTexture(TextureInfoModel emissiveTexture);
+
+    /**
+     * Returns the emissive {@link TextureModel} (optional)
      * 
      * @return The {@link TextureModel}
      */
-    default TextureModel getEmissiveTexture()
+    default TextureModel getEmissiveTextureModel()
     {
-        TextureInfoModel textureInfo = getEmissiveTextureInfoModel();
+        TextureInfoModel textureInfo = getEmissiveTexture();
         if (textureInfo == null)
         {
             return null;
@@ -275,13 +302,13 @@ public interface PbrMaterialModel extends MaterialModel
     }
     
     /**
-     * Returns the emissive texture coordinate index
+     * Returns the emissive texture coordinate index (optional)
      * 
      * @return The index
      */
     default Integer getEmissiveTexcoord()
     {
-        TextureInfoModel textureInfo = getEmissiveTextureInfoModel();
+        TextureInfoModel textureInfo = getEmissiveTexture();
         if (textureInfo == null)
         {
             return null;
@@ -290,31 +317,82 @@ public interface PbrMaterialModel extends MaterialModel
     }
     
     /**
-     * Returns the emissive factor
+     * The factors for the emissive color of the material. (optional)<br> 
+     * Default: [0.0,0.0,0.0]<br> 
+     * Number of items: 3<br> 
+     * Array elements:<br> 
+     * &nbsp;&nbsp;The elements of this array (optional)<br> 
+     * &nbsp;&nbsp;Minimum: 0.0 (inclusive)<br> 
+     * &nbsp;&nbsp;Maximum: 1.0 (inclusive) 
      * 
-     * @return The emissive factor
+     * @return emissiveFactor The emissiveFactor
      */
     double[] getEmissiveFactor();
 
     /**
-     * Returns the alpha mode
+     * The factors for the emissive color of the material. (optional)<br> 
+     * Default: [0.0,0.0,0.0]<br> 
+     * Number of items: 3<br> 
+     * Array elements:<br> 
+     * &nbsp;&nbsp;The elements of this array (optional)<br> 
+     * &nbsp;&nbsp;Minimum: 0.0 (inclusive)<br> 
+     * &nbsp;&nbsp;Maximum: 1.0 (inclusive) 
+     * 
+     * @param emissiveFactor The emissiveFactor to set
+     */
+    void setEmissiveFactor(double emissiveFactor[]);
+
+    /**
+     * The alpha rendering mode of the material. (optional)<br> 
+     * Default: "OPAQUE"<br> 
+     * Valid values: [OPAQUE, MASK, BLEND] 
      * 
      * @return The alpha mode
      */
     AlphaMode getAlphaMode();
 
     /**
-     * Returns the alpha cutoff
+     * The alpha rendering mode of the material. (optional)<br> 
+     * Default: "OPAQUE"<br> 
+     * Valid values: [OPAQUE, MASK, BLEND] 
+     * 
+     * @param alphaMode The alpha mode
+     */
+    void setAlphaMode(AlphaMode alphaMode);
+    
+
+    /**
+     * The alpha cutoff value of the material. (optional)<br> 
+     * Default: 0.5<br> 
+     * Minimum: 0.0 (inclusive) 
      * 
      * @return The alpha cutoff
      */
     Double getAlphaCutoff();
+    
+    /**
+     * The alpha cutoff value of the material. (optional)<br> 
+     * Default: 0.5<br> 
+     * Minimum: 0.0 (inclusive) 
+     * 
+     * @param alphaCutoff The alpha cutoff
+     */
+    void setAlphaCutoff(Double alphaCutoff);
 
     /**
-     * Returns whether the material is double sided
+     * Specifies whether the material is double sided. (optional)<br> 
+     * Default: false 
      *
      * @return Whether the material is double sided
      */
     Boolean isDoubleSided();
+    
+    /**
+     * Specifies whether the material is double sided. (optional)<br> 
+     * Default: false 
+     * 
+     * @param doubleSided Whether the material is double sided
+     */
+    void setDoubleSided(Boolean doubleSided);
     
 }

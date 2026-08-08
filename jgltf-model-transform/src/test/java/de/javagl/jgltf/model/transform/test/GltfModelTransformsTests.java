@@ -39,6 +39,7 @@ import de.javagl.jgltf.model.io.GltfModelWriter;
 import de.javagl.jgltf.model.khr.draco_mesh_compression.DefaultDracoMeshCompressionModel;
 import de.javagl.jgltf.model.khr.materials_clearcoat.DefaultMaterialsClearcoatModel;
 import de.javagl.jgltf.model.khr.materials_clearcoat.MaterialsClearcoatModel;
+import de.javagl.jgltf.model.khr.materials_unlit.DefaultMaterialsUnlitModel;
 import de.javagl.jgltf.model.khr.texture_transform.DefaultTextureTransformModel;
 import de.javagl.jgltf.model.transform.GltfModelTransforms;
 
@@ -96,6 +97,13 @@ public class GltfModelTransformsTests
         runTest(createTestRemoveSingleVariantMaterial());
         runTest(createTestRemoveTextureTransform());
         runTest(createTestAddClearcoatTextureTransform());
+        runTest(createTestRemoveAnisotropy());
+        runTest(createTestRemoveVolume());
+        runTest(createTestRemoveSheen());
+        runTest(createTestRemoveIridescence());
+        runTest(createTestRemoveSpecular());
+        runTest(createTestAddUnlit());
+        runTest(createTestRemoveEmissiveStrength());
     }
 
     /**
@@ -254,7 +262,7 @@ public class GltfModelTransformsTests
             MaterialsClearcoatModel clearcoat0 = material0.getExtensionModel(
                 "KHR_materials_clearcoat", MaterialsClearcoatModel.class);
             TextureInfoModel textureInfo0 =
-                clearcoat0.getClearcoatTextureInfoModel();
+                clearcoat0.getClearcoatTexture();
             DefaultTextureInfoModel defaultTextureInfo0 =
                 (DefaultTextureInfoModel) textureInfo0;
             defaultTextureInfo0.setTextureModel(null);
@@ -283,7 +291,7 @@ public class GltfModelTransformsTests
             DefaultMaterialsClearcoatModel defaultClearcoat0 =
                 material0.getExtensionModel("KHR_materials_clearcoat",
                     DefaultMaterialsClearcoatModel.class);
-            defaultClearcoat0.setClearcoatTextureInfoModel(null);
+            defaultClearcoat0.setClearcoatTexture(null);
 
             GltfModelTransforms.prune(gltfModel);
 
@@ -664,12 +672,12 @@ public class GltfModelTransformsTests
             PbrMetallicRoughnessModel pbr =
                 material0.getPbrMetallicRoughnessModel();
             DefaultTextureInfoModel textureInfo =
-                (DefaultTextureInfoModel) pbr.getBaseColorTextureInfoModel();
+                (DefaultTextureInfoModel) pbr.getBaseColorTexture();
             textureInfo.removeExtensionModel("KHR_texture_transform");
         };
         return TestCase.create(name, modifiedName, gltfModel, op);
     }
-    
+
     /**
      * Create a test to add a texture transform to a clearcoat texture
      * 
@@ -687,7 +695,9 @@ public class GltfModelTransformsTests
                 (PbrMaterialModel) m.getMaterialModel(0);
             MaterialsClearcoatModel clearcoat = material0.getExtensionModel(
                 "KHR_materials_clearcoat", MaterialsClearcoatModel.class);
-            DefaultTextureInfoModel textureInfo = (DefaultTextureInfoModel)clearcoat.getClearcoatTextureInfoModel();
+            DefaultTextureInfoModel textureInfo =
+                (DefaultTextureInfoModel) clearcoat
+                    .getClearcoatTexture();
             DefaultTextureTransformModel textureTransform =
                 new DefaultTextureTransformModel();
             textureTransform.setOffset(new double[]
@@ -702,7 +712,150 @@ public class GltfModelTransformsTests
         };
         return TestCase.create(name, modifiedName, gltfModel, op);
     }
+
+    /**
+     * Create a test to remove anisotropy
+     * 
+     * @return The test
+     */
+    static TestCase createTestRemoveAnisotropy()
+    {
+        String name = "TexturedSquareWithAnisotropy";
+        String modifiedName = name + "-removedAnisotropy";
+        DefaultGltfModel gltfModel =
+            GltfTestModelCreation.createTexturedSquareWithAnisotropy();
+        Consumer<DefaultGltfModel> op = (m) ->
+        {
+            DefaultPbrMaterialModel material0 =
+                (DefaultPbrMaterialModel) m.getMaterialModel(0);
+            material0.removeExtensionModel("KHR_materials_anisotropy");
+            GltfModelTransforms.revalidate(gltfModel);
+        };
+        return TestCase.create(name, modifiedName, gltfModel, op);
+    }
+
+    /**
+     * Create a test to remove volume
+     * 
+     * @return The test
+     */
+    static TestCase createTestRemoveVolume()
+    {
+        String name = "Lens";
+        String modifiedName = name + "-removedVolume";
+        DefaultGltfModel gltfModel = GltfTestModelCreation.createLens();
+        Consumer<DefaultGltfModel> op = (m) ->
+        {
+            DefaultPbrMaterialModel material1 =
+                (DefaultPbrMaterialModel) m.getMaterialModel(1);
+            material1.removeExtensionModel("KHR_materials_volume");
+            GltfModelTransforms.revalidate(gltfModel);
+        };
+        return TestCase.create(name, modifiedName, gltfModel, op);
+    }
+
+    /**
+     * Create a test to remove sheen
+     * 
+     * @return The test
+     */
+    static TestCase createTestRemoveSheen()
+    {
+        String name = "Lens";
+        String modifiedName = name + "-removedSheen";
+        DefaultGltfModel gltfModel = GltfTestModelCreation.createLens();
+        Consumer<DefaultGltfModel> op = (m) ->
+        {
+            DefaultPbrMaterialModel material1 =
+                (DefaultPbrMaterialModel) m.getMaterialModel(1);
+            material1.removeExtensionModel("KHR_materials_sheen");
+            GltfModelTransforms.revalidate(gltfModel);
+        };
+        return TestCase.create(name, modifiedName, gltfModel, op);
+    }
+
+    /**
+     * Create a test to remove specular
+     * 
+     * @return The test
+     */
+    static TestCase createTestRemoveSpecular()
+    {
+        String name = "Lens";
+        String modifiedName = name + "-removedSpecular";
+        DefaultGltfModel gltfModel = GltfTestModelCreation.createLens();
+        Consumer<DefaultGltfModel> op = (m) ->
+        {
+            DefaultPbrMaterialModel material1 =
+                (DefaultPbrMaterialModel) m.getMaterialModel(1);
+            material1.removeExtensionModel("KHR_materials_specular");
+            GltfModelTransforms.revalidate(gltfModel);
+        };
+        return TestCase.create(name, modifiedName, gltfModel, op);
+    }
     
+    /**
+     * Create a test to add unlit
+     * 
+     * @return The test
+     */
+    static TestCase createTestAddUnlit()
+    {
+        String name = "Lens";
+        String modifiedName = name + "-addedUnlit";
+        DefaultGltfModel gltfModel = GltfTestModelCreation.createLens();
+        Consumer<DefaultGltfModel> op = (m) ->
+        {
+            DefaultPbrMaterialModel material1 =
+                (DefaultPbrMaterialModel) m.getMaterialModel(1);
+            DefaultMaterialsUnlitModel e = new DefaultMaterialsUnlitModel();
+            material1.addExtensionModel("KHR_materials_unlit", e);
+            GltfModelTransforms.revalidate(gltfModel);
+        };
+        return TestCase.create(name, modifiedName, gltfModel, op);
+    }
+    
+    /**
+     * Create a test to remove iridescence
+     * 
+     * @return The test
+     */
+    static TestCase createTestRemoveIridescence()
+    {
+        String name = "TexturedSquareWithIridescence";
+        String modifiedName = name + "-removedIridescence";
+        DefaultGltfModel gltfModel =
+            GltfTestModelCreation.createTexturedSquareWithIridescence();
+        Consumer<DefaultGltfModel> op = (m) ->
+        {
+            DefaultPbrMaterialModel material0 =
+                (DefaultPbrMaterialModel) m.getMaterialModel(0);
+            material0.removeExtensionModel("KHR_materials_iridescence");
+            GltfModelTransforms.revalidate(gltfModel);
+        };
+        return TestCase.create(name, modifiedName, gltfModel, op);
+    }
+
+    /**
+     * Create a test to remove emissive strength
+     * 
+     * @return The test
+     */
+    static TestCase createTestRemoveEmissiveStrength()
+    {
+        String name = "TexturedSquareWithEmissive";
+        String modifiedName = name + "-removedEmissiveStrength";
+        DefaultGltfModel gltfModel =
+            GltfTestModelCreation.createTexturedSquareWithEmissive();
+        Consumer<DefaultGltfModel> op = (m) ->
+        {
+            DefaultPbrMaterialModel material0 =
+                (DefaultPbrMaterialModel) m.getMaterialModel(0);
+            material0.removeExtensionModel("KHR_materials_emissive_strength");
+            GltfModelTransforms.revalidate(gltfModel);
+        };
+        return TestCase.create(name, modifiedName, gltfModel, op);
+    }
 
     // =========================================================================
     // Utility functions for the tests

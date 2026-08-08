@@ -1145,25 +1145,25 @@ public class GltfModelStructures
 
         DefaultNormalTextureInfoModel sourceNormalTextureInfo =
             (DefaultNormalTextureInfoModel) sourceMaterial
-                .getNormalTextureInfoModel();
+                .getNormalTexture();
         DefaultNormalTextureInfoModel targetNormalTextureInfo =
             copyNormalTextureInfoModel(sourceNormalTextureInfo);
-        targetMaterial.setNormalTextureInfoModel(targetNormalTextureInfo);
+        targetMaterial.setNormalTexture(targetNormalTextureInfo);
 
         DefaultOcclusionTextureInfoModel sourceOcclusionTextureInfo =
             (DefaultOcclusionTextureInfoModel) sourceMaterial
-            .getOcclusionTextureInfoModel();
+            .getOcclusionTexture();
         DefaultOcclusionTextureInfoModel targetOcclusionTextureInfo =
             copyOcclusionTextureInfoModel(sourceOcclusionTextureInfo);
-        targetMaterial.setOcclusionTextureInfoModel(
+        targetMaterial.setOcclusionTexture(
             targetOcclusionTextureInfo);
 
         DefaultTextureInfoModel sourceEmissiveTextureInfo =
             (DefaultTextureInfoModel) sourceMaterial
-            .getEmissiveTextureInfoModel();
+            .getEmissiveTexture();
         DefaultTextureInfoModel targetEmissiveTextureInfo =
             copyTextureInfoModel(sourceEmissiveTextureInfo);
-        targetMaterial.setEmissiveTextureInfoModel(
+        targetMaterial.setEmissiveTexture(
             targetEmissiveTextureInfo);
 
         double emissiveFactor[] = sourceMaterial.getEmissiveFactor();
@@ -1198,10 +1198,10 @@ public class GltfModelStructures
         
         DefaultTextureInfoModel sourceBaseColorTextureInfo =
             (DefaultTextureInfoModel) sourcePbrMetallicRoughness
-            .getBaseColorTextureInfoModel();
+            .getBaseColorTexture();
         DefaultTextureInfoModel targetBaseColorTextureInfo = 
             copyTextureInfoModel(sourceBaseColorTextureInfo);
-        targetPbrMetallicRoughness.setBaseColorTextureInfoModel(
+        targetPbrMetallicRoughness.setBaseColorTexture(
             targetBaseColorTextureInfo);
         
         targetPbrMetallicRoughness.setMetallicFactor(
@@ -1211,10 +1211,10 @@ public class GltfModelStructures
         
         DefaultTextureInfoModel sourceMetallicRoughnessTextureInfo =
             (DefaultTextureInfoModel) sourcePbrMetallicRoughness
-            .getMetallicRoughnessTextureInfoModel();
+            .getMetallicRoughnessTexture();
         DefaultTextureInfoModel targetMetallicRoughnessTextureInfo =
             copyTextureInfoModel(sourceMetallicRoughnessTextureInfo);
-        targetPbrMetallicRoughness.setMetallicRoughnessTextureInfoModel(
+        targetPbrMetallicRoughness.setMetallicRoughnessTexture(
             targetMetallicRoughnessTextureInfo);
         
         copyGltfPropertyElements(

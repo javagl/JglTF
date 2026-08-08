@@ -83,8 +83,7 @@ public class MaterialsClearcoatExtensionHandler implements ExtensionHandler
         DefaultMaterialsClearcoatModel model =
             new DefaultMaterialsClearcoatModel();
         MaterialMaterialsClearcoat impl = (MaterialMaterialsClearcoat) object;
-        ModelElementsV2.transferGltfPropertyElementsToModel(
-            impl, model);
+        ModelElementsV2.transferGltfPropertyElementsToModel(impl, model);
 
         List<TextureModel> textureModels = gltfModel.getTextureModels();
 
@@ -92,23 +91,22 @@ public class MaterialsClearcoatExtensionHandler implements ExtensionHandler
         TextureInfo clearcoatTextureInfo = impl.getClearcoatTexture();
         if (clearcoatTextureInfo != null)
         {
-            DefaultTextureInfoModel clearcoatTextureInfoModel = 
+            DefaultTextureInfoModel clearcoatTextureInfoModel =
                 TextureInfoModels.from(textureModels, clearcoatTextureInfo);
-            model.setClearcoatTextureInfoModel(clearcoatTextureInfoModel);
-            ExtensionModels.createExtensionModels(gltfModel, 
+            model.setClearcoatTexture(clearcoatTextureInfoModel);
+            ExtensionModels.createExtensionModels(gltfModel,
                 clearcoatTextureInfoModel, TextureInfoModel.class);
         }
 
-        model.setClearcoatRoughnessFactor(
-            impl.getClearcoatRoughnessFactor());
+        model.setClearcoatRoughnessFactor(impl.getClearcoatRoughnessFactor());
         TextureInfo clearcoatRoughnessTextureInfo =
             impl.getClearcoatRoughnessTexture();
         if (clearcoatRoughnessTextureInfo != null)
         {
             DefaultTextureInfoModel clearcoatRoughnessTextureInfoModel =
-                TextureInfoModels.from(
-                    textureModels, clearcoatRoughnessTextureInfo);
-            model.setClearcoatRoughnessTextureInfoModel(
+                TextureInfoModels.from(textureModels,
+                    clearcoatRoughnessTextureInfo);
+            model.setClearcoatRoughnessTexture(
                 clearcoatRoughnessTextureInfoModel);
             ExtensionModels.createExtensionModels(gltfModel,
                 clearcoatRoughnessTextureInfoModel, TextureInfoModel.class);
@@ -119,11 +117,10 @@ public class MaterialsClearcoatExtensionHandler implements ExtensionHandler
         if (clearcoatNormalTextureInfo != null)
         {
             DefaultNormalTextureInfoModel clearcoatNormalTextureInfoModel =
-                TextureInfoModels.from(
-                    textureModels, clearcoatNormalTextureInfo);
-            model.setClearcoatNormalTextureInfoModel(
-                clearcoatNormalTextureInfoModel);
-            ExtensionModels.createExtensionModels(gltfModel, 
+                TextureInfoModels.from(textureModels,
+                    clearcoatNormalTextureInfo);
+            model.setClearcoatNormalTexture(clearcoatNormalTextureInfoModel);
+            ExtensionModels.createExtensionModels(gltfModel,
                 clearcoatNormalTextureInfoModel, TextureInfoModel.class);
         }
         return model;
@@ -133,79 +130,74 @@ public class MaterialsClearcoatExtensionHandler implements ExtensionHandler
     public Object convertToImpl(GltfModel gltfModel, Object modelObject)
     {
         DefaultMaterialsClearcoatModel model =
-            (DefaultMaterialsClearcoatModel)modelObject;
+            (DefaultMaterialsClearcoatModel) modelObject;
         MaterialMaterialsClearcoat impl = new MaterialMaterialsClearcoat();
-        ModelElementsV2.transferGltfPropertyElementsFromModel(
-            model, impl);
+        ModelElementsV2.transferGltfPropertyElementsFromModel(model, impl);
 
         impl.setClearcoatFactor(model.getClearcoatFactor());
         impl.setClearcoatRoughnessFactor(model.getClearcoatRoughnessFactor());
 
-        TextureInfoModel clearcoatTextureInfoModel = 
-            model.getClearcoatTextureInfoModel();
-        TextureInfo clearcoatTextureInfo = 
+        TextureInfoModel clearcoatTextureInfoModel =
+            model.getClearcoatTexture();
+        TextureInfo clearcoatTextureInfo =
             TextureInfos.from(gltfModel, clearcoatTextureInfoModel);
         impl.setClearcoatTexture(clearcoatTextureInfo);
 
         TextureInfoModel clearcoatRoughnessTextureInfoModel =
-            model.getClearcoatRoughnessTextureInfoModel();
-        TextureInfo clearcoatRoughnessTextureInfo = TextureInfos.from(
-            gltfModel, clearcoatRoughnessTextureInfoModel);
+            model.getClearcoatRoughnessTexture();
+        TextureInfo clearcoatRoughnessTextureInfo =
+            TextureInfos.from(gltfModel, clearcoatRoughnessTextureInfoModel);
         impl.setClearcoatRoughnessTexture(clearcoatRoughnessTextureInfo);
-        
+
         NormalTextureInfoModel clearcoatNormalTextureInfoModel =
-            model.getClearcoatNormalTextureInfoModel();
-        MaterialNormalTextureInfo clearcoatNormalTextureInfo = 
+            model.getClearcoatNormalTexture();
+        MaterialNormalTextureInfo clearcoatNormalTextureInfo =
             TextureInfos.from(gltfModel, clearcoatNormalTextureInfoModel);
         impl.setClearcoatNormalTexture(clearcoatNormalTextureInfo);
-        
+
         return impl;
     }
-    
+
     @Override
     public Object copy(GltfModel gltfModel, Object modelObject,
         Map<ModelElement, ModelElement> modelElementMap)
     {
         MaterialsClearcoatModel inputModel =
-            (MaterialsClearcoatModel)modelObject;
-        DefaultMaterialsClearcoatModel outputModel = 
+            (MaterialsClearcoatModel) modelObject;
+        DefaultMaterialsClearcoatModel outputModel =
             new DefaultMaterialsClearcoatModel();
         modelElementMap.put(inputModel, outputModel);
-        
+
         outputModel.setClearcoatFactor(inputModel.getClearcoatFactor());
         outputModel.setClearcoatRoughnessFactor(
             inputModel.getClearcoatRoughnessFactor());
 
-        TextureInfoModel inputClearcoatTextureInfoModel = 
-            inputModel.getClearcoatTextureInfoModel();
-        TextureInfoModel outputClearcoatTextureInfoModel =
-            TextureInfoModels.copy(gltfModel, 
-                inputClearcoatTextureInfoModel, modelElementMap);
-        outputModel.setClearcoatTextureInfoModel(
-            outputClearcoatTextureInfoModel);
+        TextureInfoModel inputClearcoatTextureInfoModel =
+            inputModel.getClearcoatTexture();
+        TextureInfoModel outputClearcoatTextureInfoModel = TextureInfoModels
+            .copy(gltfModel, inputClearcoatTextureInfoModel, modelElementMap);
+        outputModel.setClearcoatTexture(outputClearcoatTextureInfoModel);
 
         TextureInfoModel inputClearcoatRoughnessTextureInfoModel =
-            inputModel.getClearcoatRoughnessTextureInfoModel();
-        TextureInfoModel outputClearcoatRoughnessTextureInfoModel = 
-            TextureInfoModels.copy(gltfModel, 
+            inputModel.getClearcoatRoughnessTexture();
+        TextureInfoModel outputClearcoatRoughnessTextureInfoModel =
+            TextureInfoModels.copy(gltfModel,
                 inputClearcoatRoughnessTextureInfoModel, modelElementMap);
-        outputModel.setClearcoatRoughnessTextureInfoModel(
+        outputModel.setClearcoatRoughnessTexture(
             outputClearcoatRoughnessTextureInfoModel);
-        
+
         NormalTextureInfoModel inputClearcoatNormalTextureInfoModel =
-            inputModel.getClearcoatNormalTextureInfoModel();
+            inputModel.getClearcoatNormalTexture();
         NormalTextureInfoModel outputClearcoatNormalTextureInfoModel =
-            TextureInfoModels.copy(gltfModel, 
+            TextureInfoModels.copy(gltfModel,
                 inputClearcoatNormalTextureInfoModel, modelElementMap);
-        outputModel.setClearcoatNormalTextureInfoModel(
-            outputClearcoatNormalTextureInfoModel);
-        
-        ExtensionModels.copyExtensionModels(gltfModel, inputModel,
-            outputModel, modelElementMap);
-        
+        outputModel
+            .setClearcoatNormalTexture(outputClearcoatNormalTextureInfoModel);
+
+        ExtensionModels.copyExtensionModels(gltfModel, inputModel, outputModel,
+            modelElementMap);
+
         return outputModel;
     }
-    
-    
 
 }

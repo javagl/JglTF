@@ -35,60 +35,84 @@ import de.javagl.jgltf.model.extensions.ExtensionModel;
 public interface TextureTransformModel extends ModelElement, ExtensionModel
 {
     /**
-     * Set the offset to be a <b>reference</b> to the given array. 
+     * The offset of the UV coordinate origin as a factor of the texture 
+     * dimensions. (optional)<br> 
+     * Default: [0.0,0.0]<br> 
+     * Number of items: 2<br> 
+     * Array elements:<br> 
+     * &nbsp;&nbsp;The elements of this array (optional) 
      * 
      * @param offset The offset to set
      */
     void setOffset(double[] offset);
 
     /**
-     * Returns a <b>reference</b> to the array storing the offset, 
-     * or <code>null</code> if no color was set.
+     * The offset of the UV coordinate origin as a factor of the texture 
+     * dimensions. (optional)<br> 
+     * Default: [0.0,0.0]<br> 
+     * Number of items: 2<br> 
+     * Array elements:<br> 
+     * &nbsp;&nbsp;The elements of this array (optional) 
      * 
      * @return The offset
      */
     double[] getOffset();
 
     /**
-     * Set the counter-clockwise rotation around the origin, in radians
+     * Rotate the UVs by this many radians counter-clockwise around the 
+     * origin. (optional)<br> 
+     * Default: 0.0 
      * 
      * @param rotation The rotation to set
      */
     void setRotation(Double rotation);
 
     /**
-     * Return the counter-clockwise rotation around the origin, in radians,
-     * or <code>null</code> if the rotation was not set.
+     * Rotate the UVs by this many radians counter-clockwise around the 
+     * origin. (optional)<br> 
+     * Default: 0.0 
      * 
      * @return The rotation
      */
     Double getRotation();
 
     /**
-     * Set the scale to be a <b>reference</b> to the given array. 
+     * The scale factor applied to the components of the UV coordinates. 
+     * (optional)<br> 
+     * Default: [1.0,1.0]<br> 
+     * Number of items: 2<br> 
+     * Array elements:<br> 
+     * &nbsp;&nbsp;The elements of this array (optional) 
      * 
      * @param scale The scale to set
      */
     void setScale(double[] scale);
 
     /**
-     * Returns a <b>reference</b> to the array storing the scale, 
-     * or <code>null</code> if no color was set.
+     * The scale factor applied to the components of the UV coordinates. 
+     * (optional)<br> 
+     * Default: [1.0,1.0]<br> 
+     * Number of items: 2<br> 
+     * Array elements:<br> 
+     * &nbsp;&nbsp;The elements of this array (optional) 
      * 
      * @return The scale
      */
     double[] getScale();
 
     /**
-     * Set the optional override of the 'texCoord' value
+     * Overrides the textureInfo texCoord value if supplied, and if this 
+     * extension is supported. (optional)<br> 
+     * Minimum: 0 (inclusive) 
      * 
      * @param texCoord The texCoord to set
      */
     void setTexCoord(Integer texCoord);
 
     /**
-     * Returns the optional 'texCoord' value if supplied, or <code>null</code>
-     * if it was not provided.
+     * Overrides the textureInfo texCoord value if supplied, and if this 
+     * extension is supported. (optional)<br> 
+     * Minimum: 0 (inclusive) 
      * 
      * @return The texCoord
      */
