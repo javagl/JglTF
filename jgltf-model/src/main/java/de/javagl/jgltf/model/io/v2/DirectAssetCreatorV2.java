@@ -185,13 +185,15 @@ public final class DirectAssetCreatorV2
      * Store the given {@link Buffer} with the given index in the current 
      * output asset. <br>
      * <br>
-     * If the {@link Buffer#getUri() buffer URI} is <code>null</code> or a 
-     * data URI, it will receive a new URI, which refers to the buffer data, 
-     * which is then stored as {@link GltfAsset#getReferenceData(String) 
-     * reference data} in the asset.<br>
-     * <br>
-     * The given {@link Buffer} object will be modified accordingly, if 
-     * necessary: Its URI will be set to be the new URI. 
+     * If the {@link Buffer#getUri() buffer URI} is <code>null</code>, then
+     * no data will be stored. This is intended for 'fallback' buffers that
+     * do not have a URI.
+     * 
+     * If the URI is a data URI, it will receive a new URI, which refers to 
+     * the buffer data, which is then stored as 
+     * {@link GltfAsset#getReferenceData(String) reference data} in the 
+     * asset. In this case, the given {@link Buffer} object will be modified 
+     * accordingly, if necessary: Its URI will be set to be the new URI. 
      * 
      * @param gltfModel The {@link GltfModel} 
      * @param index The index of the {@link Buffer}
@@ -204,8 +206,12 @@ public final class DirectAssetCreatorV2
         ByteBuffer bufferData = bufferModel.getBufferData();
 
         String oldUriString = buffer.getUri();
+        if (oldUriString == null)
+        {
+            return;
+        }
         String newUriString = oldUriString;
-        if (oldUriString == null || IO.isDataUriString(oldUriString))
+        if (IO.isDataUriString(oldUriString))
         {
             newUriString = UriStrings.createBufferUriString(
                 existingBufferUriStrings);

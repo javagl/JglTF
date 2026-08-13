@@ -57,36 +57,66 @@ public class Quantization
      * @throws IllegalArgumentException If the component type of the given
      *         accessor model is neither float, nor signed/unsigned byte/short.
      */
-    static FloatBuffer readAsFloatBuffer(AccessorModel accessorModel)
+    public static FloatBuffer readAsFloatBuffer(AccessorModel accessorModel)
+    {
+        ByteBuffer outputByteBuffer = readAsByteBuffer(accessorModel);
+        FloatBuffer floatBuffer = outputByteBuffer.asFloatBuffer();
+        return floatBuffer;
+    }
+
+    /**
+     * Returns the data from the given accessor model as a buffer that contains
+     * float values, tightly packed, applying dequantization as necessary.
+     * 
+     * If the component type of the given accessor model is
+     * <code>GL_FLOAT</code>, then the data will be returned directly.
+     * 
+     * If the component type is <code>GL_BYTE</code>,
+     * <code>GL_UNSIGNED_BYTE</code>, <code>GL_SHORT</code>, or
+     * <code>GL_UNSIGNED_SHORT</code>, then the data will be dequantized into
+     * float values.
+     * 
+     * Note: This does not check whether the accessor model is indeed normalized
+     * as of {@link AccessorModel#isNormalized()}.
+     *
+     * @param accessorModel The accessor model
+     * @return The buffer
+     * @throws IllegalArgumentException If the component type of the given
+     *         accessor model is neither float, nor signed/unsigned byte/short.
+     */
+    public static ByteBuffer readAsByteBuffer(AccessorModel accessorModel)
     {
         AccessorData accessorData = accessorModel.getAccessorData();
+        ByteBuffer inputByteBuffer = accessorData.createByteBuffer();
         int componentType = accessorModel.getComponentType();
         if (componentType == GltfConstants.GL_FLOAT)
         {
-            ByteBuffer inputByteBuffer = accessorData.createByteBuffer();
-            return inputByteBuffer.asFloatBuffer();
+            return inputByteBuffer;
         }
+        ByteBuffer outputByteBuffer =
+            Buffers.create(inputByteBuffer.capacity());
+        FloatBuffer floatBuffer = outputByteBuffer.asFloatBuffer();
         if (componentType == GltfConstants.GL_BYTE)
         {
-            ByteBuffer inputByteBuffer = accessorData.createByteBuffer();
-            return dequantizeByteBuffer(inputByteBuffer);
+            dequantizeByteBuffer(inputByteBuffer, floatBuffer);
+            return outputByteBuffer;
         }
         if (componentType == GltfConstants.GL_UNSIGNED_BYTE)
         {
-            ByteBuffer inputByteBuffer = accessorData.createByteBuffer();
-            return dequantizeUnsignedByteBuffer(inputByteBuffer);
+            dequantizeUnsignedByteBuffer(inputByteBuffer, floatBuffer);
+            return outputByteBuffer;
         }
         if (componentType == GltfConstants.GL_SHORT)
         {
-            ByteBuffer inputByteBuffer = accessorData.createByteBuffer();
             ShortBuffer shortBuffer = inputByteBuffer.asShortBuffer();
-            return dequantizeShortBuffer(shortBuffer);
+            dequantizeShortBuffer(shortBuffer, floatBuffer);
+            return outputByteBuffer;
         }
         if (componentType == GltfConstants.GL_UNSIGNED_SHORT)
         {
-            ByteBuffer inputByteBuffer = accessorData.createByteBuffer();
             ShortBuffer shortBuffer = inputByteBuffer.asShortBuffer();
-            return dequantizeUnsignedShortBuffer(shortBuffer);
+            dequantizeUnsignedShortBuffer(shortBuffer, floatBuffer);
+            return outputByteBuffer;
         }
         throw new IllegalArgumentException(
             "Component type " + GltfConstants.stringFor(componentType)
@@ -102,7 +132,8 @@ public class Quantization
      */
     public static FloatBuffer dequantizeByteBuffer(ByteBuffer byteBuffer)
     {
-        FloatBuffer floatBuffer = FloatBuffer.allocate(byteBuffer.capacity());
+        FloatBuffer floatBuffer =
+            Buffers.create(byteBuffer.capacity() * Float.BYTES).asFloatBuffer();
         dequantizeByteBuffer(byteBuffer, floatBuffer);
         return floatBuffer;
     }
@@ -135,7 +166,8 @@ public class Quantization
     public static FloatBuffer
         dequantizeUnsignedByteBuffer(ByteBuffer byteBuffer)
     {
-        FloatBuffer floatBuffer = FloatBuffer.allocate(byteBuffer.capacity());
+        FloatBuffer floatBuffer =
+            Buffers.create(byteBuffer.capacity() * Float.BYTES).asFloatBuffer();
         dequantizeUnsignedByteBuffer(byteBuffer, floatBuffer);
         return floatBuffer;
     }
@@ -167,7 +199,8 @@ public class Quantization
      */
     public static FloatBuffer dequantizeShortBuffer(ShortBuffer shortBuffer)
     {
-        FloatBuffer floatBuffer = FloatBuffer.allocate(shortBuffer.capacity());
+        FloatBuffer floatBuffer = Buffers
+            .create(shortBuffer.capacity() * Float.BYTES).asFloatBuffer();
         dequantizeShortBuffer(shortBuffer, floatBuffer);
         return floatBuffer;
     }
@@ -200,7 +233,8 @@ public class Quantization
     public static FloatBuffer
         dequantizeUnsignedShortBuffer(ShortBuffer shortBuffer)
     {
-        FloatBuffer floatBuffer = FloatBuffer.allocate(shortBuffer.capacity());
+        FloatBuffer floatBuffer = Buffers
+            .create(shortBuffer.capacity() * Float.BYTES).asFloatBuffer();
         dequantizeUnsignedShortBuffer(shortBuffer, floatBuffer);
         return floatBuffer;
     }
@@ -343,7 +377,8 @@ public class Quantization
      */
     public static ShortBuffer quantizeToShortBuffer(FloatBuffer floatBuffer)
     {
-        ShortBuffer shortBuffer = ShortBuffer.allocate(floatBuffer.capacity());
+        ShortBuffer shortBuffer = Buffers
+            .create(floatBuffer.capacity() * Short.BYTES).asShortBuffer();
         quantizeToShortBuffer(floatBuffer, shortBuffer);
         return shortBuffer;
     }
@@ -374,7 +409,8 @@ public class Quantization
     public static ShortBuffer
         quantizeToUnsignedShortBuffer(FloatBuffer floatBuffer)
     {
-        ShortBuffer shortBuffer = ShortBuffer.allocate(floatBuffer.capacity());
+        ShortBuffer shortBuffer = Buffers
+            .create(floatBuffer.capacity() * Short.BYTES).asShortBuffer();
         quantizeToUnsignedShortBuffer(floatBuffer, shortBuffer);
         return shortBuffer;
     }

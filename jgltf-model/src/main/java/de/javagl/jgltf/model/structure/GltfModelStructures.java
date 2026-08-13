@@ -457,9 +457,10 @@ public class GltfModelStructures
         BufferBuilderStrategy bbs = BufferBuilderStrategies.create(config);
         bbs.process(target);
         
-        for (DefaultImageModel imageModel : imageModelsMap.values())
+        for (ImageModel im : target.getImageModels())
         {
-            bbs.validateImageModel(imageModel);
+            DefaultImageModel dim = (DefaultImageModel) im;
+            bbs.validateImageModel(dim);
         }
         target.addBufferViewModels(bbs.getBufferViewModels());
         target.addBufferModels(bbs.getBufferModels());

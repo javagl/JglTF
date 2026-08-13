@@ -220,8 +220,8 @@ public class DracoMeshCompressionExtensionHandler implements ExtensionHandler
         
         // Pass the draco data to the extension processing callback
         ByteBuffer bufferViewData = ByteBuffer.wrap(result.dracoData);
-        extensionProcessing.acceptAccessorEncoding(encodedAccessorModels,
-            bufferViewModel, bufferViewData);
+        extensionProcessing.acceptBufferView(
+            bufferViewModel, bufferViewData, encodedAccessorModels);
     }
 
 }

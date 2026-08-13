@@ -37,28 +37,24 @@ import de.javagl.jgltf.model.impl.DefaultBufferViewModel;
  * extensions that are preprocessing a glTF model, using the
  * {@link ExtensionHandler#preprocess} method.
  * 
- * For now, this interface is tailored for the case of extensions that
- * provide the data of accessors, meaning that the accessors do not have
- * an associated buffer view (i.e. Draco compression).
- * 
- * TODO: The 'acceptAccessorEncoding' function should probably rather be
- * an 'acceptBufferView(..., optionalEncodedAccessorModels)' function.
- * Extensions may use this to add arbitrary buffer views that are outside
- * of the buffer structure builder mechanism (and optionally say which
- * accessors are encoded with these buffer views)
+ * For now, this interface is tailored for the case of extensions that provide
+ * the data of accessors, meaning that the accessors do not have an associated
+ * buffer view (i.e. Draco compression), or buffers that are used as fallback
+ * buffers (i.e. Meshopt compression).
  */
 public interface ExtensionProcessing
 {
     /**
-     * Inform this instance that the given accessor models do not need an
-     * associated buffer view, but their data is encoded in the given
-     * buffer view.
+     * Accept the given buffer view data.<br>
+     * <br>
+     * The given list of accessor models are the accessors that are encoded with
+     * the given buffer views.
      * 
-     * @param accessorModels The accessor model
      * @param bufferViewModel The buffer view model
      * @param bufferViewData The buffer view data
+     * @param accessorModels The accessor models
      */
-    void acceptAccessorEncoding(List<? extends AccessorModel> accessorModels,
-        DefaultBufferViewModel bufferViewModel, ByteBuffer bufferViewData);
-
+    void acceptBufferView(DefaultBufferViewModel bufferViewModel,
+        ByteBuffer bufferViewData,
+        List<? extends AccessorModel> accessorModels);
 }

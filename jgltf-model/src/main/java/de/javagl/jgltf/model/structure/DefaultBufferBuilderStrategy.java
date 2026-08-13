@@ -127,10 +127,10 @@ class DefaultBufferBuilderStrategy implements BufferBuilderStrategy
         ExtensionProcessing extensionProcessing = new ExtensionProcessing()
         {
             @Override
-            public void acceptAccessorEncoding(
-                List<? extends AccessorModel> accessorModels,
+            public void acceptBufferView(
                 DefaultBufferViewModel bufferViewModel,
-                ByteBuffer bufferViewData)
+                ByteBuffer bufferViewData,
+                List<? extends AccessorModel> accessorModels)
             {
                 bufferStructureBuilder.addStandaloneBufferViewModel("extension",
                     bufferViewModel, bufferViewData);
