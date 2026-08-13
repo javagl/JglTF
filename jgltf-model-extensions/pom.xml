@@ -18,11 +18,6 @@
     </dependency>
     <dependency>
       <groupId>de.javagl</groupId>
-      <artifactId>jgltf-model-ext-meshopt-compression</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>de.javagl</groupId>
       <artifactId>jgltf-model-khr-draco-mesh-compression</artifactId>
       <version>${project.version}</version>
     </dependency>
