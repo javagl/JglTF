@@ -454,32 +454,8 @@ public class GltfModelStructures
         }
         // @formatter:on
         
-        BufferBuilderStrategy bbs = BufferBuilderStrategies.create(config);
-        bbs.process(target);
-        
-        for (ImageModel im : target.getImageModels())
-        {
-            DefaultImageModel dim = (DefaultImageModel) im;
-            bbs.validateImageModel(dim);
-        }
-        target.addBufferViewModels(bbs.getBufferViewModels());
-        target.addBufferModels(bbs.getBufferModels());
-        
-        // Add information about the used and required extensions
-        DefaultExtensionsModel extensionsModel = target.getExtensionsModel();
-        for (ModelElement modelElement : modelElementMap.values())
-        {
-            if (modelElement instanceof ExtensionModel)
-            {
-                ExtensionModel extensionModel = (ExtensionModel) modelElement;
-                String extensionName = extensionModel.getExtensionName();
-                extensionsModel.addExtensionUsed(extensionName);
-                if (extensionModel.isRequired())
-                {
-                    extensionsModel.addExtensionRequired(extensionName);
-                }
-            }
-        }
+        rebuildBuffers(config);
+        updateExtensionUsage();
 
         DefaultGltfModel result = target;
         this.source = null;
@@ -501,6 +477,50 @@ public class GltfModelStructures
         modelElementMap = null;
         
         return result;
+    }
+
+    /**
+     * Rebuild the buffers and buffer views of the current target model
+     * 
+     * @param config The configuration
+     */
+    private void rebuildBuffers(BufferBuilderConfig config)
+    {
+        BufferBuilderStrategy bbs = BufferBuilderStrategies.create(config);
+        bbs.process(target);
+        
+        for (ImageModel im : target.getImageModels())
+        {
+            DefaultImageModel dim = (DefaultImageModel) im;
+            bbs.validateImageModel(dim);
+        }
+        target.addBufferViewModels(bbs.getBufferViewModels());
+        target.addBufferModels(bbs.getBufferModels());
+    }
+
+    /**
+     * To be called in order to finalize the target model: This will check
+     * all model elements that have been created for the target. If they
+     * are extensions, then they will be added to the 'extensionsUsed' 
+     * and 'extensionsRequired' declarations of the extension model.
+     */
+    private void updateExtensionUsage()
+    {
+        // Add information about the used and required extensions
+        DefaultExtensionsModel extensionsModel = target.getExtensionsModel();
+        for (ModelElement modelElement : modelElementMap.values())
+        {
+            if (modelElement instanceof ExtensionModel)
+            {
+                ExtensionModel extensionModel = (ExtensionModel) modelElement;
+                String extensionName = extensionModel.getExtensionName();
+                extensionsModel.addExtensionUsed(extensionName);
+                if (extensionModel.isRequired())
+                {
+                    extensionsModel.addExtensionRequired(extensionName);
+                }
+            }
+        }
     }
     
     /**
@@ -548,8 +568,10 @@ public class GltfModelStructures
         List<AccessorModel> accessorModels = source.getAccessorModels();
         for (AccessorModel input : accessorModels)
         {
-            DefaultAccessorModel output = copy((DefaultAccessorModel) input);
+            DefaultAccessorModel defaultInput = (DefaultAccessorModel) input;
+            DefaultAccessorModel output = copy(defaultInput);
             target.addAccessorModel(output);
+            copyGltfChildOfRootPropertyElements(defaultInput, output);
             accessorModelsMap.put(input, output);
         }
     }
@@ -557,14 +579,14 @@ public class GltfModelStructures
     /**
      * Creates a copy of the given input model.<br>
      * <br>
-     * This will return a copy that contains a reference to the same data
+     * This will return a copy that contains the same data
      * as the given one, but <i>without</i> an associated 
      * {@link BufferViewModel}.
      * 
      * @param input The input model
      * @return The copy
      */
-    private DefaultAccessorModel copy(DefaultAccessorModel input)
+    private static DefaultAccessorModel copy(DefaultAccessorModel input)
     {
         AccessorData inputAccessorData = input.getAccessorData();
         ByteBuffer byteBuffer = inputAccessorData.createByteBuffer();
@@ -576,8 +598,6 @@ public class GltfModelStructures
             componentType, count, elementType);
         output.setNormalized(normalized);
         output.setAccessorData(AccessorDatas.create(output, byteBuffer));
-        
-        copyGltfChildOfRootPropertyElements(input, output);
         return output;
     }
 
