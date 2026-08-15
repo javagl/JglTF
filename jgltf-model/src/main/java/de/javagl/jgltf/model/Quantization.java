@@ -59,7 +59,7 @@ public class Quantization
      */
     public static FloatBuffer readAsFloatBuffer(AccessorModel accessorModel)
     {
-        ByteBuffer outputByteBuffer = readAsByteBuffer(accessorModel);
+        ByteBuffer outputByteBuffer = readAsFloatByteBuffer(accessorModel);
         FloatBuffer floatBuffer = outputByteBuffer.asFloatBuffer();
         return floatBuffer;
     }
@@ -84,7 +84,7 @@ public class Quantization
      * @throws IllegalArgumentException If the component type of the given
      *         accessor model is neither float, nor signed/unsigned byte/short.
      */
-    public static ByteBuffer readAsByteBuffer(AccessorModel accessorModel)
+    public static ByteBuffer readAsFloatByteBuffer(AccessorModel accessorModel)
     {
         AccessorData accessorData = accessorModel.getAccessorData();
         ByteBuffer inputByteBuffer = accessorData.createByteBuffer();

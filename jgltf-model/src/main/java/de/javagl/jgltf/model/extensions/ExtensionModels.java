@@ -232,8 +232,14 @@ public class ExtensionModels
                 logger.log(detailLevel, "  converted model   " + modelElement);
                 logger.log(detailLevel, "  to implementation " + impl);
             }
-
-            glTFProperty.addExtensions(extensionName, impl);
+            
+            // Extensions that do not have an explicit implementation-side
+            // representation on the JSON level may return 'null' as the
+            // implementation object.
+            if (impl != null)
+            {
+                glTFProperty.addExtensions(extensionName, impl);
+            }
         }
     }
 
