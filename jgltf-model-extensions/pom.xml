@@ -48,6 +48,11 @@
     </dependency>
     <dependency>
       <groupId>de.javagl</groupId>
+      <artifactId>jgltf-model-khr-mesh-quantization</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>de.javagl</groupId>
       <artifactId>jgltf-model-khr-materials-ior</artifactId>
       <version>${project.version}</version>
     </dependency>

@@ -58,21 +58,30 @@ public class TestGltfModelTransforms
         t.testRemoveMaterial();
         t.testAddTexture();
         t.testRemoveClearcoatTexture();
-        t.testRemoveClearcoatTextureInfoTexture();
         t.testRemoveClearcoatTextureInfo();
+        t.testRemoveClearcoatTextureInfoTexture();
         t.testRemoveAnimationValuesAccessor();
         t.testRemoveSingleAnimationValuesAccessor();
         t.testRemoveSkinAnimationTimesAccessor();
         t.testRemoveSkinAttributes();
         t.testAddAnimation();
         t.testRemoveInstancingAccessor();
-        t.testAddDraco();
-        t.testRemoveDraco();
         t.testRemoveMorphAnimationTimesAccessor();
         t.testRemoveMorphTargetAccessor();
         t.testAddInstancing();
+        t.testAddDraco();
+        t.testRemoveDraco();
+        t.testRemoveMaterialVariants();
+        t.testRemoveSingleVariantMaterial();
         t.testRemoveTextureTransform();
         t.testAddClearcoatTextureTransform();
+        t.testRemoveAnisotropy();
+        t.testRemoveVolume();
+        t.testRemoveSheen();
+        t.testRemoveIridescence();
+        t.testRemoveSpecular();
+        t.testAddUnlit();
+        t.testRemoveEmissiveStrength();
     }
 
     @Test
@@ -210,18 +219,86 @@ public class TestGltfModelTransforms
         TestCase t = GltfModelTransformsTests.createTestAddInstancing();
         runTestCase(t);
     }
-    
+
     @Test
     public void testRemoveTextureTransform() throws IOException
     {
-        TestCase t = GltfModelTransformsTests.createTestRemoveTextureTransform();
+        TestCase t =
+            GltfModelTransformsTests.createTestRemoveTextureTransform();
         runTestCase(t);
     }
 
     @Test
     public void testAddClearcoatTextureTransform() throws IOException
     {
-        TestCase t = GltfModelTransformsTests.createTestAddClearcoatTextureTransform();
+        TestCase t =
+            GltfModelTransformsTests.createTestAddClearcoatTextureTransform();
+        runTestCase(t);
+    }
+
+    @Test
+    public void testRemoveMaterialVariants() throws IOException
+    {
+        TestCase t =
+            GltfModelTransformsTests.createTestRemoveMaterialVariants();
+        runTestCase(t);
+    }
+
+    @Test
+    public void testRemoveSingleVariantMaterial() throws IOException
+    {
+        TestCase t =
+            GltfModelTransformsTests.createTestRemoveSingleVariantMaterial();
+        runTestCase(t);
+    }
+
+    @Test
+    public void testRemoveAnisotropy() throws IOException
+    {
+        TestCase t = GltfModelTransformsTests.createTestRemoveAnisotropy();
+        runTestCase(t);
+    }
+
+    @Test
+    public void testRemoveVolume() throws IOException
+    {
+        TestCase t = GltfModelTransformsTests.createTestRemoveVolume();
+        runTestCase(t);
+    }
+
+    @Test
+    public void testRemoveSheen() throws IOException
+    {
+        TestCase t = GltfModelTransformsTests.createTestRemoveSheen();
+        runTestCase(t);
+    }
+
+    @Test
+    public void testRemoveIridescence() throws IOException
+    {
+        TestCase t = GltfModelTransformsTests.createTestRemoveIridescence();
+        runTestCase(t);
+    }
+
+    @Test
+    public void testRemoveSpecular() throws IOException
+    {
+        TestCase t = GltfModelTransformsTests.createTestRemoveSpecular();
+        runTestCase(t);
+    }
+
+    @Test
+    public void testAddUnlit() throws IOException
+    {
+        TestCase t = GltfModelTransformsTests.createTestAddUnlit();
+        runTestCase(t);
+    }
+
+    @Test
+    public void testRemoveEmissiveStrength() throws IOException
+    {
+        TestCase t =
+            GltfModelTransformsTests.createTestRemoveEmissiveStrength();
         runTestCase(t);
     }
 

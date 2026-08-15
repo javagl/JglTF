@@ -82,6 +82,7 @@ import de.javagl.jgltf.model.khr.materials_transmission.DefaultMaterialsTransmis
 import de.javagl.jgltf.model.khr.materials_variants.DefaultMaterialsVariantsModel;
 import de.javagl.jgltf.model.khr.materials_variants.DefaultMeshPrimitiveMaterialsVariantsModel;
 import de.javagl.jgltf.model.khr.materials_volume.DefaultMaterialsVolumeModel;
+import de.javagl.jgltf.model.khr.mesh_quantization.DefaultMeshQuantizationModel;
 import de.javagl.jgltf.model.khr.texture_transform.DefaultTextureTransformModel;
 
 /**
@@ -185,6 +186,31 @@ class GltfTestModelCreation
         // Create the mesh primitive model
         DefaultMeshPrimitiveModel meshPrimitiveModel =
             createSquareMeshPrimitiveWithTexcoords();
+
+        // Assign a material
+        DefaultPbrMaterialModel materialModel =
+            createBaseColorTextureMaterialModel("baseColor.png");
+        meshPrimitiveModel.setMaterialModel(materialModel);
+
+        DefaultSceneModel sceneModel = createSceneWith(meshPrimitiveModel);
+
+        // Create the glTF model
+        GltfModelBuilder gltfModelBuilder = GltfModelBuilder.create();
+        gltfModelBuilder.addSceneModel(sceneModel);
+        DefaultGltfModel gltfModel = gltfModelBuilder.build();
+        return gltfModel;
+    }
+
+    /**
+     * Create a textured square with positions quantized to unsigned short
+     * 
+     * @return The model
+     */
+    public static DefaultGltfModel createTexturedSquareWithQuantizedPositions()
+    {
+        // Create the mesh primitive model
+        DefaultMeshPrimitiveModel meshPrimitiveModel =
+            createSquareMeshPrimitiveWithQuantizedPositions();
 
         // Assign a material
         DefaultPbrMaterialModel materialModel =
@@ -805,6 +831,32 @@ class GltfTestModelCreation
     }
 
     /**
+     * Create a square mesh primitive with positions quantized to unsigned short
+     * 
+     * @return The mesh primitive
+     */
+    private static DefaultMeshPrimitiveModel
+        createSquareMeshPrimitiveWithQuantizedPositions()
+    {
+        DefaultAccessorModel indicesAccessorModel = craeteSquareIndices();
+        DefaultAccessorModel positionsAccessorModel =
+            createSquarePositionsQuantized();
+        DefaultAccessorModel texCoordsAccessorModel = createSquareTexCoords();
+
+        // Create the mesh primitive model
+        DefaultMeshPrimitiveModel meshPrimitiveModel =
+            new DefaultMeshPrimitiveModel(GltfConstants.GL_TRIANGLES);
+        meshPrimitiveModel.setIndices(indicesAccessorModel);
+        meshPrimitiveModel.putAttribute("POSITION", positionsAccessorModel);
+        meshPrimitiveModel.putAttribute("TEXCOORD_0", texCoordsAccessorModel);
+
+        meshPrimitiveModel.addExtensionModel("KHR_mesh_quantization",
+            new DefaultMeshQuantizationModel());
+
+        return meshPrimitiveModel;
+    }
+
+    /**
      * Create morph targets for the square mesh primitive model
      * 
      * @return The morph targets
@@ -925,6 +977,30 @@ class GltfTestModelCreation
         // @formatter:on
         DefaultAccessorModel positionsAccessorModel =
             AccessorModels.createFloat3D(FloatBuffer.wrap(positions));
+        return positionsAccessorModel;
+    }
+
+    /**
+     * Create the accessor model for the square positions, quantized to unsigned
+     * short
+     * 
+     * @return The accessor model
+     */
+    private static DefaultAccessorModel createSquarePositionsQuantized()
+    {
+        // Create the positions accessor
+        // @formatter:off
+        short[] positions = new short[]
+        {   
+            0,            0,            0, 
+            (short)65535, 0,            0, 
+            0,            (short)65535, 0,
+            (short)65535, (short)65535, 0 
+        };
+        // @formatter:on
+        DefaultAccessorModel positionsAccessorModel =
+            AccessorModels.create(GltfConstants.GL_UNSIGNED_SHORT, "VEC3", true,
+                Buffers.createByteBufferFrom(ShortBuffer.wrap(positions)));
         return positionsAccessorModel;
     }
 

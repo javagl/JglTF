@@ -7,19 +7,27 @@ package de.javagl.jgltf.model.transform.test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+import java.nio.ShortBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import de.javagl.jgltf.model.AccessorData;
+import de.javagl.jgltf.model.AccessorDatas;
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.AnimationModel;
 import de.javagl.jgltf.model.AnimationModel.Channel;
 import de.javagl.jgltf.model.AnimationModel.Sampler;
+import de.javagl.jgltf.model.ElementType;
+import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.MaterialModel;
 import de.javagl.jgltf.model.MeshModel;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
@@ -27,14 +35,17 @@ import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.NodeModel;
 import de.javagl.jgltf.model.PbrMaterialModel;
 import de.javagl.jgltf.model.PbrMetallicRoughnessModel;
+import de.javagl.jgltf.model.Quantization;
 import de.javagl.jgltf.model.TextureInfoModel;
 import de.javagl.jgltf.model.ext.mesh_gpu_instancing.DefaultMeshGpuInstancingModel;
+import de.javagl.jgltf.model.impl.DefaultAccessorModel;
 import de.javagl.jgltf.model.impl.DefaultAnimationModel;
 import de.javagl.jgltf.model.impl.DefaultGltfModel;
 import de.javagl.jgltf.model.impl.DefaultMeshPrimitiveModel;
 import de.javagl.jgltf.model.impl.DefaultNodeModel;
 import de.javagl.jgltf.model.impl.DefaultPbrMaterialModel;
 import de.javagl.jgltf.model.impl.DefaultTextureInfoModel;
+import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.model.io.GltfModelWriter;
 import de.javagl.jgltf.model.khr.draco_mesh_compression.DefaultDracoMeshCompressionModel;
 import de.javagl.jgltf.model.khr.materials_clearcoat.DefaultMaterialsClearcoatModel;
@@ -104,6 +115,7 @@ public class GltfModelTransformsTests
         runTest(createTestRemoveSpecular());
         runTest(createTestAddUnlit());
         runTest(createTestRemoveEmissiveStrength());
+        runTest(createTestDequantizePositions());
     }
 
     /**
@@ -221,6 +233,70 @@ public class GltfModelTransformsTests
     }
 
     /**
+     * Create a test to dequantize the positions of the textured square with
+     * quantized positions
+     * 
+     * @return The test
+     */
+    static TestCase createTestDequantizePositions()
+    {
+        String name = "TexturedSquareQuantizedPositions";
+        String modifiedName = name + "-dequantizedPositions";
+        DefaultGltfModel gltfModel =
+            GltfTestModelCreation.createTexturedSquareWithQuantizedPositions();
+        Consumer<DefaultGltfModel> op = (m) ->
+        {
+            MeshModel mesh0 = m.getMeshModel(0);
+            MeshPrimitiveModel primitive0 =
+                mesh0.getMeshPrimitiveModels().get(0);
+            DefaultMeshPrimitiveModel defaultPrimitive0 =
+                (DefaultMeshPrimitiveModel) primitive0;
+            Map<String, AccessorModel> attributes =
+                defaultPrimitive0.getAttributes();
+
+            // Note: This is currently a fairly manual process. There should
+            // be convenience methods for "quantize" and "dequantize" that
+            // check the quantized component type, and add/remove the
+            // extension model automatically.
+            // For this to be really convenient, it will require structural
+            // modifications, maybe involving the addition of new nodes with
+            // translation/scale values, or adding a KHR_texture_transform.
+
+            // Obtain the POSITION attribute and its raw data
+            // containing the unsigned short values
+            AccessorModel positionAccessor = attributes.get("POSITION");
+            AccessorData positionAccessorData =
+                positionAccessor.getAccessorData();
+            int count = positionAccessor.getCount();
+            ByteBuffer positionDataShortBytes =
+                positionAccessorData.createByteBuffer();
+            ShortBuffer positionDataShort =
+                positionDataShortBytes.asShortBuffer();
+
+            // Dequantize the unsigned short values into floats
+            ByteBuffer positionDataFloatBytes =
+                Buffers.create(count * 3 * Float.BYTES);
+            FloatBuffer positionDataFloat =
+                positionDataFloatBytes.asFloatBuffer();
+            Quantization.dequantizeUnsignedShortBuffer(positionDataShort,
+                positionDataFloat);
+
+            // Create a new POSITION accessor model and assign it
+            // to the mesh primitive
+            DefaultAccessorModel positionAccessorFloat =
+                new DefaultAccessorModel(GltfConstants.GL_FLOAT, count,
+                    ElementType.VEC3);
+            positionAccessorFloat.setAccessorData(AccessorDatas
+                .create(positionAccessorFloat, positionDataFloatBytes));
+            defaultPrimitive0.putAttribute("POSITION", positionAccessorFloat);
+            defaultPrimitive0.removeExtensionModel("KHR_mesh_quantization");
+
+            GltfModelTransforms.prune(m);
+        };
+        return TestCase.create(name, modifiedName, gltfModel, op);
+    }
+
+    /**
      * Create a test to remove a texture
      * 
      * @return The test
@@ -261,8 +337,7 @@ public class GltfModelTransformsTests
 
             MaterialsClearcoatModel clearcoat0 = material0.getExtensionModel(
                 "KHR_materials_clearcoat", MaterialsClearcoatModel.class);
-            TextureInfoModel textureInfo0 =
-                clearcoat0.getClearcoatTexture();
+            TextureInfoModel textureInfo0 = clearcoat0.getClearcoatTexture();
             DefaultTextureInfoModel defaultTextureInfo0 =
                 (DefaultTextureInfoModel) textureInfo0;
             defaultTextureInfo0.setTextureModel(null);
@@ -696,8 +771,7 @@ public class GltfModelTransformsTests
             MaterialsClearcoatModel clearcoat = material0.getExtensionModel(
                 "KHR_materials_clearcoat", MaterialsClearcoatModel.class);
             DefaultTextureInfoModel textureInfo =
-                (DefaultTextureInfoModel) clearcoat
-                    .getClearcoatTexture();
+                (DefaultTextureInfoModel) clearcoat.getClearcoatTexture();
             DefaultTextureTransformModel textureTransform =
                 new DefaultTextureTransformModel();
             textureTransform.setOffset(new double[]
@@ -793,7 +867,7 @@ public class GltfModelTransformsTests
         };
         return TestCase.create(name, modifiedName, gltfModel, op);
     }
-    
+
     /**
      * Create a test to add unlit
      * 
@@ -814,7 +888,7 @@ public class GltfModelTransformsTests
         };
         return TestCase.create(name, modifiedName, gltfModel, op);
     }
-    
+
     /**
      * Create a test to remove iridescence
      * 

@@ -202,6 +202,11 @@
 /jgltf-model-khr-draco-mesh-compression/.project
 /jgltf-model-khr-draco-mesh-compression/target
 
+/jgltf-model-khr-mesh-quantization/.classpath
+/jgltf-model-khr-mesh-quantization/.settings
+/jgltf-model-khr-mesh-quantization/.project
+/jgltf-model-khr-mesh-quantization/target
+
 /jgltf-browser/.classpath
 /jgltf-browser/.settings
 /jgltf-browser/.project
