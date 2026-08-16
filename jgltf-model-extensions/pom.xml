@@ -96,6 +96,11 @@
       <artifactId>jgltf-model-khr-texture-transform</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>de.javagl</groupId>
+      <artifactId>jgltf-model-ext-texture-webp</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 
 </project>

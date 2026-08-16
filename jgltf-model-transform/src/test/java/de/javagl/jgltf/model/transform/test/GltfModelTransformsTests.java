@@ -5,6 +5,7 @@
  */
 package de.javagl.jgltf.model.transform.test;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -28,6 +29,7 @@ import de.javagl.jgltf.model.AnimationModel.Channel;
 import de.javagl.jgltf.model.AnimationModel.Sampler;
 import de.javagl.jgltf.model.ElementType;
 import de.javagl.jgltf.model.GltfConstants;
+import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.MaterialModel;
 import de.javagl.jgltf.model.MeshModel;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
@@ -37,14 +39,20 @@ import de.javagl.jgltf.model.PbrMaterialModel;
 import de.javagl.jgltf.model.PbrMetallicRoughnessModel;
 import de.javagl.jgltf.model.Quantization;
 import de.javagl.jgltf.model.TextureInfoModel;
+import de.javagl.jgltf.model.TextureModel;
 import de.javagl.jgltf.model.ext.mesh_gpu_instancing.DefaultMeshGpuInstancingModel;
+import de.javagl.jgltf.model.ext.texture_webp.DefaultTextureWebpModel;
+import de.javagl.jgltf.model.ext.texture_webp.ImageModelsWebp;
+import de.javagl.jgltf.model.image.ImageUtils;
 import de.javagl.jgltf.model.impl.DefaultAccessorModel;
 import de.javagl.jgltf.model.impl.DefaultAnimationModel;
 import de.javagl.jgltf.model.impl.DefaultGltfModel;
+import de.javagl.jgltf.model.impl.DefaultImageModel;
 import de.javagl.jgltf.model.impl.DefaultMeshPrimitiveModel;
 import de.javagl.jgltf.model.impl.DefaultNodeModel;
 import de.javagl.jgltf.model.impl.DefaultPbrMaterialModel;
 import de.javagl.jgltf.model.impl.DefaultTextureInfoModel;
+import de.javagl.jgltf.model.impl.DefaultTextureModel;
 import de.javagl.jgltf.model.io.Buffers;
 import de.javagl.jgltf.model.io.GltfModelWriter;
 import de.javagl.jgltf.model.khr.draco_mesh_compression.DefaultDracoMeshCompressionModel;
@@ -90,6 +98,7 @@ public class GltfModelTransformsTests
         runTest(createTestRemoveTexCoordAccessor());
         runTest(createTestRemoveMaterial());
         runTest(createTestAddTexture());
+        runTest(createTestAddWebp());
         runTest(createTestRemoveClearcoatTexture());
         runTest(createTestRemoveClearcoatTextureInfo());
         runTest(createTestRemoveClearcoatTextureInfoTexture());
@@ -152,6 +161,50 @@ public class GltfModelTransformsTests
         };
         return TestCase.create(name, modifiedName, gltfModel, op);
     }
+
+    /**
+     * Create a test to add WebP compression
+     * 
+     * @return The test
+     */
+    static TestCase createTestAddWebp()
+    {
+        String name = "TexturedSquare";
+        String modifiedName = name + "-addedWebp";
+        DefaultGltfModel gltfModel =
+            GltfTestModelCreation.createTexturedSquare();
+        Consumer<DefaultGltfModel> op = (m) ->
+        {
+            // Obtain the first texture and its image model
+            TextureModel texture0 = m.getTextureModel(0);
+            DefaultTextureModel defaultTexture0 =
+                (DefaultTextureModel) texture0;
+            ImageModel imageModel = texture0.getImageModel();
+            
+            // Read the image data as a buffered image
+            ByteBuffer imageData = imageModel.getImageData();
+            BufferedImage bufferedImage =
+                ImageUtils.readAsBufferedImage(imageData);
+            
+            // Create WebP data from the image
+            DefaultImageModel imageModelWebp = ImageModelsWebp
+                .createFromBufferedImage("texture.webp", bufferedImage);
+
+            // Create the extension and assign it to the texture
+            DefaultTextureWebpModel extensionModel =
+                new DefaultTextureWebpModel();
+            extensionModel.setSource(imageModelWebp);
+            defaultTexture0.addExtensionModel("EXT_texture_webp",
+                extensionModel);
+            
+            // Set the original image model to null (no fallback)
+            defaultTexture0.setImageModel(null);
+
+            GltfModelTransforms.prune(m);
+        };
+        return TestCase.create(name, modifiedName, gltfModel, op);
+    }
+
 
     /**
      * Create a test to remove a texture coordinate accessor
