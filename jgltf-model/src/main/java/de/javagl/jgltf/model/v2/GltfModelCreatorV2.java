@@ -28,10 +28,12 @@ package de.javagl.jgltf.model.v2;
 
 import java.nio.ByteBuffer;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
@@ -89,6 +91,8 @@ import de.javagl.jgltf.model.SceneModel;
 import de.javagl.jgltf.model.SkinModel;
 import de.javagl.jgltf.model.TextureInfoModel;
 import de.javagl.jgltf.model.TextureModel;
+import de.javagl.jgltf.model.extensions.ExtensionHandlerRegistries;
+import de.javagl.jgltf.model.extensions.ExtensionHandlerRegistry;
 import de.javagl.jgltf.model.impl.DefaultAccessorModel;
 import de.javagl.jgltf.model.impl.DefaultAnimationModel;
 import de.javagl.jgltf.model.impl.DefaultAnimationModel.DefaultChannel;
@@ -213,9 +217,51 @@ public class GltfModelCreatorV2
         initExtensionsModel();
         initAssetModel();
         
+        checkExtensionsSupport();
+        
         GltfModelExtensionProcessorV2 extensionProcessor = 
             new GltfModelExtensionProcessorV2(gltfModel);
         extensionProcessor.process();
+    }
+
+    /**
+     * Check whether the extensions that are declared in the extensionsRequired
+     * and extensionsUsed are supported, and print log errors or info messages
+     * if this is not the case.
+     */
+    private void checkExtensionsSupport()
+    {
+        ExtensionHandlerRegistry extensionHandlerRegistry =
+            ExtensionHandlerRegistries.get();
+        Set<String> extensionNames =
+            extensionHandlerRegistry.getExtensionNames();
+
+        ExtensionsModel extensionsModel = gltfModel.getExtensionsModel();
+
+        // Print error messages for required extensions that are not supported
+        List<String> extensionsRequired =
+            extensionsModel.getExtensionsRequired();
+        for (String extensionName : extensionsRequired)
+        {
+            if (!extensionNames.contains(extensionName))
+            {
+                logger.severe("Extension '" + extensionName
+                    + "' is required but not supported. "
+                    + "The model may be inconsistent.");
+            }
+        }
+
+        // Print info messages for used extensions that are not supported
+        List<String> extensionsUsed = extensionsModel.getExtensionsUsed();
+        for (String extensionName : extensionsUsed)
+        {
+            if (!extensionNames.contains(extensionName)
+                && !extensionsRequired.contains(extensionName))
+            {
+                logger.info("Extension '" + extensionName
+                    + "' is used but not supported");
+            }
+        }
     }
     
     /**
@@ -904,12 +950,37 @@ public class GltfModelCreatorV2
      */
     private static boolean isMeshoptFallbackBuffer(Buffer buffer)
     {
+        if (isMeshoptFallbackBuffer(buffer, "EXT_meshopt_compression"))
+        {
+            return true;
+        }
+        if (isMeshoptFallbackBuffer(buffer, "KHR_meshopt_compression"))
+        {
+            return true;
+        }
+        return false;
+    }    
+
+    /**
+     * Returns whether the given buffer is a meshopt fallback buffer.
+     * 
+     * This means that it has a <code>EXT_meshopt_compression</code> extension
+     * object that defines <code>fallback: true</code>. KHR_meshopt_compression
+     * 
+     * @param buffer The buffer
+     * @param extensionName The extension name, EXT_meshopt_compression or
+     * 
+     * @return Whether the buffer is a fallback buffer.
+     */
+    private static boolean isMeshoptFallbackBuffer(Buffer buffer,
+        String extensionName)
+    {
         Map<String, Object> extensions = buffer.getExtensions();
         if (extensions == null)
         {
             return false;
         }
-        Object extensionObject = extensions.get("EXT_meshopt_compression");
+        Object extensionObject = extensions.get(extensionName);
         if (extensionObject == null)
         {
             return false;
@@ -926,7 +997,7 @@ public class GltfModelCreatorV2
         }
         boolean isFallback = Boolean.TRUE.equals(fallbackObject);
         return isFallback;
-    }    
+    }
     
     /**
      * Initialize the {@link BufferViewModel} instances

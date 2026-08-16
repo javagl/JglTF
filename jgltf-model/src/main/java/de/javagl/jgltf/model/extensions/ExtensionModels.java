@@ -131,7 +131,7 @@ public class ExtensionModels
 
             if (extensionHandler == null)
             {
-                logger.info("No extension handler found for " + extensionName);
+                logger.fine("No extension handler found for " + extensionName);
                 continue;
             }
             logger.fine("Found extension " + extensionName

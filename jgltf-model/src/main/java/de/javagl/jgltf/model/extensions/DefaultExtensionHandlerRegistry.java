@@ -27,8 +27,10 @@
 package de.javagl.jgltf.model.extensions;
 
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -45,8 +47,13 @@ class DefaultExtensionHandlerRegistry implements ExtensionHandlerRegistry
     /**
      * The list of extension handlers
      */
-    private List<ExtensionHandler> extensionHandlers;
+    private final List<ExtensionHandler> extensionHandlers;
 
+    /**
+     * The set of names of all registered extensions
+     */
+    private final Set<String> extensionNames;
+    
     /**
      * Package-private default constructor. This will store a reference to the
      * given list.
@@ -57,6 +64,13 @@ class DefaultExtensionHandlerRegistry implements ExtensionHandlerRegistry
     {
         this.extensionHandlers = Objects.requireNonNull(extensionHandlers,
             "The extensionsHandlers may not be null");
+        
+        Set<String> names = new LinkedHashSet<String>();
+        for (ExtensionHandler extensionHandler : extensionHandlers)
+        {
+            names.add(extensionHandler.getExtensionName());
+        }
+        this.extensionNames = Collections.unmodifiableSet(names);
     }
 
     /**
@@ -69,6 +83,12 @@ class DefaultExtensionHandlerRegistry implements ExtensionHandlerRegistry
     public List<ExtensionHandler> getAll()
     {
         return Collections.unmodifiableList(extensionHandlers);
+    }
+    
+    @Override
+    public Set<String> getExtensionNames()
+    {
+        return extensionNames;
     }
 
     @Override

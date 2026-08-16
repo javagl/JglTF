@@ -27,6 +27,7 @@
 package de.javagl.jgltf.model.extensions;
 
 import java.util.List;
+import java.util.Set;
 
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.ModelElement;
@@ -46,6 +47,14 @@ public interface ExtensionHandlerRegistry
      * @return The list of {@link ExtensionHandler} instances
      */
     List<ExtensionHandler> getAll();
+    
+    /**
+     * Returns an unmodifiable set of all names of extensions for which an
+     * {@link ExtensionHandler} is registered.
+     * 
+     * @return The extension names
+     */
+    Set<String> getExtensionNames();
 
     /**
      * Returns an {@link ExtensionHandler} for the specified extension when it
