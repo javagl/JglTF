@@ -66,7 +66,7 @@ class DracoDecoding
     /**
      * The default log level
      */
-    private static final Level level = Level.INFO;
+    private static final Level level = Level.FINE;
 
     /**
      * Internal class for the decoded draco data of one mesh primitive
