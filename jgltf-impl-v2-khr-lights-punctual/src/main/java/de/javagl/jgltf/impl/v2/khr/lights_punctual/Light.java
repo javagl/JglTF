@@ -54,7 +54,8 @@ public class Light
     private String type;
     /**
      * A distance cutoff at which the light's intensity may be considered to 
-     * have reached zero. (optional) 
+     * have reached zero. (optional)<br> 
+     * Minimum: 0 (exclusive) 
      * 
      */
     private Double range;
@@ -200,16 +201,11 @@ public class Light
      * 
      * @param type The type to set
      * @throws NullPointerException If the given value is <code>null</code>
-     * @throws IllegalArgumentException If the given value does not meet
-     * the given constraints
      * 
      */
     public void setType(String type) {
         if (type == null) {
             throw new NullPointerException((("Invalid value for type: "+ type)+", may not be null"));
-        }
-        if (((!"directional".equals(type))&&(!"point".equals(type)))&&(!"spot".equals(type))) {
-            throw new IllegalArgumentException((("Invalid value for type: "+ type)+", valid: [directional, point, spot]"));
         }
         this.type = type;
     }
@@ -227,9 +223,12 @@ public class Light
 
     /**
      * A distance cutoff at which the light's intensity may be considered to 
-     * have reached zero. (optional) 
+     * have reached zero. (optional)<br> 
+     * Minimum: 0 (exclusive) 
      * 
      * @param range The range to set
+     * @throws IllegalArgumentException If the given value does not meet
+     * the given constraints
      * 
      */
     public void setRange(Double range) {
@@ -237,12 +236,16 @@ public class Light
             this.range = range;
             return ;
         }
+        if (range<= 0.0D) {
+            throw new IllegalArgumentException("range <= 0.0");
+        }
         this.range = range;
     }
 
     /**
      * A distance cutoff at which the light's intensity may be considered to 
-     * have reached zero. (optional) 
+     * have reached zero. (optional)<br> 
+     * Minimum: 0 (exclusive) 
      * 
      * @return The range
      * 

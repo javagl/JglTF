@@ -32,7 +32,7 @@ public class LightSpot
      * Angle in radians from centre of spotlight where falloff ends. 
      * (optional)<br> 
      * Default: 0.7853981633974483<br> 
-     * Minimum: 1.5707963267948966 (exclusive)<br> 
+     * Minimum: 0 (exclusive)<br> 
      * Maximum: 1.5707963267948966 (inclusive) 
      * 
      */
@@ -93,7 +93,7 @@ public class LightSpot
      * Angle in radians from centre of spotlight where falloff ends. 
      * (optional)<br> 
      * Default: 0.7853981633974483<br> 
-     * Minimum: 1.5707963267948966 (exclusive)<br> 
+     * Minimum: 0 (exclusive)<br> 
      * Maximum: 1.5707963267948966 (inclusive) 
      * 
      * @param outerConeAngle The outerConeAngle to set
@@ -109,8 +109,8 @@ public class LightSpot
         if (outerConeAngle > 1.5707963267948966D) {
             throw new IllegalArgumentException("outerConeAngle > 1.5707963267948966");
         }
-        if (outerConeAngle<= 1.5707963267948966D) {
-            throw new IllegalArgumentException("outerConeAngle <= 1.5707963267948966");
+        if (outerConeAngle<= 0.0D) {
+            throw new IllegalArgumentException("outerConeAngle <= 0.0");
         }
         this.outerConeAngle = outerConeAngle;
     }
@@ -119,7 +119,7 @@ public class LightSpot
      * Angle in radians from centre of spotlight where falloff ends. 
      * (optional)<br> 
      * Default: 0.7853981633974483<br> 
-     * Minimum: 1.5707963267948966 (exclusive)<br> 
+     * Minimum: 0 (exclusive)<br> 
      * Maximum: 1.5707963267948966 (inclusive) 
      * 
      * @return The outerConeAngle
