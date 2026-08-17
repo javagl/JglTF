@@ -101,6 +101,11 @@
       <artifactId>jgltf-model-ext-texture-webp</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>de.javagl</groupId>
+      <artifactId>jgltf-model-khr-texture-basisu</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 
 </project>

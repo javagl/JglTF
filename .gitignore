@@ -127,6 +127,11 @@
 /jgltf-impl-v2-ext-texture-webp/.project
 /jgltf-impl-v2-ext-texture-webp/target
 
+/jgltf-impl-v2-khr-texture-basisu/.classpath
+/jgltf-impl-v2-khr-texture-basisu/.settings
+/jgltf-impl-v2-khr-texture-basisu/.project
+/jgltf-impl-v2-khr-texture-basisu/target
+
 /jgltf-model-ext-mesh-gpu-instancing/.classpath
 /jgltf-model-ext-mesh-gpu-instancing/.settings
 /jgltf-model-ext-mesh-gpu-instancing/.project
@@ -206,6 +211,11 @@
 /jgltf-model-ext-texture-webp/.settings
 /jgltf-model-ext-texture-webp/.project
 /jgltf-model-ext-texture-webp/target
+
+/jgltf-model-khr-texture-basisu/.classpath
+/jgltf-model-khr-texture-basisu/.settings
+/jgltf-model-khr-texture-basisu/.project
+/jgltf-model-khr-texture-basisu/target
 
 /jgltf-model-khr-draco-mesh-compression/.classpath
 /jgltf-model-khr-draco-mesh-compression/.settings
