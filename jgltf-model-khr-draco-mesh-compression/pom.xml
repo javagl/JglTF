@@ -51,7 +51,7 @@
     <dependency>
       <groupId>com.openize</groupId>
       <artifactId>drako</artifactId>
-      <version>26.2.0</version>
+      <version>26.3.0</version>
     </dependency>
 
     <dependency>
