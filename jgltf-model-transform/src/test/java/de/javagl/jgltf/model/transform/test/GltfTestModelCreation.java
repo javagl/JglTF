@@ -132,6 +132,28 @@ class GltfTestModelCreation
      */
     public static DefaultGltfModel createTwoAnimatedSquares()
     {
+        return createTwoSquares(true);
+    }
+
+    /**
+     * Create two animated squares
+     * 
+     * @return The model
+     */
+    public static DefaultGltfModel createTwoSquares()
+    {
+        return createTwoSquares(false);
+    }
+
+    
+    /**
+     * Create two (possibly animated) squares
+     * 
+     * @param animated Whether the squares should be animated
+     * @return The model
+     */
+    private static DefaultGltfModel createTwoSquares(boolean animated)
+    {
         // Create the mesh primitive model
         DefaultMeshPrimitiveModel meshPrimitiveModel =
             createSquareMeshPrimitive();
@@ -165,17 +187,22 @@ class GltfTestModelCreation
         sceneModel.addNode(rootNodeModel);
 
         // Create the animation model
-        DefaultAnimationModel animationModel =
-            createSimpleTranslationAnimation(nodeModelA, nodeModelB);
+        DefaultAnimationModel animationModel = null;
+        if (animated) {
+            animationModel = createSimpleTranslationAnimation(nodeModelA, nodeModelB);
+        }
 
         // Create the glTF model
         GltfModelBuilder gltfModelBuilder = GltfModelBuilder.create();
         gltfModelBuilder.addSceneModel(sceneModel);
-        gltfModelBuilder.addAnimationModel(animationModel);
+        if (animated)
+        {
+            gltfModelBuilder.addAnimationModel(animationModel);
+        }
         DefaultGltfModel gltfModel = gltfModelBuilder.build();
         return gltfModel;
     }
-
+    
     /**
      * Create a textured square
      * 

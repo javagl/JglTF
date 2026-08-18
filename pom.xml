@@ -64,6 +64,7 @@
     <module>jgltf-impl-v2-khr-texture-transform</module>
     <module>jgltf-impl-v2-ext-texture-webp</module>
     <module>jgltf-impl-v2-khr-texture-basisu</module>
+    <module>jgltf-impl-v2-khr-node-visibility</module>
     <module>jgltf-impl-v2-technique-webgl</module>
     <module>jgltf-model</module>
     <module>jgltf-model-builder</module>
@@ -87,6 +88,7 @@
     <module>jgltf-model-khr-texture-transform</module>
     <module>jgltf-model-ext-texture-webp</module>
     <module>jgltf-model-khr-texture-basisu</module>
+    <module>jgltf-model-khr-node-visibility</module>
     <module>jgltf-model-transform</module>
     <module>jgltf-obj</module>
     <module>jgltf-validator</module>

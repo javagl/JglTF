@@ -132,6 +132,11 @@
 /jgltf-impl-v2-khr-texture-basisu/.project
 /jgltf-impl-v2-khr-texture-basisu/target
 
+/jgltf-impl-v2-khr-node-visibility/.classpath
+/jgltf-impl-v2-khr-node-visibility/.settings
+/jgltf-impl-v2-khr-node-visibility/.project
+/jgltf-impl-v2-khr-node-visibility/target
+
 /jgltf-model-ext-mesh-gpu-instancing/.classpath
 /jgltf-model-ext-mesh-gpu-instancing/.settings
 /jgltf-model-ext-mesh-gpu-instancing/.project
@@ -226,6 +231,11 @@
 /jgltf-model-khr-mesh-quantization/.settings
 /jgltf-model-khr-mesh-quantization/.project
 /jgltf-model-khr-mesh-quantization/target
+
+/jgltf-model-khr-node-visibility/.classpath
+/jgltf-model-khr-node-visibility/.settings
+/jgltf-model-khr-node-visibility/.project
+/jgltf-model-khr-node-visibility/target
 
 /jgltf-browser/.classpath
 /jgltf-browser/.settings

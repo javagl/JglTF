@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -51,6 +52,7 @@ import de.javagl.jgltf.model.impl.DefaultImageModel;
 import de.javagl.jgltf.model.impl.DefaultMeshPrimitiveModel;
 import de.javagl.jgltf.model.impl.DefaultNodeModel;
 import de.javagl.jgltf.model.impl.DefaultPbrMaterialModel;
+import de.javagl.jgltf.model.impl.DefaultSceneModel;
 import de.javagl.jgltf.model.impl.DefaultTextureInfoModel;
 import de.javagl.jgltf.model.impl.DefaultTextureModel;
 import de.javagl.jgltf.model.io.Buffers;
@@ -59,6 +61,7 @@ import de.javagl.jgltf.model.khr.draco_mesh_compression.DefaultDracoMeshCompress
 import de.javagl.jgltf.model.khr.materials_clearcoat.DefaultMaterialsClearcoatModel;
 import de.javagl.jgltf.model.khr.materials_clearcoat.MaterialsClearcoatModel;
 import de.javagl.jgltf.model.khr.materials_unlit.DefaultMaterialsUnlitModel;
+import de.javagl.jgltf.model.khr.node_visibility.DefaultNodeVisibilityModel;
 import de.javagl.jgltf.model.khr.texture_transform.DefaultTextureTransformModel;
 import de.javagl.jgltf.model.transform.GltfModelTransforms;
 
@@ -125,6 +128,7 @@ public class GltfModelTransformsTests
         runTest(createTestAddUnlit());
         runTest(createTestRemoveEmissiveStrength());
         runTest(createTestDequantizePositions());
+        runTest(createTestAddNodeVisibility());
     }
 
     /**
@@ -349,6 +353,34 @@ public class GltfModelTransformsTests
         return TestCase.create(name, modifiedName, gltfModel, op);
     }
 
+    /**
+     * Create a test to add the node visibility extension to a node
+     * 
+     * @return The test
+     */
+    static TestCase createTestAddNodeVisibility()
+    {
+        String name = "TwoSquares";
+        String modifiedName = name + "-addedNodeVisbility";
+        DefaultGltfModel gltfModel = GltfTestModelCreation.createTwoSquares();
+        Consumer<DefaultGltfModel> op = (m) ->
+        {
+            DefaultSceneModel scene0 = m.getSceneModel(0);
+            List<NodeModel> sceneNodes0 = scene0.getNodeModels();
+            NodeModel rootNode = sceneNodes0.get(0);
+            List<NodeModel> rootChildren = rootNode.getChildren();
+            NodeModel rootChild1 = rootChildren.get(1);
+            DefaultNodeModel defaultRootChild1 = (DefaultNodeModel) rootChild1;
+
+            DefaultNodeVisibilityModel extension =
+                new DefaultNodeVisibilityModel();
+            extension.setVisible(false);
+            defaultRootChild1.addExtensionModel("KHR_node_visibility",
+                extension);
+        };
+        return TestCase.create(name, modifiedName, gltfModel, op);
+    }
+    
     /**
      * Create a test to remove a texture
      * 
