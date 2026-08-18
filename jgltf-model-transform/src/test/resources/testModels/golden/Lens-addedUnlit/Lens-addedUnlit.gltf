@@ -1,0 +1,165 @@
+{
+  "extensionsUsed" : [ "KHR_materials_volume", "KHR_materials_transmission", "KHR_materials_dispersion", "KHR_materials_ior", "KHR_materials_sheen", "KHR_materials_specular", "KHR_materials_unlit" ],
+  "accessors" : [ {
+    "bufferView" : 0,
+    "componentType" : 5123,
+    "count" : 6,
+    "type" : "SCALAR",
+    "max" : [ 3 ],
+    "min" : [ 0 ]
+  }, {
+    "bufferView" : 1,
+    "componentType" : 5126,
+    "count" : 4,
+    "type" : "VEC3",
+    "max" : [ 1.0, 1.0, 0.0 ],
+    "min" : [ 0.0, 0.0, 0.0 ]
+  }, {
+    "bufferView" : 2,
+    "componentType" : 5126,
+    "count" : 4,
+    "type" : "VEC2",
+    "max" : [ 1.0, 1.0 ],
+    "min" : [ 0.0, 0.0 ]
+  }, {
+    "bufferView" : 3,
+    "componentType" : 5123,
+    "count" : 1920,
+    "type" : "SCALAR",
+    "max" : [ 384 ],
+    "min" : [ 0 ]
+  }, {
+    "bufferView" : 4,
+    "componentType" : 5126,
+    "count" : 385,
+    "type" : "VEC3",
+    "max" : [ 1.0, 1.0, 0.125 ],
+    "min" : [ 0.0, 0.0, -0.0 ]
+  }, {
+    "bufferView" : 5,
+    "componentType" : 5126,
+    "count" : 385,
+    "type" : "VEC3",
+    "max" : [ 0.96929, 0.97326, 1.0 ],
+    "min" : [ -0.97361, -0.97326, 0.22597 ]
+  } ],
+  "asset" : {
+    "generator" : "JglTF from https://github.com/javagl/JglTF",
+    "version" : "2.0"
+  },
+  "buffers" : [ {
+    "uri" : "buffer0.bin",
+    "byteLength" : 13172
+  } ],
+  "bufferViews" : [ {
+    "buffer" : 0,
+    "byteOffset" : 0,
+    "byteLength" : 12,
+    "target" : 34963
+  }, {
+    "buffer" : 0,
+    "byteOffset" : 12,
+    "byteLength" : 48,
+    "target" : 34962
+  }, {
+    "buffer" : 0,
+    "byteOffset" : 60,
+    "byteLength" : 32,
+    "target" : 34962
+  }, {
+    "buffer" : 0,
+    "byteOffset" : 92,
+    "byteLength" : 3840,
+    "target" : 34963
+  }, {
+    "buffer" : 0,
+    "byteOffset" : 3932,
+    "byteLength" : 4620,
+    "target" : 34962
+  }, {
+    "buffer" : 0,
+    "byteOffset" : 8552,
+    "byteLength" : 4620,
+    "target" : 34962
+  } ],
+  "images" : [ {
+    "uri" : "background.png",
+    "mimeType" : "image/png"
+  } ],
+  "materials" : [ {
+    "pbrMetallicRoughness" : {
+      "baseColorTexture" : {
+        "index" : 0
+      },
+      "metallicFactor" : 0.0
+    },
+    "doubleSided" : true
+  }, {
+    "extensions" : {
+      "KHR_materials_volume" : {
+        "thicknessFactor" : 0.7,
+        "attenuationDistance" : 0.9,
+        "attenuationColor" : [ 0.1, 0.9, 0.1 ]
+      },
+      "KHR_materials_transmission" : {
+        "transmissionFactor" : 0.9
+      },
+      "KHR_materials_dispersion" : {
+        "dispersion" : 0.1
+      },
+      "KHR_materials_ior" : {
+        "ior" : 1.5
+      },
+      "KHR_materials_sheen" : {
+        "sheenColorFactor" : [ 1.0, 1.0, 0.0 ],
+        "sheenRoughnessFactor" : 0.9
+      },
+      "KHR_materials_specular" : {
+        "specularColorFactor" : [ 0.0, 0.0, 1.0 ]
+      },
+      "KHR_materials_unlit" : { }
+    },
+    "pbrMetallicRoughness" : {
+      "baseColorFactor" : [ 0.9, 0.1, 0.1, 0.1 ],
+      "metallicFactor" : 0.0,
+      "roughnessFactor" : 0.1
+    }
+  } ],
+  "meshes" : [ {
+    "primitives" : [ {
+      "attributes" : {
+        "POSITION" : 1,
+        "TEXCOORD_0" : 2
+      },
+      "indices" : 0,
+      "material" : 0,
+      "mode" : 4
+    } ]
+  }, {
+    "primitives" : [ {
+      "attributes" : {
+        "POSITION" : 4,
+        "NORMAL" : 5
+      },
+      "indices" : 3,
+      "material" : 1,
+      "mode" : 4
+    } ]
+  } ],
+  "nodes" : [ {
+    "children" : [ 1, 2 ]
+  }, {
+    "mesh" : 0,
+    "scale" : [ 2.0, 2.0, 2.0 ],
+    "translation" : [ -0.5, -0.5, -0.5 ]
+  }, {
+    "mesh" : 1
+  } ],
+  "scene" : 0,
+  "scenes" : [ {
+    "nodes" : [ 0 ]
+  } ],
+  "textures" : [ {
+    "source" : 0
+  } ]
+}
