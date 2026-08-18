@@ -66,7 +66,7 @@ The extensions that are currently supported by JglTF are listed here:
 - [`EXT_texture_webp`](https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Vendor/EXT_texture_webp/README.md) via [`jgltf-model-ext-texture-webp`](jgltf-model-ext-texture-webp)
 - [`KHR_draco_mesh_compression`](https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_draco_mesh_compression/README.md) via [`jgltf-model-khr-draco-mesh-compression`](jgltf-model-khr-draco-mesh-compression)
 - [`KHR_lights_punctual`](https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_lights_punctual/README.md) via [`jgltf-model-khr-lights-punctual`](jgltf-model-khr-lights-punctual)
-- [`KHR_materials_anisotropy`](https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_materials_anisotropy/README.md) via [`jgltf-model-khr-materials-anisotropy`](khr-materials-anisotropy)
+- [`KHR_materials_anisotropy`](https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_materials_anisotropy/README.md) via [`jgltf-model-khr-materials-anisotropy`](jgltf-model-khr-materials-anisotropy)
 - [`KHR_materials_clearcoat`](https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_materials_clearcoat/README.md) via [`jgltf-model-khr-materials-clearcoat`](jgltf-model-khr-materials-clearcoat)
 - [`KHR_materials_dispersion`](https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_materials_dispersion/README.md) via [`jgltf-model-khr-materials-dispersion`](jgltf-model-khr-materials-dispersion)
 - [`KHR_materials_emissive_strength`](https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_materials_emissive_strength/README.md) via [`jgltf-model-khr-materials-emissive-strength`](jgltf-model-khr-materials-emissive-strength)
@@ -79,7 +79,7 @@ The extensions that are currently supported by JglTF are listed here:
 - [`KHR_materials_variants`](https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_materials_variants/README.md) via [`jgltf-model-khr-materials-variants`](jgltf-model-khr-materials-variants)
 - [`KHR_materials_volume`](https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_materials_volume/README.md) via [`jgltf-model-khr-materials-volume`](jgltf-model-khr-materials-volume)
 - [`KHR_mesh_quantization`](https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_mesh_quantization/README.md) via [`jgltf-model-khr-mesh-quantization`](jgltf-model-khr-mesh-quantization)
-- [`KHR_node_visibility`](https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_node_visibility/README.md) via [`jgltf-model-khr-node_visibility`](jgltf-model-khr-node_visibility)
+- [`KHR_node_visibility`](https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_node_visibility/README.md) via [`jgltf-model-khr-node-visibility`](jgltf-model-khr-node-visibility)
 - [`KHR_texture_basisu`](https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_texture_basisu/README.md) via [`jgltf-model-khr-texture-basisu`](jgltf-model-khr-texture-basisu)
 - [`KHR_texture_transform`](https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_texture_transform/README.md) via [`jgltf-model-khr-texture-transform`](jgltf-model-khr-texture-transform)
 
