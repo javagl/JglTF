@@ -22,37 +22,37 @@ An overview of the current functionality:
 
 * Directly load sample models from the repository 
 
-![GltfBrowserSamples.png](https://github.com/javagl/JglTF/blob/master/images/GltfBrowserSamples.png)
+![GltfBrowserSamples.png](../images/GltfBrowserSamples.png)
 
 * Viewing the models 
 
-![GltfBrowserMonster.png](https://github.com/javagl/JglTF/blob/master/images/GltfBrowserMonster.png)
+![GltfBrowserMonster.png](../images/GltfBrowserMonster.png)
 
 * Importing OBJ files 
 
-![GltfBrowserObjImport.png](https://github.com/javagl/JglTF/blob/master/images/GltfBrowserObjImport.png)
+![GltfBrowserObjImport.png](../images/GltfBrowserObjImport.png)
 
 * Converting to embedded- or binary glTF 
 
-![GltfBrowserConversion.png](https://github.com/javagl/JglTF/blob/master/images/GltfBrowserConversion.png)
+![GltfBrowserConversion.png](../images/GltfBrowserConversion.png)
 
 * Basic browsing by right-clicking references and selecting the referenced
 element:
  
-![GltfBrowser_browsing_01.png](https://github.com/javagl/JglTF/blob/master/images/GltfBrowser_browsing_01.png)
+![GltfBrowser_browsing_01.png](../images/GltfBrowser_browsing_01.png)
 
 * Viewing images (of textures):
 
-![GltfBrowser_images_01.png](https://github.com/javagl/JglTF/blob/master/images/GltfBrowser_images_01.png)
+![GltfBrowser_images_01.png](../images/GltfBrowser_images_01.png)
 
 
 * Viewing the source code of vertex- and fragment shaders:
 
-![GltfBrowser_shaders_01.png](https://github.com/javagl/JglTF/blob/master/images/GltfBrowser_shaders_01.png)
+![GltfBrowser_shaders_01.png](../images/GltfBrowser_shaders_01.png)
 
 
 * Viewing the data that is provided by accessors:
 
-![GltfBrowser_accessors_01.png](https://github.com/javagl/JglTF/blob/master/images/GltfBrowser_accessors_01.png)
+![GltfBrowser_accessors_01.png](../images/GltfBrowser_accessors_01.png)
 
 
