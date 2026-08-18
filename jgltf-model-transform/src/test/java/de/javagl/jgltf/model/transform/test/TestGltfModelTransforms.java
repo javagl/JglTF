@@ -82,6 +82,8 @@ public class TestGltfModelTransforms
         t.testRemoveSpecular();
         t.testAddUnlit();
         t.testRemoveEmissiveStrength();
+        t.testDequantizePositions();
+        t.testAddNodeVisibility();
     }
 
     @Test
@@ -299,6 +301,22 @@ public class TestGltfModelTransforms
     {
         TestCase t =
             GltfModelTransformsTests.createTestRemoveEmissiveStrength();
+        runTestCase(t);
+    }
+
+    @Test
+    public void testDequantizePositions() throws IOException
+    {
+        TestCase t =
+            GltfModelTransformsTests.createTestDequantizePositions();
+        runTestCase(t);
+    }
+
+    @Test
+    public void testAddNodeVisibility() throws IOException
+    {
+        TestCase t =
+            GltfModelTransformsTests.createTestAddNodeVisibility();
         runTestCase(t);
     }
 
