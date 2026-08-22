@@ -1280,7 +1280,7 @@ public class AnimationBuilder
         {
             throw new IllegalStateException("No channels have been created. "
                 + "Use 'animationBuilder.beginChannel(...)' to create a "
-                + "channel builder, and 'channelBuilder.end()' to "
+                + "channel builder, and 'channelBuilder.endChannel()' to "
                 + "end the channel");
         }
         animationModel = new DefaultAnimationModel();
