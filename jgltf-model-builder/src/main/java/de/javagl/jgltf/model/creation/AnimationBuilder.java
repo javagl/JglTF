@@ -27,20 +27,21 @@
 package de.javagl.jgltf.model.creation;
 
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.TreeMap;
-import java.util.function.Function;
 
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.AnimationModel;
-import de.javagl.jgltf.model.AnimationModel.Channel;
 import de.javagl.jgltf.model.AnimationModel.Interpolation;
 import de.javagl.jgltf.model.AnimationModel.Sampler;
+import de.javagl.jgltf.model.ElementType;
 import de.javagl.jgltf.model.MathUtils;
 import de.javagl.jgltf.model.NodeModel;
 import de.javagl.jgltf.model.impl.DefaultAnimationModel;
@@ -49,41 +50,21 @@ import de.javagl.jgltf.model.impl.DefaultAnimationModel.DefaultSampler;
 import de.javagl.jgltf.model.io.Buffers;
 
 /**
- * A class for building {@link DefaultAnimationModel} instances.<br>
+ * A class for building {@link AnimationModel} instances.<br>
  * <br>
- * This class exposes a few static classes that will usually not directly be
- * used by most clients. These classes are only intended for handling the
- * different interpolation types (linear, step, and spline) for the different
- * node properties (translation, rotation, scale) as transparently and easily as
- * possible.
- * 
  * Usually the process for building an animation will be as follows:
  * 
  * <ul>
  * <li>Create an animation builder instance with
  * {@link AnimationBuilder#create()}</li>
  * <li>Create a channel builder with
- * {@link AnimationBuilder#beginChannelLinear(NodeModel)}.<br>
- * Different flavors of this function exist, one for each interpolation type.
- * Additionally, there is a generic form of that, which allows passing in the
- * interpolation types manually, for example:<br>
- * 
- * <pre>
- * <code>
- *     cb = ab.beginChannel(nodeModel, 
- *       TranslationInterpolation.LINEAR, 
- *       RotationInterpolation.STEP, 
- *       ScaleInterpolation.SPLINE);
- *     </code>
- * </pre>
- * 
- * </li>
- * <li>Use the {@link ChannelBuilder#translations()},
- * {@link ChannelBuilder#rotations()}, and {@link ChannelBuilder#scales()}
- * handles to pass in key frames.</li>
- * <li><b>Important:</b> Mark the end of the channel, by calling
- * {@link ChannelBuilder#end()}</li>
- * 
+ * {@link AnimationBuilder#beginChannel(NodeModel)}.</li>
+ * <li>Begin adding channels with one of the <code>begin...</code> methods, e.g.
+ * {@link ChannelBuilder#beginLinearTranslation()}.</li>
+ * <li>Add key frames using the <code>add...</code> methods, e.g.
+ * {@link LinearTranslationBuilder#add(double, double, double, double)}</li>
+ * <li>End the channel with {@link ChannelBuilder#endChannel()}.</li>
+ * <li>Build the animation model with {@link AnimationBuilder#build()}.</li>
  * </ul>
  * 
  * A complete example for building a linear translation animation is shown here:
@@ -91,956 +72,554 @@ import de.javagl.jgltf.model.io.Buffers;
  * <pre>
  * <code>
  * AnimationBuilder ab = AnimationBuilder.create();
- * ChannelBuilder<LinearT, LinearR, LinearS> cb = ab.beginChannelLinear(nodeModel);
- * 
- * cb.translations().add(0.5, 0.0, 0.0, 0.0);
- * cb.translations().add(1.5, 1.0, 0.0, 0.0);
- * cb.translations().add(2.5, 2.0, 0.0, 0.0);
- * cb.translations().add(4.5, 0.0, 0.0, 0.0);
- * 
- * cb.end();
- * 
- * DefaultAnimationModel animationModel = ab.build();
+ * ChannelBuilder cb = ab.beginChannel(nodeModel);
+ * LinearTranslationBuilder tb = cb.beginLinearTranslation();
+ * tb.add(1.0, 0.1, 0.2, 0.3);
+ * tb.add(2.0, 0.2, 0.3, 0.5);
+ * tb.add(3.0, 0.3, 0.4, 0.6);
+ * cb.endChannel();
+ * AnimationModel a = ab.build();
  * </code>
  * </pre>
  */
 public class AnimationBuilder
 {
-    // TODO: There should be a warning when the animation is built while
-    // a channel has not been "end()"ed.
-    // TODO: All rotation handles should offer "axis-angle" functions
-    
+    // =========================================================================
+    // The public classes for building channels.
+    //
+    // These are strictly typed, to only allow the specialized methods e.g.
+    // for adding 3 key frame values to a "Linear Translation", or the
+    // 3x4 key frame values for a "Cubic Spline Rotation", including the
+    // convenience methods that use the "axis-angle" representation for the
+    // rotations.
+
     /**
-     * A class containing constants for translation interpolation
-     *
-     * @param <T> The interpolation type
+     * Class for building translation animation channels with linear
+     * interpolation
      */
-    public static class TranslationInterpolation<T>
+    public static class LinearTranslationBuilder
+        extends DefaultLagrangianInterpolationBuilder
     {
         /**
-         * Linear translation interpolation
+         * Default constructor
          */
-        public static final TranslationInterpolation<LinearT> LINEAR =
-            new TranslationInterpolation<LinearT>(LinearT::new);
-
-        /**
-         * Step translation interpolation
-         */
-        public static final TranslationInterpolation<StepT> STEP =
-            new TranslationInterpolation<StepT>(StepT::new);
-
-        /**
-         * Spline translation interpolation
-         */
-        public static final TranslationInterpolation<SplineT> SPLINE =
-            new TranslationInterpolation<SplineT>(SplineT::new);
-
-        /**
-         * The factory
-         */
-        private final Function<NodeModel, T> factory;
-
-        /**
-         * Create the interpolation instance
-         * 
-         * @param nodeModel The node model
-         * @return The instance
-         */
-        T create(NodeModel nodeModel)
+        private LinearTranslationBuilder()
         {
-            return factory.apply(nodeModel);
+            super(Interpolation.LINEAR, 3);
         }
 
         /**
-         * Default constructor
+         * Add the given key frame at the given time
          * 
-         * @param factory The factory
+         * @param time The time
+         * @param x The x-component
+         * @param y The y-component
+         * @param z The z-component
          */
-        private TranslationInterpolation(Function<NodeModel, T> factory)
+        public void add(double time, double x, double y, double z)
         {
-            this.factory = factory;
+            addInternal(time, new double[]
+            { x, y, z });
         }
     }
 
     /**
-     * A class containing constants for rotation interpolation
-     *
-     * @param <R> The interpolation type
+     * Class for building rotation animation channels with linear interpolation
      */
-    public static class RotationInterpolation<R>
+    public static class LinearRotationBuilder
+        extends DefaultLagrangianInterpolationBuilder
     {
         /**
-         * Linear rotation interpolation
+         * Default constructor
          */
-        public static final RotationInterpolation<LinearR> LINEAR =
-            new RotationInterpolation<LinearR>(LinearR::new);
-
-        /**
-         * Step rotation interpolation
-         */
-        public static final RotationInterpolation<StepR> STEP =
-            new RotationInterpolation<StepR>(StepR::new);
-
-        /**
-         * Spline rotation interpolation
-         */
-        public static final RotationInterpolation<SplineR> SPLINE =
-            new RotationInterpolation<SplineR>(SplineR::new);
-
-        /**
-         * The factory
-         */
-        private final Function<NodeModel, R> factory;
-
-        /**
-         * Create the interpolation instance
-         * 
-         * @param nodeModel The node model
-         * @return The instance
-         */
-        R create(NodeModel nodeModel)
+        private LinearRotationBuilder()
         {
-            return factory.apply(nodeModel);
+            super(Interpolation.LINEAR, 4);
         }
 
         /**
-         * Default constructor
+         * Add the given key frame at the given time
          * 
-         * @param factory The factory
+         * @param time The time
+         * @param qx The x-component of the quaternion
+         * @param qy The y-component of the quaternion
+         * @param qz The z-component of the quaternion
+         * @param qw The w-component of the quaternion
          */
-        private RotationInterpolation(Function<NodeModel, R> factory)
+        public void add(double time, double qx, double qy, double qz, double qw)
         {
-            this.factory = factory;
+            addInternal(time, new double[]
+            { qx, qy, qz, qw });
+        }
+
+        /**
+         * Add the given key frame at the given time, using the axis-angle
+         * representation.
+         * 
+         * @param time The time
+         * @param ax The x-component of the axis
+         * @param ay The y-component of the axis
+         * @param az The z-component of the axis
+         * @param angleRad The angle, in radians
+         */
+        public void addAxisAngle(double time, double ax, double ay, double az,
+            double angleRad)
+        {
+            double q[] = new double[4];
+            MathUtils.axisAngleRadToQuaternion(ax, ay, az, angleRad, q);
+            addInternal(time, q);
         }
     }
 
     /**
-     * A class containing constants for scale interpolation
-     *
-     * @param <S> The interpolation type
+     * Class for building scale animation channels with linear interpolation
      */
-    public static class ScaleInterpolation<S>
+    public static class LinearScaleBuilder
+        extends DefaultLagrangianInterpolationBuilder
     {
         /**
-         * Linear scale interpolation
+         * Default constructor
          */
-        public static final ScaleInterpolation<LinearS> LINEAR =
-            new ScaleInterpolation<LinearS>(LinearS::new);
-
-        /**
-         * Step scale interpolation
-         */
-        public static final ScaleInterpolation<StepS> STEP =
-            new ScaleInterpolation<StepS>(StepS::new);
-
-        /**
-         * Spline scale interpolation
-         */
-        public static final ScaleInterpolation<SplineS> SPLINE =
-            new ScaleInterpolation<SplineS>(SplineS::new);
-
-        /**
-         * The factory
-         */
-        private final Function<NodeModel, S> factory;
-
-        /**
-         * Create the interpolation instance
-         * 
-         * @param nodeModel The node model
-         * @return The instance
-         */
-        S create(NodeModel nodeModel)
+        private LinearScaleBuilder()
         {
-            return factory.apply(nodeModel);
+            super(Interpolation.LINEAR, 3);
         }
 
         /**
-         * Default constructor
+         * Add the given key frame at the given time
          * 
-         * @param factory The factory
+         * @param time The time
+         * @param x The x-component
+         * @param y The y-component
+         * @param z The z-component
          */
-        private ScaleInterpolation(Function<NodeModel, S> factory)
+        public void add(double time, double x, double y, double z)
         {
-            this.factory = factory;
+            addInternal(time, new double[]
+            { x, y, z });
         }
     }
 
     /**
-     * Interface for interpolation channel component handles
+     * Class for building weight animation channels with linear interpolation
      */
-    private static interface Handle
+    public static class LinearWeightsBuilder
+        extends DefaultLagrangianInterpolationBuilder
     {
         /**
-         * Returns all times for the animation channel
+         * Default constructor
+         */
+        private LinearWeightsBuilder()
+        {
+            super(Interpolation.LINEAR, 1);
+        }
+
+        /**
+         * Add the given key frame at the given time
+         * 
+         * @param time The time
+         * @param weights The weights
+         */
+        public void add(double time, double... weights)
+        {
+            addInternal(time, weights.clone());
+        }
+    }
+
+    /**
+     * Class for building translation animation channels with step interpolation
+     */
+    public static class StepTranslationBuilder
+        extends DefaultLagrangianInterpolationBuilder
+    {
+        /**
+         * Default constructor
+         */
+        private StepTranslationBuilder()
+        {
+            super(Interpolation.STEP, 3);
+        }
+
+        /**
+         * Add the given key frame at the given time
+         * 
+         * @param time The time
+         * @param x The x-component
+         * @param y The y-component
+         * @param z The z-component
+         */
+        public void add(double time, double x, double y, double z)
+        {
+            addInternal(time, new double[]
+            { x, y, z });
+        }
+    }
+
+    /**
+     * Class for building rotation animation channels with step interpolation
+     */
+    public static class StepRotationBuilder
+        extends DefaultLagrangianInterpolationBuilder
+    {
+        /**
+         * Default constructor
+         */
+        private StepRotationBuilder()
+        {
+            super(Interpolation.STEP, 4);
+        }
+
+        /**
+         * Add the given key frame at the given time
+         * 
+         * @param time The time
+         * @param qx The x-component of the quaternion
+         * @param qy The y-component of the quaternion
+         * @param qz The z-component of the quaternion
+         * @param qw The w-component of the quaternion
+         */
+        public void add(double time, double qx, double qy, double qz, double qw)
+        {
+            addInternal(time, new double[]
+            { qx, qy, qz, qw });
+        }
+
+        /**
+         * Add the given key frame at the given time, using the axis-angle
+         * representation.
+         * 
+         * @param time The time
+         * @param ax The x-component of the axis
+         * @param ay The y-component of the axis
+         * @param az The z-component of the axis
+         * @param angleRad The angle, in radians
+         */
+        public void addAxisAngle(double time, double ax, double ay, double az,
+            double angleRad)
+        {
+            double q[] = new double[4];
+            MathUtils.axisAngleRadToQuaternion(ax, ay, az, angleRad, q);
+            addInternal(time, q);
+        }
+    }
+
+    /**
+     * Class for building scale animation channels with step interpolation
+     */
+    public static class StepScaleBuilder
+        extends DefaultLagrangianInterpolationBuilder
+    {
+        /**
+         * Default constructor
+         */
+        private StepScaleBuilder()
+        {
+            super(Interpolation.STEP, 3);
+        }
+
+        /**
+         * Add the given key frame at the given time
+         * 
+         * @param time The time
+         * @param x The x-component
+         * @param y The y-component
+         * @param z The z-component
+         */
+        public void add(double time, double x, double y, double z)
+        {
+            addInternal(time, new double[]
+            { x, y, z });
+        }
+    }
+
+    /**
+     * Class for building weight animation channels with step interpolation
+     */
+    public static class StepWeightsBuilder
+        extends DefaultLagrangianInterpolationBuilder
+    {
+        /**
+         * Default constructor
+         */
+        private StepWeightsBuilder()
+        {
+            super(Interpolation.STEP, 1);
+        }
+
+        /**
+         * Add the given key frame at the given time
+         * 
+         * @param time The time
+         * @param weights The weights
+         */
+        public void add(double time, double... weights)
+        {
+            addInternal(time, weights.clone());
+        }
+    }
+
+    /**
+     * Class for building translation animation channels with cubic spline
+     * interpolation
+     */
+    public static class CubicSplineTranslationBuilder
+        extends DefaultHermiteInterpolationBuilder
+    {
+        /**
+         * Default constructor
+         */
+        private CubicSplineTranslationBuilder()
+        {
+            super(Interpolation.CUBICSPLINE, 3);
+        }
+
+        /**
+         * Add the given key frame at the given time
+         * 
+         * @param time The time
+         * @param ix The x-component of the in-tangent
+         * @param iy The y-component of the in-tangent
+         * @param iz The z-component of the in-tangent
+         * @param kx The x-component of the key frame
+         * @param ky The y-component of the key frame
+         * @param kz The z-component of the key frame
+         * @param ox The x-component of the out-tangent
+         * @param oy The y-component of the out-tangent
+         * @param oz The z-component of the out-tangent
+         */
+        public void add(double time, double ix, double iy, double iz, double kx,
+            double ky, double kz, double ox, double oy, double oz)
+        {
+            double i[] =
+            { ix, iy, iz };
+            double k[] =
+            { kx, ky, kz };
+            double o[] =
+            { ox, oy, oz };
+            double values[][] =
+            { i, k, o };
+            addInternal(time, values);
+        }
+    }
+
+    /**
+     * Class for building rotation animation channels with cubic spline
+     * interpolation
+     */
+    public static class CubicSplineRotationBuilder
+        extends DefaultHermiteInterpolationBuilder
+    {
+        /**
+         * Default constructor
+         */
+        private CubicSplineRotationBuilder()
+        {
+            super(Interpolation.CUBICSPLINE, 4);
+        }
+
+        /**
+         * Add the given key frame at the given time
+         * 
+         * @param time The time
+         * @param iqx The x-component of the in-tangent quaternion
+         * @param iqy The y-component of the in-tangent quaternion
+         * @param iqz The z-component of the in-tangent quaternion
+         * @param iqw The w-component of the in-tangent quaternion
+         * @param kqx The x-component of the key frame quaternion
+         * @param kqy The y-component of the key frame quaternion
+         * @param kqz The z-component of the key frame quaternion
+         * @param kqw The w-component of the key frame quaternion
+         * @param oqx The x-component of the out-tangent quaternion
+         * @param oqy The y-component of the out-tangent quaternion
+         * @param oqz The z-component of the out-tangent quaternion
+         * @param oqw The w-component of the out-tangent quaternion
+         */
+        public void add(double time, double iqx, double iqy, double iqz,
+            double iqw, double kqx, double kqy, double kqz, double kqw,
+            double oqx, double oqy, double oqz, double oqw)
+        {
+            double i[] =
+            { iqx, iqy, iqz, iqw };
+            double k[] =
+            { kqx, kqy, kqz, kqw };
+            double o[] =
+            { oqx, oqy, oqz, oqw };
+            double values[][] =
+            { i, k, o };
+            addInternal(time, values);
+        }
+
+        /**
+         * Add the given key frame at the given time, using the axis-angle
+         * representation
+         * 
+         * @param time The time
+         * @param iax The x-component of the axis of the in-tangent
+         * @param iay The y-component of the axis of the in-tangent
+         * @param iaz The z-component of the axis of the in-tangent
+         * @param iAngleRad The angle (in radians) of the in-tangent
+         * @param kax The x-component of the axis of the key frame
+         * @param kay The y-component of the axis of the key frame
+         * @param kaz The z-component of the axis of the key frame
+         * @param kAngleRad The angle (in radians) of the key frame
+         * @param oax The x-component of the axis of the out-tangent
+         * @param oay The y-component of the axis of the out-tangent
+         * @param oaz The z-component of the axis of the out-tangent
+         * @param oAngleRad The angle (in radians) of the out-tangent
+         */
+        public void addAxisAngle(double time, double iax, double iay,
+            double iaz, double iAngleRad, double kax, double kay, double kaz,
+            double kAngleRad, double oax, double oay, double oaz,
+            double oAngleRad)
+        {
+
+            double iq[] = new double[4];
+            double kq[] = new double[4];
+            double oq[] = new double[4];
+            MathUtils.axisAngleRadToQuaternion(iax, iay, iaz, iAngleRad, iq);
+            MathUtils.axisAngleRadToQuaternion(kax, kay, kaz, kAngleRad, kq);
+            MathUtils.axisAngleRadToQuaternion(oax, oay, oaz, oAngleRad, oq);
+            double values[][] =
+            { iq, kq, oq };
+            addInternal(time, values);
+        }
+    }
+
+    /**
+     * Interface for building scale animation channels with cubic spline
+     * interpolation
+     */
+    public static class CubicSplineScaleBuilder
+        extends DefaultHermiteInterpolationBuilder
+    {
+        /**
+         * Default constructor
+         */
+        private CubicSplineScaleBuilder()
+        {
+            super(Interpolation.CUBICSPLINE, 3);
+        }
+
+        /**
+         * Add the given key frame at the given time
+         * 
+         * @param time The time
+         * @param ix The x-component of the in-tangent
+         * @param iy The y-component of the in-tangent
+         * @param iz The z-component of the in-tangent
+         * @param kx The x-component of the key frame
+         * @param ky The y-component of the key frame
+         * @param kz The z-component of the key frame
+         * @param ox The x-component of the out-tangent
+         * @param oy The y-component of the out-tangent
+         * @param oz The z-component of the out-tangent
+         */
+        public void add(double time, double ix, double iy, double iz, double kx,
+            double ky, double kz, double ox, double oy, double oz)
+        {
+
+            double i[] =
+            { ix, iy, iz };
+            double k[] =
+            { kx, ky, kz };
+            double o[] =
+            { ox, oy, oz };
+            double values[][] =
+            { i, k, o };
+            addInternal(time, values);
+        }
+    }
+
+    /**
+     * Class for building weight animation channels with cubic spline
+     * interpolation
+     */
+    public static class CubicSplineWeightsBuilder
+        extends DefaultHermiteInterpolationBuilder
+    {
+        /**
+         * Default constructor
+         */
+        private CubicSplineWeightsBuilder()
+        {
+            super(Interpolation.CUBICSPLINE, 1);
+        }
+
+        /**
+         * Add the given key frame at the given time
+         * 
+         * @param time The time
+         * @param i The weights for the in-tangent
+         * @param k The weights for the key frame
+         * @param o The weights for the out-tangent
+         */
+        public void add(double time, double i[], double k[], double o[])
+        {
+            double values[][] =
+            { i.clone(), k.clone(), o.clone() };
+            addInternal(time, values);
+        }
+    }
+
+    /**
+     * Interface for interpolation builders
+     */
+    private static interface InterpolationBuilder
+    {
+        /**
+         * Return the interpolation method that should be used
+         * 
+         * @return The interpolation method
+         */
+        Interpolation getInterpolation();
+
+        /**
+         * Returns the number of components per element.
+         * 
+         * This is 3 for translation and scale, 4 for rotation, and 1 for
+         * weights.
+         * 
+         * @return The number of components
+         */
+        int getNumComponents();
+
+        /**
+         * Returns a set represents the key frame times.
+         * 
+         * This set will contain the elements in ascending order. It may be
+         * unmodifiable, and may not be modified.
          * 
          * @return The times
          */
         Set<Double> getTimes();
 
         /**
-         * Creates the channel
+         * Returns a set of values that correspond to the key frame times.
          * 
-         * @param timesAccessorModel The accessor model for the times
-         * @return The channel
-         */
-        DefaultChannel createChannel(AccessorModel timesAccessorModel);
-    }
-
-    /**
-     * A base class for linear and step animations
-     */
-    private static class SimpleHandle implements Handle
-    {
-        /**
-         * The node model for the animation channel
-         */
-        private final NodeModel nodeModel;
-
-        /**
-         * The interpolation (STEP or LINEAR)
-         */
-        private final Interpolation interpolation;
-
-        /**
-         * The number of components.
+         * This set will be "flat", regardless of the interpolation method. For
+         * <code>n</code> key frame times, it will contain <code>n*n</code>
+         * elements, where <code>m</code> is the number of components per
+         * element (times three, if the interpolation method is CUBICSPLINE).
          * 
-         * This is 3 for translation and scale, and 4 for rotations
+         * @return The flat values
          */
-        private final int components;
-
-        /**
-         * The channel path, "translation", "rotation", or "scale"
-         */
-        private final String path;
-
-        /**
-         * The mapping from key frame times to values
-         */
-        private final Map<Double, double[]> map;
-
-        /**
-         * Creates a new instance
-         * 
-         * @param nodeModel The node model
-         * @param components The number of components
-         * @param interpolation The interpolation
-         * @param path The path
-         */
-        private SimpleHandle(NodeModel nodeModel, int components,
-            Interpolation interpolation, String path)
-        {
-            this.nodeModel = nodeModel;
-            this.components = components;
-            this.interpolation = interpolation;
-            this.path = path;
-            this.map = new TreeMap<Double, double[]>();
-        }
-
-        /**
-         * Add the given key frame
-         * 
-         * @param time The time
-         * @param values The values
-         */
-        protected final void addInternal(double time, double values[])
-        {
-            if (values.length != components)
-            {
-                throw new IllegalArgumentException(
-                    "The values must have a length of " + components
-                        + ", but have a length of " + values.length);
-            }
-            map.put(time, values);
-        }
-
-        @Override
-        public Set<Double> getTimes()
-        {
-            return map.keySet();
-        }
-
-        @Override
-        public DefaultChannel createChannel(AccessorModel timesAccessorModel)
-        {
-            FloatBuffer buffer = flatten1D(map.values(), components);
-            AccessorModel accessorModel;
-            if (components == 3)
-            {
-                accessorModel = AccessorModels.createFloat3D(buffer);
-            }
-            else
-            {
-                accessorModel = AccessorModels.createFloat4D(buffer);
-            }
-
-            Sampler sampler = new DefaultSampler(timesAccessorModel,
-                interpolation, accessorModel);
-
-            DefaultChannel channel =
-                new DefaultChannel(sampler, nodeModel, path);
-            return channel;
-        }
-
-    }
-
-    /**
-     * A base class for spline animations
-     */
-    private static class SplineHandle implements Handle
-    {
-        /**
-         * The node model for the animation channel
-         */
-        private final NodeModel nodeModel;
-
-        /**
-         * The number of components.
-         * 
-         * This is 3 for translation and scale, and 4 for rotations
-         */
-        private final int components;
-
-        /**
-         * The channel path, "translation", "rotation", or "scale"
-         */
-        private final String path;
-
-        /**
-         * The mapping from key frame times to values
-         */
-        private final Map<Double, double[][]> map;
-
-        /**
-         * Creates a new instance
-         * 
-         * @param nodeModel The node model
-         * @param components The number of components
-         * @param path The path
-         */
-        private SplineHandle(NodeModel nodeModel, int components, String path)
-        {
-            this.nodeModel = nodeModel;
-            this.components = components;
-            this.path = path;
-            this.map = new TreeMap<Double, double[][]>();
-        }
-
-        @Override
-        public Set<Double> getTimes()
-        {
-            return map.keySet();
-        }
-
-        /**
-         * Add the specified key frame
-         * 
-         * @param time The time
-         * @param values The values
-         */
-        protected final void addInternal(double time, double values[][])
-        {
-            if (values.length != 3)
-            {
-                throw new IllegalArgumentException(
-                    "The values must have a length of " + 3
-                        + ", but have a length of " + values.length);
-            }
-            for (double value[] : values)
-            {
-                if (value.length != components)
-                {
-                    throw new IllegalArgumentException(
-                        "Each of the values must have a length of " + components
-                            + ", but have a length of " + value.length);
-                }
-            }
-            map.put(time, values);
-        }
-
-        @Override
-        public DefaultChannel createChannel(AccessorModel timesAccessorModel)
-        {
-            FloatBuffer buffer = flatten2D(map.values(), 3 * components);
-
-            AccessorModel accessorModel;
-            if (components == 3)
-            {
-                accessorModel = AccessorModels.createFloat3D(buffer);
-            }
-            else
-            {
-                accessorModel = AccessorModels.createFloat4D(buffer);
-            }
-
-            Sampler sampler = new DefaultSampler(timesAccessorModel,
-                Interpolation.CUBICSPLINE, accessorModel);
-
-            DefaultChannel channel =
-                new DefaultChannel(sampler, nodeModel, path);
-            return channel;
-        }
-    }
-
-    /**
-     * A class for defining linear translation animations
-     */
-    public static class LinearT extends SimpleHandle
-    {
-        /**
-         * Default constructor
-         * 
-         * @param nodeModel The node model
-         */
-        private LinearT(NodeModel nodeModel)
-        {
-            super(nodeModel, 3, Interpolation.LINEAR, "translation");
-        }
-
-        /**
-         * Add the specified key frame
-         * 
-         * @param time The time
-         * @param x The x-component
-         * @param y The y-component
-         * @param z The z-component
-         * @return This instance
-         */
-        public LinearT add(double time, double x, double y, double z)
-        {
-            addInternal(time, new double[]
-            { x, y, z });
-            return this;
-        }
-
-        /**
-         * Add the specified key frame
-         * 
-         * @param time The time
-         * @param value The value
-         * @return This instance
-         */
-        public LinearT add(double time, double value[])
-        {
-            addInternal(time, value.clone());
-            return this;
-        }
-
-    }
-
-    /**
-     * A class for defining linear translation animations
-     */
-    public static class StepT extends SimpleHandle
-    {
-        /**
-         * Default constructor
-         * 
-         * @param nodeModel The node model
-         */
-        private StepT(NodeModel nodeModel)
-        {
-            super(nodeModel, 3, Interpolation.STEP, "translation");
-        }
-
-        /**
-         * Add the specified key frame
-         * 
-         * @param time The time
-         * @param x The x-component
-         * @param y The y-component
-         * @param z The z-component
-         * @return This instance
-         */
-        public StepT add(double time, double x, double y, double z)
-        {
-            addInternal(time, new double[]
-            { x, y, z });
-            return this;
-        }
-
-        /**
-         * Add the specified key frame
-         * 
-         * @param time The time
-         * @param value The value
-         * @return This instance
-         */
-        public StepT add(double time, double value[])
-        {
-            addInternal(time, value.clone());
-            return this;
-        }
-
-    }
-
-    /**
-     * A class for defining spline translation animations
-     */
-    public static class SplineT extends SplineHandle
-    {
-        /**
-         * Default constructor
-         * 
-         * @param nodeModel The node model
-         */
-        private SplineT(NodeModel nodeModel)
-        {
-            super(nodeModel, 3, "translation");
-        }
-
-        /**
-         * Add the specified key frame
-         * 
-         * @param time The time
-         * @param xIn The x-component of the in-tangent
-         * @param yIn The y-component of the in-tangent
-         * @param zIn The z-component of the in-tangent
-         * @param x The x-component
-         * @param y The y-component
-         * @param z The z-component
-         * @param xOut The x-component of the out-tangent
-         * @param yOut The y-component of the out-tangent
-         * @param zOut The z-component of the out-tangent
-         * @return This instance
-         */
-        public SplineT add(double time, double xIn, double yIn, double zIn,
-            double x, double y, double z, double xOut, double yOut, double zOut)
-        {
-            double v[][] = new double[3][3];
-            v[0][0] = xIn;
-            v[0][1] = yIn;
-            v[0][2] = zIn;
-
-            v[1][0] = x;
-            v[1][1] = y;
-            v[1][2] = z;
-
-            v[2][0] = xOut;
-            v[2][1] = yOut;
-            v[2][2] = zOut;
-            addInternal(time, v);
-            return this;
-        }
-
-        /**
-         * Add the specified key frame
-         * 
-         * @param time The time
-         * @param in The in-tangent
-         * @param v The key frame
-         * @param out The out-tangent
-         * @return This instance
-         */
-        public SplineT add(double time, double in[], double v[], double out[])
-        {
-            double vs[][] = new double[3][];
-            vs[0] = in.clone();
-            vs[1] = v.clone();
-            vs[2] = out.clone();
-            addInternal(time, vs);
-            return this;
-        }
-
-    }
-
-    /**
-     * A class for defining linear rotation animations
-     */
-    public static class LinearR extends SimpleHandle
-    {
-        /**
-         * Default constructor
-         * 
-         * @param nodeModel The node model
-         */
-        private LinearR(NodeModel nodeModel)
-        {
-            super(nodeModel, 4, Interpolation.LINEAR, "rotation");
-        }
-
-        /**
-         * Add the specified key frame
-         * 
-         * @param time The time
-         * @param x The x-component
-         * @param y The y-component
-         * @param z The z-component
-         * @param w The w-component
-         * @return This instance
-         */
-        public LinearR add(double time, double x, double y, double z, double w)
-        {
-            addInternal(time, new double[]
-            { x, y, z, w });
-            return this;
-        }
-
-        /**
-         * Add the specified key frame
-         * 
-         * @param time The time
-         * @param value The value
-         */
-        public void add(double time, double value[])
-        {
-            addInternal(time, value.clone());
-        }
-
-        /**
-         * Add the given rotation at the given time stamp
-         * 
-         * @param time The time stamp.
-         * 
-         * @param x The x-component of the rotation axis
-         * @param y The y-component of the rotation axis
-         * @param z The z-component of the rotation axis
-         * @param angleRad The rotation angle in radians
-         * @return This instance
-         */
-        public LinearR addAxisAngle(double time, double x, double y, double z,
-            double angleRad)
-        {
-            double q[] = new double[4];
-            MathUtils.axisAngleRadToQuaternion(x, y, z, angleRad, q);
-            addInternal(time, q);
-            return this;
-        }
-
-        /**
-         * Add the given rotation at the given time stamp
-         * 
-         * @param time The time stamp.
-         * @param axisAngle The axis and angle
-         * @return This instance
-         */
-        public LinearR addAxisAngle(double time, double axisAngle[])
-        {
-            return addAxisAngle(time, axisAngle[0], axisAngle[1], axisAngle[2],
-                axisAngle[3]);
-        }
-
-    }
-
-    /**
-     * A class for defining linear rotation animations
-     */
-    public static class StepR extends SimpleHandle
-    {
-        /**
-         * Default constructor
-         * 
-         * @param nodeModel The node model
-         */
-        private StepR(NodeModel nodeModel)
-        {
-            super(nodeModel, 4, Interpolation.STEP, "rotation");
-        }
-
-        /**
-         * Add the specified key frame
-         * 
-         * @param time The time
-         * @param x The x-component
-         * @param y The y-component
-         * @param z The z-component
-         * @param w The w-component
-         * @return This instance
-         */
-        public StepR add(double time, double x, double y, double z, double w)
-        {
-            addInternal(time, new double[]
-            { x, y, z, w });
-            return this;
-        }
-
-        /**
-         * Add the specified key frame
-         * 
-         * @param time The time
-         * @param value The value
-         * @return This instance
-         */
-        public StepR add(double time, double value[])
-        {
-            addInternal(time, value.clone());
-            return this;
-        }
-
-    }
-
-    /**
-     * A class for defining spline rotation animations
-     */
-    public static class SplineR extends SplineHandle
-    {
-        /**
-         * Default constructor
-         * 
-         * @param nodeModel The node model
-         */
-        private SplineR(NodeModel nodeModel)
-        {
-            super(nodeModel, 4, "rotation");
-        }
-
-        /**
-         * Add the specified key frame
-         * 
-         * @param time The time
-         * @param xIn The x-component of the in-tangent
-         * @param yIn The y-component of the in-tangent
-         * @param zIn The z-component of the in-tangent
-         * @param wIn The w-component of the in-tangent
-         * @param x The x-component
-         * @param y The y-component
-         * @param z The z-component
-         * @param w The w-component
-         * @param xOut The x-component of the out-tangent
-         * @param yOut The y-component of the out-tangent
-         * @param zOut The z-component of the out-tangent
-         * @param wOut The w-component of the out-tangent
-         * @return This instance
-         */
-        SplineR add(double time, double xIn, double yIn, double zIn, double wIn,
-            double x, double y, double z, double w, double xOut, double yOut,
-            double zOut, double wOut)
-        {
-            double v[][] = new double[3][4];
-            v[0][0] = xIn;
-            v[0][1] = yIn;
-            v[0][2] = zIn;
-            v[0][3] = wIn;
-
-            v[1][0] = x;
-            v[1][1] = y;
-            v[1][2] = z;
-            v[1][3] = w;
-
-            v[2][0] = xOut;
-            v[2][1] = yOut;
-            v[2][2] = zOut;
-            v[2][3] = wOut;
-            addInternal(time, v);
-            return this;
-        }
-
-        /**
-         * Add the specified key frame
-         * 
-         * @param time The time
-         * @param in The in-tangent
-         * @param v The key frame
-         * @param out The out-tangent
-         * @return This instance
-         */
-        public SplineR add(double time, double in[], double v[], double out[])
-        {
-            double vs[][] = new double[3][];
-            vs[0] = in.clone();
-            vs[1] = v.clone();
-            vs[2] = out.clone();
-            addInternal(time, vs);
-            return this;
-        }
-
-    }
-
-    /**
-     * A class for defining linear scale animations
-     */
-    public static class LinearS extends SimpleHandle
-    {
-        /**
-         * Default constructor
-         * 
-         * @param nodeModel The node model
-         */
-        private LinearS(NodeModel nodeModel)
-        {
-            super(nodeModel, 3, Interpolation.LINEAR, "scale");
-        }
-
-        /**
-         * Add the specified key frame
-         * 
-         * @param time The time
-         * @param x The x-component
-         * @param y The y-component
-         * @param z The z-component
-         * @return This instance
-         */
-        public LinearS add(double time, double x, double y, double z)
-        {
-            addInternal(time, new double[]
-            { x, y, z });
-            return this;
-        }
-
-        /**
-         * Add the specified key frame
-         * 
-         * @param time The time
-         * @param value The value
-         * @return This instance
-         */
-        public LinearS add(double time, double value[])
-        {
-            addInternal(time, value.clone());
-            return this;
-        }
-
-    }
-
-    /**
-     * A class for defining linear scale animations
-     */
-    public static class StepS extends SimpleHandle
-    {
-        /**
-         * Default constructor
-         * 
-         * @param nodeModel The node model
-         */
-        private StepS(NodeModel nodeModel)
-        {
-            super(nodeModel, 3, Interpolation.STEP, "scale");
-        }
-
-        /**
-         * Add the specified key frame
-         * 
-         * @param time The time
-         * @param x The x-component
-         * @param y The y-component
-         * @param z The z-component
-         * @return This instance
-         */
-        public StepS add(double time, double x, double y, double z)
-        {
-            addInternal(time, new double[]
-            { x, y, z });
-            return this;
-        }
-
-        /**
-         * Add the specified key frame
-         * 
-         * @param time The time
-         * @param value The value
-         * @return This instance
-         */
-        public StepS add(double time, double value[])
-        {
-            addInternal(time, value.clone());
-            return this;
-        }
-
-    }
-
-    /**
-     * A class for defining spline scale animations
-     */
-    public static class SplineS extends SplineHandle
-    {
-        /**
-         * Default constructor
-         * 
-         * @param nodeModel The node model
-         */
-        private SplineS(NodeModel nodeModel)
-        {
-            super(nodeModel, 3, "scale");
-        }
-
-        /**
-         * Add the specified key frame
-         * 
-         * @param time The time
-         * @param xIn The x-component of the in-tangent
-         * @param yIn The y-component of the in-tangent
-         * @param zIn The z-component of the in-tangent
-         * @param x The x-component
-         * @param y The y-component
-         * @param z The z-component
-         * @param xOut The x-component of the out-tangent
-         * @param yOut The y-component of the out-tangent
-         * @param zOut The z-component of the out-tangent
-         * @return This instance
-         */
-        public SplineS add(double time, double xIn, double yIn, double zIn,
-            double x, double y, double z, double xOut, double yOut, double zOut)
-        {
-            double v[][] = new double[3][3];
-            v[0][0] = xIn;
-            v[0][1] = yIn;
-            v[0][2] = zIn;
-
-            v[1][0] = x;
-            v[1][1] = y;
-            v[1][2] = z;
-
-            v[2][0] = xOut;
-            v[2][1] = yOut;
-            v[2][2] = zOut;
-            addInternal(time, v);
-            return this;
-        }
-
-        /**
-         * Add the specified key frame
-         * 
-         * @param time The time
-         * @param in The in-tangent
-         * @param v The key frame
-         * @param out The out-tangent
-         * @return This instance
-         */
-        public SplineS add(double time, double in[], double v[], double out[])
-        {
-            double vs[][] = new double[3][];
-            vs[0] = in.clone();
-            vs[1] = v.clone();
-            vs[2] = out.clone();
-            addInternal(time, vs);
-            return this;
-        }
-
+        List<Double> createFlatValues();
     }
 
     /**
      * A class for building animation channels
-     * 
-     * @param <T> The translation interpolation type
-     * @param <R> The rotation interpolation type
-     * @param <S> The scale interpolation type
      */
-    public static class ChannelBuilder<T extends Handle, R extends Handle, S extends Handle>
+    public static class ChannelBuilder
     {
         /**
-         * The owner of this instance
-         */
-        private final AnimationBuilder owner;
-
-        /**
-         * The animation model that is built in the owner
+         * The animation model that is currently being built
          */
         private final DefaultAnimationModel animationModel;
 
         /**
-         * The translation animation handler
+         * The node model that the channel refers to
          */
-        private final T translations;
-
-        /**
-         * The rotation animation handler
-         */
-        private final R rotations;
-
-        /**
-         * The scale animation handler
-         */
-        private final S scales;
+        private final NodeModel nodeModel;
 
         /**
          * A lookup from key frame times to accessor models
@@ -1048,55 +627,376 @@ public class AnimationBuilder
         private final Map<Set<Double>, AccessorModel> timesAccessorModels;
 
         /**
-         * Creates a new instance
-         * 
-         * @param owner The owner
-         * @param animationModel The animation model
-         * @param translations The translation handle
-         * @param rotations The rotation handle
-         * @param scales The scale handle
+         * The current set of animation paths that have already been created or
+         * added (i.e. "translation", "rotation", "scale", and "weights")
          */
-        ChannelBuilder(AnimationBuilder owner,
-            DefaultAnimationModel animationModel, T translations, R rotations,
-            S scales)
+        private final Set<String> currentPaths;
+
+        /**
+         * Internal builder for the "translation" path
+         */
+        private InterpolationBuilder translationBuilder;
+
+        /**
+         * Internal builder for the "rotation" path
+         */
+        private InterpolationBuilder rotationBuilder;
+
+        /**
+         * Internal builder for the "scale" path
+         */
+        private InterpolationBuilder scaleBuilder;
+
+        /**
+         * Internal builder for the "weights" path
+         */
+        private InterpolationBuilder weightsBuilder;
+
+        /**
+         * Create a new instance
+         * 
+         * @param animationModel The animation model that is being built
+         * @param nodeModel The node model that the channel refers to
+         */
+        private ChannelBuilder(DefaultAnimationModel animationModel,
+            NodeModel nodeModel)
         {
-            this.owner = owner;
+            Objects.requireNonNull(animationModel,
+                "The animationModel may not be null");
+            Objects.requireNonNull(nodeModel, "The nodeModel may not be null");
+
             this.animationModel = animationModel;
-            this.translations = translations;
-            this.rotations = rotations;
-            this.scales = scales;
+            this.nodeModel = nodeModel;
             this.timesAccessorModels =
                 new LinkedHashMap<Set<Double>, AccessorModel>();
+            this.currentPaths = new LinkedHashSet<String>();
         }
 
         /**
-         * Returns the handle for adding translation key frames
+         * Returns a builder for a linear translation channel
          * 
-         * @return The handle
+         * @return The builder
+         * @throws IllegalStateException If there already is a translation
+         *         channel
          */
-        public T translations()
+        public LinearTranslationBuilder beginLinearTranslation()
         {
-            return translations;
+            activatePath("translation");
+            LinearTranslationBuilder result = new LinearTranslationBuilder();
+            this.translationBuilder = result;
+            return result;
         }
 
         /**
-         * Returns the handle for adding rotation key frames
+         * Returns a builder for a linear rotation channel
          * 
-         * @return The handle
+         * @return The builder
+         * @throws IllegalStateException If there already is a rotation channel
          */
-        public R rotations()
+        public LinearRotationBuilder beginLinearRotation()
         {
-            return rotations;
+            activatePath("rotation");
+            LinearRotationBuilder result = new LinearRotationBuilder();
+            this.rotationBuilder = result;
+            return result;
         }
 
         /**
-         * Returns the handle for adding scale key frames
+         * Returns a builder for a linear scale channel
          * 
-         * @return The handle
+         * @return The builder
+         * @throws IllegalStateException If there already is a scale channel
          */
-        public S scales()
+        public LinearScaleBuilder beginLinearScale()
         {
-            return scales;
+            activatePath("scale");
+            LinearScaleBuilder result = new LinearScaleBuilder();
+            this.scaleBuilder = result;
+            return result;
+        }
+
+        /**
+         * Returns a builder for a linear weights channel
+         * 
+         * @return The builder
+         * @throws IllegalStateException If there already is a weights channel
+         */
+        public LinearWeightsBuilder beginLinearWeights()
+        {
+            activatePath("weights");
+            LinearWeightsBuilder result = new LinearWeightsBuilder();
+            this.weightsBuilder = result;
+            return result;
+        }
+
+        /**
+         * Returns a builder for a step translation channel
+         * 
+         * @return The builder
+         * @throws IllegalStateException If there already is a translation
+         *         channel
+         */
+        public StepTranslationBuilder beginStepTranslation()
+        {
+            activatePath("translation");
+            StepTranslationBuilder result = new StepTranslationBuilder();
+            this.translationBuilder = result;
+            return result;
+        }
+
+        /**
+         * Returns a builder for a step rotation channel
+         * 
+         * @return The builder
+         * @throws IllegalStateException If there already is a rotation channel
+         */
+        public StepRotationBuilder beginStepRotation()
+        {
+            activatePath("rotation");
+            StepRotationBuilder result = new StepRotationBuilder();
+            this.rotationBuilder = result;
+            return result;
+        }
+
+        /**
+         * Returns a builder for a step scale channel
+         * 
+         * @return The builder
+         * @throws IllegalStateException If there already is a scale channel
+         */
+        public StepScaleBuilder beginStepScale()
+        {
+            activatePath("scale");
+            StepScaleBuilder result = new StepScaleBuilder();
+            this.scaleBuilder = result;
+            return result;
+        }
+
+        /**
+         * Returns a builder for a step weights channel
+         * 
+         * @return The builder
+         * @throws IllegalStateException If there already is a weights channel
+         */
+        public StepWeightsBuilder beginStepWeights()
+        {
+            activatePath("weights");
+            StepWeightsBuilder result = new StepWeightsBuilder();
+            this.weightsBuilder = result;
+            return result;
+        }
+
+        /**
+         * Returns a builder for a cubic spline translation channel
+         * 
+         * @return The builder
+         * @throws IllegalStateException If there already is a translation
+         *         channel
+         */
+        public CubicSplineTranslationBuilder beginCubicSplineTranslation()
+        {
+            activatePath("translation");
+            CubicSplineTranslationBuilder result =
+                new CubicSplineTranslationBuilder();
+            this.translationBuilder = result;
+            return result;
+        }
+
+        /**
+         * Returns a builder for a cubic spline rotation channel
+         * 
+         * @return The builder
+         * @throws IllegalStateException If there already is a rotation channel
+         */
+        public CubicSplineRotationBuilder beginCubicSplineRotation()
+        {
+            activatePath("rotation");
+            CubicSplineRotationBuilder result =
+                new CubicSplineRotationBuilder();
+            this.rotationBuilder = result;
+            return result;
+        }
+
+        /**
+         * Returns a builder for a cubic spline scale channel
+         * 
+         * @return The builder
+         * @throws IllegalStateException If there already is a scale channel
+         */
+        public CubicSplineScaleBuilder beginCubicSplineScale()
+        {
+            activatePath("scale");
+            CubicSplineScaleBuilder result = new CubicSplineScaleBuilder();
+            this.scaleBuilder = result;
+            return result;
+        }
+
+        /**
+         * Returns a builder for a cubic spline weights channel
+         * 
+         * @return The builder
+         * @throws IllegalStateException If there already is a weights channel
+         */
+        public CubicSplineWeightsBuilder beginCubicSplineWeights()
+        {
+            activatePath("weights");
+            CubicSplineWeightsBuilder result = new CubicSplineWeightsBuilder();
+            this.weightsBuilder = result;
+            return result;
+        }
+
+        /**
+         * Manually add a channel to this builder.<br>
+         * <br>
+         * The caller is responsible for the consistency of the given data.<br>
+         * <br>
+         * This mainly means that the given key frame values must match the
+         * given path and interpolation method. For example, for a linear
+         * translation animation, and <code>n</code> key frame times, the values
+         * must contain <code>n*3</code> elements. For a cubic spline rotation
+         * animation, the values must contain <code>n*(3*4)</code> elements.
+         * 
+         * @param path The path, "translation", "rotation", "scale", or
+         *        "weights"
+         * @param interpolation The {@link Interpolation} method
+         * @param times The key frame times
+         * @param values The (flat) key frame values.
+         * @throws IllegalStateException If the channel already has the given
+         *         path
+         * @throws IllegalArgumentException If the given path is not
+         *         "translation", "rotation", "scale", or "weights"
+         * @throws IllegalArgumentException If the given data does not have the
+         *         expected layout (as defined above)
+         */
+        public void add(String path, Interpolation interpolation,
+            Collection<? extends Number> times,
+            Collection<? extends Number> values)
+        {
+            FloatBuffer timesBuffer = AnimationBuilder.floats(times);
+            FloatBuffer valuesBuffer = AnimationBuilder.floats(values);
+            add(path, interpolation, timesBuffer, valuesBuffer);
+        }
+
+        /**
+         * Manually add a channel to this builder.<br>
+         * <br>
+         * The caller is responsible for the consistency of the given data.<br>
+         * <br>
+         * This mainly means that the given key frame values must match the
+         * given path and interpolation method. For example, for a linear
+         * translation animation, and <code>n</code> key frame times, the values
+         * must contain <code>n*3</code> elements. For a cubic spline rotation
+         * animation, the values must contain <code>n*(3*4)</code> elements.
+         * 
+         * @param path The path, "translation", "rotation", "scale", or
+         *        "weights"
+         * @param interpolation The {@link Interpolation} method
+         * @param times The key frame times
+         * @param values The (flat) key frame values.
+         * @throws IllegalStateException If the channel already has the given
+         *         path
+         * @throws IllegalArgumentException If the given path is not
+         *         "translation", "rotation", "scale", or "weights"
+         * @throws IllegalArgumentException If the given data does not have the
+         *         expected layout (as defined above)
+         */
+        public void add(String path, Interpolation interpolation,
+            FloatBuffer times, FloatBuffer values)
+        {
+            Objects.requireNonNull(path, "The path may not be null");
+            Objects.requireNonNull(interpolation,
+                "The interpolation may not be null");
+            activatePath(path);
+
+            int numTimes = times.capacity();
+            int numValues = values.capacity();
+            validateLayout(path, interpolation, numTimes, numValues);
+
+            int numComponents = computeNumComponents(path);
+            AccessorModel timesAccessorModel =
+                AccessorModels.createFloatScalar(times);
+            AccessorModel valuesAccessorModel =
+                createAccessorModel(values, numComponents);
+
+            addChannel(path, interpolation, timesAccessorModel,
+                valuesAccessorModel);
+        }
+
+        /**
+         * Activate the given path.<br>
+         * <br>
+         * This is called from the respective "begin..." methods, or when a path
+         * is added manually. It will ensure that the given path is valid, and
+         * that it was NOT already added
+         * 
+         * @param path The path
+         * @throws IllegalArgumentException If the path is invalid
+         * @throws IllegalStateException If the path is already active
+         */
+        private void activatePath(String path)
+        {
+            List<String> validPaths =
+                Arrays.asList("translation", "rotation", "scale", "weights");
+            if (!validPaths.contains(path))
+            {
+                throw new IllegalArgumentException(
+                    "The path must be " + validPaths + ", but is " + path);
+            }
+            if (currentPaths.contains(path))
+            {
+                throw new IllegalStateException(
+                    "The channel already has a '" + path + "' path");
+            }
+            currentPaths.add(path);
+        }
+
+        /**
+         * Add a channel with the given data to the animation model
+         * 
+         * @param path The path
+         * @param interpolation The interpolation method
+         * @param timesAccessorModel The accessor model for the times
+         * @param valuesAccessorModel The accessor model for the values
+         */
+        private void addChannel(String path, Interpolation interpolation,
+            AccessorModel timesAccessorModel, AccessorModel valuesAccessorModel)
+        {
+            Sampler sampler = new DefaultSampler(timesAccessorModel,
+                interpolation, valuesAccessorModel);
+
+            DefaultChannel channel =
+                new DefaultChannel(sampler, nodeModel, path);
+            animationModel.addChannel(channel);
+        }
+
+        /**
+         * Create a channel from the given interpolation builder (if it does
+         * contain key frames), and add the channel to the animation.
+         * 
+         * @param builder The builder
+         * @param path The path
+         */
+        private void createChannelOptional(InterpolationBuilder builder,
+            String path)
+        {
+            if (builder == null)
+            {
+                return;
+            }
+            Set<Double> times = builder.getTimes();
+            if (times.isEmpty())
+            {
+                return;
+            }
+            AccessorModel timesAccessorModel = fetchTimesAccessorModel(times);
+
+            List<Double> flatValues = builder.createFlatValues();
+            int components = builder.getNumComponents();
+            AccessorModel valuesAccessorModel =
+                createAccessorModel(flatValues, components);
+
+            addChannel(path, builder.getInterpolation(), timesAccessorModel,
+                valuesAccessorModel);
         }
 
         /**
@@ -1115,95 +1015,225 @@ public class AnimationBuilder
             {
                 return accessorModel;
             }
-            FloatBuffer timesBuffer = floats(times);
+            FloatBuffer timesBuffer = AnimationBuilder.floats(times);
             accessorModel = AccessorModels.createFloatScalar(timesBuffer);
             timesAccessorModels.put(times, accessorModel);
             return accessorModel;
         }
 
         /**
-         * End building the animation channel
-         * 
-         * @return The animation builder
-         * @throws IllegalStateException If no key frames have been added after
-         *         this instance was created, or this instance contains key
-         *         frames for an animation channel that was already created
+         * Called to indicate that the channel is finished and should be added
+         * to the animation model.
          */
-        public AnimationBuilder end()
+        public void endChannel()
         {
-            boolean created = false;
+            int numChannelsBefore = animationModel.getChannels().size();
 
-            Set<Double> translationTimes = translations.getTimes();
-            if (!translationTimes.isEmpty())
-            {
-                AccessorModel timesAccessorModel =
-                    fetchTimesAccessorModel(translationTimes);
-                DefaultChannel translationChannel =
-                    translations.createChannel(timesAccessorModel);
-                ensureChannelPathIsNew(animationModel, "translation");
-                animationModel.addChannel(translationChannel);
-                created = true;
-            }
+            createChannelOptional(translationBuilder, "translation");
+            createChannelOptional(rotationBuilder, "rotation");
+            createChannelOptional(scaleBuilder, "scale");
+            createChannelOptional(weightsBuilder, "weights");
 
-            Set<Double> rotationTimes = rotations.getTimes();
-            if (!rotationTimes.isEmpty())
-            {
-                AccessorModel timesAccessorModel =
-                    fetchTimesAccessorModel(rotationTimes);
-                DefaultChannel rotationChannel =
-                    rotations.createChannel(timesAccessorModel);
-                ensureChannelPathIsNew(animationModel, "rotation");
-                animationModel.addChannel(rotationChannel);
-                created = true;
-            }
-
-            Set<Double> scaleTimes = scales.getTimes();
-            if (!scaleTimes.isEmpty())
-            {
-                AccessorModel timesAccessorModel =
-                    fetchTimesAccessorModel(scaleTimes);
-                DefaultChannel scaleChannel =
-                    scales.createChannel(timesAccessorModel);
-                ensureChannelPathIsNew(animationModel, "scale");
-                animationModel.addChannel(scaleChannel);
-                created = true;
-            }
-
-            if (!created)
+            int numChannelsAfter = animationModel.getChannels().size();
+            if (numChannelsBefore == numChannelsAfter)
             {
                 throw new IllegalStateException(
                     "No key frames have been added to the current channel.");
             }
-            return owner;
         }
     }
 
+    // =========================================================================
+    // Private base classes for the interpolation builders
+
     /**
-     * Ensure that the given animation model does not contain a channel with the
-     * given path name, and throw an exception of this is not the case.
-     * 
-     * @param animationModel The animation model
-     * @param path The path
-     * @throws IllegalStateException If the path already exists
+     * Default implementation of a an {@link InterpolationBuilder} for Lagrange
+     * interpolations (that require only the key frame, but no tangents)
      */
-    private static void ensureChannelPathIsNew(AnimationModel animationModel,
-        String path)
+    private static class DefaultLagrangianInterpolationBuilder
+        implements InterpolationBuilder
     {
-        List<Channel> channels = animationModel.getChannels();
-        for (Channel channel : channels)
+        /**
+         * The interpolation method
+         */
+        private final Interpolation interpolation;
+
+        /**
+         * The number of components per element (3 for translation and scale, 4
+         * for rotation, 1 for weights)
+         */
+        private final int components;
+
+        /**
+         * The mapping from times to key frame data
+         */
+        private final Map<Double, double[]> data =
+            new LinkedHashMap<Double, double[]>();
+
+        /**
+         * Creates a new instance
+         * 
+         * @param interpolation The interpolation
+         * @param components The number of components per element (3 for
+         *        translation and scale, 4 for rotation, 1 for weights)
+         */
+        private DefaultLagrangianInterpolationBuilder(
+            Interpolation interpolation, int components)
         {
-            if (channel.getPath().equals(path))
-            {
-                throw new IllegalStateException(
-                    "The animation already has a '" + path + "' channel.");
-            }
+            Objects.requireNonNull(interpolation,
+                "The interpolation may not be null");
+            this.interpolation = interpolation;
+            this.components = components;
         }
+
+        @Override
+        public Interpolation getInterpolation()
+        {
+            return interpolation;
+        }
+
+        @Override
+        public int getNumComponents()
+        {
+            return components;
+        }
+
+        /**
+         * Internal method for for adding a key frame, to be called by
+         * subclasses.
+         * 
+         * @param time The time
+         * @param values The values
+         */
+        protected void addInternal(double time, double... values)
+        {
+            if (this.components != 1)
+            {
+                if (values.length != this.components)
+                {
+                    throw new IllegalArgumentException(
+                        "The values must have a length of " + this.components
+                            + ", but has a length of " + values.length);
+                }
+            }
+            data.put(time, values);
+        }
+
+        @Override
+        public Set<Double> getTimes()
+        {
+            return data.keySet();
+        }
+
+        @Override
+        public List<Double> createFlatValues()
+        {
+            return AnimationBuilder.flattenList1D(data.values());
+        }
+
+    }
+
+    /**
+     * Default implementation of a an {@link InterpolationBuilder} for Hermite
+     * interpolations (that require the in-tangent, key frame, and out-tangent)
+     */
+    private static class DefaultHermiteInterpolationBuilder
+        implements InterpolationBuilder
+    {
+        /**
+         * The interpolation method
+         */
+        private final Interpolation interpolation;
+
+        /**
+         * The number of components per element (3 for translation and scale, 4
+         * for rotation, 1 for weights)
+         */
+        private final int components;
+
+        /**
+         * The mapping from times to key frame data
+         */
+        private final Map<Double, double[][]> data =
+            new LinkedHashMap<Double, double[][]>();
+
+        /**
+         * Creates a new instance
+         * 
+         * @param interpolation The interpolation
+         * @param components The number of components per element (3 for
+         *        translation and scale, 4 for rotation, 1 for weights)
+         */
+        private DefaultHermiteInterpolationBuilder(Interpolation interpolation,
+            int components)
+        {
+            Objects.requireNonNull(interpolation,
+                "The interpolation may not be null");
+            this.interpolation = interpolation;
+            this.components = components;
+        }
+
+        @Override
+        public Interpolation getInterpolation()
+        {
+            return interpolation;
+        }
+
+        @Override
+        public int getNumComponents()
+        {
+            return components;
+        }
+
+        /**
+         * Internal method for for adding a key frame, to be called by
+         * subclasses.
+         * 
+         * @param time The time
+         * @param values The values
+         */
+        protected void addInternal(double time, double values[][])
+        {
+            if (values.length != 3)
+            {
+                throw new IllegalArgumentException(
+                    "The values must have a length of " + 3
+                        + ", but have a length of " + values.length);
+            }
+            if (this.components != 1)
+            {
+                for (double value[] : values)
+                {
+                    if (value.length != components)
+                    {
+                        throw new IllegalArgumentException(
+                            "Each of the values must have a length of "
+                                + components + ", but have a length of "
+                                + value.length);
+                    }
+                }
+            }
+            data.put(time, values);
+        }
+
+        @Override
+        public Set<Double> getTimes()
+        {
+            return data.keySet();
+        }
+
+        @Override
+        public List<Double> createFlatValues()
+        {
+            return AnimationBuilder.flattenList2D(data.values());
+        }
+
     }
 
     /**
      * Creates a new instance
      * 
-     * @return The {@link AnimationBuilder}
+     * @return The animation builder
      */
     public static AnimationBuilder create()
     {
@@ -1216,7 +1246,7 @@ public class AnimationBuilder
     private DefaultAnimationModel animationModel;
 
     /**
-     * Private constructor to be called from {@link #create()}.
+     * Private constructor
      */
     private AnimationBuilder()
     {
@@ -1224,88 +1254,24 @@ public class AnimationBuilder
     }
 
     /**
-     * Begin a new channel.
+     * Begin building a new channel that refers to the given node.<br>
+     * <br>
+     * When the channel is finished, {@link ChannelBuilder#endChannel()} has to
+     * be called.
      * 
-     * This will use LINEAR interpolation for translation, rotation, and scale
-     * 
-     * @param nodeModel The node model that should be affected
-     * @return The channel builder
+     * @param nodeModel The node
+     * @return The builder for the channel.
      */
-    public ChannelBuilder<LinearT, LinearR, LinearS>
-        beginChannelLinear(NodeModel nodeModel)
+    public ChannelBuilder beginChannel(NodeModel nodeModel)
     {
-        return beginChannel(nodeModel, TranslationInterpolation.LINEAR,
-            RotationInterpolation.LINEAR, ScaleInterpolation.LINEAR);
+        return new ChannelBuilder(animationModel, nodeModel);
     }
 
     /**
-     * Begin a new channel.
+     * Build the animation model containing all channels that have been created.
      * 
-     * This will use STEP interpolation for translation, rotation, and scale
-     * 
-     * @param nodeModel The node model that should be affected
-     * @return The channel builder
-     */
-    public ChannelBuilder<StepT, StepR, StepS>
-        beginChannelStep(NodeModel nodeModel)
-    {
-        return beginChannel(nodeModel, TranslationInterpolation.STEP,
-            RotationInterpolation.STEP, ScaleInterpolation.STEP);
-    }
-
-    /**
-     * Begin a new channel.
-     * 
-     * This will use SPLINE interpolation for translation, rotation, and scale
-     * 
-     * @param nodeModel The node model that should be affected
-     * @return The channel builder
-     */
-    public ChannelBuilder<SplineT, SplineR, SplineS>
-        beginChannelSpline(NodeModel nodeModel)
-    {
-        return beginChannel(nodeModel, TranslationInterpolation.SPLINE,
-            RotationInterpolation.SPLINE, ScaleInterpolation.SPLINE);
-    }
-
-    /**
-     * Begins a new channel with the given interpolation types
-     * 
-     * @param <T> The translation interpolation type
-     * @param <R> The rotation interpolation type
-     * @param <S> The scale interpolation type
-     * 
-     * @param nodeModel The node model
-     * @param translationInterpolation The translation interpolation
-     * @param rotationInterpolation The rotation interpolation
-     * @param scaleInterpolation The scale interpolation
-     * @return The channel builder
-     */
-    public <T extends Handle, R extends Handle, S extends Handle>
-        ChannelBuilder<T, R, S> beginChannel(NodeModel nodeModel,
-            TranslationInterpolation<T> translationInterpolation,
-            RotationInterpolation<R> rotationInterpolation,
-            ScaleInterpolation<S> scaleInterpolation)
-    {
-        Objects.requireNonNull(nodeModel, "The nodeModel may not be null");
-        Objects.requireNonNull(translationInterpolation,
-            "The translationInterpolation may not be null");
-        Objects.requireNonNull(rotationInterpolation,
-            "The rotationInterpolation may not be null");
-        Objects.requireNonNull(scaleInterpolation,
-            "The scaleInterpolation may not be null");
-
-        T translations = translationInterpolation.create(nodeModel);
-        R rotations = rotationInterpolation.create(nodeModel);
-        S scales = scaleInterpolation.create(nodeModel);
-        return new ChannelBuilder<T, R, S>(this, animationModel, translations,
-            rotations, scales);
-    }
-
-    /**
-     * Build the {@link DefaultAnimationModel} with the current state
-     * 
-     * @return The {@link DefaultAnimationModel}
+     * @return The animation model
+     * @throws IllegalStateException If no channels have been created
      */
     public DefaultAnimationModel build()
     {
@@ -1318,6 +1284,182 @@ public class AnimationBuilder
                 + "end the channel");
         }
         animationModel = new DefaultAnimationModel();
+        return result;
+    }
+
+    // =========================================================================
+    // Internal utility methods
+
+    /**
+     * Create an accessor model from the given values
+     * 
+     * @param flatValues The values
+     * @param components The number of components per element (1, 3, or 4)
+     * @return The accessor model
+     */
+    private static AccessorModel createAccessorModel(
+        Collection<? extends Number> flatValues, int components)
+    {
+        FloatBuffer buffer = AnimationBuilder.floats(flatValues);
+        return createAccessorModel(buffer, components);
+    }
+
+    /**
+     * Create an accessor model from the given values
+     * 
+     * @param buffer The values
+     * @param components The number of components per element (1, 3, or 4)
+     * @return The accessor model
+     */
+    private static AccessorModel createAccessorModel(FloatBuffer buffer,
+        int components)
+    {
+        if (components == 3)
+        {
+            return AccessorModels.createFloat3D(buffer);
+        }
+        else if (components == 4)
+        {
+            return AccessorModels.createFloat4D(buffer);
+        }
+        return AccessorModels.createFloatScalar(buffer);
+    }
+
+    /**
+     * Returns the element type for the given path.<br>
+     * <br>
+     * This is VEC3 for translation and scale, VEC4 for rotation, and defaulting
+     * to SCALAR (for weights and others)
+     * 
+     * @param path The path
+     * @return The element type
+     */
+    private static ElementType computeElementType(String path)
+    {
+        if (path.equals("translation"))
+        {
+            return ElementType.VEC3;
+        }
+        if (path.equals("rotation"))
+        {
+            return ElementType.VEC4;
+        }
+        if (path.equals("scale"))
+        {
+            return ElementType.VEC3;
+        }
+        return ElementType.SCALAR;
+    }
+
+    /**
+     * Returns the number of components per element for the given path.<br>
+     * <br>
+     * This is 3 for translation and scale, 4 for rotation, and defaulting to 1
+     * (for weights and others)
+     * 
+     * @param path The path
+     * @return The number of components
+     */
+    private static int computeNumComponents(String path)
+    {
+        ElementType elementType = computeElementType(path);
+        return elementType.getNumComponents();
+    }
+
+    /**
+     * Validate the layout of the given data for the given path and
+     * interpolation method.<br>
+     * <br>
+     * For example, for a linear translation animation, and <code>n</code> key
+     * frame times, the values must contain <code>n*3</code> elements. For a
+     * cubic spline rotation animation, the values must contain
+     * <code>n*(3*4)</code> elements.
+     * 
+     * @param path The path
+     * @param interpolation The interpolation
+     * @param numTimes The number of elements of the key frame times
+     * @param numValues The total number of values
+     * @throws IllegalArgumentException If the layout is not valid
+     */
+    private static void validateLayout(String path, Interpolation interpolation,
+        int numTimes, int numValues)
+    {
+        int actualNumValuesPerTime = numValues / numTimes;
+        int remainder = numValues - (numTimes * actualNumValuesPerTime);
+        if (remainder != 0)
+        {
+            throw new IllegalArgumentException(
+                "The number of values (" + numValues + ") for the '" + path
+                    + "' path is not divisible by the number of times ("
+                    + numTimes + ")");
+        }
+        if (path.equals("weights"))
+        {
+            return;
+        }
+
+        int expectedNumComponentsPerTime = computeNumComponents(path);
+        int expectedNumValuesPerTime = 0;
+        if (interpolation == Interpolation.LINEAR)
+        {
+            expectedNumValuesPerTime = expectedNumComponentsPerTime;
+        }
+        else if (interpolation == Interpolation.STEP)
+        {
+            expectedNumValuesPerTime = expectedNumComponentsPerTime;
+        }
+        else if (interpolation == Interpolation.CUBICSPLINE)
+        {
+            expectedNumValuesPerTime = 3 * expectedNumComponentsPerTime;
+        }
+        if (actualNumValuesPerTime != expectedNumValuesPerTime)
+        {
+            throw new IllegalArgumentException("The number of values for the '"
+                + path + "' path with interpolation type " + interpolation
+                + " must be " + expectedNumValuesPerTime + " but is "
+                + actualNumValuesPerTime);
+        }
+    }
+
+    /**
+     * Flatten the given collection of arrays into a list
+     * 
+     * @param values The values
+     * @return The buffer
+     */
+    private static List<Double> flattenList1D(Collection<double[]> values)
+    {
+        List<Double> result = new ArrayList<Double>();
+        for (double v[] : values)
+        {
+            for (int i = 0; i < v.length; i++)
+            {
+                result.add(v[i]);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Flatten the given collection of arrays into a list
+     * 
+     * @param values The values
+     * @return The buffer
+     */
+    private static List<Double> flattenList2D(Collection<double[][]> values)
+    {
+        List<Double> result = new ArrayList<Double>();
+        for (double vs[][] : values)
+        {
+            for (int i = 0; i < vs.length; i++)
+            {
+                double v[] = vs[i];
+                for (int j = 0; j < v.length; j++)
+                {
+                    result.add(v[j]);
+                }
+            }
+        }
         return result;
     }
 
@@ -1348,8 +1490,7 @@ public class AnimationBuilder
      * @param valueLength The length of each value
      * @return The buffer
      */
-    private static FloatBuffer flatten1D(Collection<double[]> values,
-        int valueLength)
+    static FloatBuffer flatten1D(Collection<double[]> values, int valueLength)
     {
         int totalSize = values.size() * valueLength;
         FloatBuffer buffer = FloatBuffer.allocate(totalSize);
@@ -1363,31 +1504,4 @@ public class AnimationBuilder
         Buffers.position(buffer, 0);
         return buffer;
     }
-
-    /**
-     * Flatten the given collection of arrays into a float buffer.
-     * 
-     * @param values The values
-     * @param valueLength The length of each value
-     * @return The buffer
-     */
-    private static FloatBuffer flatten2D(Collection<double[][]> values,
-        int valueLength)
-    {
-        int totalSize = values.size() * valueLength;
-        FloatBuffer buffer = FloatBuffer.allocate(totalSize);
-        for (double v[][] : values)
-        {
-            for (int i = 0; i < v.length; i++)
-            {
-                for (int j = 0; j < v[i].length; j++)
-                {
-                    buffer.put((float) v[i][j]);
-                }
-            }
-        }
-        Buffers.position(buffer, 0);
-        return buffer;
-    }
-
 }
