@@ -1,7 +1,7 @@
 /*
  * www.javagl.de - JglTF
  *
- * Copyright 2015-2016 Marco Hutter - http://www.javagl.de
+ * Copyright 2025 Marco Hutter - http://www.javagl.de
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
