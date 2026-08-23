@@ -628,9 +628,12 @@ public class AnimationBuilder
 
         /**
          * The current set of animation paths that have already been created or
-         * added (i.e. "translation", "rotation", "scale", and "weights")
+         * added (i.e. "translation", "rotation", "scale", and "weights").
+         * 
+         * This is set to <code>null</code> when {@link #endChannel()} is
+         * called, to indicate that no new paths may be added.
          */
-        private final Set<String> currentPaths;
+        private Set<String> currentPaths;
 
         /**
          * Internal builder for the "translation" path
@@ -677,7 +680,7 @@ public class AnimationBuilder
          * 
          * @return The builder
          * @throws IllegalStateException If there already is a translation
-         *         channel
+         *         channel or {@link #endChannel()} was already called
          */
         public LinearTranslationBuilder beginLinearTranslation()
         {
@@ -692,6 +695,7 @@ public class AnimationBuilder
          * 
          * @return The builder
          * @throws IllegalStateException If there already is a rotation channel
+         *         or {@link #endChannel()} was already called
          */
         public LinearRotationBuilder beginLinearRotation()
         {
@@ -705,7 +709,8 @@ public class AnimationBuilder
          * Returns a builder for a linear scale channel
          * 
          * @return The builder
-         * @throws IllegalStateException If there already is a scale channel
+         * @throws IllegalStateException If there already is a scale channel or
+         *         {@link #endChannel()} was already called
          */
         public LinearScaleBuilder beginLinearScale()
         {
@@ -720,6 +725,7 @@ public class AnimationBuilder
          * 
          * @return The builder
          * @throws IllegalStateException If there already is a weights channel
+         *         or {@link #endChannel()} was already called
          */
         public LinearWeightsBuilder beginLinearWeights()
         {
@@ -734,7 +740,7 @@ public class AnimationBuilder
          * 
          * @return The builder
          * @throws IllegalStateException If there already is a translation
-         *         channel
+         *         channel or {@link #endChannel()} was already called
          */
         public StepTranslationBuilder beginStepTranslation()
         {
@@ -749,6 +755,7 @@ public class AnimationBuilder
          * 
          * @return The builder
          * @throws IllegalStateException If there already is a rotation channel
+         *         or {@link #endChannel()} was already called
          */
         public StepRotationBuilder beginStepRotation()
         {
@@ -762,7 +769,8 @@ public class AnimationBuilder
          * Returns a builder for a step scale channel
          * 
          * @return The builder
-         * @throws IllegalStateException If there already is a scale channel
+         * @throws IllegalStateException If there already is a scale channel or
+         *         {@link #endChannel()} was already called
          */
         public StepScaleBuilder beginStepScale()
         {
@@ -777,6 +785,7 @@ public class AnimationBuilder
          * 
          * @return The builder
          * @throws IllegalStateException If there already is a weights channel
+         *         or {@link #endChannel()} was already called
          */
         public StepWeightsBuilder beginStepWeights()
         {
@@ -791,7 +800,7 @@ public class AnimationBuilder
          * 
          * @return The builder
          * @throws IllegalStateException If there already is a translation
-         *         channel
+         *         channel or {@link #endChannel()} was already called
          */
         public CubicSplineTranslationBuilder beginCubicSplineTranslation()
         {
@@ -807,6 +816,7 @@ public class AnimationBuilder
          * 
          * @return The builder
          * @throws IllegalStateException If there already is a rotation channel
+         *         or {@link #endChannel()} was already called
          */
         public CubicSplineRotationBuilder beginCubicSplineRotation()
         {
@@ -821,7 +831,8 @@ public class AnimationBuilder
          * Returns a builder for a cubic spline scale channel
          * 
          * @return The builder
-         * @throws IllegalStateException If there already is a scale channel
+         * @throws IllegalStateException If there already is a scale channel or
+         *         {@link #endChannel()} was already called
          */
         public CubicSplineScaleBuilder beginCubicSplineScale()
         {
@@ -836,6 +847,7 @@ public class AnimationBuilder
          * 
          * @return The builder
          * @throws IllegalStateException If there already is a weights channel
+         *         or {@link #endChannel()} was already called
          */
         public CubicSplineWeightsBuilder beginCubicSplineWeights()
         {
@@ -862,7 +874,7 @@ public class AnimationBuilder
          * @param times The key frame times
          * @param values The (flat) key frame values.
          * @throws IllegalStateException If the channel already has the given
-         *         path
+         *         path or {@link #endChannel()} was already called
          * @throws IllegalArgumentException If the given path is not
          *         "translation", "rotation", "scale", or "weights"
          * @throws IllegalArgumentException If the given data does not have the
@@ -894,7 +906,7 @@ public class AnimationBuilder
          * @param times The key frame times
          * @param values The (flat) key frame values.
          * @throws IllegalStateException If the channel already has the given
-         *         path
+         *         path or {@link #endChannel()} was already called
          * @throws IllegalArgumentException If the given path is not
          *         "translation", "rotation", "scale", or "weights"
          * @throws IllegalArgumentException If the given data does not have the
@@ -931,10 +943,16 @@ public class AnimationBuilder
          * 
          * @param path The path
          * @throws IllegalArgumentException If the path is invalid
-         * @throws IllegalStateException If the path is already active
+         * @throws IllegalStateException If the path is already active or
+         *         {@link #endChannel()} was already called
          */
         private void activatePath(String path)
         {
+            if (currentPaths == null)
+            {
+                throw new IllegalStateException(
+                    "The channel was already finished by calling endChannel");
+            }
             List<String> validPaths =
                 Arrays.asList("translation", "rotation", "scale", "weights");
             if (!validPaths.contains(path))
@@ -1024,9 +1042,17 @@ public class AnimationBuilder
         /**
          * Called to indicate that the channel is finished and should be added
          * to the animation model.
+         * 
+         * @throws IllegalStateException If {@link #endChannel()} was already
+         *         called
          */
         public void endChannel()
         {
+            if (currentPaths == null)
+            {
+                throw new IllegalStateException(
+                    "The channel was already finished by calling endChannel");
+            }
             int numChannelsBefore = animationModel.getChannels().size();
 
             createChannelOptional(translationBuilder, "translation");
@@ -1040,6 +1066,7 @@ public class AnimationBuilder
                 throw new IllegalStateException(
                     "No key frames have been added to the current channel.");
             }
+            currentPaths = null;
         }
     }
 
