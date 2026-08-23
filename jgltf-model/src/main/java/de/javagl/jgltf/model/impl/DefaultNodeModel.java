@@ -27,14 +27,17 @@
 package de.javagl.jgltf.model.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import de.javagl.jgltf.model.CameraModel;
 import de.javagl.jgltf.model.MathUtils;
 import de.javagl.jgltf.model.MeshModel;
+import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.NodeModel;
 import de.javagl.jgltf.model.SkinModel;
 import de.javagl.jgltf.model.Suppliers;
@@ -281,6 +284,48 @@ public class DefaultNodeModel extends AbstractNamedModelElement
         return weights;
     }
     
+    @Override
+    public Set<ModelElement> getReferencedModelElements()
+    {
+        Set<ModelElement> modelElements = 
+            getReferencedExtensionModelElements();
+        modelElements.addAll(children);
+        modelElements.addAll(meshModels);
+        if (cameraModel != null)
+        {
+            modelElements.add(cameraModel);
+        }
+        if (skinModel != null)
+        {
+            modelElements.add(skinModel);
+        }
+        return modelElements;
+    }
+    
+    @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove)
+    {
+        removeExtensionModelElements(modelElementsToRemove);
+        children.removeAll(modelElementsToRemove);
+        meshModels.removeAll(modelElementsToRemove);
+        if (modelElementsToRemove.contains(cameraModel)) 
+        {
+            setCameraModel(null);
+        }
+        if (modelElementsToRemove.contains(skinModel)) 
+        {
+            setSkinModel(null);
+        }
+        boolean removeThis = false;
+        if (children.isEmpty() && meshModels.isEmpty() && cameraModel == null
+            && skinModel == null)
+        {
+            removeThis = true;
+        }
+        return removeThis;
+    }
+    
     
     @Override
     public double[] computeLocalTransform(double result[])
@@ -307,7 +352,7 @@ public class DefaultNodeModel extends AbstractNamedModelElement
         return Suppliers.createTransformSupplier(this, 
             NodeModel::computeLocalTransform);
     }
-
+    
     /**
      * Compute the local transform of the given node. The transform
      * is either taken from the {@link #getMatrix()} (if it is not

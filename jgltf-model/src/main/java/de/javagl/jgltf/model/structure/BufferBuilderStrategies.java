@@ -41,10 +41,26 @@ public class BufferBuilderStrategies
      */
     public static BufferBuilderStrategy createDefault() 
     {
-        DefaultBufferBuilderStrategy.Config config = 
-            new DefaultBufferBuilderStrategy.Config();
+        BufferBuilderConfig config = 
+            new BufferBuilderConfig();
         return new DefaultBufferBuilderStrategy(config);
     }
+    
+    /**
+     * Create an {@link BufferBuilderStrategy} for GLB data.
+     * Many details are not specified.
+     * 
+     * @return The {@link BufferBuilderStrategy}
+     */
+    public static BufferBuilderStrategy createBinary() 
+    {
+        BufferBuilderConfig config = 
+            new BufferBuilderConfig();
+        config.imagesInBufferViews = true;
+        config.bufferViewPerAttributeAccessor = true;
+        return new DefaultBufferBuilderStrategy(config);
+    }
+    
     
     /**
      * Create a default {@link BufferBuilderStrategy} with the given 
@@ -53,8 +69,7 @@ public class BufferBuilderStrategies
      * @param config The configuration
      * @return The {@link BufferBuilderStrategy}
      */
-    static BufferBuilderStrategy create(
-        DefaultBufferBuilderStrategy.Config config) 
+    static BufferBuilderStrategy create(BufferBuilderConfig config)  
     {
         return new DefaultBufferBuilderStrategy(config);
     }

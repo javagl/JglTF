@@ -33,21 +33,21 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.javagl.jgltf.model.TechniqueMaterialModel;
 import de.javagl.jgltf.model.TextureModel;
 import de.javagl.jgltf.model.gl.TechniqueModel;
-import de.javagl.jgltf.model.impl.DefaultTechniqueMaterialModel;
 import de.javagl.obj.FloatTuple;
 import de.javagl.obj.FloatTuples;
 import de.javagl.obj.Mtl;
 
 /**
- * Methods to create the {@link DefaultTechniqueMaterialModel#getValues() material values} 
+ * Methods to create the {@link TechniqueMaterialModel#getValues() material values} 
  * from an MTL
  */
 class MtlMaterialValues
 {
     /**
-     * Create the {@link DefaultTechniqueMaterialModel#getValues() material values} for the 
+     * Create the {@link TechniqueMaterialModel#getValues() material values} for the 
      * given MTL data, matching to the {@link TechniqueModel} instances that
      * are contained in the {@link ObjTechniqueModels}
      * 

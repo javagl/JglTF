@@ -26,8 +26,10 @@
  */
 package de.javagl.jgltf.model.impl;
 
-import de.javagl.jgltf.model.NormalTextureInfoModel;
-import de.javagl.jgltf.model.OcclusionTextureInfoModel;
+import java.util.Collection;
+import java.util.Set;
+
+import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.PbrMetallicRoughnessModel;
 import de.javagl.jgltf.model.TextureInfoModel;
 
@@ -45,52 +47,33 @@ public class DefaultPbrMetallicRoughnessModel extends AbstractModelElement
     /**
      * The base color texture info
      */
-    private TextureInfoModel baseColorTextureInfoModel;
+    private TextureInfoModel baseColorTexture;
 
     /**
      * The metallic factor
      */
-    private double metallicFactor;
+    private Double metallicFactor;
 
     /**
      * The roughness factor
      */
-    private double roughnessFactor;
+    private Double roughnessFactor;
 
     /**
      * The metallic-roughness texture info
      */
-    private TextureInfoModel metallicRoughnessTextureInfoModel;
+    private TextureInfoModel metallicRoughnessTexture;
 
     /**
-     * The normal texture info
-     */
-    private NormalTextureInfoModel normalTextureInfoModel;
-
-    /**
-     * The occlusion texture info
-     */
-    private OcclusionTextureInfoModel occlusionTextureInfoModel;
-
-    /**
-     * The emissive texture info
-     */
-    private TextureInfoModel emissiveTextureInfoModel;
-
-    /**
-     * Creates a new instance with default values
+     * Creates a new instance
      */
     public DefaultPbrMetallicRoughnessModel()
     {
-        baseColorFactor = new double[]
-        { 1.0, 1.0, 1.0, 1.0 };
-        baseColorTextureInfoModel = null;
-        metallicFactor = 1.0;
-        roughnessFactor = 1.0;
-        metallicRoughnessTextureInfoModel = null;
-        normalTextureInfoModel = null;
-        occlusionTextureInfoModel = null;
-        emissiveTextureInfoModel = null;
+        baseColorFactor = null;
+        baseColorTexture = null;
+        metallicFactor = null;
+        roughnessFactor = null;
+        metallicRoughnessTexture = null;
     }
 
     @Override
@@ -99,142 +82,90 @@ public class DefaultPbrMetallicRoughnessModel extends AbstractModelElement
         return baseColorFactor;
     }
 
-    /**
-     * Set the base color factor
-     *
-     * @param baseColorFactor The base color factor
-     */
+    @Override
     public void setBaseColorFactor(double[] baseColorFactor)
     {
         this.baseColorFactor = baseColorFactor;
     }
 
     @Override
-    public TextureInfoModel getBaseColorTextureInfoModel()
+    public TextureInfoModel getBaseColorTexture()
     {
-        return baseColorTextureInfoModel;
-    }
-
-    /**
-     * Set the base color texture info model
-     *
-     * @param baseColorTextureInfoModel The base color texture info model
-     */
-    public void setBaseColorTexture(TextureInfoModel baseColorTextureInfoModel)
-    {
-        this.baseColorTextureInfoModel = baseColorTextureInfoModel;
+        return baseColorTexture;
     }
 
     @Override
-    public double getMetallicFactor()
+    public void setBaseColorTexture(TextureInfoModel baseColorTexture)
+    {
+        this.baseColorTexture = baseColorTexture;
+    }
+
+    @Override
+    public Double getMetallicFactor()
     {
         return metallicFactor;
     }
 
-    /**
-     * Set the metallic factor
-     *
-     * @param metallicFactor The metallic factor
-     */
-    public void setMetallicFactor(double metallicFactor)
+    @Override
+    public void setMetallicFactor(Double metallicFactor)
     {
         this.metallicFactor = metallicFactor;
     }
 
     @Override
-    public double getRoughnessFactor()
+    public Double getRoughnessFactor()
     {
         return roughnessFactor;
     }
 
-    /**
-     * Set the roughness factor
-     *
-     * @param roughnessFactor The roughness factor
-     */
-    public void setRoughnessFactor(double roughnessFactor)
+    @Override
+    public void setRoughnessFactor(Double roughnessFactor)
     {
         this.roughnessFactor = roughnessFactor;
     }
 
     @Override
-    public TextureInfoModel getMetallicRoughnessTextureInfoModel()
+    public TextureInfoModel getMetallicRoughnessTexture()
     {
-        return metallicRoughnessTextureInfoModel;
+        return metallicRoughnessTexture;
     }
 
-    /**
-     * Set the metallic-roughness-texture info model
-     *
-     * @param metallicRoughnessTextureInfoModel The metallic-roughness-texture
-     *        info model
-     */
-    public void setMetallicRoughnessTextureInfo(
-        TextureInfoModel metallicRoughnessTextureInfoModel)
-    {
-        this.metallicRoughnessTextureInfoModel =
-            metallicRoughnessTextureInfoModel;
-    }
-
-    /**
-     * Returns the normal texture info model
-     *
-     * @return The normal texture info model
-     */
-    public NormalTextureInfoModel getNormalTextureInfoModel()
-    {
-        return normalTextureInfoModel;
-    }
-
-    /**
-     * Set the normal texture info model
-     *
-     * @param normalTextureInfoModel The normal texture info model
-     */
+    @Override
     public void
-        setNormalTextureInfoModel(NormalTextureInfoModel normalTextureInfoModel)
+        setMetallicRoughnessTexture(TextureInfoModel metallicRoughnessTexture)
     {
-        this.normalTextureInfoModel = normalTextureInfoModel;
+        this.metallicRoughnessTexture = metallicRoughnessTexture;
     }
 
-    /**
-     * Returns the occlusion texture info model
-     *
-     * @return The occlusion texture info model
-     */
-    public OcclusionTextureInfoModel getOcclusionTextureInfoModel()
+    @Override
+    public Set<ModelElement> getReferencedModelElements()
     {
-        return occlusionTextureInfoModel;
+        Set<ModelElement> modelElements = getReferencedExtensionModelElements();
+        if (baseColorTexture != null)
+        {
+            modelElements.add(baseColorTexture);
+        }
+        if (metallicRoughnessTexture != null)
+        {
+            modelElements.add(metallicRoughnessTexture);
+        }
+        return modelElements;
     }
 
-    /**
-     * Set the occlusion texture info model
-     *
-     * @param occlusionTextureInfoModel The occlusion texture info model
-     */
-    public void setOcclusionTextureInfoModel(
-        OcclusionTextureInfoModel occlusionTextureInfoModel)
+    @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove)
     {
-        this.occlusionTextureInfoModel = occlusionTextureInfoModel;
+        removeExtensionModelElements(modelElementsToRemove);
+        if (modelElementsToRemove.contains(baseColorTexture))
+        {
+            setBaseColorTexture(null);
+        }
+        if (modelElementsToRemove.contains(metallicRoughnessTexture))
+        {
+            setBaseColorTexture(null);
+        }
+        return false;
     }
 
-    /**
-     * Returns the emissive texture info model
-     *
-     * @return The emissive texture info model
-     */
-    public TextureInfoModel getEmissiveTextureInfoModel()
-    {
-        return emissiveTextureInfoModel;
-    }
-
-    /**
-     * Set the emissive texture info model
-     *
-     * @param emissiveTextureInfoModel The emissive texture info model
-     */
-    public void setEmissiveTexture(TextureInfoModel emissiveTextureInfoModel)
-    {
-        this.emissiveTextureInfoModel = emissiveTextureInfoModel;
-    }
 }

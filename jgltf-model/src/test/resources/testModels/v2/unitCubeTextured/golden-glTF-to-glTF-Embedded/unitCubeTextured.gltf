@@ -1,7 +1,6 @@
 {
   "accessors" : [ {
     "bufferView" : 0,
-    "byteOffset" : 0,
     "componentType" : 5123,
     "count" : 36,
     "type" : "SCALAR",
@@ -9,7 +8,6 @@
     "min" : [ 0 ]
   }, {
     "bufferView" : 1,
-    "byteOffset" : 0,
     "componentType" : 5126,
     "count" : 24,
     "type" : "VEC3",
@@ -17,7 +15,6 @@
     "min" : [ 0.0, 0.0, 0.0 ]
   }, {
     "bufferView" : 2,
-    "byteOffset" : 0,
     "componentType" : 5126,
     "count" : 24,
     "type" : "VEC3",
@@ -25,7 +22,6 @@
     "min" : [ -1.0, -1.0, -1.0 ]
   }, {
     "bufferView" : 3,
-    "byteOffset" : 0,
     "componentType" : 5126,
     "count" : 24,
     "type" : "VEC2",
@@ -92,16 +88,11 @@
   "nodes" : [ {
     "mesh" : 0
   } ],
-  "samplers" : [ {
-    "wrapS" : 10497,
-    "wrapT" : 10497
-  } ],
   "scene" : 0,
   "scenes" : [ {
     "nodes" : [ 0 ]
   } ],
   "textures" : [ {
-    "sampler" : 0,
     "source" : 0
   } ]
 }

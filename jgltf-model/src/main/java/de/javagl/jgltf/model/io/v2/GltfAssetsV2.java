@@ -27,6 +27,8 @@
 package de.javagl.jgltf.model.io.v2;
 
 import de.javagl.jgltf.model.GltfModel;
+import de.javagl.jgltf.model.impl.DefaultGltfModel;
+import de.javagl.jgltf.model.structure.GltfModelStructures;
 
 /**
  * Utility methods related to {@link GltfAssetV2} instances.<br>
@@ -45,8 +47,11 @@ public class GltfAssetsV2
      */
     public static GltfAssetV2 createDefault(GltfModel gltfModel)
     {
-        DefaultAssetCreatorV2 assetCreator = new DefaultAssetCreatorV2();
-        GltfAssetV2 gltfAsset = assetCreator.create(gltfModel);
+        GltfModelStructures g = new GltfModelStructures();
+        g.prepare(gltfModel);
+        DefaultGltfModel defaultGltfModel = g.createDefault();
+        DirectAssetCreatorV2 delegate = new DirectAssetCreatorV2();
+        GltfAssetV2 gltfAsset = delegate.createDefault(defaultGltfModel);
         return gltfAsset;
     }
     
@@ -59,8 +64,11 @@ public class GltfAssetsV2
      */
     public static GltfAssetV2 createBinary(GltfModel gltfModel)
     {
-        BinaryAssetCreatorV2 assetCreator = new BinaryAssetCreatorV2();
-        GltfAssetV2 gltfAsset = assetCreator.create(gltfModel);
+        GltfModelStructures g = new GltfModelStructures();
+        g.prepare(gltfModel);
+        DefaultGltfModel binaryGltfModel = g.createBinary();
+        DirectAssetCreatorV2 delegate = new DirectAssetCreatorV2();
+        GltfAssetV2 gltfAsset = delegate.createBinary(binaryGltfModel);
         return gltfAsset;
     }
     
@@ -73,11 +81,13 @@ public class GltfAssetsV2
      */
     public static GltfAssetV2 createEmbedded(GltfModel gltfModel)
     {
+        GltfModelStructures g = new GltfModelStructures();
+        g.prepare(gltfModel);
+        DefaultGltfModel defaultGltfModel = g.createDefault();
         EmbeddedAssetCreatorV2 assetCreator = new EmbeddedAssetCreatorV2();
-        GltfAssetV2 gltfAsset = assetCreator.create(gltfModel);
+        GltfAssetV2 gltfAsset = assetCreator.create(defaultGltfModel);
         return gltfAsset;
     }
-    
     
     
     /**

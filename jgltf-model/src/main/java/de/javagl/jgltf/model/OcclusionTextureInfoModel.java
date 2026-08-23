@@ -37,5 +37,5 @@ public interface OcclusionTextureInfoModel extends TextureInfoModel
      * 
      * @return The strength
      */
-    double getStrength();
+    Double getStrength();
 }

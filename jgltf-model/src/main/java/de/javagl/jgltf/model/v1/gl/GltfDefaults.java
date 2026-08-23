@@ -83,7 +83,7 @@ public class GltfDefaults
     /**
      * The default {@link Program}
      */
-    private static final Program DEFAULT_PROGRAM = 
+    static final Program DEFAULT_PROGRAM = 
         Programs.createDefaultProgram(
             DEFAULT_VERTEX_SHADER_ID, DEFAULT_FRAGMENT_SHADER_ID);
     

@@ -107,8 +107,7 @@ public final class MeshPrimitiveBuilder
      */
     public MeshPrimitiveBuilder setTriangles()
     {
-        this.mode = GltfConstants.GL_TRIANGLES;
-        return this;
+        return setMode(GltfConstants.GL_TRIANGLES);
     }
     
     /**
@@ -119,8 +118,7 @@ public final class MeshPrimitiveBuilder
      */
     public MeshPrimitiveBuilder setLines()
     {
-        this.mode = GltfConstants.GL_LINES;
-        return this;
+        return setMode(GltfConstants.GL_LINES);
     }
     
     /**
@@ -131,7 +129,19 @@ public final class MeshPrimitiveBuilder
      */
     public MeshPrimitiveBuilder setPoints()
     {
-        this.mode = GltfConstants.GL_POINTS;
+        return setMode(GltfConstants.GL_POINTS);
+    }
+
+    /**
+     * Set the {@link MeshPrimitiveModel#getMode() rendering mode} to
+     * the given value
+     * 
+     * @param mode The mode, e.g. <code>GltfConstants.GL_TRIANGLES</code>
+     * @return This builder
+     */
+    public MeshPrimitiveBuilder setMode(int mode)
+    {
+        this.mode = mode;
         return this;
     }
     

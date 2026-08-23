@@ -27,14 +27,17 @@
 package de.javagl.jgltf.model.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import de.javagl.jgltf.model.AccessorDatas;
 import de.javagl.jgltf.model.AccessorFloatData;
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.MathUtils;
+import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.NodeModel;
 import de.javagl.jgltf.model.SkinModel;
 import de.javagl.jgltf.model.Utils;
@@ -164,5 +167,51 @@ public final class DefaultSkinModel extends AbstractNamedModelElement
         }
         return localResult;
     }
+    
+    @Override
+    public Set<ModelElement> getReferencedModelElements()
+    {
+        Set<ModelElement> modelElements = 
+            getReferencedExtensionModelElements();
+        modelElements.addAll(joints);
+        if (skeleton != null)
+        {
+            modelElements.add(skeleton);
+        }
+        if (inverseBindMatrices != null)
+        {
+            modelElements.add(inverseBindMatrices);
+        }
+        return modelElements;
+    }
+    
+    @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove)
+    {
+        removeExtensionModelElements(modelElementsToRemove);
+        boolean removeThis = false;
+        for (NodeModel joint : joints)
+        {
+            if (modelElementsToRemove.contains(joint)) 
+            {
+                joints.clear();
+                removeThis = true;
+                break;
+            }
+        }
+        if (modelElementsToRemove.contains(skeleton))
+        {
+            setSkeleton(null);
+            removeThis = true;
+        }
+        if (modelElementsToRemove.contains(inverseBindMatrices))
+        {
+            setInverseBindMatrices(null);
+            removeThis = true;
+        }
+        return removeThis;
+    }
+    
 
 }

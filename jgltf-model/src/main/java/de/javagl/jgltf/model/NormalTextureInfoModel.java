@@ -37,5 +37,5 @@ public interface NormalTextureInfoModel extends TextureInfoModel
      * 
      * @return The scale
      */
-    double getScale();
+    Double getScale();
 }

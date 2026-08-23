@@ -28,13 +28,11 @@ package de.javagl.jgltf.model.creation;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.AnimationModel;
-import de.javagl.jgltf.model.AnimationModel.Channel;
 import de.javagl.jgltf.model.BufferModel;
 import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.CameraModel;
@@ -43,9 +41,8 @@ import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.MaterialModel;
 import de.javagl.jgltf.model.MeshModel;
-import de.javagl.jgltf.model.MeshPrimitiveModel;
+import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.NodeModel;
-import de.javagl.jgltf.model.PbrMaterialModel;
 import de.javagl.jgltf.model.SceneModel;
 import de.javagl.jgltf.model.SkinModel;
 import de.javagl.jgltf.model.TextureModel;
@@ -66,7 +63,6 @@ import de.javagl.jgltf.model.impl.DefaultMeshModel;
 import de.javagl.jgltf.model.impl.DefaultNodeModel;
 import de.javagl.jgltf.model.impl.DefaultSceneModel;
 import de.javagl.jgltf.model.impl.DefaultSkinModel;
-import de.javagl.jgltf.model.impl.DefaultTechniqueMaterialModel;
 import de.javagl.jgltf.model.impl.DefaultTextureModel;
 import de.javagl.jgltf.model.structure.BufferBuilderStrategies;
 import de.javagl.jgltf.model.structure.BufferBuilderStrategy;
@@ -98,6 +94,12 @@ import de.javagl.jgltf.model.v1.GltfModelV1;
  */
 public class GltfModelBuilder
 {
+    /**
+     * The logger used in this class
+     */
+    private static final Logger logger =
+        Logger.getLogger(GltfModelBuilder.class.getName());
+    
     /**
      * Creates a new instance
      * 
@@ -188,6 +190,12 @@ public class GltfModelBuilder
      * model manually.
      */
     private final Set<DefaultBufferModel> bufferModelsSet;
+
+    /**
+     * A set of {@link ModelElement} objects that have been found in 
+     * extensions and are not part of the top-level elements.
+     */
+    private final Set<ModelElement> genericModelElements;
     
     /**
      * Private constructor
@@ -210,6 +218,8 @@ public class GltfModelBuilder
         this.accessorModelsSet = new LinkedHashSet<DefaultAccessorModel>();
         this.bufferViewModelsSet = new LinkedHashSet<DefaultBufferViewModel>();
         this.bufferModelsSet = new LinkedHashSet<DefaultBufferModel>();
+        
+        this.genericModelElements = new LinkedHashSet<ModelElement>();
         
     }
     
@@ -292,10 +302,7 @@ public class GltfModelBuilder
         boolean added = animationModelsSet.add(defaultAnimationModel);
         if (added) 
         {
-            for (Channel channel : animationModel.getChannels())
-            {
-                addNodeModel(channel.getNodeModel());
-            }
+            addReferencedModelElements(animationModel);
         }
     }
     
@@ -327,7 +334,11 @@ public class GltfModelBuilder
             return;
         }
         DefaultCameraModel defaultCameraModel = (DefaultCameraModel)cameraModel;
-        cameraModelsSet.add(defaultCameraModel);
+        boolean added = cameraModelsSet.add(defaultCameraModel);
+        if (added)
+        {
+            addReferencedModelElements(cameraModel);
+        }
     }
 
     /**
@@ -356,7 +367,11 @@ public class GltfModelBuilder
             return;
         }
         DefaultImageModel defaultImageModel = (DefaultImageModel)imageModel;
-        imageModelsSet.add(defaultImageModel);
+        boolean added = imageModelsSet.add(defaultImageModel);
+        if (added)
+        {
+            addReferencedModelElements(imageModel);
+        }
     }
 
     /**
@@ -387,33 +402,7 @@ public class GltfModelBuilder
         boolean added = materialModelsSet.add(materialModel);
         if (added)
         {
-            if (materialModel instanceof DefaultTechniqueMaterialModel)
-            {
-                DefaultTechniqueMaterialModel materialModelV1 = 
-                    (DefaultTechniqueMaterialModel)materialModel;
-                
-                addTechniqueModel(materialModelV1.getTechniqueModel());
-                
-                Map<String, Object> values = materialModelV1.getValues();
-                for (Object value : values.values())
-                {
-                    if (value instanceof TextureModel)
-                    {
-                        TextureModel textureModel = (TextureModel)value;
-                        addTextureModel(textureModel);
-                    }
-                }
-            }
-            if (materialModel instanceof PbrMaterialModel)
-            {
-                PbrMaterialModel pbrMaterialModel = 
-                    (PbrMaterialModel)materialModel;
-                addTextureModel(pbrMaterialModel.getBaseColorTexture());
-                addTextureModel(pbrMaterialModel.getOcclusionTexture());
-                addTextureModel(pbrMaterialModel.getMetallicRoughnessTexture());
-                addTextureModel(pbrMaterialModel.getEmissiveTexture());
-                addTextureModel(pbrMaterialModel.getNormalTexture());
-            }
+            addReferencedModelElements(materialModel);
         }
     }
 
@@ -446,12 +435,7 @@ public class GltfModelBuilder
         boolean added = meshModelsSet.add(defaultMeshModel);
         if (added) 
         {
-            List<MeshPrimitiveModel> meshPrimitives = 
-                meshModel.getMeshPrimitiveModels();
-            for (MeshPrimitiveModel meshPrimitive : meshPrimitives)
-            {
-                addMaterialModel(meshPrimitive.getMaterialModel());
-            }
+            addReferencedModelElements(meshModel);
         }
     }
 
@@ -484,10 +468,7 @@ public class GltfModelBuilder
         boolean added = nodeModelsSet.add(defaultNodeModel);
         if (added) 
         {
-            addCameraModel(nodeModel.getCameraModel());
-            addMeshModels(nodeModel.getMeshModels());
-            addNodeModels(nodeModel.getChildren());
-            addSkinModel(nodeModel.getSkinModel());
+            addReferencedModelElements(nodeModel);
         }
     }
 
@@ -520,7 +501,7 @@ public class GltfModelBuilder
         boolean added = sceneModelsSet.add(defaultSceneModel);
         if (added) 
         {
-            addNodeModels(sceneModel.getNodeModels());
+            addReferencedModelElements(sceneModel);
         }
     }
 
@@ -553,8 +534,7 @@ public class GltfModelBuilder
         boolean added = skinModelsSet.add(defaultSkinModel);
         if (added) 
         {
-            addNodeModels(skinModel.getJoints());
-            addNodeModel(skinModel.getSkeleton());
+            addReferencedModelElements(skinModel);
         }
     }
 
@@ -588,7 +568,7 @@ public class GltfModelBuilder
         boolean added = textureModelsSet.add(defaultTextureModel);
         if (added) 
         {
-            addImageModel(textureModel.getImageModel());
+            addReferencedModelElements(textureModel);
         }
     }
 
@@ -623,7 +603,7 @@ public class GltfModelBuilder
         boolean added = techniqueModelsSet.add(defaultTechniqueModel);
         if (added) 
         {
-            addProgramModel(techniqueModel.getProgramModel());
+            addReferencedModelElements(techniqueModel);
         }
     }
     
@@ -658,8 +638,7 @@ public class GltfModelBuilder
         boolean added = programModelsSet.add(defaultProgramModel);
         if (added) 
         {
-            addShaderModel(programModel.getVertexShaderModel());
-            addShaderModel(programModel.getFragmentShaderModel());
+            addReferencedModelElements(programModel);
         }
     }
 
@@ -690,7 +669,11 @@ public class GltfModelBuilder
         }
         DefaultShaderModel defaultShaderModel = 
             (DefaultShaderModel)shaderModel;
-        shaderModelsSet.add(defaultShaderModel);
+        boolean added = shaderModelsSet.add(defaultShaderModel);
+        if (added)
+        {
+            addReferencedModelElements(shaderModel);
+        }
     }
 
     /**
@@ -729,7 +712,11 @@ public class GltfModelBuilder
         }
         DefaultAccessorModel defaultAccessorModel = 
             (DefaultAccessorModel) accessorModel;
-        accessorModelsSet.add(defaultAccessorModel);
+        boolean added = accessorModelsSet.add(defaultAccessorModel);
+        if (added)
+        {
+            addReferencedModelElements(accessorModel);
+        }
     }
     
     /**
@@ -775,7 +762,11 @@ public class GltfModelBuilder
         
         DefaultBufferViewModel defaultBufferViewModel = 
             (DefaultBufferViewModel) bufferViewModel;
-        bufferViewModelsSet.add(defaultBufferViewModel);
+        boolean added = bufferViewModelsSet.add(defaultBufferViewModel);
+        if (added)
+        {
+            addReferencedModelElements(bufferViewModel);
+        }
     }
     
     /**
@@ -809,7 +800,11 @@ public class GltfModelBuilder
     {
         DefaultBufferModel defaultBufferModel = 
             (DefaultBufferModel) bufferModel;
-        bufferModelsSet.add(defaultBufferModel);
+        boolean added = bufferModelsSet.add(defaultBufferModel);
+        if (added)
+        {
+            addReferencedModelElements(bufferModel);
+        }
     }
     
     /**
@@ -827,6 +822,123 @@ public class GltfModelBuilder
         }
     }
     
+    /**
+     * Add the referenced model elements from the given one to this builder
+     * 
+     * @param modelElement The model element
+     */
+    private void addReferencedModelElements(ModelElement modelElement)
+    {
+        Set<ModelElement> referencedModelElements = 
+            modelElement.getReferencedModelElements();
+        addModelElements(referencedModelElements);
+    }
     
+    /**
+     * Add the given model elements to this builder
+     * 
+     * @param modelElements The model elements
+     */
+    private void addModelElements(
+        Iterable<? extends ModelElement> modelElements)
+    {
+       for (ModelElement modelElement : modelElements)
+       {
+           addModelElement(modelElement);
+       }
+    }
+    
+    /**
+     * Add the given model element to this builder
+     * 
+     * @param modelElement The {@link ModelElement}
+     */
+    private void addModelElement(ModelElement modelElement)
+    {
+        if (modelElement instanceof AnimationModel)
+        {
+            AnimationModel element = (AnimationModel)modelElement;
+            addAnimationModel(element);
+        } 
+        else if (modelElement instanceof CameraModel)
+        {
+            CameraModel element = (CameraModel)modelElement;
+            addCameraModel(element);
+        }
+        else if (modelElement instanceof ImageModel)
+        {
+            ImageModel element = (ImageModel)modelElement;
+            addImageModel(element);
+        }
+        else if (modelElement instanceof MaterialModel)
+        {
+            MaterialModel element = (MaterialModel)modelElement;
+            addMaterialModel(element);
+        }
+        else if (modelElement instanceof MeshModel)
+        {
+            MeshModel element = (MeshModel)modelElement;
+            addMeshModel(element);
+        }
+        else if (modelElement instanceof NodeModel)
+        {
+            NodeModel element = (NodeModel)modelElement;
+            addNodeModel(element);
+        }
+        else if (modelElement instanceof SceneModel)
+        {
+            SceneModel element = (SceneModel)modelElement;
+            addSceneModel(element);
+        }
+        else if (modelElement instanceof SkinModel)
+        {
+            SkinModel element = (SkinModel)modelElement;
+            addSkinModel(element);
+        }
+        else if (modelElement instanceof TextureModel)
+        {
+            TextureModel element = (TextureModel)modelElement;
+            addTextureModel(element);
+        }
+        else if (modelElement instanceof TechniqueModel)
+        {
+            TechniqueModel element = (TechniqueModel)modelElement;
+            addTechniqueModel(element);
+        }
+        else if (modelElement instanceof ProgramModel)
+        {
+            ProgramModel element = (ProgramModel)modelElement;
+            addProgramModel(element);
+        }
+        else if (modelElement instanceof ShaderModel)
+        {
+            ShaderModel element = (ShaderModel)modelElement;
+            addShaderModel(element);
+        }
+        else if (modelElement instanceof AccessorModel)
+        {
+            // Accessor models are created by the buffer structure 
+            // builder when calling 'fill'
+        }
+        else if (modelElement instanceof BufferViewModel)
+        {
+            // Buffer view models are created by the buffer structure 
+            // builder when calling 'fill'
+        }
+        else if (modelElement instanceof BufferModel)
+        {
+            // Buffer models are created by the buffer structure 
+            // builder when calling 'fill'
+        }
+        else
+        {
+            logger.fine("Generic model element: " + modelElement);
+            boolean added = genericModelElements.add(modelElement);
+            if (added)
+            {
+                addReferencedModelElements(modelElement);
+            }
+        }
+    }
     
 }

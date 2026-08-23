@@ -50,8 +50,6 @@ import de.javagl.jgltf.impl.v1.Camera;
 import de.javagl.jgltf.impl.v1.CameraOrthographic;
 import de.javagl.jgltf.impl.v1.CameraPerspective;
 import de.javagl.jgltf.impl.v1.GlTF;
-import de.javagl.jgltf.impl.v1.GlTFChildOfRootProperty;
-import de.javagl.jgltf.impl.v1.GlTFProperty;
 import de.javagl.jgltf.impl.v1.Image;
 import de.javagl.jgltf.impl.v1.Material;
 import de.javagl.jgltf.impl.v1.Mesh;
@@ -85,12 +83,11 @@ import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.MaterialModel;
 import de.javagl.jgltf.model.MeshModel;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
-import de.javagl.jgltf.model.ModelElement;
-import de.javagl.jgltf.model.NamedModelElement;
 import de.javagl.jgltf.model.NodeModel;
 import de.javagl.jgltf.model.Optionals;
 import de.javagl.jgltf.model.SceneModel;
 import de.javagl.jgltf.model.SkinModel;
+import de.javagl.jgltf.model.TechniqueMaterialModel;
 import de.javagl.jgltf.model.TextureModel;
 import de.javagl.jgltf.model.gl.ProgramModel;
 import de.javagl.jgltf.model.gl.ShaderModel;
@@ -99,7 +96,6 @@ import de.javagl.jgltf.model.gl.TechniqueModel;
 import de.javagl.jgltf.model.gl.TechniqueParametersModel;
 import de.javagl.jgltf.model.gl.TechniqueStatesFunctionsModel;
 import de.javagl.jgltf.model.gl.TechniqueStatesModel;
-import de.javagl.jgltf.model.impl.DefaultTechniqueMaterialModel;
 
 /**
  * A class for creating the {@link GlTF version 1.0 glTF} from a 
@@ -323,7 +319,7 @@ public class GltfCreatorV1
     public GlTF create()
     {
         GlTF gltf = new GlTF();
-        transferGltfPropertyElements(gltfModel, gltf);
+        ModelElementsV1.transferGltfPropertyElementsFromModel(gltfModel, gltf);
         
         gltf.setAccessors(map("accessor",
             gltfModel.getAccessorModels(), 
@@ -423,11 +419,14 @@ public class GltfCreatorV1
         AccessorModel accessorModel, String bufferViewId)
     {
         Accessor accessor = new Accessor();
-        transferGltfChildOfRootPropertyElements(accessorModel, accessor);
+        ModelElementsV1.transferGltfChildOfRootPropertyElementsFromModel(accessorModel, accessor);
         
         accessor.setBufferView(bufferViewId);
         
-        accessor.setByteOffset(accessorModel.getByteOffset());
+        if (accessorModel.getByteOffset() != 0)
+        {
+            accessor.setByteOffset(accessorModel.getByteOffset());
+        }
         accessor.setComponentType(accessorModel.getComponentType());
         accessor.setCount(accessorModel.getCount());
         accessor.setType(accessorModel.getElementType().toString());
@@ -449,7 +448,7 @@ public class GltfCreatorV1
     private Animation createAnimation(AnimationModel animationModel)
     {
         Animation animation = new Animation();
-        transferGltfChildOfRootPropertyElements(animationModel, animation);
+        ModelElementsV1.transferGltfChildOfRootPropertyElementsFromModel(animationModel, animation);
         
         Map<Sampler, String> samplers = new LinkedHashMap<Sampler, String>();
         List<Channel> channels = animationModel.getChannels();
@@ -509,7 +508,7 @@ public class GltfCreatorV1
     public static Buffer createBuffer(BufferModel bufferModel)
     {
         Buffer buffer = new Buffer();
-        transferGltfChildOfRootPropertyElements(bufferModel, buffer);
+        ModelElementsV1.transferGltfChildOfRootPropertyElementsFromModel(bufferModel, buffer);
 
         buffer.setUri(bufferModel.getUri());
         buffer.setByteLength(bufferModel.getByteLength());
@@ -541,7 +540,7 @@ public class GltfCreatorV1
         BufferViewModel bufferViewModel, String bufferId)
     {
         BufferView bufferView = new BufferView();
-        transferGltfChildOfRootPropertyElements(bufferViewModel, bufferView);
+        ModelElementsV1.transferGltfChildOfRootPropertyElementsFromModel(bufferViewModel, bufferView);
 
         bufferView.setBuffer(bufferId);
         bufferView.setByteOffset(bufferViewModel.getByteOffset());
@@ -561,7 +560,7 @@ public class GltfCreatorV1
     private Camera createCamera(CameraModel cameraModel)
     {
         Camera camera = new Camera();
-        transferGltfChildOfRootPropertyElements(cameraModel, camera);
+        ModelElementsV1.transferGltfChildOfRootPropertyElementsFromModel(cameraModel, camera);
         
         CameraPerspectiveModel cameraPerspectiveModel = 
             cameraModel.getCameraPerspectiveModel();
@@ -611,7 +610,7 @@ public class GltfCreatorV1
     private Image createImage(ImageModel imageModel)
     {
         Image image = new Image();
-        transferGltfChildOfRootPropertyElements(imageModel, image);
+        ModelElementsV1.transferGltfChildOfRootPropertyElementsFromModel(imageModel, image);
         
         String bufferView = 
             bufferViewIds.get(imageModel.getBufferViewModel());
@@ -628,7 +627,7 @@ public class GltfCreatorV1
     
     /**
      * Create the {@link Material} for the given {@link MaterialModel}.
-     * If the given {@link MaterialModel} is not a {@link MaterialModelV1},
+     * If the given {@link MaterialModel} is not a {@link TechniqueMaterialModel},
      * then a warning is printed and <code>null</code> is returned.
      * 
      * @param materialModel The {@link MaterialModel}
@@ -636,9 +635,9 @@ public class GltfCreatorV1
      */
     private Material createMaterial(MaterialModel materialModel)
     {
-        if (materialModel instanceof DefaultTechniqueMaterialModel)
+        if (materialModel instanceof TechniqueMaterialModel)
         {
-            DefaultTechniqueMaterialModel materialModelV1 = (DefaultTechniqueMaterialModel)materialModel;
+            TechniqueMaterialModel materialModelV1 = (TechniqueMaterialModel)materialModel;
             return createMaterialV1(materialModelV1);
         }
         // TODO It should be possible to use a glTF 2.0 material model here
@@ -647,15 +646,15 @@ public class GltfCreatorV1
     }
     
     /**
-     * Create the {@link Material} for the given {@link DefaultTechniqueMaterialModel}
+     * Create the {@link Material} for the given {@link TechniqueMaterialModel}
      * 
-     * @param materialModel The {@link DefaultTechniqueMaterialModel}
+     * @param materialModel The {@link TechniqueMaterialModel}
      * @return The {@link Material}
      */
-    private Material createMaterialV1(DefaultTechniqueMaterialModel materialModel)
+    private Material createMaterialV1(TechniqueMaterialModel materialModel)
     {
         Material material = new Material();
-        transferGltfChildOfRootPropertyElements(materialModel, material);
+        ModelElementsV1.transferGltfChildOfRootPropertyElementsFromModel(materialModel, material);
         
         TechniqueModel techniqueModel = materialModel.getTechniqueModel();
         material.setTechnique(techniqueIds.get(techniqueModel));
@@ -690,7 +689,7 @@ public class GltfCreatorV1
     private Program createProgram(ProgramModel programModel)
     {
         Program program = new Program();
-        transferGltfChildOfRootPropertyElements(programModel, program);
+        ModelElementsV1.transferGltfChildOfRootPropertyElementsFromModel(programModel, program);
         
         ShaderModel vertexShaderModel = 
             programModel.getVertexShaderModel();
@@ -718,7 +717,7 @@ public class GltfCreatorV1
     private Shader createShader(ShaderModel shaderModel)
     {
         Shader shader = new Shader();
-        transferGltfChildOfRootPropertyElements(shaderModel, shader);
+        ModelElementsV1.transferGltfChildOfRootPropertyElementsFromModel(shaderModel, shader);
         
         ShaderType shaderType = shaderModel.getShaderType();
         if (shaderType == ShaderType.VERTEX_SHADER)
@@ -746,7 +745,7 @@ public class GltfCreatorV1
     private Technique createTechnique(TechniqueModel techniqueModel)
     {
         Technique technique = new Technique();
-        transferGltfChildOfRootPropertyElements(techniqueModel, technique);
+        ModelElementsV1.transferGltfChildOfRootPropertyElementsFromModel(techniqueModel, technique);
         
         ProgramModel programModel = techniqueModel.getProgramModel();
         technique.setProgram(programIds.get(programModel));
@@ -889,7 +888,7 @@ public class GltfCreatorV1
     private Mesh createMesh(MeshModel meshModel)
     {
         Mesh mesh = new Mesh();
-        transferGltfChildOfRootPropertyElements(meshModel, mesh);
+        ModelElementsV1.transferGltfChildOfRootPropertyElementsFromModel(meshModel, mesh);
         
         List<MeshPrimitive> meshPrimitives = new ArrayList<MeshPrimitive>();
         List<MeshPrimitiveModel> meshPrimitiveModels = 
@@ -919,7 +918,7 @@ public class GltfCreatorV1
         MeshPrimitiveModel meshPrimitiveModel)
     {
         MeshPrimitive meshPrimitive = new MeshPrimitive();
-        transferGltfPropertyElements(meshPrimitiveModel, meshPrimitive);
+        ModelElementsV1.transferGltfPropertyElementsFromModel(meshPrimitiveModel, meshPrimitive);
 
         meshPrimitive.setMode(meshPrimitiveModel.getMode());
         
@@ -954,7 +953,7 @@ public class GltfCreatorV1
     private Node createNode(NodeModel nodeModel)
     {
         Node node = new Node();
-        transferGltfChildOfRootPropertyElements(nodeModel, node);
+        ModelElementsV1.transferGltfChildOfRootPropertyElementsFromModel(nodeModel, node);
         
         if (!nodeModel.getChildren().isEmpty())
         {
@@ -1001,7 +1000,7 @@ public class GltfCreatorV1
     private Scene createScene(SceneModel sceneModel)
     {
         Scene scene = new Scene();
-        transferGltfChildOfRootPropertyElements(sceneModel, scene);
+        ModelElementsV1.transferGltfChildOfRootPropertyElementsFromModel(sceneModel, scene);
         
         scene.setNodes(map(
             sceneModel.getNodeModels(), nodeIds::get));
@@ -1017,7 +1016,7 @@ public class GltfCreatorV1
     private Skin createSkin(SkinModel skinModel)
     {
         Skin skin = new Skin();
-        transferGltfChildOfRootPropertyElements(skinModel, skin);
+        ModelElementsV1.transferGltfChildOfRootPropertyElementsFromModel(skinModel, skin);
         
         String inverseBindMatrices = 
             accessorIds.get(skinModel.getInverseBindMatrices());
@@ -1108,7 +1107,7 @@ public class GltfCreatorV1
     private Texture createTexture(TextureModel textureModel)
     {
         Texture texture = new Texture();
-        transferGltfChildOfRootPropertyElements(textureModel, texture);
+        ModelElementsV1.transferGltfChildOfRootPropertyElementsFromModel(textureModel, texture);
         
         SamplerInfo samplerInfo = new SamplerInfo(textureModel);
         String id = samplerIds.get(samplerInfo);
@@ -1131,7 +1130,7 @@ public class GltfCreatorV1
         asset.setVersion("1.0");
         asset.setGenerator("JglTF from https://github.com/javagl/JglTF");
         
-        transferGltfPropertyElements(assetModel, asset);
+        ModelElementsV1.transferGltfPropertyElementsFromModel(assetModel, asset);
         
         if (assetModel.getCopyright() != null)
         {
@@ -1144,35 +1143,6 @@ public class GltfCreatorV1
         return asset;
     }
 
-    /**
-     * Transfer the extensions and extras from the given model element to
-     * the given property
-     * 
-     * @param modelElement The model element
-     * @param property The property
-     */
-    private static void transferGltfPropertyElements(
-        ModelElement modelElement, GlTFProperty property)
-    {
-        property.setExtensions(modelElement.getExtensions());
-        property.setExtras(modelElement.getExtras());
-    }
-    
-    /**
-     * Transfer the name and extensions and extras from the given model
-     * element to the given property
-     * 
-     * @param modelElement The model element
-     * @param property The property
-     */
-    private static void transferGltfChildOfRootPropertyElements(
-        NamedModelElement modelElement,
-        GlTFChildOfRootProperty property)
-    {
-        property.setName(modelElement.getName());
-        transferGltfPropertyElements(modelElement, property);
-    }
-    
     /**
      * Creates a map that maps (unspecified) strings starting with the 
      * given prefix to the results of applying the given mapper to the

@@ -26,12 +26,14 @@
  */
 package de.javagl.jgltf.model.v2;
 
+import java.nio.IntBuffer;
 import java.util.logging.Logger;
 
 import de.javagl.jgltf.model.AccessorByteData;
 import de.javagl.jgltf.model.AccessorData;
 import de.javagl.jgltf.model.AccessorFloatData;
 import de.javagl.jgltf.model.AccessorIntData;
+import de.javagl.jgltf.model.AccessorDataBuffers;
 import de.javagl.jgltf.model.AccessorShortData;
 
 /**
@@ -65,44 +67,10 @@ class AccessorSparseUtils
      */
     private static int[] extractIndices(AccessorData accessorData)
     {
-        if (accessorData.getComponentType() == byte.class)
-        {
-            AccessorByteData accessorByteData = 
-                (AccessorByteData)accessorData;
-            int numElements = accessorByteData.getNumElements();
-            int indices[] = new int[numElements];
-            for (int i=0; i<numElements; i++)
-            {
-                indices[i] = accessorByteData.getInt(i, 0);
-            }
-            return indices;
-        }
-        if (accessorData.getComponentType() == short.class)
-        {
-            AccessorShortData accessorShortData = 
-                (AccessorShortData)accessorData;
-            int numElements = accessorShortData.getNumElements();
-            int indices[] = new int[numElements];
-            for (int i=0; i<numElements; i++)
-            {
-                indices[i] = accessorShortData.getInt(i, 0);
-            }
-            return indices;
-        }
-        if (accessorData.getComponentType() == int.class)
-        {
-            AccessorIntData accessorIntData = 
-                (AccessorIntData)accessorData;
-            int numElements = accessorIntData.getNumElements();
-            int indices[] = new int[numElements];
-            for (int i=0; i<numElements; i++)
-            {
-                indices[i] = accessorIntData.get(i, 0);
-            }
-            return indices;
-        }
-        throw new IllegalArgumentException(
-            "Invalid type for indices: " + accessorData.getComponentType());
+        int n = accessorData.getTotalNumComponents();
+        int result[] = new int[n];
+        AccessorDataBuffers.readAsInts(accessorData, IntBuffer.wrap(result));
+        return result;
     }
 
     /**

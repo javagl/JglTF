@@ -57,14 +57,18 @@ public class ImageUtils
     
     /**
      * Returns the contents of the given buffer as a <code>BufferedImage</code>.
+     * <br>
+     * <br>
      * Returns <code>null</code> if the given buffer is <code>null</code>.
      * If the data can not be converted into a buffered image, then an error
-     * message is printed and <code>null</code> is returned.
+     * message is printed and <code>null</code> is returned.<br>
+     * <br>
+     * This method is not part of the public API.
      * 
      * @param byteBuffer The byte buffer
      * @return The buffered image
      */
-    static BufferedImage readAsBufferedImage(ByteBuffer byteBuffer)
+    public static BufferedImage readAsBufferedImage(ByteBuffer byteBuffer)
     {
         if (byteBuffer == null)
         {

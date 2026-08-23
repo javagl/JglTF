@@ -37,14 +37,14 @@ public class DefaultNormalTextureInfoModel extends DefaultTextureInfoModel
     /**
      * The scale factor
      */
-    private double scale;
+    private Double scale;
     
     /**
      * Creates a new instance
      */
     public DefaultNormalTextureInfoModel()
     {
-        scale = 1.0;
+        // Default constructor
     }
 
     /**
@@ -52,13 +52,13 @@ public class DefaultNormalTextureInfoModel extends DefaultTextureInfoModel
      * 
      * @param scale The scale factor
      */
-    public void setScale(double scale)
+    public void setScale(Double scale)
     {
         this.scale = scale;
     }
     
     @Override
-    public double getScale()
+    public Double getScale()
     {
         return scale;
     }

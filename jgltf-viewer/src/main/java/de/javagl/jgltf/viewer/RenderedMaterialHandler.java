@@ -39,6 +39,7 @@ import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.NodeModel;
 import de.javagl.jgltf.model.NormalTextureInfoModel;
 import de.javagl.jgltf.model.OcclusionTextureInfoModel;
+import de.javagl.jgltf.model.PbrMaterialModel;
 import de.javagl.jgltf.model.PbrMetallicRoughnessModel;
 import de.javagl.jgltf.model.TextureModel;
 import de.javagl.jgltf.model.gl.ProgramModel;
@@ -256,7 +257,7 @@ class RenderedMaterialHandler
      * @return The {@link RenderedMaterial}
      */
     RenderedMaterial createRenderedMaterial(
-        DefaultPbrMaterialModel material, int numJoints)
+        PbrMaterialModel material, int numJoints)
     {
         MaterialStructure materialStructure = 
             new MaterialStructure(material, numJoints);
@@ -276,7 +277,7 @@ class RenderedMaterialHandler
         
         
         TextureModel baseColorTexture = 
-            material.getBaseColorTexture();
+            material.getBaseColorTextureModel();
         if (baseColorTexture != null)
         {
             values.put("hasBaseColorTexture", 1);
@@ -300,7 +301,7 @@ class RenderedMaterialHandler
         
         
         TextureModel metallicRoughnessTexture = 
-            material.getMetallicRoughnessTexture();
+            material.getMetallicRoughnessTextureModel();
         if (metallicRoughnessTexture != null)
         {
             values.put("hasMetallicRoughnessTexture", 1);
@@ -324,7 +325,7 @@ class RenderedMaterialHandler
         
         
         TextureModel normalTexture = 
-            material.getNormalTexture();
+            material.getNormalTextureModel();
         if (normalTexture != null)
         {
             values.put("hasNormalTexture", 1);
@@ -333,7 +334,7 @@ class RenderedMaterialHandler
             values.put("normalTexture", normalTexture);
             
             NormalTextureInfoModel normalTextureInfo = 
-                material.getNormalTextureInfoModel();
+                material.getNormalTexture();
             double normalScale = normalTextureInfo.getScale();
             values.put("normalScale", normalScale);
         }
@@ -344,7 +345,7 @@ class RenderedMaterialHandler
         }
 
         TextureModel occlusionTexture = 
-            material.getOcclusionTexture();
+            material.getOcclusionTextureModel();
         if (occlusionTexture != null)
         {
             values.put("hasOcclusionTexture", 1);
@@ -353,7 +354,7 @@ class RenderedMaterialHandler
             values.put("occlusionTexture", occlusionTexture);
             
             OcclusionTextureInfoModel occlusionTextureInfo = 
-                material.getOcclusionTextureInfoModel();
+                material.getOcclusionTexture();
             double occlusionStrength = occlusionTextureInfo.getStrength();
             values.put("occlusionStrength", occlusionStrength);
         }
@@ -366,7 +367,7 @@ class RenderedMaterialHandler
         }
 
         TextureModel emissiveTexture = 
-            material.getEmissiveTexture();
+            material.getEmissiveTextureModel();
         if (emissiveTexture != null)
         {
             values.put("hasEmissiveTexture", 1);

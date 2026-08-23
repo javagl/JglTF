@@ -5,11 +5,10 @@ Transmission Format, in Java
 
 **Note:** This library is still subject to change.
 
-This library extends the basic auto-generated 
-[jgltf-impl-v1](https://github.com/javagl/JglTF/tree/master/jgltf-impl-v1) and
-[jgltf-impl-v2](https://github.com/javagl/JglTF/tree/master/jgltf-impl-v2) libraries
-by classes that offer the entities and data that appear in a
-glTF in a form that is more convenient for the use in Java. 
+This library extends the basic auto-generated [jgltf-impl-v1](../jgltf-impl-v1)
+and [jgltf-impl-v2](../jgltf-impl-v2) libraries by classes that offer the 
+entities and data that appear in a glTF in a form that is more convenient for 
+the use in Java. 
 
 The classes serve as a thin abstraction layer around the underlying implementation.
 The `GltfModel` class offers the functionality for accessing the data elements 

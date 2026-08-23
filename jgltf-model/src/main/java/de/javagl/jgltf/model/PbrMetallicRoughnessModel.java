@@ -33,38 +33,98 @@ package de.javagl.jgltf.model;
 public interface PbrMetallicRoughnessModel extends ModelElement
 {
     /**
-     * Returns the base color factor
+     * The factors for the base color of the material. (optional)<br> 
+     * Default: [1.0,1.0,1.0,1.0]<br> 
+     * Number of items: 4<br> 
+     * Array elements:<br> 
+     * &nbsp;&nbsp;The elements of this array (optional)<br> 
+     * &nbsp;&nbsp;Minimum: 0.0 (inclusive)<br> 
+     * &nbsp;&nbsp;Maximum: 1.0 (inclusive) 
      *
      * @return The base color factor
      */
     double[] getBaseColorFactor();
-
+    
     /**
-     * Returns the base color texture info
-     *
-     * @return The base color texture info
+     * The factors for the base color of the material. (optional)<br> 
+     * Default: [1.0,1.0,1.0,1.0]<br> 
+     * Number of items: 4<br> 
+     * Array elements:<br> 
+     * &nbsp;&nbsp;The elements of this array (optional)<br> 
+     * &nbsp;&nbsp;Minimum: 0.0 (inclusive)<br> 
+     * &nbsp;&nbsp;Maximum: 1.0 (inclusive) 
+     * 
+     * @param baseColorFactor The baseColorFactor to set
      */
-    TextureInfoModel getBaseColorTextureInfoModel();
+    void setBaseColorFactor(double[] baseColorFactor);
 
     /**
-     * Returns the metallic factor
+     * The base color texture. (optional) 
+     *
+     * @return The base color texture
+     */
+    TextureInfoModel getBaseColorTexture();
+
+    /**
+     * The base color texture. (optional) 
+     * 
+     * @param baseColorTexture The baseColorTexture to set
+     */
+    void setBaseColorTexture(TextureInfoModel baseColorTexture);
+    
+    /**
+     * The factor for the metalness of the material. (optional)<br> 
+     * Default: 1.0<br> 
+     * Minimum: 0.0 (inclusive)<br> 
+     * Maximum: 1.0 (inclusive) 
      *
      * @return The metallic factor
      */
-    double getMetallicFactor();
+    Double getMetallicFactor();
     
     /**
-     * Returns the roughness factor
-     *
-     * @return The roughness factor
+     * The factor for the metalness of the material. (optional)<br> 
+     * Default: 1.0<br> 
+     * Minimum: 0.0 (inclusive)<br> 
+     * Maximum: 1.0 (inclusive) 
+     * 
+     * @param metallicFactor The metallicFactor to set
      */
-    double getRoughnessFactor();
+    void setMetallicFactor(Double metallicFactor);
+    
+    /**
+     * The factor for the roughness of the material. (optional)<br> 
+     * Default: 1.0<br> 
+     * Minimum: 0.0 (inclusive)<br> 
+     * Maximum: 1.0 (inclusive) 
+     * 
+     * @return roughnessFactor The roughnessFactor
+     */
+    Double getRoughnessFactor();
 
     /**
-     * Returns the metallic-roughness-texture info
+     * The factor for the roughness of the material. (optional)<br> 
+     * Default: 1.0<br> 
+     * Minimum: 0.0 (inclusive)<br> 
+     * Maximum: 1.0 (inclusive) 
+     * 
+     * @param roughnessFactor The roughnessFactor to set
+     */
+    void setRoughnessFactor(Double roughnessFactor);
+    
+    /**
+     * The metallic-roughness texture. (optional) 
      *
      * @return The metallic-roughness texture info
      */
-    TextureInfoModel getMetallicRoughnessTextureInfoModel();
+    TextureInfoModel getMetallicRoughnessTexture();
+    
+    /**
+     * The metallic-roughness texture. (optional) 
+     * 
+     * @param metallicRoughnessTexture The metallic-roughness texture to set
+     */
+    void setMetallicRoughnessTexture(TextureInfoModel metallicRoughnessTexture);
+    
 
 }

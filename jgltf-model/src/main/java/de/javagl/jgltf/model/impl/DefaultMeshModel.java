@@ -27,11 +27,14 @@
 package de.javagl.jgltf.model.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import de.javagl.jgltf.model.MeshModel;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
+import de.javagl.jgltf.model.ModelElement;
 
 /**
  * Implementation of a {@link MeshModel}
@@ -68,6 +71,16 @@ public class DefaultMeshModel extends AbstractNamedModelElement
     }
     
     /**
+     * Remove the given {@link MeshPrimitiveModel}
+     * 
+     * @param meshPrimitiveModel The {@link MeshPrimitiveModel}
+     */
+    public void removeMeshPrimitiveModel(MeshPrimitiveModel meshPrimitiveModel)
+    {
+        this.meshPrimitiveModels.remove(meshPrimitiveModel);
+    }
+    
+    /**
      * Set the default morph target weights to be a <b>reference</b> to the 
      * given array. 
      * 
@@ -90,4 +103,26 @@ public class DefaultMeshModel extends AbstractNamedModelElement
         return weights;
     }
 
+    @Override
+    public Set<ModelElement> getReferencedModelElements()
+    {
+        Set<ModelElement> modelElements = 
+            getReferencedExtensionModelElements();
+        modelElements.addAll(meshPrimitiveModels);
+        return modelElements;
+    }
+    
+    @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove)
+    {
+        removeExtensionModelElements(modelElementsToRemove);
+        meshPrimitiveModels.removeAll(modelElementsToRemove);
+        for (MeshPrimitiveModel meshPrimitiveModel : meshPrimitiveModels)
+        {
+            meshPrimitiveModel.removeModelElements(modelElementsToRemove);
+        }
+        return meshPrimitiveModels.isEmpty();
+    }
+    
 }

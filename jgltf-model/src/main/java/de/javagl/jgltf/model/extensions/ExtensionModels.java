@@ -1,0 +1,410 @@
+/*
+ * www.javagl.de - JglTF
+ *
+ * Copyright 2015-2016 Marco Hutter - http://www.javagl.de
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
+package de.javagl.jgltf.model.extensions;
+
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import de.javagl.jgltf.impl.v2.GlTFProperty;
+import de.javagl.jgltf.model.GltfModel;
+import de.javagl.jgltf.model.ModelElement;
+import de.javagl.jgltf.model.impl.AbstractModelElement;
+
+/**
+ * Methods related to handling extension implementation- and model objects.
+ * 
+ * This class is not part of the public API.
+ *
+ */
+public class ExtensionModels
+{
+    /**
+     * The logger used in this class
+     */
+    private static final Logger logger =
+        Logger.getLogger(ExtensionModels.class.getName());
+
+    /**
+     * The log level for detailed information about the conversion
+     */
+    private static final Level detailLevel = Level.FINE;
+
+    /**
+     * Call {@link ExtensionHandler#preprocess(GltfModel, ExtensionProcessing)}
+     * with the given model and extension processing instance on all known
+     * extension handlers.
+     * 
+     * @param gltfModel The glTF model
+     * @param extensionProcessing The {@link ExtensionProcessing}
+     */
+    public static void preprocess(GltfModel gltfModel,
+        ExtensionProcessing extensionProcessing)
+    {
+        ExtensionHandlerRegistry extensionHandlerRegistry =
+            ExtensionHandlerRegistries.get();
+        List<ExtensionHandler> extensionHandlers =
+            extensionHandlerRegistry.getAll();
+        for (ExtensionHandler extensionHandler : extensionHandlers)
+        {
+            extensionHandler.preprocess(gltfModel, extensionProcessing);
+        }
+    }
+
+    /**
+     * Process the extensions of the given model element (with the given class)
+     * that is contained in the given glTF model.<br>
+     * <br>
+     * Note: An implementation detail is that this assumes that the given model
+     * element extends the {@link AbstractModelElement} class.<br>
+     * <br>
+     * This will examine all extension objects that are stored in the given
+     * {@link ModelElement}. For each extension object, it will look up an
+     * {@link ExtensionHandler} in the {@link ExtensionHandlerRegistry}. When an
+     * extension handler is found, then it will be used for converting the
+     * extension object into its "model" representation, using
+     * {@link ExtensionHandler#convertToModel(GltfModel, Object, Object)}, and
+     * add it to the {@link ModelElement#getExtensionModels()} of the model
+     * element.<br>
+     * <br>
+     * Clients can then obtain the extension model object from the model
+     * element, with {@link ModelElement#getExtensionModel(String, Class)}.
+     * 
+     * @param gltfModel The {@link GltfModel}
+     * @param modelElement The {@link ModelElement}
+     * @param modelClass The class of the {@link ModelElement}
+     */
+    public static void createExtensionModels(GltfModel gltfModel,
+        ModelElement modelElement, Class<?> modelClass)
+    {
+        if (!(modelElement instanceof AbstractModelElement))
+        {
+            logger.warning("Could not process extensions of " + modelElement
+                + ": The object is not an AbstractModelElement");
+            return;
+        }
+        AbstractModelElement abstractModelElement =
+            (AbstractModelElement) modelElement;
+
+        Map<String, Object> extensions = modelElement.getExtensions();
+        if (extensions == null || extensions.isEmpty())
+        {
+            return;
+        }
+        ExtensionHandlerRegistry extensionHandlerRegistry =
+            ExtensionHandlerRegistries.get();
+        for (Entry<String, Object> entry : extensions.entrySet())
+        {
+            String extensionName = entry.getKey();
+
+            Object jsonObject = entry.getValue();
+            ExtensionHandler extensionHandler =
+                extensionHandlerRegistry.get(modelClass, extensionName);
+
+            if (extensionHandler == null)
+            {
+                logger.fine("No extension handler found for " + extensionName);
+                continue;
+            }
+            logger.fine("Found extension " + extensionName
+                + " with extension handler " + extensionHandler);
+
+            Class<?> implClass = extensionHandler.getImplClass();
+
+            // Try to convert the object, printing a warning when
+            // the conversion fails
+            Object impl =
+                GltfExtensions.convertValueOptional(jsonObject, implClass);
+            if (impl != null)
+            {
+                Object extensionModel = extensionHandler
+                    .convertToModel(gltfModel, modelElement, impl);
+
+                if (logger.isLoggable(detailLevel))
+                {
+                    logger.log(detailLevel,
+                        "Found extension implementation for " + extensionName);
+                    logger.log(detailLevel,
+                        "  with model class         " + modelClass);
+                    logger.log(detailLevel,
+                        "  extension handler        " + extensionHandler);
+                    logger.log(detailLevel,
+                        "  converted implementation " + impl);
+                    logger.log(detailLevel,
+                        "  to model                 " + extensionModel);
+                }
+
+                if (extensionModel != null)
+                {
+                    abstractModelElement.addExtensionModel(extensionName,
+                        extensionModel);
+                }
+            }
+        }
+    }
+
+    /**
+     * Create the implementation-level representation of the given model
+     * element, to be stored in the {@link GlTFProperty#getExtensions()} of the
+     * given glTF property.<br>
+     * <br>
+     * This will examine all extension model objects that are stored in the
+     * {@link ModelElement#getExtensionModels()} of the given
+     * {@link ModelElement}. For each extension model object, it will look up an
+     * {@link ExtensionHandler} in the {@link ExtensionHandlerRegistry}. When an
+     * extension handler is found, then it will be used for converting the
+     * extension model object into its "impl" representation, using
+     * {@link ExtensionHandler#convertToImpl(GltfModel, Object)}, and add it to
+     * the {@link GlTFProperty#getExtensions()} of the given
+     * {@link GlTFProperty}.<br>
+     * <br>
+     * 
+     * @param gltfModel The {@link GltfModel}
+     * @param modelElement The {@link ModelElement}
+     * @param modelClass The class of the {@link ModelElement}
+     * @param glTFProperty The {@link GlTFProperty} that will store the
+     *        implementation-level representation of the extension.
+     */
+    public static void createExtensionImpls(GltfModel gltfModel,
+        ModelElement modelElement, Class<?> modelClass,
+        GlTFProperty glTFProperty)
+    {
+        Map<String, Object> extensionModels = modelElement.getExtensionModels();
+        if (extensionModels == null || extensionModels.isEmpty())
+        {
+            return;
+        }
+        ExtensionHandlerRegistry extensionHandlerRegistry =
+            ExtensionHandlerRegistries.get();
+        for (Entry<String, Object> entry : extensionModels.entrySet())
+        {
+            String extensionName = entry.getKey();
+            Object modelObject = entry.getValue();
+            ExtensionHandler extensionHandler =
+                extensionHandlerRegistry.get(modelClass, extensionName);
+
+            if (extensionHandler == null)
+            {
+                logger.info("No extension handler found for " + extensionName);
+                continue;
+            }
+            logger.fine("Found extension " + extensionName
+                + " with extension handler " + extensionHandler);
+
+            Object impl =
+                extensionHandler.convertToImpl(gltfModel, modelObject);
+
+            if (logger.isLoggable(detailLevel))
+            {
+                logger.log(detailLevel,
+                    "Found extension model for " + extensionName);
+                logger.log(detailLevel, "  with model class  " + modelClass);
+                logger.log(detailLevel,
+                    "  extension handler " + extensionHandler);
+                logger.log(detailLevel, "  converted model   " + modelElement);
+                logger.log(detailLevel, "  to implementation " + impl);
+            }
+            
+            // Extensions that do not have an explicit implementation-side
+            // representation on the JSON level may return 'null' as the
+            // implementation object.
+            if (impl != null)
+            {
+                glTFProperty.addExtensions(extensionName, impl);
+            }
+        }
+    }
+
+    /**
+     * Copy all extension model objects that are stored in the given source
+     * model element into the target model element.
+     * 
+     * @param gltfModel The glTF model that contains the source
+     * @param sourceElement The source {@link ModelElement}
+     * @param targetElement The target {@link ModelElement}
+     * @param modelElementMap The mapping from source to target model elements
+     *        that will be passed to {@link ExtensionHandler#copy}
+     */
+    public static void copyExtensionModels(GltfModel gltfModel,
+        ModelElement sourceElement, ModelElement targetElement,
+        Map<ModelElement, ModelElement> modelElementMap)
+    {
+        Class<? extends ModelElement> sourceType = sourceElement.getClass();
+        Set<Class<?>> types = computeModelElementInterfaceTypes(sourceType);
+        for (Class<?> type : types)
+        {
+            logger.finer("Copying extension models based on type " + type);
+            copyExtensionModels(gltfModel, sourceElement, targetElement, type,
+                modelElementMap);
+        }
+    }
+
+    /**
+     * Copy all extension model objects that are stored in the given source
+     * model element into the target model element, based on the given model
+     * class
+     * 
+     * @param gltfModel The glTF model that contains the source
+     * @param sourceElement The source {@link ModelElement}
+     * @param targetElement The target {@link ModelElement}
+     * @param modelClass The model class
+     * @param modelElementMap The mapping from source to target model elements
+     *        that will be passed to {@link ExtensionHandler#copy}
+     */
+    private static void copyExtensionModels(GltfModel gltfModel,
+        ModelElement sourceElement, ModelElement targetElement,
+        Class<?> modelClass, Map<ModelElement, ModelElement> modelElementMap)
+    {
+        if (!(targetElement instanceof AbstractModelElement))
+        {
+            logger.warning("The target element is not an AbstractModelElement");
+            return;
+        }
+        AbstractModelElement targetModelElement =
+            (AbstractModelElement) targetElement;
+        ExtensionModels.copyExtensionModelsInternal(gltfModel, sourceElement,
+            targetModelElement, modelClass, modelElementMap);
+    }
+
+    /**
+     * Copy all extension model elements that are contained in the given source
+     * element, and add the copies to the given target.<br>
+     * <br>
+     * Note: An implementation detail is that this assumes that the given target
+     * element extends the {@link AbstractModelElement} class.<br>
+     * <br>
+     * This will examine all extension objects that are stored in the given
+     * source {@link ModelElement}. For each extension object, it will look up
+     * an {@link ExtensionHandler} in the {@link ExtensionHandlerRegistry}. When
+     * an extension handler is found, then it will be used for copying the
+     * extension object, using {@link ExtensionHandler#copy}, and the copy to
+     * the {@link ModelElement#getExtensionModels()} of the model element.<br>
+     * <br>
+     * 
+     * @param gltfModel The {@link GltfModel}
+     * @param sourceModelElement The source {@link ModelElement}
+     * @param targetModelElement The target {@link ModelElement}
+     * @param modelClass The class of the {@link ModelElement}
+     * @param modelElementMap The mapping from source to target model elements
+     *        that will be passed to {@link ExtensionHandler#copy}
+     */
+    private static void copyExtensionModelsInternal(GltfModel gltfModel,
+        ModelElement sourceModelElement, ModelElement targetModelElement,
+        Class<?> modelClass, Map<ModelElement, ModelElement> modelElementMap)
+    {
+        if (!(targetModelElement instanceof AbstractModelElement))
+        {
+            logger
+                .warning("Could not process extensions of " + targetModelElement
+                    + ": The object is not an AbstractModelElement");
+            return;
+        }
+        AbstractModelElement abstractTargetModelElement =
+            (AbstractModelElement) targetModelElement;
+
+        Map<String, Object> sourceExtensionModels =
+            sourceModelElement.getExtensionModels();
+        if (sourceExtensionModels == null || sourceExtensionModels.isEmpty())
+        {
+            return;
+        }
+        ExtensionHandlerRegistry extensionHandlerRegistry =
+            ExtensionHandlerRegistries.get();
+        for (Entry<String, Object> entry : sourceExtensionModels.entrySet())
+        {
+            String extensionName = entry.getKey();
+            ExtensionHandler extensionHandler =
+                extensionHandlerRegistry.get(modelClass, extensionName);
+            if (extensionHandler == null)
+            {
+                continue;
+            }
+            logger.fine(
+                "Copy extension " + extensionName + " with extension handler "
+                    + extensionHandler + " for " + modelClass);
+
+            Object sourceExtensionModelObject = entry.getValue();
+            Object targetExtensionModelObject = extensionHandler.copy(gltfModel,
+                sourceExtensionModelObject, modelElementMap);
+            abstractTargetModelElement.addExtensionModel(extensionName,
+                targetExtensionModelObject);
+        }
+    }
+
+    /**
+     * Compute the set of all class objects that represent interfaces that are
+     * implemented by the given class or any of its superclasses, and that are
+     * assignable to {@link ModelElement}
+     * 
+     * @param c The class
+     * @return The resulting types
+     */
+    private static Set<Class<?>> computeModelElementInterfaceTypes(Class<?> c)
+    {
+        Set<Class<?>> types = new LinkedHashSet<Class<?>>();
+        computeModelElementInterfaceTypes(c, types);
+        return types;
+    }
+
+    /**
+     * Implementation for {@link #computeModelElementInterfaceTypes(Class)}
+     * 
+     * @param c The class
+     * @param types The resulting types
+     */
+    private static void computeModelElementInterfaceTypes(Class<?> c,
+        Set<Class<?>> types)
+    {
+        if (c.isInterface() && ModelElement.class.isAssignableFrom(c))
+        {
+            types.add(c);
+        }
+        Class<?> superclass = c.getSuperclass();
+        if (superclass != null)
+        {
+            computeModelElementInterfaceTypes(superclass, types);
+        }
+        Class<?>[] interfaces = c.getInterfaces();
+        for (Class<?> i : interfaces)
+        {
+            computeModelElementInterfaceTypes(i, types);
+        }
+    }
+
+    /**
+     * Private constructor to prevent instantiation
+     */
+    private ExtensionModels()
+    {
+        // Private constructor to prevent instantiation
+    }
+
+}

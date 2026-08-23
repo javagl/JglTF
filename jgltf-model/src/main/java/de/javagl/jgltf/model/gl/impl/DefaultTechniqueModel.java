@@ -26,11 +26,15 @@
  */
 package de.javagl.jgltf.model.gl.impl;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
+import de.javagl.jgltf.model.ModelElement;
+import de.javagl.jgltf.model.NodeModel;
 import de.javagl.jgltf.model.gl.ProgramModel;
 import de.javagl.jgltf.model.gl.TechniqueModel;
 import de.javagl.jgltf.model.gl.TechniqueParametersModel;
@@ -188,5 +192,55 @@ public class DefaultTechniqueModel extends AbstractNamedModelElement
     {
         return techniqueStatesModel;
     }
+    
+    @Override
+    public Set<ModelElement> getReferencedModelElements()
+    {
+        Set<ModelElement> modelElements = 
+            getReferencedExtensionModelElements();
+        for (TechniqueParametersModel parameter : parameters.values())
+        {
+            NodeModel nodeModel = parameter.getNodeModel();
+            if (nodeModel != null)
+            {
+                modelElements.add(nodeModel);
+            }
+            Object value = parameter.getValue();
+            if (value instanceof ModelElement)
+            {
+                ModelElement modelElement = (ModelElement) value;
+                modelElements.add(modelElement);
+            }
+        }
+        return modelElements;
+    }
+    
+    @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove) 
+    {
+        removeExtensionModelElements(modelElementsToRemove);
+        boolean removeThis = false;
+        for (TechniqueParametersModel parameter : parameters.values())
+        {
+            NodeModel nodeModel = parameter.getNodeModel();
+            if (modelElementsToRemove.contains(nodeModel))
+            {
+                removeThis = true;
+            }
+            Object value = parameter.getValue();
+            if (value instanceof ModelElement)
+            {
+                ModelElement modelElement = (ModelElement) value;
+                if (modelElementsToRemove.contains(modelElement))
+                {
+                    removeThis = true;
+                }
+            }
+        }
+        return removeThis;
+    }
+    
+    
 }
 

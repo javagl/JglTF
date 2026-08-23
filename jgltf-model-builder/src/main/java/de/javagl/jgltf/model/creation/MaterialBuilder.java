@@ -167,7 +167,7 @@ public class MaterialBuilder
         DefaultTextureInfoModel textureInfo = new DefaultTextureInfoModel();
         textureInfo.setTextureModel(metallicRoughnessTexture);
         textureInfo.setTexCoord(texCoord);
-        metallicRoughnessModel.setMetallicRoughnessTextureInfo(textureInfo);
+        metallicRoughnessModel.setMetallicRoughnessTexture(textureInfo);
         materialModel.setPbrMetallicRoughnessModel(metallicRoughnessModel);
         return this;
     }
@@ -207,7 +207,7 @@ public class MaterialBuilder
         textureInfo.setTextureModel(normalTexture);
         textureInfo.setTexCoord(texCoord);
         textureInfo.setScale(scale);
-        materialModel.setNormalTextureInfoModel(textureInfo);
+        materialModel.setNormalTexture(textureInfo);
         return this;
     }
 
@@ -246,7 +246,7 @@ public class MaterialBuilder
         textureInfo.setTextureModel(occlusionTexture);
         textureInfo.setTexCoord(texCoord);
         textureInfo.setStrength(strength);
-        materialModel.setOcclusionTextureInfoModel(textureInfo);
+        materialModel.setOcclusionTexture(textureInfo);
         return this;
     }
 
@@ -288,7 +288,7 @@ public class MaterialBuilder
             new DefaultTextureInfoModel();
         textureInfo.setTextureModel(emissiveTexture);
         textureInfo.setTexCoord(texCoord);
-        materialModel.setEmissiveTextureInfoModel(textureInfo);
+        materialModel.setEmissiveTexture(textureInfo);
         materialModel.setEmissiveFactor(new double[] { r, g, b });
         return this;
     }

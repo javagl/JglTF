@@ -6,11 +6,11 @@ A viewer for glTF.
 
 There are viewer implementations based on different Java OpenGL bindings:
 
-* [jgltf-viewer-jogl](https://github.com/javagl/JglTF/tree/master/jgltf-viewer-jogl) - A glTF viewer based on [JOGL](http://jogamp.org/jogl/www/)
-* [jgltf-viewer-lwjgl](https://github.com/javagl/JglTF/tree/master/jgltf-viewer-lwjgl) - A glTF viewer based on [LWJGL version 2](http://legacy.lwjgl.org/)
+* [jgltf-viewer-jogl](../jgltf-viewer-jogl) - A glTF viewer based on [JOGL](http://jogamp.org/jogl/www/)
+* [jgltf-viewer-lwjgl](../jgltf-viewer-lwjgl) - A glTF viewer based on [LWJGL version 2](http://legacy.lwjgl.org/)
 
 The following is a complete, standalone program that downloads the "Duck" model 
-from the [Khronos glTF samples repository](https://github.com/KhronosGroup/glTF-Sample-Models/)
+from the [Khronos glTF samples repository](https://github.com/KhronosGroup/glTF-Sample-Assets/)
 and displays it in a frame:
 
 ```Java
@@ -32,7 +32,7 @@ public class GltfViewerMiniDemo
     {
         String uriString = 
             "https://raw.githubusercontent.com/KhronosGroup/" + 
-            "glTF-Sample-Models/master/2.0/Duck/glTF/Duck.gltf";
+            "glTF-Sample-Assets/main/Models/Duck/glTF/Duck.gltf";
         GltfModelReader r = new GltfModelReader();
         GltfModel gltfModel = r.read(new URI(uriString));
         SwingUtilities.invokeLater(() -> createAndShowGui(gltfModel));

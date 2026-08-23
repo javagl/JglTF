@@ -48,8 +48,10 @@ import de.javagl.jgltf.model.MeshModel;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
 import de.javagl.jgltf.model.NodeModel;
 import de.javagl.jgltf.model.Optionals;
+import de.javagl.jgltf.model.PbrMaterialModel;
 import de.javagl.jgltf.model.SceneModel;
 import de.javagl.jgltf.model.SkinModel;
+import de.javagl.jgltf.model.TechniqueMaterialModel;
 import de.javagl.jgltf.model.TextureModel;
 import de.javagl.jgltf.model.gl.ProgramModel;
 import de.javagl.jgltf.model.gl.TechniqueModel;
@@ -57,7 +59,6 @@ import de.javagl.jgltf.model.gl.TechniqueParametersModel;
 import de.javagl.jgltf.model.gl.TechniqueStatesFunctionsModel;
 import de.javagl.jgltf.model.gl.TechniqueStatesModel;
 import de.javagl.jgltf.model.gl.impl.TechniqueStatesModels;
-import de.javagl.jgltf.model.impl.DefaultPbrMaterialModel;
 import de.javagl.jgltf.model.impl.DefaultTechniqueMaterialModel;
 import de.javagl.jgltf.model.v1.gl.DefaultModels;
 import de.javagl.jgltf.viewer.Morphing.MorphableAttribute;
@@ -287,17 +288,17 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
             return new DefaultRenderedMaterial(techniqueModel, values);
         }
         
-        if (materialModel instanceof DefaultTechniqueMaterialModel)
+        if (materialModel instanceof TechniqueMaterialModel)
         {
-            DefaultTechniqueMaterialModel materialModelV1 = (DefaultTechniqueMaterialModel)materialModel;
+            TechniqueMaterialModel materialModelV1 = (TechniqueMaterialModel)materialModel;
             TechniqueModel techniqueModel = 
                 materialModelV1.getTechniqueModel();
             Map<String, Object> values = materialModelV1.getValues();
             return new DefaultRenderedMaterial(techniqueModel, values);
         }
-        if (materialModel instanceof DefaultPbrMaterialModel)
+        if (materialModel instanceof PbrMaterialModel)
         {
-            DefaultPbrMaterialModel DefaultPbrMaterialModel = (DefaultPbrMaterialModel)materialModel;
+            PbrMaterialModel pbrMaterialModel = (PbrMaterialModel)materialModel;
             SkinModel skinModel = nodeModel.getSkinModel();
             int numJoints = 0;
             if (skinModel != null)
@@ -305,7 +306,7 @@ class DefaultRenderedGltfModel implements RenderedGltfModel
                 numJoints = skinModel.getJoints().size();
             }
             return materialModelHandler.createRenderedMaterial(
-                DefaultPbrMaterialModel, numJoints);
+                pbrMaterialModel, numJoints);
         }
         logger.severe("Unknown material model type: " + materialModel);
         return null;

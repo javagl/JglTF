@@ -27,12 +27,20 @@
 package de.javagl.jgltf.model.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.logging.Logger;
 
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.AnimationModel;
+import de.javagl.jgltf.model.MeshModel;
+import de.javagl.jgltf.model.MeshPrimitiveModel;
+import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.NodeModel;
 
 /**
@@ -41,6 +49,12 @@ import de.javagl.jgltf.model.NodeModel;
 public class DefaultAnimationModel extends AbstractNamedModelElement
     implements AnimationModel
 {
+    /**
+     * The logger used in this class
+     */
+    private static final Logger logger =
+        Logger.getLogger(DefaultAnimationModel.class.getName());
+    
     /**
      * Default implementation of a 
      * {@link de.javagl.jgltf.model.AnimationModel.Sampler}
@@ -193,5 +207,109 @@ public class DefaultAnimationModel extends AbstractNamedModelElement
     {
         return Collections.unmodifiableList(channels);
     }
+    
+    
+    @Override
+    public Set<ModelElement> getReferencedModelElements()
+    {
+        Set<ModelElement> modelElements = 
+            getReferencedExtensionModelElements();
+        for (Channel channel : channels)
+        {
+            NodeModel nodeModel = channel.getNodeModel();
+            if (nodeModel != null)
+            {
+                modelElements.add(nodeModel);
+            }
+            Sampler sampler = channel.getSampler();
+            AccessorModel input = sampler.getInput();
+            if (input != null)
+            {
+                modelElements.add(input);
+            }
+            AccessorModel output = sampler.getOutput();
+            if (output != null)
+            {
+                modelElements.add(output);
+            }
+        }
+        return modelElements;
+    }
+    
+    @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove)
+    {
+        removeExtensionModelElements(modelElementsToRemove);
+        Set<Channel> channelsToRemove = new LinkedHashSet<Channel>();
+        for (Channel channel : channels)
+        {
+            NodeModel nodeModel = channel.getNodeModel();
+            if (modelElementsToRemove.contains(nodeModel))
+            {
+                channelsToRemove.add(channel);
+            }
+            Sampler sampler = channel.getSampler();
+            AccessorModel input = sampler.getInput();
+            if (modelElementsToRemove.contains(input))
+            {
+                channelsToRemove.add(channel);
+            }
+            AccessorModel output = sampler.getOutput();
+            if (modelElementsToRemove.contains(output))
+            {
+                channelsToRemove.add(channel);
+            }
+            
+            // When one of the removed elements is used in a morph target of
+            // a mesh primitive that is affected by this channel, then the 
+            // channel has to be removed
+            if (isAnyUsedInMorphTarget(nodeModel, modelElementsToRemove))
+            {
+                logger.fine("Removal morph target accessor "
+                    + "requires removal of animation");
+                channelsToRemove.add(channel);
+            }
+        }
+        channels.removeAll(channelsToRemove);
+        boolean removeThis = channels.isEmpty();
+        return removeThis;
+    }
+    
+    /**
+     * Returns whether any of the given model elements to remove is used
+     * in a morph target of any mesh primitive that is contained in the
+     * meshes of the given node.
+     * 
+     * @param nodeModel The node
+     * @param modelElementsToRemove The model elements to remove
+     * @return Whether any morph target is affected
+     */
+    private static boolean isAnyUsedInMorphTarget(NodeModel nodeModel,
+        Collection<? extends ModelElement> modelElementsToRemove)
+    {
+        List<MeshModel> meshModels = nodeModel.getMeshModels();
+        for (MeshModel meshModel : meshModels)
+        {
+            List<MeshPrimitiveModel> meshPrimitiveModels =
+                meshModel.getMeshPrimitiveModels();
+            for (MeshPrimitiveModel meshPrimitiveModel : meshPrimitiveModels)
+            {
+                List<Map<String, AccessorModel>> targets =
+                    meshPrimitiveModel.getTargets();
+                for (Map<String, AccessorModel> target : targets)
+                {
+                    for (AccessorModel targetValue : target.values())
+                    {
+                        if (modelElementsToRemove.contains(targetValue))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }    
     
 }

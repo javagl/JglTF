@@ -26,10 +26,13 @@
  */
 package de.javagl.jgltf.model.impl;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
+import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.TechniqueMaterialModel;
 import de.javagl.jgltf.model.gl.TechniqueModel;
 
@@ -97,6 +100,32 @@ public final class DefaultTechniqueMaterialModel extends AbstractNamedModelEleme
     public Map<String, Object> getValues()
     {
         return values;
+    }
+    
+    @Override
+    public Set<ModelElement> getReferencedModelElements()
+    {
+        Set<ModelElement> modelElements = 
+            getReferencedExtensionModelElements();
+        if (techniqueModel != null)
+        {
+            modelElements.add(techniqueModel);
+        }
+        return modelElements;
+    }
+    
+    @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove)
+    {
+        removeExtensionModelElements(modelElementsToRemove);
+        boolean removeThis = false;
+        if (modelElementsToRemove.contains(techniqueModel)) 
+        {
+            setTechniqueModel(null);
+            removeThis = true;
+        }
+        return removeThis;
     }
     
 }
