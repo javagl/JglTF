@@ -8,7 +8,7 @@
   </parent>
 
   <artifactId>jgltf-model-extensions</artifactId>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
 
   <dependencies>
     <dependency>
