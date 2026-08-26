@@ -1,0 +1,13 @@
+{
+  "numMeshPrimitives": [8],
+  "pointSizes": [[[64, 64]]],
+  "numTextures": [4, 8, 16, 32],
+  "pixelSizes": [[[512, 512]]],
+  "numMaterials": [32],
+  "numMeshes": [64],
+  "numMeshPrimitivesPerMesh": [1],
+  "numNodes": [64, 512, 4096, 32768],
+  "noiseGeometry": [false],
+  "noiseTextures": [true],
+  "gridDimensions": [3]
+}

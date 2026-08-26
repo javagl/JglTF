@@ -16,7 +16,7 @@
 /AccessorVis
 /JglTF
 /jgltf-jgltfifier
-/jgltf-asset-creator
+/jgltf-asset-creator-experiments
 # ---
 
 # Extension experiments:
@@ -30,6 +30,14 @@
 # Temporarily ignored until the unit tests are settled
 /jgltf-model-transform/src/test/resources/testModels
 
+
+/jgltf-asset-creator/.classpath
+/jgltf-asset-creator/.settings
+/jgltf-asset-creator/.project
+/jgltf-asset-creator/target
+/jgltf-asset-creator/output
+/jgltf-asset-creator/releases
+/jgltf-asset-creator/localMavenRepository
 
 /jgltf-model-transform/.classpath
 /jgltf-model-transform/.settings

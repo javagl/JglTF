@@ -1,0 +1,104 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>de.javagl</groupId>
+    <artifactId>jgltf-parent</artifactId>
+    <version>2.0.5-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>jgltf-asset-creator</artifactId>
+  <packaging>jar</packaging>
+
+  <repositories>
+    <repository>
+      <id>localMocalMepository</id>
+      <url>file://${basedir}/localMavenRepository</url>
+    </repository>
+  </repositories>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.6</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>de.javagl.jgltf.asset.creator.AssetCreatorMain</mainClass>
+            </manifest>
+          </archive>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+        </configuration>
+      </plugin>
+      
+    </plugins>
+  </build>
+
+  <dependencies>
+    <dependency>
+      <groupId>de.javagl</groupId>
+      <artifactId>jgltf-model</artifactId>
+      <version>2.0.5-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>de.javagl</groupId>
+      <artifactId>jgltf-model-builder</artifactId>
+      <version>2.0.5-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.22.1</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>2.18.8</version>
+    </dependency>
+    <dependency>
+      <groupId>de.javagl</groupId>
+      <artifactId>geogen-core</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>de.javagl</groupId>
+      <artifactId>geogen-generation</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+    
+    <!-- Dependencies of GeoGen -->
+    <dependency>
+      <groupId>de.javagl</groupId>
+      <artifactId>colors</artifactId>
+      <version>0.0.3</version>
+    </dependency>
+    <dependency>
+      <groupId>org.joml</groupId>
+      <artifactId>joml</artifactId>
+      <version>1.10.5</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.13.2</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+</project>
