@@ -13,7 +13,7 @@
   <groupId>de.javagl</groupId>
   <artifactId>jgltf-parent</artifactId>
   <packaging>pom</packaging>
-  <version>2.0.5-SNAPSHOT</version>
+  <version>3.0.0-SNAPSHOT</version>
 
   <scm>
     <connection>scm:git:git@github.com:javagl/JglTF.git</connection>
@@ -95,6 +95,7 @@
     <module>jgltf-viewer</module>
     <module>jgltf-viewer-jogl</module>
     <module>jgltf-viewer-lwjgl</module>
+    <module>jgltf-browser</module>
   </modules>
 
   <build>
