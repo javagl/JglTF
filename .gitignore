@@ -28,15 +28,12 @@
 /jgltf-model-ext-meshopt-compression
 # ---
 
-# Temporarily ignored until the unit tests are settled
-/jgltf-model-transform/src/test/resources/testModels
-
-
 /jgltf-model-transform/.classpath
 /jgltf-model-transform/.settings
 /jgltf-model-transform/.project
 /jgltf-model-transform/target
 /jgltf-model-transform/data
+/jgltf-model-transform/src/test/resources/testModels/output
 
 /jgltf-model-extensions/.classpath
 /jgltf-model-extensions/.settings
