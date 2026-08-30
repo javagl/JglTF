@@ -93,7 +93,6 @@
     <module>jgltf-viewer</module>
     <module>jgltf-viewer-jogl</module>
     <module>jgltf-viewer-lwjgl</module>
-    <module>jgltf-browser</module>
   </modules>
 
   <build>
