@@ -4,7 +4,7 @@
   <parent>
     <groupId>de.javagl</groupId>
     <artifactId>jgltf-parent</artifactId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.0.0</version>
   </parent>
 
   <artifactId>jgltf-impl-v2-khr-materials-ior</artifactId>
@@ -28,14 +28,14 @@
     <dependency>
       <groupId>de.javagl</groupId>
       <artifactId>jgltf-impl-v2</artifactId>
-      <version>3.0.0-SNAPSHOT</version>
+      <version>3.0.0</version>
     </dependency>
 
     <!-- Only required for test! -->
     <dependency>
       <groupId>de.javagl</groupId>
       <artifactId>jgltf-model</artifactId>
-      <version>3.0.0-SNAPSHOT</version>
+      <version>3.0.0</version>
       <scope>test</scope>
     </dependency>
 

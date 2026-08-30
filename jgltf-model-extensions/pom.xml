@@ -4,7 +4,7 @@
   <parent>
     <groupId>de.javagl</groupId>
     <artifactId>jgltf-parent</artifactId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.0.0</version>
   </parent>
 
   <artifactId>jgltf-model-extensions</artifactId>

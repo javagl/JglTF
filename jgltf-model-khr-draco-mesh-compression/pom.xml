@@ -1,12 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>de.javagl</groupId>
     <artifactId>jgltf-parent</artifactId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.0.0</version>
   </parent>
 
   <artifactId>jgltf-model-khr-draco-mesh-compression</artifactId>
@@ -30,22 +28,22 @@
     <dependency>
       <groupId>de.javagl</groupId>
       <artifactId>jgltf-impl-v2</artifactId>
-      <version>3.0.0-SNAPSHOT</version>
+      <version>3.0.0</version>
     </dependency>
     <dependency>
       <groupId>de.javagl</groupId>
       <artifactId>jgltf-impl-v2-khr-draco-mesh-compression</artifactId>
-      <version>3.0.0-SNAPSHOT</version>
+      <version>3.0.0</version>
     </dependency>
     <dependency>
       <groupId>de.javagl</groupId>
       <artifactId>jgltf-model</artifactId>
-      <version>3.0.0-SNAPSHOT</version>
+      <version>3.0.0</version>
     </dependency>
     <dependency>
       <groupId>de.javagl</groupId>
       <artifactId>jgltf-model-builder</artifactId>
-      <version>3.0.0-SNAPSHOT</version>
+      <version>3.0.0</version>
     </dependency>
 
     <dependency>
