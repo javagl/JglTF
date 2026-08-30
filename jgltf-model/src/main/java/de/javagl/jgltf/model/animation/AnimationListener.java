@@ -44,5 +44,5 @@ public interface AnimationListener
      * @param values The interpolated values for the given time
      */
     void animationUpdated(
-        Animation source, float timeS, float values[]);
+        Animation source, double timeS, double values[]);
 }

@@ -36,29 +36,29 @@ public class DefaultCameraPerspectiveModel implements CameraPerspectiveModel
     /**
      * The aspect ratio
      */
-    private Float aspectRatio;
+    private Double aspectRatio;
 
     /**
      * The FOV
      */
-    private Float yfov;
+    private Double yfov;
 
     /**
      * The clipping plane distance
      */
-    private Float zfar;
+    private Double zfar;
 
     /**
      * The near clipping plane distance
      */
-    private Float znear;
+    private Double znear;
 
     /**
      * Set the aspect ratio
      * 
      * @param aspectRatio The aspect ratio
      */
-    public void setAspectRatio(Float aspectRatio)
+    public void setAspectRatio(Double aspectRatio)
     {
         this.aspectRatio = aspectRatio;
     }
@@ -68,7 +68,7 @@ public class DefaultCameraPerspectiveModel implements CameraPerspectiveModel
      * 
      * @param yfov The FOV
      */
-    public void setYfov(Float yfov)
+    public void setYfov(Double yfov)
     {
         this.yfov = yfov;
     }
@@ -78,7 +78,7 @@ public class DefaultCameraPerspectiveModel implements CameraPerspectiveModel
      * 
      * @param zfar The distance
      */
-    public void setZfar(Float zfar)
+    public void setZfar(Double zfar)
     {
         this.zfar = zfar;
     }
@@ -88,31 +88,31 @@ public class DefaultCameraPerspectiveModel implements CameraPerspectiveModel
      * 
      * @param znear The distance
      */
-    public void setZnear(Float znear)
+    public void setZnear(Double znear)
     {
         this.znear = znear;
     }
     
     @Override
-    public Float getAspectRatio()
+    public Double getAspectRatio()
     {
         return aspectRatio;
     }
     
     @Override
-    public Float getYfov()
+    public Double getYfov()
     {
         return yfov;
     }
 
     @Override
-    public Float getZfar()
+    public Double getZfar()
     {
         return zfar;
     }
 
     @Override
-    public Float getZnear()
+    public Double getZnear()
     {
         return znear;
     }

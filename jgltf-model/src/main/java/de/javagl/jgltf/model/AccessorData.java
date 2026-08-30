@@ -41,6 +41,8 @@ import java.nio.ByteBuffer;
  *   {@link AccessorIntData}</li>
  *   <li>For <code>float.class</code>, the implementation is an 
  *   {@link AccessorFloatData}</li>
+ *   <li>For <code>double.class</code>, the implementation is an 
+ *   {@link AccessorDoubleData}</li>
  * </ul>
  */
 public interface AccessorData

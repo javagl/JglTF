@@ -225,7 +225,7 @@ public class GltfAnimations
         InterpolatorType interpolatorType)
     {
         int numKeyElements = timeData.getNumElements();
-        float keys[] = new float[numKeyElements];
+        double keys[] = new double[numKeyElements];
         for (int e=0; e<numKeyElements; e++)
         {
             keys[e] = timeData.get(e);
@@ -243,7 +243,7 @@ public class GltfAnimations
             outputData.getTotalNumComponents();
         int numComponentsPerElement = 
             totalNumValueComponents / numKeyElements;
-        float values[][] = new float[numKeyElements][numComponentsPerElement];
+        double values[][] = new double[numKeyElements][numComponentsPerElement];
         for (int c = 0; c < numComponentsPerElement; c++)
         {
             for (int e = 0; e < numKeyElements; e++)
@@ -308,7 +308,7 @@ public class GltfAnimations
     {
         return (animation, timeS, values) ->
         {
-            float translation[] = nodeModel.getTranslation();
+            double translation[] = nodeModel.getTranslation();
             if (translation == null)
             {
                 translation = values.clone();
@@ -334,7 +334,7 @@ public class GltfAnimations
     {
         return (animation, timeS, values) ->
         {
-            float rotation[] = nodeModel.getRotation();
+            double rotation[] = nodeModel.getRotation();
             if (rotation == null)
             {
                 rotation = values.clone();
@@ -360,7 +360,7 @@ public class GltfAnimations
     {
         return (animation, timeS, values) ->
         {
-            float scale[] = nodeModel.getScale();
+            double scale[] = nodeModel.getScale();
             if (scale == null)
             {
                 scale = values.clone();
@@ -386,7 +386,7 @@ public class GltfAnimations
     {
         return (animation, timeS, values) ->
         {
-            float weights[] = nodeModel.getWeights();
+            double weights[] = nodeModel.getWeights();
             if (weights == null)
             {
                 weights = values.clone();

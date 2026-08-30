@@ -31,21 +31,31 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Base64;
+import java.util.logging.Logger;
 
 /**
  * IO utility methods
  */
 public class IO
 {
+    /**
+     * The logger used in this class
+     */
+    private static final Logger logger =
+        Logger.getLogger(IO.class.getName());
+    
     /**
      * Convert the given URI string into an absolute URI, resolving it
      * against the given base URI if necessary
@@ -60,6 +70,8 @@ public class IO
     {
         try
         {
+            // The URI string may contain the space character. Escape
+            // this to make it a valid URI string
             String escapedUriString = uriString.replaceAll(" ", "%20");
             URI uri = new URI(escapedUriString);
             if (uri.isAbsolute())
@@ -103,6 +115,78 @@ public class IO
         }
     }
 
+    
+    /**
+     * Returns whether the given string is a valid URI string.
+     * 
+     * Note that this will return <code>false</code> if the given string
+     * contains a space character.
+     * 
+     * @param uriString The URI string
+     * @return Whether the string is a valid URI string.
+     */
+    public static boolean isValidUri(String uriString)
+    {
+        try
+        {
+            URI.create(uriString);
+            return true;
+        }
+        catch (IllegalArgumentException e)
+        {
+            logger.finer(
+                "Note a valid URI: '" + uriString + "', " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Returns whether the given string is an absolute URI.
+     * 
+     * Note that this will print a warning and return <code>false</code> when
+     * the given string is not a valid URI string, as of
+     * {@link #isValidUri(String)}
+     * 
+     * @param uriString The URI string
+     * @return Whether the string is an absolute URI
+     */
+    public static boolean isAbsolute(String uriString)
+    {
+        try
+        {
+            URI uri = URI.create(uriString);
+            return uri.isAbsolute();
+        }
+        catch (IllegalArgumentException e)
+        {
+            logger.warning(
+                "Note a valid URI: '" + uriString + "', " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Perform a standard UTF-8 URI decoding on the given string.
+     * 
+     * @param uriString The URI string
+     * @return The result
+     */
+    public static String decodeUri(String uriString)
+    {
+        try
+        {
+            String encoding = StandardCharsets.UTF_8.name();
+            String result = URLDecoder.decode(uriString, encoding);
+            return result;
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            // Can not happen
+            throw new IllegalArgumentException(
+                "Could not decode URI string: " + e.getMessage());
+        }
+    }
+    
     /**
      * Returns the URI describing the parent of the given URI. If the 
      * given URI describes a file, this will return the URI of the 

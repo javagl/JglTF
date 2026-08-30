@@ -33,7 +33,11 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 
 import de.javagl.jgltf.model.io.v1.GltfAssetV1;
 import de.javagl.jgltf.model.io.v1.GltfAssetWriterV1;
@@ -45,6 +49,12 @@ import de.javagl.jgltf.model.io.v2.GltfAssetWriterV2;
  */
 public class GltfAssetWriter
 {
+    /**
+     * The logger used in this class
+     */
+    private static final Logger logger =
+        Logger.getLogger(GltfAssetWriter.class.getName());
+    
     /**
      * Default constructor
      */
@@ -212,8 +222,8 @@ public class GltfAssetWriter
     }
 
     /**
-     * Write all {@link GltfAsset#getReferenceDatas()} to files, relative
-     * to the given file.
+     * Write all {@link GltfAsset#getReferenceDatas()} to files, relative to the
+     * given file.
      * 
      * @param gltfAsset The {@link GltfAsset}
      * @param file The base file
@@ -222,22 +232,60 @@ public class GltfAssetWriter
     private void writeReferenceDatas(GltfAsset gltfAsset, File file)
         throws IOException
     {
-        for (Entry<String, ByteBuffer> entry : 
-            gltfAsset.getReferenceDatas().entrySet())
+        Map<String, ByteBuffer> referenceDatas = gltfAsset.getReferenceDatas();
+        for (Entry<String, ByteBuffer> entry : referenceDatas.entrySet())
         {
-            String relativeUrlString = entry.getKey();
+            String rawUriString = entry.getKey();
+
+            // The space character is allowed in glTF URIs, but not
+            // part of a valid URI - replace it for the checks here
+            String uriString = rawUriString.replaceAll(" ", "%20");
+
+            if (!IO.isValidUri(uriString))
+            {
+                logger.severe("Not a valid URI: '" + uriString + "'");
+                continue;
+            }
+
+            // A data URI should never be in the referenceDatas!
+            if (IO.isDataUriString(uriString))
+            {
+                logger.severe("Found data URI as reference");
+                continue;
+            }
+
+            // Absolute URIs cannot be written - print a severe error
+            // message, but continue with the remaining entries
+            if (IO.isAbsolute(uriString))
+            {
+                logger.severe(
+                    "Found absolute URI as reference: '" + uriString + "'");
+                continue;
+            }
+
+            // Decode the URI to be used as a file name
+            String decodedUriString = IO.decodeUri(uriString);
+            // System.out.println("Decoded '"+uriString+"'");
+            // System.out.println(" to '"+decodedUriString+"'");
+
+            // Resolve the decoded URI against the containing directory
+            Path resolutionPath = file.toPath().getParent();
+            Path referenceFilePath = resolutionPath.resolve(decodedUriString);
+            File referenceFile = referenceFilePath.toFile();
+
+            // Ensure that the directory of the reference file exists
+            Path referenceDirectoryPath = referenceFilePath.getParent();
+            Files.createDirectories(referenceDirectoryPath);
+
+            // Write the actual reference file data
             ByteBuffer data = entry.getValue();
-            
-            String referenceFileName = 
-                file.toPath().getParent().resolve(relativeUrlString).toString();
             try (@SuppressWarnings("resource")
-                WritableByteChannel writableByteChannel = 
-                Channels.newChannel(new FileOutputStream(referenceFileName)))
+            WritableByteChannel writableByteChannel =
+                Channels.newChannel(new FileOutputStream(referenceFile)))
             {
                 writableByteChannel.write(data.slice());
             }
         }
     }
-    
-    
+
 }

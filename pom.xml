@@ -2,21 +2,20 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.sonatype.oss</groupId>
-    <artifactId>oss-parent</artifactId>
-    <version>9</version>
-  </parent>
-
   <groupId>de.javagl</groupId>
   <artifactId>jgltf-parent</artifactId>
+  <version>3.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <version>2.0.5-SNAPSHOT</version>
+  
+  <name>${project.groupId}:${project.artifactId}</name>
+  <description>Java libraries for glTF</description>
+  <url>https://github.com/javagl/JglTF</url>
 
   <scm>
     <connection>scm:git:git@github.com:javagl/JglTF.git</connection>
     <developerConnection>scm:git:git@github.com:javagl/JglTF.git</developerConnection>
     <url>git@github.com:javagl/JglTF.git</url>
+    <tag>HEAD</tag>
   </scm>
 
   <developers>
@@ -41,9 +40,53 @@
   <modules>
     <module>jgltf-impl-v1</module>
     <module>jgltf-impl-v2</module>
+    <module>jgltf-impl-v2-ext-instance-features</module>
+    <module>jgltf-impl-v2-ext-mesh-features</module>
+    <module>jgltf-impl-v2-ext-mesh-gpu-instancing</module>
+    <module>jgltf-impl-v2-ext-structural-metadata</module>
+    <module>jgltf-impl-v2-khr-draco-mesh-compression</module>
+    <module>jgltf-impl-v2-khr-lights-punctual</module>
+    <module>jgltf-impl-v2-khr-materials-anisotropy</module>
+    <module>jgltf-impl-v2-khr-materials-clearcoat</module>
+    <module>jgltf-impl-v2-khr-materials-dispersion</module>
+    <module>jgltf-impl-v2-khr-materials-emissive-strength</module>
+    <module>jgltf-impl-v2-khr-materials-ior</module>
+    <module>jgltf-impl-v2-khr-materials-iridescence</module>
+    <module>jgltf-impl-v2-khr-materials-sheen</module>
+    <module>jgltf-impl-v2-khr-materials-specular</module>
+    <module>jgltf-impl-v2-khr-materials-transmission</module>
+    <module>jgltf-impl-v2-khr-materials-unlit</module>
+    <module>jgltf-impl-v2-khr-materials-variants</module>
+    <module>jgltf-impl-v2-khr-materials-volume</module>
+    <module>jgltf-impl-v2-khr-texture-transform</module>
+    <module>jgltf-impl-v2-ext-texture-webp</module>
+    <module>jgltf-impl-v2-khr-texture-basisu</module>
+    <module>jgltf-impl-v2-khr-node-visibility</module>
     <module>jgltf-impl-v2-technique-webgl</module>
     <module>jgltf-model</module>
     <module>jgltf-model-builder</module>
+    <module>jgltf-model-ext-mesh-gpu-instancing</module>
+    <module>jgltf-model-extensions</module>
+    <module>jgltf-model-khr-draco-mesh-compression</module>
+    <module>jgltf-model-khr-lights-punctual</module>
+    <module>jgltf-model-khr-materials-anisotropy</module>
+    <module>jgltf-model-khr-materials-clearcoat</module>
+    <module>jgltf-model-khr-materials-dispersion</module>
+    <module>jgltf-model-khr-materials-emissive-strength</module>
+    <module>jgltf-model-khr-materials-ior</module>
+    <module>jgltf-model-khr-materials-iridescence</module>
+    <module>jgltf-model-khr-materials-sheen</module>
+    <module>jgltf-model-khr-materials-specular</module>
+    <module>jgltf-model-khr-materials-transmission</module>
+    <module>jgltf-model-khr-materials-unlit</module>
+    <module>jgltf-model-khr-materials-variants</module>
+    <module>jgltf-model-khr-materials-volume</module>
+    <module>jgltf-model-khr-mesh-quantization</module>
+    <module>jgltf-model-khr-texture-transform</module>
+    <module>jgltf-model-ext-texture-webp</module>
+    <module>jgltf-model-khr-texture-basisu</module>
+    <module>jgltf-model-khr-node-visibility</module>
+    <module>jgltf-model-transform</module>
     <module>jgltf-obj</module>
     <module>jgltf-validator</module>
     <module>jgltf-viewer</module>
@@ -55,7 +98,32 @@
 
     <plugins>
 
-      <!-- Copy all JARs of the submodules and dependencies into the target -->
+      <plugin>
+        <groupId>org.sonatype.central</groupId>
+        <artifactId>central-publishing-maven-plugin</artifactId>
+        <version>0.8.0</version>
+        <extensions>true</extensions>
+        <configuration>
+          <publishingServerId>central</publishingServerId>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>1.5</version>
+        <executions>
+          <execution>
+            <id>sign-artifacts</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Copy all JARs of the submodules and dependencies into the
+			target -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
@@ -204,5 +272,14 @@
       </plugins>
     </pluginManagement>
   </build>
+  
+  <distributionManagement>
+    <snapshotRepository>
+      <id>central</id>
+      <name>Maven Central Snapshots Repository</name>
+      <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+    </snapshotRepository>
+  </distributionManagement>
+  
 
 </project>

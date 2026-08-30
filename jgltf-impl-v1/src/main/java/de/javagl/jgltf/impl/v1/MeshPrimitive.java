@@ -3,7 +3,7 @@
  * 
  * Do not modify this class. It is automatically generated
  * with JsonModelGen (https://github.com/javagl/JsonModelGen)
- * Copyright (c) 2016 Marco Hutter - http://www.javagl.de
+ * Copyright (c) 2016-2021 Marco Hutter - http://www.javagl.de
  */
 
 package de.javagl.jgltf.impl.v1;
@@ -197,17 +197,12 @@ public class MeshPrimitive
      * Valid values: [0, 1, 2, 3, 4, 5, 6] 
      * 
      * @param mode The mode to set
-     * @throws IllegalArgumentException If the given value does not meet
-     * the given constraints
      * 
      */
     public void setMode(Integer mode) {
         if (mode == null) {
             this.mode = mode;
             return ;
-        }
-        if (((((((mode!= 0)&&(mode!= 1))&&(mode!= 2))&&(mode!= 3))&&(mode!= 4))&&(mode!= 5))&&(mode!= 6)) {
-            throw new IllegalArgumentException((("Invalid value for mode: "+ mode)+", valid: [0, 1, 2, 3, 4, 5, 6]"));
         }
         this.mode = mode;
     }

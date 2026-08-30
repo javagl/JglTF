@@ -26,12 +26,16 @@
  */
 package de.javagl.jgltf.model.impl;
 
+import java.util.Collection;
+import java.util.Set;
+
 import de.javagl.jgltf.model.AccessorData;
 import de.javagl.jgltf.model.AccessorDatas;
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.Accessors;
 import de.javagl.jgltf.model.BufferViewModel;
 import de.javagl.jgltf.model.ElementType;
+import de.javagl.jgltf.model.ModelElement;
 
 /**
  * Implementation of an {@link AccessorModel}
@@ -250,6 +254,32 @@ public final class DefaultAccessorModel extends AbstractNamedModelElement
             max = AccessorDatas.computeMax(getAccessorData());
         }
         return max.clone();
+    }
+    
+    @Override
+    public Set<ModelElement> getReferencedModelElements()
+    {
+        Set<ModelElement> modelElements = 
+            getReferencedExtensionModelElements();
+        if (bufferViewModel != null)
+        {
+            modelElements.add(bufferViewModel);
+        }
+        return modelElements;
+    }
+    
+    @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove)
+    {
+        removeExtensionModelElements(modelElementsToRemove);
+        boolean removeThis = false;
+        if (modelElementsToRemove.contains(bufferViewModel)) 
+        {
+            setBufferViewModel(null);
+            removeThis = true;
+        }
+        return removeThis;
     }
     
 }

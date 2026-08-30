@@ -3,7 +3,7 @@
  * 
  * Do not modify this class. It is automatically generated
  * with JsonModelGen (https://github.com/javagl/JsonModelGen)
- * Copyright (c) 2016 Marco Hutter - http://www.javagl.de
+ * Copyright (c) 2016-2021 Marco Hutter - http://www.javagl.de
  */
 
 package de.javagl.jgltf.impl.v1;
@@ -30,7 +30,7 @@ public class AnimationSampler
     /**
      * Interpolation algorithm. (optional)<br> 
      * Default: "LINEAR"<br> 
-     * Valid values: ["LINEAR", "STEP"] 
+     * Valid values: [LINEAR] 
      * 
      */
     private String interpolation;
@@ -70,11 +70,9 @@ public class AnimationSampler
     /**
      * Interpolation algorithm. (optional)<br> 
      * Default: "LINEAR"<br> 
-     * Valid values: ["LINEAR"] 
+     * Valid values: [LINEAR] 
      * 
      * @param interpolation The interpolation to set
-     * @throws IllegalArgumentException If the given value does not meet
-     * the given constraints
      * 
      */
     public void setInterpolation(String interpolation) {
@@ -82,16 +80,13 @@ public class AnimationSampler
             this.interpolation = interpolation;
             return ;
         }
-        if ((!"LINEAR".equals(interpolation))&&(!"STEP".equals(interpolation))) {
-            throw new IllegalArgumentException((("Invalid value for interpolation: "+ interpolation)+", valid: [\"LINEAR\", \"STEP\"]"));
-        }
         this.interpolation = interpolation;
     }
 
     /**
      * Interpolation algorithm. (optional)<br> 
      * Default: "LINEAR"<br> 
-     * Valid values: ["LINEAR"] 
+     * Valid values: [LINEAR] 
      * 
      * @return The interpolation
      * 

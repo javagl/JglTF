@@ -26,12 +26,15 @@
  */
 package de.javagl.jgltf.model.impl;
 
+import java.util.Collection;
+import java.util.Set;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import de.javagl.jgltf.model.CameraModel;
 import de.javagl.jgltf.model.CameraOrthographicModel;
 import de.javagl.jgltf.model.CameraPerspectiveModel;
+import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.Suppliers;
 
 /**
@@ -93,25 +96,40 @@ public final class DefaultCameraModel extends AbstractNamedModelElement
     }
 
     @Override
-    public float[] computeProjectionMatrix(float result[], Float aspectRatio)
+    public double[] computeProjectionMatrix(double result[], Double aspectRatio)
     {
         return Cameras.computeProjectionMatrix(this, aspectRatio, result);
     }
     
     @Override
-    public Supplier<float[]> createProjectionMatrixSupplier(
+    public Supplier<double[]> createProjectionMatrixSupplier(
         DoubleSupplier aspectRatioSupplier)
     {
         return Suppliers.createTransformSupplier(this, (c, t) -> 
         {
-            Float aspectRatio = null;
+            Double aspectRatio = null;
             if (aspectRatioSupplier != null)
             {
-                aspectRatio = (float)aspectRatioSupplier.getAsDouble();
+                aspectRatio = aspectRatioSupplier.getAsDouble();
             }
             computeProjectionMatrix(t, aspectRatio);
         });
     }
     
+    @Override
+    public Set<ModelElement> getReferencedModelElements()
+    {
+        Set<ModelElement> modelElements = 
+            getReferencedExtensionModelElements();
+        return modelElements;
+    }
+    
+    @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove) 
+    {
+        removeExtensionModelElements(modelElementsToRemove);
+        return false;
+    }
     
 }

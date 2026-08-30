@@ -3,7 +3,7 @@
  * 
  * Do not modify this class. It is automatically generated
  * with JsonModelGen (https://github.com/javagl/JsonModelGen)
- * Copyright (c) 2016 Marco Hutter - http://www.javagl.de
+ * Copyright (c) 2016-2021 Marco Hutter - http://www.javagl.de
  */
 
 package de.javagl.jgltf.impl.v1;
@@ -35,7 +35,7 @@ public class Buffer
     /**
      * XMLHttpRequest `responseType`. (optional)<br> 
      * Default: "arraybuffer"<br> 
-     * Valid values: ["arraybuffer", "text"] 
+     * Valid values: [arraybuffer, text] 
      * 
      */
     private String type;
@@ -111,11 +111,9 @@ public class Buffer
     /**
      * XMLHttpRequest `responseType`. (optional)<br> 
      * Default: "arraybuffer"<br> 
-     * Valid values: ["arraybuffer", "text"] 
+     * Valid values: [arraybuffer, text] 
      * 
      * @param type The type to set
-     * @throws IllegalArgumentException If the given value does not meet
-     * the given constraints
      * 
      */
     public void setType(String type) {
@@ -123,16 +121,13 @@ public class Buffer
             this.type = type;
             return ;
         }
-        if ((!"arraybuffer".equals(type))&&(!"text".equals(type))) {
-            throw new IllegalArgumentException((("Invalid value for type: "+ type)+", valid: [\"arraybuffer\", \"text\"]"));
-        }
         this.type = type;
     }
 
     /**
      * XMLHttpRequest `responseType`. (optional)<br> 
      * Default: "arraybuffer"<br> 
-     * Valid values: ["arraybuffer", "text"] 
+     * Valid values: [arraybuffer, text] 
      * 
      * @return The type
      * 

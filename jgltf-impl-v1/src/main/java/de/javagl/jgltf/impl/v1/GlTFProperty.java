@@ -3,7 +3,7 @@
  * 
  * Do not modify this class. It is automatically generated
  * with JsonModelGen (https://github.com/javagl/JsonModelGen)
- * Copyright (c) 2016 Marco Hutter - http://www.javagl.de
+ * Copyright (c) 2016-2021 Marco Hutter - http://www.javagl.de
  */
 
 package de.javagl.jgltf.impl.v1;
@@ -19,18 +19,18 @@ import java.util.Map;
 public class GlTFProperty {
 
     /**
-     * Dictionary object with extension-specific objects. (optional) 
+     * The extensions of this GlTFProperty (optional) 
      * 
      */
     private Map<String, Object> extensions;
     /**
-     * Application-specific data. (optional) 
+     * The extras of this GlTFProperty (optional) 
      * 
      */
     private Object extras;
 
     /**
-     * Dictionary object with extension-specific objects. (optional) 
+     * The extensions of this GlTFProperty (optional) 
      * 
      * @param extensions The extensions to set
      * 
@@ -44,7 +44,7 @@ public class GlTFProperty {
     }
 
     /**
-     * Dictionary object with extension-specific objects. (optional) 
+     * The extensions of this GlTFProperty (optional) 
      * 
      * @return The extensions
      * 
@@ -108,7 +108,7 @@ public class GlTFProperty {
     }
 
     /**
-     * Application-specific data. (optional) 
+     * The extras of this GlTFProperty (optional) 
      * 
      * @param extras The extras to set
      * 
@@ -122,7 +122,7 @@ public class GlTFProperty {
     }
 
     /**
-     * Application-specific data. (optional) 
+     * The extras of this GlTFProperty (optional) 
      * 
      * @return The extras
      * 

@@ -24,7 +24,7 @@ public class MaterialNormalTextureInfo
      * Default: 1.0 
      * 
      */
-    private Float scale;
+    private Double scale;
 
     /**
      * The scalar parameter applied to each normal vector of the normal 
@@ -34,7 +34,7 @@ public class MaterialNormalTextureInfo
      * @param scale The scale to set
      * 
      */
-    public void setScale(Float scale) {
+    public void setScale(Double scale) {
         if (scale == null) {
             this.scale = scale;
             return ;
@@ -50,7 +50,7 @@ public class MaterialNormalTextureInfo
      * @return The scale
      * 
      */
-    public Float getScale() {
+    public Double getScale() {
         return this.scale;
     }
 
@@ -61,8 +61,8 @@ public class MaterialNormalTextureInfo
      * @return The default scale
      * 
      */
-    public Float defaultScale() {
-        return  1.0F;
+    public Double defaultScale() {
+        return  1.0D;
     }
 
 }

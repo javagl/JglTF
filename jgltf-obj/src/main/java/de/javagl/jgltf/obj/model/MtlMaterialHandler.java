@@ -57,6 +57,6 @@ interface MtlMaterialHandler
      * @return The {@link MaterialModel}
      */
     MaterialModel createMaterialWithColor(
-        boolean withNormals, float r, float g, float b);
+        boolean withNormals, double r, double g, double b);
 
 }

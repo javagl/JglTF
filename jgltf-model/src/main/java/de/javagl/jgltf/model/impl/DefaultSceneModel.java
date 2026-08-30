@@ -27,9 +27,12 @@
 package de.javagl.jgltf.model.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
+import de.javagl.jgltf.model.ModelElement;
 import de.javagl.jgltf.model.NodeModel;
 import de.javagl.jgltf.model.SceneModel;
 
@@ -68,4 +71,23 @@ public class DefaultSceneModel extends AbstractNamedModelElement
         return Collections.unmodifiableList(nodeModels);
     }
 
+    @Override
+    public Set<ModelElement> getReferencedModelElements()
+    {
+        Set<ModelElement> modelElements = 
+            getReferencedExtensionModelElements();
+        modelElements.addAll(nodeModels);
+        return modelElements;
+    }
+    
+    @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove)
+    {
+        removeExtensionModelElements(modelElementsToRemove);
+        nodeModels.removeAll(modelElementsToRemove);
+        return nodeModels.isEmpty();
+    }
+    
+    
 }

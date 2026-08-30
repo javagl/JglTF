@@ -26,10 +26,12 @@
  */
 package de.javagl.jgltf.viewer;
 
+import java.nio.IntBuffer;
+
 import de.javagl.jgltf.model.AccessorData;
-import de.javagl.jgltf.model.AccessorDatas;
 import de.javagl.jgltf.model.AccessorFloatData;
 import de.javagl.jgltf.model.AccessorModel;
+import de.javagl.jgltf.model.AccessorDataBuffers;
 import de.javagl.jgltf.model.ElementType;
 import de.javagl.jgltf.model.GltfConstants;
 
@@ -59,21 +61,23 @@ public class NormalComputation
         if (indicesAccessorModel != null)
         {
             AccessorData indicesAccessorData = 
-                AccessorDatas.create(indicesAccessorModel);
-            indices = AccessorDataUtils.readInts(indicesAccessorData);
+                indicesAccessorModel.getAccessorData();
+            indices = new int[indicesAccessorData.getTotalNumComponents()];
+            AccessorDataBuffers.readAsInts(
+                indicesAccessorData, IntBuffer.wrap(indices));
         } 
         else
         {
             indices = createDefaultIndices(numTriangles);
         }
         AccessorFloatData positionsAccessorData = 
-            AccessorDatas.createFloat(positionsAccessorModel);
+            (AccessorFloatData) positionsAccessorModel.getAccessorData();
         
         AccessorModel normalsAccessorModel = 
             AccessorModelCreation.createAccessorModel(
                 GltfConstants.GL_FLOAT, numPositions, ElementType.VEC3, "");
         AccessorFloatData normalsAccessorData = 
-            AccessorDatas.createFloat(normalsAccessorModel); 
+            (AccessorFloatData) normalsAccessorModel.getAccessorData(); 
         
         float vertex0[] = new float[3];
         float vertex1[] = new float[3];

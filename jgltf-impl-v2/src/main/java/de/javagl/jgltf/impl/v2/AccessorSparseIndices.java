@@ -127,16 +127,11 @@ public class AccessorSparseIndices
      * 
      * @param componentType The componentType to set
      * @throws NullPointerException If the given value is <code>null</code>
-     * @throws IllegalArgumentException If the given value does not meet
-     * the given constraints
      * 
      */
     public void setComponentType(Integer componentType) {
         if (componentType == null) {
             throw new NullPointerException((("Invalid value for componentType: "+ componentType)+", may not be null"));
-        }
-        if (((componentType!= 5121)&&(componentType!= 5123))&&(componentType!= 5125)) {
-            throw new IllegalArgumentException((("Invalid value for componentType: "+ componentType)+", valid: [5121, 5123, 5125]"));
         }
         this.componentType = componentType;
     }

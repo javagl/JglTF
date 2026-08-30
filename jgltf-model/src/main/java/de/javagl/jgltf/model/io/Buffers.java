@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
@@ -227,6 +228,23 @@ public class Buffers
         FloatBuffer floatBuffer = 
             byteBuffer.order(ByteOrder.nativeOrder()).asFloatBuffer();
         floatBuffer.put(buffer.slice());
+        return byteBuffer;
+    }
+
+    /**
+     * Create a new direct byte buffer with native byte order that has the
+     * same contents as the given double buffer.
+     *  
+     * @param buffer The input buffer
+     * @return The new byte buffer
+     */
+    public static ByteBuffer createByteBufferFrom(DoubleBuffer buffer)
+    {
+        ByteBuffer byteBuffer = 
+            ByteBuffer.allocateDirect(buffer.capacity() * Double.BYTES);
+        DoubleBuffer doubleBuffer = 
+            byteBuffer.order(ByteOrder.nativeOrder()).asDoubleBuffer();
+        doubleBuffer.put(buffer.slice());
         return byteBuffer;
     }
 

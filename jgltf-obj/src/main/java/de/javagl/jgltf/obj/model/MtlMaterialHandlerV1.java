@@ -30,13 +30,13 @@ import java.util.Map;
 
 import de.javagl.jgltf.model.MaterialModel;
 import de.javagl.jgltf.model.TextureModel;
-import de.javagl.jgltf.model.v1.MaterialModelV1;
+import de.javagl.jgltf.model.impl.DefaultTechniqueMaterialModel;
 import de.javagl.obj.Mtl;
 import de.javagl.obj.ReadableObj;
 
 /**
  * Implementation of a {@link MtlMaterialHandler} that generates 
- * {@link MaterialModelV1} instances
+ * {@link DefaultTechniqueMaterialModel} instances
  */
 class MtlMaterialHandlerV1 implements MtlMaterialHandler
 {
@@ -81,7 +81,7 @@ class MtlMaterialHandlerV1 implements MtlMaterialHandler
     private MaterialModel createMaterialWithTexture(
         boolean withNormals, Mtl mtl)
     {
-        MaterialModelV1 materialModelV1 = new MaterialModelV1();
+        DefaultTechniqueMaterialModel materialModelV1 = new DefaultTechniqueMaterialModel();
         if (withNormals)
         {
             materialModelV1.setTechniqueModel(
@@ -105,9 +105,9 @@ class MtlMaterialHandlerV1 implements MtlMaterialHandler
 
     @Override
     public MaterialModel createMaterialWithColor(boolean withNormals, 
-        float r, float g, float b)
+        double r, double g, double b)
     {
-        MaterialModelV1 materialModelV1 = new MaterialModelV1();
+        DefaultTechniqueMaterialModel materialModelV1 = new DefaultTechniqueMaterialModel();
         if (withNormals)
         {
             materialModelV1.setTechniqueModel(

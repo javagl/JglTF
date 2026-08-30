@@ -34,13 +34,13 @@ class LinearInterpolator implements Interpolator
 {
     @Override
     public void interpolate(
-        float[] a, float[] b, float alpha, float[] result)
+        double[] a, double[] b, double alpha, double[] result)
     {
         for (int i=0; i<a.length; i++)
         {
-            float ai = a[i];
-            float bi = b[i];
-            float ri = ai + alpha * (bi - ai);
+            double ai = a[i];
+            double bi = b[i];
+            double ri = ai + alpha * (bi - ai);
             result[i] = ri;
         }
         

@@ -40,7 +40,7 @@ public class MorphTargetsBuildingTest
         // Create a scene with a node with a mesh with the given primitive
         DefaultMeshModel meshModel = new DefaultMeshModel();
         meshModel.addMeshPrimitiveModel(inputMeshPrimitiveModel);
-        meshModel.setWeights(new float[]
+        meshModel.setWeights(new double[]
         { 0.0f, 0.25f });
         DefaultNodeModel nodeModel = new DefaultNodeModel();
         nodeModel.addMeshModel(meshModel);

@@ -52,17 +52,12 @@ public class Sampler
      * Valid values: [9728, 9729] 
      * 
      * @param magFilter The magFilter to set
-     * @throws IllegalArgumentException If the given value does not meet
-     * the given constraints
      * 
      */
     public void setMagFilter(Integer magFilter) {
         if (magFilter == null) {
             this.magFilter = magFilter;
             return ;
-        }
-        if ((magFilter!= 9728)&&(magFilter!= 9729)) {
-            throw new IllegalArgumentException((("Invalid value for magFilter: "+ magFilter)+", valid: [9728, 9729]"));
         }
         this.magFilter = magFilter;
     }
@@ -83,17 +78,12 @@ public class Sampler
      * Valid values: [9728, 9729, 9984, 9985, 9986, 9987] 
      * 
      * @param minFilter The minFilter to set
-     * @throws IllegalArgumentException If the given value does not meet
-     * the given constraints
      * 
      */
     public void setMinFilter(Integer minFilter) {
         if (minFilter == null) {
             this.minFilter = minFilter;
             return ;
-        }
-        if ((((((minFilter!= 9728)&&(minFilter!= 9729))&&(minFilter!= 9984))&&(minFilter!= 9985))&&(minFilter!= 9986))&&(minFilter!= 9987)) {
-            throw new IllegalArgumentException((("Invalid value for minFilter: "+ minFilter)+", valid: [9728, 9729, 9984, 9985, 9986, 9987]"));
         }
         this.minFilter = minFilter;
     }
@@ -115,17 +105,12 @@ public class Sampler
      * Valid values: [33071, 33648, 10497] 
      * 
      * @param wrapS The wrapS to set
-     * @throws IllegalArgumentException If the given value does not meet
-     * the given constraints
      * 
      */
     public void setWrapS(Integer wrapS) {
         if (wrapS == null) {
             this.wrapS = wrapS;
             return ;
-        }
-        if (((wrapS!= 33071)&&(wrapS!= 33648))&&(wrapS!= 10497)) {
-            throw new IllegalArgumentException((("Invalid value for wrapS: "+ wrapS)+", valid: [33071, 33648, 10497]"));
         }
         this.wrapS = wrapS;
     }
@@ -159,17 +144,12 @@ public class Sampler
      * Valid values: [33071, 33648, 10497] 
      * 
      * @param wrapT The wrapT to set
-     * @throws IllegalArgumentException If the given value does not meet
-     * the given constraints
      * 
      */
     public void setWrapT(Integer wrapT) {
         if (wrapT == null) {
             this.wrapT = wrapT;
             return ;
-        }
-        if (((wrapT!= 33071)&&(wrapT!= 33648))&&(wrapT!= 10497)) {
-            throw new IllegalArgumentException((("Invalid value for wrapT: "+ wrapT)+", valid: [33071, 33648, 10497]"));
         }
         this.wrapT = wrapT;
     }

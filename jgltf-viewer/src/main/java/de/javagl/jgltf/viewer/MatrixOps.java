@@ -37,8 +37,8 @@ import java.util.logging.Logger;
 import de.javagl.jgltf.model.MathUtils;
 
 /**
- * A class for building suppliers of float arrays that represent matrices.
- * The suppliers MAY always return the same instances of float arrays,
+ * A class for building suppliers of double arrays that represent matrices.
+ * The suppliers MAY always return the same instances of double arrays,
  * so callers MUST NOT store or modify the returned arrays.<br>
  * <br>
  * This class does not perform validations of the matrix size. The user
@@ -56,7 +56,7 @@ class MatrixOps
     /**
      * The supplier that provides the input matrix
      */
-    private final Supplier<float[]> inputSupplier;
+    private final Supplier<double[]> inputSupplier;
     
     /**
      * The chain of functions that will be applied. Starting with the
@@ -65,7 +65,7 @@ class MatrixOps
      * The result of the final function will be returned by the 
      * supplier that is created with {@link #build()}.
      */
-    private final List<Function<float[], float[]>> functions;
+    private final List<Function<double[], double[]>> functions;
     
     /**
      * Create a builder for matrix operations that obtains its initial
@@ -74,7 +74,7 @@ class MatrixOps
      * @param inputSupplier The input matrix supplier
      * @return The builder
      */
-    static MatrixOps create4x4(Supplier<float[]> inputSupplier)
+    static MatrixOps create4x4(Supplier<double[]> inputSupplier)
     {
         return new MatrixOps(inputSupplier);
     }
@@ -95,9 +95,9 @@ class MatrixOps
      * 
      * @return The supplier
      */
-    private static Supplier<float[]> createIdentitySupplier4x4()
+    private static Supplier<double[]> createIdentitySupplier4x4()
     {
-        float matrix[] = new float[16];
+        double matrix[] = new double[16];
         return () ->
         {
             MathUtils.setIdentity4x4(matrix);
@@ -110,10 +110,10 @@ class MatrixOps
      * 
      * @param inputSupplier The supplier of the input matrix
      */
-    private MatrixOps(Supplier<float[]> inputSupplier)
+    private MatrixOps(Supplier<double[]> inputSupplier)
     {
         this.inputSupplier = inputSupplier; 
-        this.functions = new ArrayList<Function<float[], float[]>>();
+        this.functions = new ArrayList<Function<double[], double[]>>();
     }
     
     /**
@@ -123,9 +123,9 @@ class MatrixOps
      * @param operandSupplier The supplier of the operand
      * @return This builder
      */
-    MatrixOps multiply4x4(Supplier<float[]> operandSupplier)
+    MatrixOps multiply4x4(Supplier<double[]> operandSupplier)
     {
-        float result[] = new float[16];
+        double result[] = new double[16];
         functions.add(named("multiply4x4", input -> 
         {
             MathUtils.mul4x4(input, operandSupplier.get(), result);
@@ -141,7 +141,7 @@ class MatrixOps
      */
     MatrixOps invert4x4()
     {
-        float result[] = new float[16];
+        double result[] = new double[16];
         functions.add(named("invert4x4", input -> 
         {
             MathUtils.invert4x4(input, result);
@@ -157,7 +157,7 @@ class MatrixOps
      */
     MatrixOps invert3x3()
     {
-        float result[] = new float[9];
+        double result[] = new double[9];
         functions.add(named("invert3x4", input -> 
         {
             MathUtils.invert3x3(input, result);
@@ -173,7 +173,7 @@ class MatrixOps
      */
     MatrixOps transpose4x4()
     {
-        float result[] = new float[16];
+        double result[] = new double[16];
         functions.add(named("transpose4x4", input -> 
         {
             MathUtils.transpose4x4(input, result);
@@ -190,7 +190,7 @@ class MatrixOps
      */
     MatrixOps getRotationScale()
     {
-        float result[] = new float[9];
+        double result[] = new double[9];
         functions.add(named("getRotationScale", input -> 
         {
             MathUtils.getRotationScale(input, result);
@@ -207,9 +207,9 @@ class MatrixOps
      * @param z The z-translation
      * @return This builder
      */
-    MatrixOps translate(float x, float y, float z)
+    MatrixOps translate(double x, double y, double z)
     {
-        float result[] = new float[16];
+        double result[] = new double[16];
         functions.add(named("translate", input -> 
         {
             MathUtils.translate(input, x, y, z, result);
@@ -275,12 +275,12 @@ class MatrixOps
      * 
      * @return The supplier
      */
-    Supplier<float[]> build()
+    Supplier<double[]> build()
     {
         return () ->
         {
-            float current[] = inputSupplier.get();
-            for (Function<float[], float[]> function : functions)
+            double current[] = inputSupplier.get();
+            for (Function<double[], double[]> function : functions)
             {
                 current = function.apply(current);
                 if (logger.isLoggable(Level.FINEST))

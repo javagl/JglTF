@@ -36,8 +36,8 @@ public class TestSimpleMorph
         
         List<MeshModel> meshes = gltfModel.getMeshModels();
         MeshModel mesh = meshes.get(0);
-        float expected[] = new float[] { 0.5f, 0.5f };
-        float actual[] = mesh.getWeights();
+        double expected[] = new double[] { 0.5, 0.5 };
+        double actual[] = mesh.getWeights();
         assertArrayEquals(expected,  actual, 0.0f);
     }
     

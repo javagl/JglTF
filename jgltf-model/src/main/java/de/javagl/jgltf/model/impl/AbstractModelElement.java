@@ -26,21 +26,32 @@
  */
 package de.javagl.jgltf.model.impl;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Set;
+import java.util.logging.Logger;
 
 import de.javagl.jgltf.model.ModelElement;
 
 /**
- * Abstract base implementation of the {@link ModelElement} interface.
+ * Abstract base implementation of the {@link ModelElement} interface.<br>
+ * <br>
+ * Clients should usually not use this class. It is mainly intended for
+ * convenience of implementing model elements as part of the core 
+ * implementation or extensions.
  */
-public class AbstractModelElement implements ModelElement
+public abstract class AbstractModelElement implements ModelElement
 {
     /**
-     * The extensions
+     * The logger used in this class
      */
-    private Map<String, Object> extensions;
+    private static final Logger logger = 
+        Logger.getLogger(AbstractModelElement.class.getName());
     
     /**
      * The extras
@@ -48,7 +59,37 @@ public class AbstractModelElement implements ModelElement
     private Object extras;
     
     /**
+     * The extensions
+     */
+    private Map<String, Object> extensions;
+    
+    /**
+     * The extension models
+     */
+    private Map<String, Object> extensionModels;
+
+    /**
+     * Set the extras
+     * 
+     * @param extras The extras
+     */
+    public void setExtras(Object extras)
+    {
+        this.extras = extras;
+    }
+    
+    @Override
+    public Object getExtras()
+    {
+        return extras;
+    }
+    
+    /**
      * Set the extensions to be a reference to the given map.
+     * 
+     * A reference to the map will be stored internally. Clients should 
+     * usually call this method directly. Library developers may call
+     * this function, but are then responsible for ensuring consistency. 
      * 
      * @param extensions The extensions
      */
@@ -56,7 +97,13 @@ public class AbstractModelElement implements ModelElement
     {
         this.extensions = extensions;
     }
-    
+
+    @Override
+    public Map<String, Object> getExtensions()
+    {
+        return extensions;
+    }
+
     /**
      * Add the given extension to this object.
      * 
@@ -96,26 +143,162 @@ public class AbstractModelElement implements ModelElement
         }
     }
     
+    @Override
+    public Map<String, Object> getExtensionModels()
+    {
+        if (this.extensionModels == null)
+        {
+            return null;
+        }
+        return Collections.unmodifiableMap(extensionModels);
+    }
 
     /**
-     * Set the extras
+     * Add the given extension model to this object.
      * 
-     * @param extras The extras
+     * This will add the given key-value pair to the extension models map,
+     * creating it if it was <code>null</code>.
+     *  
+     * @param name The name of the extension
+     * @param extensionModel The extension model object
      */
-    public void setExtras(Object extras)
+    public void addExtensionModel(String name, Object extensionModel)
     {
-        this.extras = extras;
+        Objects.requireNonNull(name, "The name may not be null");
+        if (this.extensionModels == null)
+        {
+            this.extensionModels = new LinkedHashMap<String, Object>();
+        }
+        this.extensionModels.put(name, extensionModel);
+    }
+
+    /**
+     * Remove the specified extension model from this object.
+     * 
+     * If the extension model map is empty after this call, then it will be
+     * set to <code>null</code>.
+     * 
+     * @param name The name of the extension model
+     */
+    public void removeExtensionModel(String name)
+    {
+        if (this.extensionModels != null)
+        {
+            this.extensionModels.remove(name);
+            if (this.extensionModels.isEmpty())
+            {
+                this.extensionModels = null;
+            }
+        }
     }
     
     @Override
-    public Map<String, Object> getExtensions()
+    public <T> T getExtensionModel(String extensionName,
+        Class<? extends T> type)
     {
-        return extensions;
+        if (this.extensionModels == null)
+        {
+            return null;
+        }
+        Object value = extensionModels.get(extensionName);
+        if (value == null)
+        {
+            return null;
+        }
+        if (type.isInstance(value)) 
+        {
+            @SuppressWarnings("unchecked")
+            T result = (T)value;
+            return result;
+        }
+        logger.warning("Extension model for " + extensionName
+            + " does not have type " + type);
+        return null;
     }
     
-    @Override
-    public Object getExtras()
+//    @Override
+//    public List<? extends ModelElement> getReferencedModelElements()
+//    {
+//        return getReferencedExtensionModelElements();
+//    }
+    
+    /**
+     * Returns a set containing all {@link ModelElement} objects that are
+     * found as values in the {@link #getExtensionModels()} map.
+     * 
+     * This serves as the basis for {@link #getReferencedModelElements()}
+     * implementations. Classes implementing the {@link ModelElement} 
+     * interface will implement {@link #getReferencedModelElements()} 
+     * by calling this function, and then adding their referenced
+     * model elements to the returned set.
+     * 
+     * @return The set
+     */
+    protected final Set<ModelElement> getReferencedExtensionModelElements()
     {
-        return extras;
+        Set<ModelElement> modelElements = new LinkedHashSet<ModelElement>();
+        Map<String, Object> extensionModels = getExtensionModels();
+        if (extensionModels != null)
+        {
+            for (Object object : extensionModels.values()) 
+            {
+                if (object instanceof ModelElement) 
+                {
+                    ModelElement modelElement = (ModelElement) object;
+                    modelElements.add(modelElement);
+                }
+            }
+        }
+        return modelElements;
     }
+    
+    
+    @Override
+    public boolean removeModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove)
+    {
+        logger.info("Using default implementation of "
+            + "removeModelElements for " + this);
+        return false;
+    }
+    
+    /**
+     * A generic base implementation of the model element removal function
+     * for all extension model objects.
+     * 
+     * Implementors of this class should call this function in their
+     * {@link #removeModelElements(Collection)} implementation.
+     * 
+     * @param modelElementsToRemove The model elements to remove
+     */
+    protected final void removeExtensionModelElements(
+        Collection<? extends ModelElement> modelElementsToRemove)
+    {
+        if (extensionModels == null)
+        {
+            return;
+        }
+        Set<String> keysToRemove = new LinkedHashSet<String>();
+        for (Entry<String, Object> entry : extensionModels.entrySet())
+        {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            if (value instanceof ModelElement)
+            {
+                ModelElement modelElement = (ModelElement) value;
+                boolean removeExtensionObject =
+                    modelElement.removeModelElements(modelElementsToRemove);
+                if (removeExtensionObject
+                    || modelElementsToRemove.contains(modelElement))
+                {
+                    keysToRemove.add(key);
+                }
+            }
+        }
+        for (String keyToRemove : keysToRemove)
+        {
+            extensionModels.remove(keyToRemove);
+        }
+    }
+
 }
