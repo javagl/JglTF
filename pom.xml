@@ -4,16 +4,14 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.sonatype.oss</groupId>
-    <artifactId>oss-parent</artifactId>
-    <version>9</version>
-  </parent>
-
   <groupId>de.javagl</groupId>
   <artifactId>jgltf-parent</artifactId>
-  <packaging>pom</packaging>
   <version>3.0.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  
+  <name>${project.groupId}:${project.artifactId}</name>
+  <description>Java libraries for glTF</description>
+  <url>https://github.com/javagl/JglTF</url>
 
   <scm>
     <connection>scm:git:git@github.com:javagl/JglTF.git</connection>
@@ -101,6 +99,30 @@
   <build>
 
     <plugins>
+
+      <plugin>
+        <groupId>org.sonatype.central</groupId>
+        <artifactId>central-publishing-maven-plugin</artifactId>
+        <version>0.8.0</version>
+        <extensions>true</extensions>
+        <configuration>
+          <publishingServerId>central</publishingServerId>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>1.5</version>
+        <executions>
+          <execution>
+            <id>sign-artifacts</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
 
       <!-- Copy all JARs of the submodules and dependencies into the
 			target -->
@@ -252,5 +274,14 @@
       </plugins>
     </pluginManagement>
   </build>
+  
+  <distributionManagement>
+    <snapshotRepository>
+      <id>central</id>
+      <name>Maven Central Snapshots Repository</name>
+      <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+    </snapshotRepository>
+  </distributionManagement>
+  
 
 </project>
