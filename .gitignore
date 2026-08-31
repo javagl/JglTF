@@ -15,7 +15,6 @@
 /jgltf2-experiments
 /AccessorVis
 /JglTF
-/jgltf-jgltfifier
 /jgltf-asset-creator
 /jgltf-asset-creator-experiments
 # ---
@@ -27,6 +26,13 @@
 /jgltf-impl-v2-ext-meshopt-compression
 /jgltf-model-ext-meshopt-compression
 # ---
+
+/jgltf-jgltfifier/.classpath
+/jgltf-jgltfifier/.settings
+/jgltf-jgltfifier/.project
+/jgltf-jgltfifier/target
+/jgltf-jgltfifier/data
+/jgltf-jgltfifier/src/test/java/de/javagl/jgltf/jgltfifier/generated
 
 /jgltf-model-transform/.classpath
 /jgltf-model-transform/.settings
