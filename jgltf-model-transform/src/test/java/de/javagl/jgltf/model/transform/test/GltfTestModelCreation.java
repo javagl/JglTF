@@ -823,7 +823,7 @@ class GltfTestModelCreation
      */
     private static DefaultMeshPrimitiveModel createSquareMeshPrimitive()
     {
-        DefaultAccessorModel indicesAccessorModel = craeteSquareIndices();
+        DefaultAccessorModel indicesAccessorModel = createSquareIndices();
         DefaultAccessorModel positionsAccessorModel = createSquarePositions();
 
         // Create the mesh primitive model
@@ -843,7 +843,7 @@ class GltfTestModelCreation
     private static DefaultMeshPrimitiveModel
         createSquareMeshPrimitiveWithTexcoords()
     {
-        DefaultAccessorModel indicesAccessorModel = craeteSquareIndices();
+        DefaultAccessorModel indicesAccessorModel = createSquareIndices();
         DefaultAccessorModel positionsAccessorModel = createSquarePositions();
         DefaultAccessorModel texCoordsAccessorModel = createSquareTexCoords();
 
@@ -865,7 +865,7 @@ class GltfTestModelCreation
     private static DefaultMeshPrimitiveModel
         createSquareMeshPrimitiveWithQuantizedPositions()
     {
-        DefaultAccessorModel indicesAccessorModel = craeteSquareIndices();
+        DefaultAccessorModel indicesAccessorModel = createSquareIndices();
         DefaultAccessorModel positionsAccessorModel =
             createSquarePositionsQuantized();
         DefaultAccessorModel texCoordsAccessorModel = createSquareTexCoords();
@@ -971,7 +971,7 @@ class GltfTestModelCreation
      * 
      * @return The accessor model
      */
-    private static DefaultAccessorModel craeteSquareIndices()
+    private static DefaultAccessorModel createSquareIndices()
     {
         // @formatter:off
         short[] indices = new short[]
