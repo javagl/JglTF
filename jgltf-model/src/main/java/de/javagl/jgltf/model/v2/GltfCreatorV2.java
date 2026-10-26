@@ -845,9 +845,9 @@ public class GltfCreatorV2
         normalTextureInfo.setIndex(
             textureIndices.get(textureModel));
         normalTextureInfo.setTexCoord(
-            normalTextureInfo.getTexCoord());
+            normalTextureInfoModel.getTexCoord());
         normalTextureInfo.setScale(
-            normalTextureInfo.getScale());
+            normalTextureInfoModel.getScale());
         
         ExtensionModels.createExtensionImpls(
             gltfModel, normalTextureInfoModel, 
