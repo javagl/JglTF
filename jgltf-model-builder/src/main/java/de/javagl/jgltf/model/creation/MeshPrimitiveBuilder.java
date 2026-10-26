@@ -38,6 +38,7 @@ import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import de.javagl.jgltf.model.AccessorModel;
+import de.javagl.jgltf.model.Accessors;
 import de.javagl.jgltf.model.ElementType;
 import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.GltfException;
@@ -402,18 +403,18 @@ public final class MeshPrimitiveBuilder
      * If the specified target entry already existed, then a warning will
      * be printed, and it will be overwritten with the given data.
      * 
-     * This assumes that the {@link ElementType} of the morph target data
-     * is the same as for the specified attribute, except for the
-     * <code>TANGENT</code> attribute: The <code>TANGENT</code> attribute
-     * type is <code>VEC4</code>, but the morph target data is expected
-     * to be <code>VEC3</code>. 
+     * This will derive the {@link ElementType} for the morph target from
+     * the given data, and the type and count of the morphed attribute. 
+     * The user is responsible for passing in data that is compatible with 
+     * the element type and count of the specified attribute.
      *
      * @param index The index of the morph target
      * @param attributeName The attribute name
      * @param data The morph target data
      * @return This builder
      * @throws GltfException If the mesh primitive does not already contain
-     * an attribute with the given name
+     * an attribute with the given name, or the given data is not suitable
+     * for a morph target of the given attribute
      */
     public MeshPrimitiveBuilder addMorphTarget(
         int index, String attributeName,
@@ -427,13 +428,39 @@ public final class MeshPrimitiveBuilder
                 + attributeName + " attribute");
         }
         int componentType = attribute.getComponentType();
-        ElementType morphDataElementType = attribute.getElementType();
-        if ("TANGENT".equals(attributeName))
+        int componentSize =
+            Accessors.getNumBytesForAccessorComponentType(componentType);
+        if (data.capacity() % componentSize != 0)
         {
-            morphDataElementType = ElementType.VEC3;
+            throw new GltfException("The data size must be divisible by "
+                + "the size of the components ("+ componentSize + "), "
+                + "but is " + data.capacity());
+        }
+        int numComponents = data.capacity() / componentSize;
+        if (numComponents % attribute.getCount() != 0)
+        {
+            throw new GltfException("The number of components of the given "
+                + "data must be divisble by the attribute count "
+                + "("+ attribute.getCount() + "), but is " + numComponents);
+        }
+        int numComponentsPerElement = numComponents / attribute.getCount();
+        String elementTypeString = null;
+        if (numComponentsPerElement == 1)
+        {
+            elementTypeString = "SCALAR";
+        }
+        else if (numComponentsPerElement >= 2 && numComponentsPerElement <= 4)
+        {
+            elementTypeString = "VEC" + numComponentsPerElement;
+        }
+        else
+        {
+            throw new GltfException("The given data would imply "
+                + numComponentsPerElement + " components per element, "
+                + " but this must be in [1, 4]");
         }
         DefaultAccessorModel accessorModel = AccessorModels.create(
-            componentType, morphDataElementType.toString(), false, data);
+            componentType, elementTypeString, false, data);
         return addMorphTarget(index, attributeName, accessorModel);
     }
 
