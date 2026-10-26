@@ -38,6 +38,7 @@ import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import de.javagl.jgltf.model.AccessorModel;
+import de.javagl.jgltf.model.Accessors;
 import de.javagl.jgltf.model.ElementType;
 import de.javagl.jgltf.model.GltfConstants;
 import de.javagl.jgltf.model.GltfException;
@@ -348,18 +349,6 @@ public final class MeshPrimitiveBuilder
     
     /**
      * Add the given data as the "TANGENT" attribute of the mesh primitive.
-     * The data will be interpreted as 3D float values.
-     * 
-     * @param data The data
-     * @return This builder
-     */
-    public MeshPrimitiveBuilder addTangents3D(FloatBuffer data)
-    {
-        return addAttributeInternal("TANGENT", 3, data);
-    }
-
-    /**
-     * Add the given data as the "TANGENT" attribute of the mesh primitive.
      * The data will be interpreted as 4D float values.
      * 
      * @param data The data
@@ -413,13 +402,19 @@ public final class MeshPrimitiveBuilder
      *
      * If the specified target entry already existed, then a warning will
      * be printed, and it will be overwritten with the given data.
+     * 
+     * This will derive the {@link ElementType} for the morph target from
+     * the given data, and the type and count of the morphed attribute. 
+     * The user is responsible for passing in data that is compatible with 
+     * the element type and count of the specified attribute.
      *
      * @param index The index of the morph target
      * @param attributeName The attribute name
      * @param data The morph target data
      * @return This builder
      * @throws GltfException If the mesh primitive does not already contain
-     * an attribute with the given name
+     * an attribute with the given name, or the given data is not suitable
+     * for a morph target of the given attribute
      */
     public MeshPrimitiveBuilder addMorphTarget(
         int index, String attributeName,
@@ -433,9 +428,39 @@ public final class MeshPrimitiveBuilder
                 + attributeName + " attribute");
         }
         int componentType = attribute.getComponentType();
-        ElementType elementType = attribute.getElementType();
+        int componentSize =
+            Accessors.getNumBytesForAccessorComponentType(componentType);
+        if (data.capacity() % componentSize != 0)
+        {
+            throw new GltfException("The data size must be divisible by "
+                + "the size of the components ("+ componentSize + "), "
+                + "but is " + data.capacity());
+        }
+        int numComponents = data.capacity() / componentSize;
+        if (numComponents % attribute.getCount() != 0)
+        {
+            throw new GltfException("The number of components of the given "
+                + "data must be divisble by the attribute count "
+                + "("+ attribute.getCount() + "), but is " + numComponents);
+        }
+        int numComponentsPerElement = numComponents / attribute.getCount();
+        String elementTypeString = null;
+        if (numComponentsPerElement == 1)
+        {
+            elementTypeString = "SCALAR";
+        }
+        else if (numComponentsPerElement >= 2 && numComponentsPerElement <= 4)
+        {
+            elementTypeString = "VEC" + numComponentsPerElement;
+        }
+        else
+        {
+            throw new GltfException("The given data would imply "
+                + numComponentsPerElement + " components per element, "
+                + " but this must be in [1, 4]");
+        }
         DefaultAccessorModel accessorModel = AccessorModels.create(
-            componentType, elementType.toString(), false, data);
+            componentType, elementTypeString, false, data);
         return addMorphTarget(index, attributeName, accessorModel);
     }
 
@@ -450,15 +475,24 @@ public final class MeshPrimitiveBuilder
      *
      * If the specified target entry already existed, then a warning will
      * be printed, and it will be overwritten with the given data.
+     * 
+     * In most cases, the {@link ElementType} of the given morph accessor
+     * model must be the same as the element type of the respective attribute.
+     * The only exceptions for this in the core specification are that of
+     * the <code>TANGENT</code> attribute (which is <code>VEC4</code> but 
+     * has <code>VEC3</code> morph data), and the <code>COLOR_n</code> 
+     * attribute (which may be <code>VEC3</code> or <code>VEC4</code>, and
+     * may have <code>VEC3</code> or <code>VEC4</code> morph data).
+     * 
+     * The caller is responsible for making sure that the morph data 
+     * structure is compatible with the given attribute data. 
      *
      * @param index The index of the morph target
      * @param attributeName The attribute name
      * @param morphAccessorModel The accessor model containing the morph data
      * @return This builder
      * @throws GltfException If the mesh primitive does not already contain
-     * an attribute with the given name, or if there is an attribute that
-     * uses a different component- or element type than the given accessor
-     * model.
+     * an attribute with the given name
      */
     public MeshPrimitiveBuilder addMorphTarget(
         int index, String attributeName,
@@ -482,17 +516,6 @@ public final class MeshPrimitiveBuilder
                 + ", but the morphed attribute data has component type "
                 + GltfConstants.stringFor(morphComponentType));
         }
-
-        ElementType elementType = attribute.getElementType();
-        ElementType morphElementType = morphAccessorModel.getElementType();
-        if (elementType != morphElementType)
-        {
-            throw new GltfException(
-                "Attribute " + attributeName + " has element type "
-                + elementType + ", but the morphed attribute data "
-                + "has element type " + morphElementType);
-        }
-
         if (index == targets.size())
         {
             targets.add(new LinkedHashMap<String, DefaultAccessorModel>());
